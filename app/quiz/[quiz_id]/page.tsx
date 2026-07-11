@@ -50,9 +50,11 @@ export default async function QuizPage({ params }: PageProps) {
   const [{ data: existingAttempt }, { data: questions }] = await Promise.all([
     supabase
       .from("user_quiz_attempts")
-      .select("id")
+      .select("id, score, answers_json")
       .eq("user_id", user.id)
       .eq("quiz_id", quiz_id)
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle(),
     supabase
       .from("quiz_questions")
@@ -61,9 +63,7 @@ export default async function QuizPage({ params }: PageProps) {
       .order("created_at"),
   ]);
 
-  if (existingAttempt) {
-    redirect(`/lesson/${quiz.lesson_id}`);
-  }
+  const hasCompleted = Boolean(existingAttempt);
 
   return (
     <div className="space-y-8">
@@ -82,13 +82,22 @@ export default async function QuizPage({ params }: PageProps) {
           </div>
           <h1 className="text-3xl font-semibold tracking-tight">{quiz.title}</h1>
           <p className="text-muted-foreground">
-            Answer all questions below, then submit when you&apos;re ready.
+            {hasCompleted
+              ? "This quiz has already been submitted. Your answers are read-only."
+              : "Answer all questions below, then submit when you're ready."}
           </p>
         </div>
       </div>
 
       {questions && questions.length > 0 ? (
-        <QuizForm quizId={quiz.id} questions={questions} />
+        <QuizForm
+          quizId={quiz.id}
+          lessonId={quiz.lesson_id}
+          questions={questions}
+          locked={hasCompleted}
+          existingScore={existingAttempt?.score}
+          savedAnswers={existingAttempt?.answers_json}
+        />
       ) : (
         <div className="rounded-xl border border-dashed py-16 text-center text-muted-foreground">
           This quiz has no questions yet.

@@ -47,6 +47,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
               fullName={fullName}
               email={user?.email ?? null}
               avatarUrl={avatarUrl}
+              isAdmin={isAdmin}
             />
           </div>
         </div>

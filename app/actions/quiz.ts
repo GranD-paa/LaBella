@@ -28,13 +28,16 @@ export async function submitQuizAction(
 
   const { data: existingAttempt } = await supabase
     .from("user_quiz_attempts")
-    .select("id")
+    .select("id, score")
     .eq("user_id", user.id)
     .eq("quiz_id", quizId)
     .maybeSingle();
 
   if (existingAttempt) {
-    return { error: "You have already completed this quiz." };
+    return {
+      error: "You have already attempted this quiz.",
+      code: 409,
+    };
   }
 
   const [{ data: quiz }, { data: questions }] = await Promise.all([
@@ -76,6 +79,12 @@ export async function submitQuizAction(
   });
 
   if (insertError) {
+    if (insertError.code === "23505") {
+      return {
+        error: "You have already attempted this quiz.",
+        code: 409,
+      };
+    }
     return { error: insertError.message };
   }
 

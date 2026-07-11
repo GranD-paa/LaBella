@@ -69,6 +69,15 @@ export const quizQuestionSchema = z.object({
 
 export type QuizQuestionValues = z.infer<typeof quizQuestionSchema>;
 
+export const quizTitleSchema = z.object({
+  title: z
+    .string()
+    .min(2, "Title must be at least 2 characters")
+    .max(150, "Title is too long"),
+});
+
+export type QuizTitleValues = z.infer<typeof quizTitleSchema>;
+
 export const quizSchema = z.object({
   lessonId: z.string().uuid("Please select a lesson"),
   title: z

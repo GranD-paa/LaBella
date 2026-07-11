@@ -1,9 +1,35 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { quizSchema } from "@/lib/validations/admin";
+import {
+  quizQuestionSchema,
+  quizSchema,
+  quizTitleSchema,
+} from "@/lib/validations/admin";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
+
+async function getQuizLessonId(quizId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("quizzes")
+    .select("lesson_id")
+    .eq("id", quizId)
+    .single();
+  return data?.lesson_id;
+}
+
+async function getQuestionLessonId(questionId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("quiz_questions")
+    .select("quiz_id, quizzes(lesson_id)")
+    .eq("id", questionId)
+    .single();
+
+  const quiz = data?.quizzes as { lesson_id: string } | null | undefined;
+  return quiz?.lesson_id;
+}
 
 export async function createQuizWithQuestions(
   values: unknown
@@ -48,54 +74,109 @@ export async function createQuizWithQuestions(
   return { success: true };
 }
 
-export async function updateQuizWithQuestions(
+export async function updateQuizTitle(
   quizId: string,
   values: unknown
 ): Promise<ActionResult> {
-  const parsed = quizSchema.safeParse(values);
+  const parsed = quizTitleSchema.safeParse(values);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const supabase = await createClient();
+  const lessonId = await getQuizLessonId(quizId);
 
-  const { error: quizError } = await supabase
+  const { error } = await supabase
     .from("quizzes")
-    .update({ lesson_id: parsed.data.lessonId, title: parsed.data.title })
+    .update({ title: parsed.data.title })
     .eq("id", quizId);
 
-  if (quizError) {
-    return { error: quizError.message };
+  if (error) {
+    return { error: error.message };
   }
 
-  const { error: deleteError } = await supabase
+  revalidateAppContent(lessonId);
+  return { success: true };
+}
+
+export async function addQuizQuestion(
+  quizId: string,
+  values: unknown
+): Promise<ActionResult> {
+  const parsed = quizQuestionSchema.safeParse(values);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const supabase = await createClient();
+  const lessonId = await getQuizLessonId(quizId);
+
+  const { error } = await supabase.from("quiz_questions").insert({
+    quiz_id: quizId,
+    question_text: parsed.data.questionText,
+    option_a: parsed.data.optionA,
+    option_b: parsed.data.optionB,
+    option_c: parsed.data.optionC,
+    option_d: parsed.data.optionD,
+    correct_option: parsed.data.correctOption,
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidateAppContent(lessonId);
+  return { success: true };
+}
+
+export async function updateQuizQuestion(
+  questionId: string,
+  values: unknown
+): Promise<ActionResult> {
+  const parsed = quizQuestionSchema.safeParse(values);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const supabase = await createClient();
+  const lessonId = await getQuestionLessonId(questionId);
+
+  const { error } = await supabase
+    .from("quiz_questions")
+    .update({
+      question_text: parsed.data.questionText,
+      option_a: parsed.data.optionA,
+      option_b: parsed.data.optionB,
+      option_c: parsed.data.optionC,
+      option_d: parsed.data.optionD,
+      correct_option: parsed.data.correctOption,
+    })
+    .eq("id", questionId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidateAppContent(lessonId);
+  return { success: true };
+}
+
+export async function deleteQuizQuestion(
+  questionId: string
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  const lessonId = await getQuestionLessonId(questionId);
+
+  const { error } = await supabase
     .from("quiz_questions")
     .delete()
-    .eq("quiz_id", quizId);
+    .eq("id", questionId);
 
-  if (deleteError) {
-    return { error: deleteError.message };
+  if (error) {
+    return { error: error.message };
   }
 
-  const { error: questionsError } = await supabase
-    .from("quiz_questions")
-    .insert(
-      parsed.data.questions.map((q) => ({
-        quiz_id: quizId,
-        question_text: q.questionText,
-        option_a: q.optionA,
-        option_b: q.optionB,
-        option_c: q.optionC,
-        option_d: q.optionD,
-        correct_option: q.correctOption,
-      }))
-    );
-
-  if (questionsError) {
-    return { error: questionsError.message };
-  }
-
-  revalidateAppContent(parsed.data.lessonId);
+  revalidateAppContent(lessonId);
   return { success: true };
 }
 

@@ -4,12 +4,9 @@ import { useState, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Loader2, Pencil, Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 
-import {
-  createQuizWithQuestions,
-  updateQuizWithQuestions,
-} from "@/app/admin/actions/quizzes";
+import { createQuizWithQuestions } from "@/app/admin/actions/quizzes";
 import { quizSchema, type QuizValues } from "@/lib/validations/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +29,7 @@ import {
 } from "@/components/ui/form";
 import { LessonPicker } from "@/components/admin/lesson-picker";
 import { QuizQuestionFields } from "@/components/admin/quizzes/quiz-question-fields";
-import type { Lesson, Quiz, QuizQuestion } from "@/types";
+import type { Lesson } from "@/types";
 
 const emptyQuestion = {
   questionText: "",
@@ -43,39 +40,20 @@ const emptyQuestion = {
   correctOption: "a" as const,
 };
 
-function toFormQuestions(questions: QuizQuestion[]): QuizValues["questions"] {
-  return questions.map((q) => ({
-    questionText: q.question_text,
-    optionA: q.option_a,
-    optionB: q.option_b,
-    optionC: q.option_c,
-    optionD: q.option_d,
-    correctOption: q.correct_option,
-  }));
-}
-
 export function QuizFormDialog({
   lessons,
   defaultLessonId,
-  quiz,
-  initialQuestions,
 }: {
   lessons: Lesson[];
   defaultLessonId?: string;
-  quiz?: Quiz;
-  initialQuestions?: QuizQuestion[];
 }) {
-  const isEdit = Boolean(quiz);
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const defaultValues: QuizValues = {
-    lessonId: quiz?.lesson_id ?? defaultLessonId ?? "",
-    title: quiz?.title ?? "",
-    questions:
-      quiz && initialQuestions?.length
-        ? toFormQuestions(initialQuestions)
-        : [{ ...emptyQuestion }],
+    lessonId: defaultLessonId ?? lessons[0]?.id ?? "",
+    title: "",
+    questions: [{ ...emptyQuestion }],
   };
 
   const form = useForm<QuizValues>({
@@ -90,25 +68,20 @@ export function QuizFormDialog({
 
   function onSubmit(values: QuizValues) {
     startTransition(async () => {
-      const result =
-        isEdit && quiz
-          ? await updateQuizWithQuestions(quiz.id, values)
-          : await createQuizWithQuestions(values);
+      const result = await createQuizWithQuestions(values);
 
       if ("error" in result) {
         toast.error(result.error);
         return;
       }
 
-      toast.success(isEdit ? "Quiz updated" : "Quiz created");
+      toast.success("Quiz created");
       setOpen(false);
-      if (!isEdit) {
-        form.reset({
-          lessonId: values.lessonId,
-          title: "",
-          questions: [{ ...emptyQuestion }],
-        });
-      }
+      form.reset({
+        lessonId: values.lessonId,
+        title: "",
+        questions: [{ ...emptyQuestion }],
+      });
     });
   }
 
@@ -127,24 +100,16 @@ export function QuizFormDialog({
       }}
     >
       <DialogTrigger asChild>
-        {isEdit ? (
-          <Button variant="ghost" size="icon" aria-label="Edit quiz">
-            <Pencil className="h-4 w-4" />
-          </Button>
-        ) : (
-          <Button disabled={!lessons.length}>
-            <Plus className="h-4 w-4" />
-            New quiz
-          </Button>
-        )}
+        <Button disabled={!lessons.length}>
+          <Plus className="h-4 w-4" />
+          New quiz
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit quiz" : "Create a quiz"}</DialogTitle>
+          <DialogTitle>Create a quiz</DialogTitle>
           <DialogDescription>
-            {isEdit
-              ? `Update "${quiz?.title}" and its questions.`
-              : "Add a quiz with one or more multiple-choice questions."}
+            Add a quiz with one or more multiple-choice questions.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -221,10 +186,8 @@ export function QuizFormDialog({
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Saving...
+                    Creating...
                   </>
-                ) : isEdit ? (
-                  "Save changes"
                 ) : (
                   "Create quiz"
                 )}

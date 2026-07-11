@@ -1,1 +1,3 @@
-export type ActionResult = { error: string } | { success: true };
+export type ActionResult =
+  | { error: string; code?: number }
+  | { success: true };
