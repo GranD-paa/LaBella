@@ -15,17 +15,24 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="brand-header">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="flex items-center gap-2 font-semibold">
-              <ShieldCheck className="h-5 w-5" />
+            <Link href="/admin" className="brand-header-link">
+              <ShieldCheck className="h-5 w-5 text-brand-accent" />
               Admin Panel
             </Link>
-            <Badge variant="secondary">Admin</Badge>
+            <Badge className="border-brand-accent/30 bg-brand-accent/15 text-brand-accent hover:bg-brand-accent/20">
+              Admin
+            </Badge>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="brand-header-btn"
+              asChild
+            >
               <Link href="/dashboard">
                 <LayoutDashboard className="h-4 w-4" />
                 Back to app

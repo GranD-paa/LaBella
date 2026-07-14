@@ -55,6 +55,26 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        brand: {
+          dark: "#090014",
+          mid: "#3C096C",
+          light: "#7209B7",
+          accent: "#FBBF24",
+        },
+      },
+      backgroundImage: {
+        "brand-gradient":
+          "linear-gradient(135deg, #090014 0%, #3C096C 50%, #7209B7 100%)",
+        "brand-gradient-vertical":
+          "linear-gradient(180deg, #090014 0%, #3C096C 55%, #7209B7 100%)",
+        "brand-gradient-subtle":
+          "linear-gradient(180deg, #090014 0%, #1a0a2e 100%)",
+        "brand-radial":
+          "radial-gradient(ellipse at 20% 0%, rgba(114, 9, 183, 0.35) 0%, transparent 55%), radial-gradient(ellipse at 80% 100%, rgba(60, 9, 108, 0.4) 0%, transparent 50%)",
+      },
+      boxShadow: {
+        brand: "0 4px 24px rgba(114, 9, 183, 0.25)",
+        "brand-lg": "0 8px 40px rgba(9, 0, 20, 0.6)",
       },
       borderRadius: {
         lg: "var(--radius)",

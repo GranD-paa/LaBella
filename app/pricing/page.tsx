@@ -12,18 +12,22 @@ export const metadata: Metadata = {
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
+    <div className="min-h-screen bg-brand-gradient-subtle">
+      <header className="brand-header">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <GraduationCap className="h-5 w-5" />
+          <Link href="/" className="brand-header-link">
+            <GraduationCap className="h-5 w-5 text-brand-accent" />
             LaBella
           </Link>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" size="sm" className="brand-header-btn" asChild>
               <Link href="/login">Sign in</Link>
             </Button>
-            <Button size="sm" asChild>
+            <Button
+              size="sm"
+              className="bg-primary font-semibold text-primary-foreground hover:bg-primary/90"
+              asChild
+            >
               <Link href="/sign-up">Get started</Link>
             </Button>
           </div>

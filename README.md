@@ -59,6 +59,27 @@ cp final-deployment/.env.example .env.local
 npm run dev
 ```
 
+### Windows: `npm run dev` blocked by PowerShell?
+
+If you see *"running scripts is disabled on this system"*, PowerShell is blocking `npm.ps1`. Use any of these instead:
+
+```powershell
+# Option A — use npm.cmd (recommended)
+npm.cmd run dev
+
+# Option B — run the project launcher
+.\dev.cmd
+
+# Option C — use Command Prompt instead of PowerShell
+cmd /c "npm run dev"
+```
+
+To permanently fix PowerShell (run once in an elevated terminal):
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
 Open [http://localhost:3000](http://localhost:3000).
 
 ## Build for production

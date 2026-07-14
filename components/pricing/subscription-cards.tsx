@@ -81,12 +81,13 @@ export function SubscriptionCards() {
         <Card
           key={plan.id}
           className={cn(
-            "relative flex flex-col",
-            plan.highlighted && "border-primary shadow-lg ring-1 ring-primary/20"
+            "brand-surface relative flex flex-col",
+            plan.highlighted &&
+              "border-brand-accent shadow-brand ring-1 ring-brand-accent/30"
           )}
         >
           {plan.highlighted ? (
-            <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 gap-1">
+            <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 gap-1 bg-primary text-primary-foreground hover:bg-primary/90">
               <Sparkles className="h-3 w-3" />
               Most Popular
             </Badge>
@@ -107,7 +108,7 @@ export function SubscriptionCards() {
             <ul className="space-y-3">
               {plan.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-2 text-sm">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-accent" />
                   <span>{feature}</span>
                 </li>
               ))}

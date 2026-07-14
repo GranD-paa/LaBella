@@ -7,6 +7,21 @@ import type { SignInValues, SignUpValues } from "@/lib/validations/auth";
 
 type ActionResult = { error: string } | { success: true; message: string };
 
+function formatAuthError(message: string) {
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes("fetch failed") ||
+    normalized.includes("connect timeout") ||
+    normalized.includes("econnreset") ||
+    normalized.includes("network")
+  ) {
+    return "Cannot reach the authentication server. Check your internet connection, VPN/firewall settings, and that your Supabase project is active, then try again.";
+  }
+
+  return message;
+}
+
 export async function signInAction(
   values: SignInValues
 ): Promise<ActionResult | void> {
@@ -19,7 +34,7 @@ export async function signInAction(
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
-    return { error: error.message };
+    return { error: formatAuthError(error.message) };
   }
 
   redirect("/dashboard");
@@ -43,7 +58,7 @@ export async function signUpAction(
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: formatAuthError(error.message) };
   }
 
   // If email confirmation is enabled in the Supabase project, `session`
