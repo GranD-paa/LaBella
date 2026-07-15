@@ -177,9 +177,16 @@ export function createSupabaseRepository(): DataRepository {
       const supabase = await createClient();
       const { data } = await supabase
         .from("quiz_questions")
-        .select("id, correct_option")
+        .select("id, correct_option, question_type, expected_answer")
         .eq("quiz_id", quizId);
-      return data ?? [];
+      return (data ?? []).map((row) => ({
+        id: row.id,
+        correct_option: row.correct_option,
+        question_type: (row.question_type ?? "multiple_choice") as
+          | "multiple_choice"
+          | "written",
+        expected_answer: row.expected_answer ?? null,
+      }));
     },
 
     async getAttemptsByUserId(userId) {
@@ -309,11 +316,26 @@ export function createSupabaseRepository(): DataRepository {
       return error ? { error: error.message } : {};
     },
 
-    async createQuizWithQuestions({ lessonId, title, questions }) {
+    async createQuizWithQuestions({
+      lessonId,
+      title,
+      languageSlug = "italian",
+      levelSlug = "a1-1",
+      sectionSlug = "quiz",
+      status = "draft",
+      questions,
+    }) {
       const supabase = await createClient();
       const { data: quiz, error: quizError } = await supabase
         .from("quizzes")
-        .insert({ lesson_id: lessonId, title })
+        .insert({
+          lesson_id: lessonId,
+          title,
+          language_slug: languageSlug,
+          level_slug: levelSlug,
+          section_slug: sectionSlug,
+          status,
+        })
         .select("id")
         .single();
 
@@ -321,17 +343,33 @@ export function createSupabaseRepository(): DataRepository {
         return { error: quizError?.message ?? "Failed to create quiz." };
       }
 
-      const rows = questions.map((question) => ({
-        quiz_id: quiz.id,
-        question_text: question.questionText,
-        option_a: question.optionA,
-        option_b: question.optionB,
-        option_c: question.optionC,
-        option_d: question.optionD,
-        correct_option: question.correctOption,
-      }));
+      const rows = questions.map((question) => {
+        const questionType = question.questionType ?? "multiple_choice";
+        return {
+          quiz_id: quiz.id,
+          question_text: question.questionText,
+          option_a: questionType === "written" ? "-" : (question.optionA ?? "-"),
+          option_b: questionType === "written" ? "-" : (question.optionB ?? "-"),
+          option_c: questionType === "written" ? "-" : (question.optionC ?? "-"),
+          option_d: questionType === "written" ? "-" : (question.optionD ?? "-"),
+          correct_option:
+            questionType === "written" ? "a" : (question.correctOption ?? "a"),
+          question_type: questionType,
+          expected_answer: question.expectedAnswer ?? null,
+          explanation: question.explanation ?? null,
+        };
+      });
 
       const { error } = await supabase.from("quiz_questions").insert(rows);
+      return error ? { error: error.message } : {};
+    },
+
+    async updateQuizStatus(id, status) {
+      const supabase = await createClient();
+      const { error } = await supabase
+        .from("quizzes")
+        .update({ status })
+        .eq("id", id);
       return error ? { error: error.message } : {};
     },
 

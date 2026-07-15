@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useTransition } from "react";
+import { useEffect, useMemo, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -8,9 +8,10 @@ import { Loader2, Plus } from "lucide-react";
 
 import { createVocabulary } from "@/app/admin/actions/vocabulary";
 import {
-  vocabularySchema,
+  createVocabularySchema,
   type VocabularyValues,
-} from "@/lib/validations/admin";
+} from "@/lib/validations/i18n/admin-schemas";
+import { resolveMessage } from "@/lib/i18n/resolve-message";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,6 +31,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { LessonPicker } from "@/components/admin/lesson-picker";
+import { useTranslations } from "@/components/providers/locale-provider";
 import type { Lesson } from "@/types";
 
 export function VocabularyForm({
@@ -41,7 +43,10 @@ export function VocabularyForm({
   defaultLessonId?: string;
   onLessonChange: (lessonId: string) => void;
 }) {
+  const { t } = useTranslations();
   const [isPending, startTransition] = useTransition();
+
+  const vocabularySchema = useMemo(() => createVocabularySchema(t), [t]);
 
   const form = useForm<VocabularyValues>({
     resolver: zodResolver(vocabularySchema),
@@ -65,10 +70,10 @@ export function VocabularyForm({
     startTransition(async () => {
       const result = await createVocabulary(values);
       if ("error" in result) {
-        toast.error(result.error);
+        toast.error(resolveMessage(t, result.error));
         return;
       }
-      toast.success("Vocabulary added");
+      toast.success(t("admin.vocabulary.added"));
       form.reset({
         lessonId: values.lessonId,
         word: "",
@@ -82,10 +87,8 @@ export function VocabularyForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add vocabulary</CardTitle>
-        <CardDescription>
-          Choose a lesson, then add a word with its translation.
-        </CardDescription>
+        <CardTitle>{t("admin.vocabulary.addTitle")}</CardTitle>
+        <CardDescription>{t("admin.vocabulary.addDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -98,7 +101,7 @@ export function VocabularyForm({
               name="lessonId"
               render={({ field }) => (
                 <FormItem className="sm:col-span-2">
-                  <FormLabel>Lesson</FormLabel>
+                  <FormLabel>{t("admin.fields.lesson")}</FormLabel>
                   <FormControl>
                     <LessonPicker
                       lessons={lessons}
@@ -116,9 +119,13 @@ export function VocabularyForm({
               name="word"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Word</FormLabel>
+                  <FormLabel>{t("admin.fields.word")}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Hola" disabled={isPending} {...field} />
+                    <Input
+                      placeholder={t("admin.placeholders.word")}
+                      disabled={isPending}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -130,9 +137,13 @@ export function VocabularyForm({
               name="translation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Translation</FormLabel>
+                  <FormLabel>{t("admin.fields.translation")}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Hello" disabled={isPending} {...field} />
+                    <Input
+                      placeholder={t("admin.placeholders.translation")}
+                      disabled={isPending}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -144,10 +155,10 @@ export function VocabularyForm({
               name="imageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image URL (optional)</FormLabel>
+                  <FormLabel>{t("admin.fields.imageUrlOptional")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="https://..."
+                      placeholder={t("admin.placeholders.imageUrl")}
                       disabled={isPending}
                       {...field}
                     />
@@ -162,7 +173,7 @@ export function VocabularyForm({
               name="exampleSentence"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Example sentence (optional)</FormLabel>
+                  <FormLabel>{t("admin.fields.exampleSentenceOptional")}</FormLabel>
                   <FormControl>
                     <Textarea disabled={isPending} {...field} />
                   </FormControl>
@@ -176,12 +187,12 @@ export function VocabularyForm({
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Adding...
+                    {t("common.adding")}
                   </>
                 ) : (
                   <>
                     <Plus className="h-4 w-4" />
-                    Add vocabulary
+                    {t("admin.vocabulary.addButton")}
                   </>
                 )}
               </Button>

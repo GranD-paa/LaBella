@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useTransition } from "react";
+import { useEffect, useMemo, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -8,9 +8,10 @@ import { Loader2, Plus } from "lucide-react";
 
 import { createGrammarRule } from "@/app/admin/actions/grammar";
 import {
-  grammarRuleSchema,
+  createGrammarRuleSchema,
   type GrammarRuleValues,
-} from "@/lib/validations/admin";
+} from "@/lib/validations/i18n/admin-schemas";
+import { resolveMessage } from "@/lib/i18n/resolve-message";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,6 +31,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { LessonPicker } from "@/components/admin/lesson-picker";
+import { useTranslations } from "@/components/providers/locale-provider";
 import type { Lesson } from "@/types";
 
 export function GrammarForm({
@@ -41,7 +43,10 @@ export function GrammarForm({
   defaultLessonId?: string;
   onLessonChange: (lessonId: string) => void;
 }) {
+  const { t } = useTranslations();
   const [isPending, startTransition] = useTransition();
+
+  const grammarRuleSchema = useMemo(() => createGrammarRuleSchema(t), [t]);
 
   const form = useForm<GrammarRuleValues>({
     resolver: zodResolver(grammarRuleSchema),
@@ -64,10 +69,10 @@ export function GrammarForm({
     startTransition(async () => {
       const result = await createGrammarRule(values);
       if ("error" in result) {
-        toast.error(result.error);
+        toast.error(resolveMessage(t, result.error));
         return;
       }
-      toast.success("Grammar rule added");
+      toast.success(t("admin.grammar.added"));
       form.reset({
         lessonId: values.lessonId,
         title: "",
@@ -80,10 +85,8 @@ export function GrammarForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add a grammar rule</CardTitle>
-        <CardDescription>
-          Choose a lesson, then add a grammar rule with an example.
-        </CardDescription>
+        <CardTitle>{t("admin.grammar.addTitle")}</CardTitle>
+        <CardDescription>{t("admin.grammar.addDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -93,7 +96,7 @@ export function GrammarForm({
               name="lessonId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Lesson</FormLabel>
+                  <FormLabel>{t("admin.fields.lesson")}</FormLabel>
                   <FormControl>
                     <LessonPicker
                       lessons={lessons}
@@ -111,10 +114,10 @@ export function GrammarForm({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>{t("common.title")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Present tense of 'ser'"
+                      placeholder={t("admin.placeholders.grammarTitle")}
                       disabled={isPending}
                       {...field}
                     />
@@ -129,7 +132,7 @@ export function GrammarForm({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description (optional)</FormLabel>
+                  <FormLabel>{t("admin.fields.descriptionOptional")}</FormLabel>
                   <FormControl>
                     <Textarea disabled={isPending} {...field} />
                   </FormControl>
@@ -143,7 +146,7 @@ export function GrammarForm({
               name="example"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Example (optional)</FormLabel>
+                  <FormLabel>{t("admin.fields.exampleOptional")}</FormLabel>
                   <FormControl>
                     <Textarea disabled={isPending} {...field} />
                   </FormControl>
@@ -157,12 +160,12 @@ export function GrammarForm({
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Adding...
+                    {t("common.adding")}
                   </>
                 ) : (
                   <>
                     <Plus className="h-4 w-4" />
-                    Add grammar rule
+                    {t("admin.grammar.addButton")}
                   </>
                 )}
               </Button>

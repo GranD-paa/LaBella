@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -8,7 +8,10 @@ import Link from "next/link";
 import { Loader2, LogIn, Mail, ShieldCheck } from "lucide-react";
 
 import { signInAction } from "@/app/actions/auth";
-import { signInSchema, type SignInValues } from "@/lib/validations/auth";
+import { useTranslations } from "@/components/providers/locale-provider";
+import type { SignInValues } from "@/lib/validations/auth";
+import { resolveMessage } from "@/lib/i18n/resolve-message";
+import { createSignInSchema } from "@/lib/validations/i18n/auth-schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,6 +33,8 @@ export function SignInForm({
 }) {
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
+  const { t } = useTranslations();
+  const signInSchema = useMemo(() => createSignInSchema(t), [t]);
 
   const form = useForm<SignInValues>({
     resolver: zodResolver(signInSchema),
@@ -56,8 +61,9 @@ export function SignInForm({
     startTransition(async () => {
       const result = await signInAction(values, redirectTo);
       if (result && "error" in result) {
-        setFormError(result.error);
-        toast.error(result.error);
+        const errorMessage = resolveMessage(t, result.error);
+        setFormError(errorMessage);
+        toast.error(errorMessage);
       }
     });
   }
@@ -70,10 +76,10 @@ export function SignInForm({
         </div>
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">
-            Welcome back
+            {t("auth.welcomeBack")}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Sign in to continue your language journey
+            {t("auth.signInSubtitle")}
           </p>
         </div>
       </div>
@@ -85,13 +91,13 @@ export function SignInForm({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t("auth.email")}</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       type="email"
-                      placeholder="you@example.com"
+                      placeholder={t("auth.emailPlaceholder")}
                       autoComplete="email"
                       disabled={isPending}
                       className="pl-10"
@@ -109,11 +115,11 @@ export function SignInForm({
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t("auth.password")}</FormLabel>
                 <FormControl>
                   <Input
                     type="password"
-                    placeholder="••••••••"
+                    placeholder={t("auth.passwordPlaceholder")}
                     autoComplete="current-password"
                     disabled={isPending}
                     {...field}
@@ -140,11 +146,10 @@ export function SignInForm({
                   />
                   <div className="space-y-1">
                     <Label htmlFor="rememberMe" className="cursor-pointer">
-                      Remember me
+                      {t("auth.rememberMe")}
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Keep your secure session active so you can return without
-                      signing in again. Your password is never stored locally.
+                      {t("auth.rememberMeHint")}
                     </p>
                   </div>
                 </div>
@@ -164,12 +169,12 @@ export function SignInForm({
             {isPending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Signing in...
+                {t("auth.signingIn")}
               </>
             ) : (
               <>
                 <ShieldCheck className="h-4 w-4" />
-                Sign in
+                {t("auth.signIn")}
               </>
             )}
           </Button>
@@ -177,12 +182,12 @@ export function SignInForm({
       </Form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
+        {t("auth.noAccount")}{" "}
         <Link
           href="/sign-up"
           className="font-medium text-foreground underline-offset-4 hover:underline"
         >
-          Sign up
+          {t("auth.signUp")}
         </Link>
       </p>
     </div>

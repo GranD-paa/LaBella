@@ -4,6 +4,7 @@ import { revalidateAppContent } from "@/lib/revalidate-paths";
 import { redirect } from "next/navigation";
 
 import { getDataRepository } from "@/lib/data";
+import { scoreWrittenAnswer } from "@/lib/quiz-management/types";
 import { submitQuizSchema } from "@/lib/validations/quiz";
 import type { ActionResult } from "@/lib/action-result";
 
@@ -12,14 +13,14 @@ export async function submitQuizAction(
 ): Promise<ActionResult | void> {
   const parsed = submitQuizSchema.safeParse(values);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid submission" };
+    return { error: "actions.errors.invalidSubmission" };
   }
 
   const repo = getDataRepository();
   const user = await repo.getAuthUser();
 
   if (!user) {
-    return { error: "You must be signed in to submit a quiz." };
+    return { error: "actions.errors.mustSignIn" };
   }
 
   const { quizId, answers } = parsed.data;
@@ -27,33 +28,43 @@ export async function submitQuizAction(
   const existingAttempt = await repo.getAttemptByUserAndQuiz(user.id, quizId);
   if (existingAttempt) {
     return {
-      error: "You have already attempted this quiz.",
+      error: "actions.errors.alreadyAttempted",
       code: 409,
     };
   }
 
-  const [quiz, questions] = await Promise.all([
+  const [quiz, questions, profile] = await Promise.all([
     repo.getQuizById(quizId),
     repo.getQuizQuestionAnswers(quizId),
+    repo.getProfileById(user.id),
   ]);
 
   if (!quiz) {
-    return { error: "Quiz not found." };
+    return { error: "actions.errors.quizNotFound" };
+  }
+
+  if (!profile?.is_admin && quiz.status !== "published") {
+    return { error: "actions.errors.quizUnavailable" };
   }
 
   if (questions.length === 0) {
-    return { error: "This quiz has no questions." };
+    return { error: "actions.errors.quizNoQuestions" };
   }
 
   for (const question of questions) {
-    if (!answers[question.id]) {
-      return { error: "Please answer all questions before submitting." };
+    if (!answers[question.id]?.trim()) {
+      return { error: "actions.errors.answerAll" };
     }
   }
 
   let correctCount = 0;
   for (const question of questions) {
-    if (answers[question.id] === question.correct_option) {
+    const userAnswer = answers[question.id];
+    if (question.question_type === "written") {
+      if (scoreWrittenAnswer(userAnswer, question.expected_answer)) {
+        correctCount++;
+      }
+    } else if (userAnswer === question.correct_option) {
       correctCount++;
     }
   }
@@ -69,11 +80,13 @@ export async function submitQuizAction(
 
   if (result.error) {
     return {
-      error: result.error,
+      error: "actions.errors.generic",
       code: result.code,
     };
   }
 
   revalidateAppContent(quiz.lesson_id);
-  redirect(`/lesson/${quiz.lesson_id}`);
+  redirect(
+    `/quizzes/browse/${quiz.language_slug}/${quiz.level_slug}/${quiz.section_slug}?completed=${quiz.id}&score=${score}`
+  );
 }

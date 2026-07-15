@@ -56,16 +56,47 @@ export const grammarRuleSchema = z.object({
 
 export type GrammarRuleValues = z.infer<typeof grammarRuleSchema>;
 
-export const quizQuestionSchema = z.object({
-  questionText: z.string().min(1, "Question text is required"),
-  optionA: z.string().min(1, "Option A is required"),
-  optionB: z.string().min(1, "Option B is required"),
-  optionC: z.string().min(1, "Option C is required"),
-  optionD: z.string().min(1, "Option D is required"),
-  correctOption: z.enum(["a", "b", "c", "d"], {
-    message: "Select the correct answer",
-  }),
-});
+export const quizQuestionSchema = z
+  .object({
+    questionType: z.enum(["multiple_choice", "written"]),
+    questionText: z.string().min(1, "Question text is required"),
+    optionA: z.string().optional(),
+    optionB: z.string().optional(),
+    optionC: z.string().optional(),
+    optionD: z.string().optional(),
+    correctOption: z.enum(["a", "b", "c", "d"]).optional(),
+    expectedAnswer: z.string().optional(),
+    explanation: optionalText(1000),
+  })
+  .superRefine((value, ctx) => {
+    if (value.questionType === "multiple_choice") {
+      if (!value.optionA?.trim()) {
+        ctx.addIssue({ code: "custom", message: "Option A is required", path: ["optionA"] });
+      }
+      if (!value.optionB?.trim()) {
+        ctx.addIssue({ code: "custom", message: "Option B is required", path: ["optionB"] });
+      }
+      if (!value.optionC?.trim()) {
+        ctx.addIssue({ code: "custom", message: "Option C is required", path: ["optionC"] });
+      }
+      if (!value.optionD?.trim()) {
+        ctx.addIssue({ code: "custom", message: "Option D is required", path: ["optionD"] });
+      }
+      if (!value.correctOption) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Select the correct answer",
+          path: ["correctOption"],
+        });
+      }
+    } else if (!value.expectedAnswer?.trim()) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Expected answer is required",
+        path: ["expectedAnswer"],
+      });
+    }
+  });
 
 export type QuizQuestionValues = z.infer<typeof quizQuestionSchema>;
 
@@ -77,6 +108,21 @@ export const quizTitleSchema = z.object({
 });
 
 export type QuizTitleValues = z.infer<typeof quizTitleSchema>;
+
+export const structuredQuizSchema = z.object({
+  lessonId: z.string().uuid("Please select a lesson"),
+  title: z
+    .string()
+    .min(2, "Title must be at least 2 characters")
+    .max(150, "Title is too long"),
+  languageSlug: z.enum(["italian", "english", "german", "turkish"]),
+  levelSlug: z.string().min(1, "Select a course level"),
+  sectionSlug: z.enum(["grammar", "vocabulary", "visual", "quiz", "custom"]),
+  status: z.enum(["draft", "published"]),
+  questions: z.array(quizQuestionSchema).min(1, "Add at least one question"),
+});
+
+export type StructuredQuizValues = z.infer<typeof structuredQuizSchema>;
 
 export const quizSchema = z.object({
   lessonId: z.string().uuid("Please select a lesson"),

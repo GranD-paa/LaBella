@@ -21,6 +21,7 @@ import {
 import { deleteVocabulary } from "@/app/admin/actions/vocabulary";
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
 import { VocabularyEditDialog } from "@/components/admin/vocabulary/vocabulary-edit-dialog";
+import { useTranslations } from "@/components/providers/locale-provider";
 import type { Lesson, Vocabulary } from "@/types";
 
 export function VocabularyTable({
@@ -30,30 +31,36 @@ export function VocabularyTable({
   vocabulary: Vocabulary[];
   lessons: Lesson[];
 }) {
+  const { t } = useTranslations();
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Vocabulary for this lesson</CardTitle>
-        <CardDescription>{vocabulary.length} words</CardDescription>
+        <CardTitle>{t("admin.vocabulary.tableTitle")}</CardTitle>
+        <CardDescription>
+          {t("admin.vocabulary.wordCount", { count: vocabulary.length })}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {vocabulary.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-10 text-center text-muted-foreground">
             <Languages className="h-8 w-8" />
-            <p>No vocabulary for this lesson yet.</p>
+            <p>{t("admin.vocabulary.empty")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-14">Image</TableHead>
-                  <TableHead>Word</TableHead>
-                  <TableHead>Translation</TableHead>
+                  <TableHead className="w-14">{t("common.image")}</TableHead>
+                  <TableHead>{t("admin.fields.word")}</TableHead>
+                  <TableHead>{t("admin.fields.translation")}</TableHead>
                   <TableHead className="hidden md:table-cell">
-                    Example
+                    {t("common.example")}
                   </TableHead>
-                  <TableHead className="w-24 text-right">Actions</TableHead>
+                  <TableHead className="w-24 text-right">
+                    {t("common.actions")}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -76,7 +83,7 @@ export function VocabularyTable({
                     <TableCell className="font-medium">{item.word}</TableCell>
                     <TableCell>{item.translation}</TableCell>
                     <TableCell className="hidden max-w-xs truncate text-muted-foreground md:table-cell">
-                      {item.example_sentence || "—"}
+                      {item.example_sentence || t("common.noValue")}
                     </TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-1">
@@ -85,9 +92,11 @@ export function VocabularyTable({
                           lessons={lessons}
                         />
                         <DeleteConfirmDialog
-                          title="Delete this vocabulary word?"
-                          description={`This will permanently delete "${item.word}".`}
-                          successMessage="Vocabulary deleted"
+                          title={t("admin.vocabulary.deleteTitle")}
+                          description={t("admin.vocabulary.deleteDescription", {
+                            word: item.word,
+                          })}
+                          successMessage={t("admin.vocabulary.deleted")}
                           onConfirm={() => deleteVocabulary(item.id)}
                         />
                       </div>

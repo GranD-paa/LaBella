@@ -1,13 +1,18 @@
+"use client";
+
 import { BookMarked } from "lucide-react";
 
+import { useTranslations } from "@/components/providers/locale-provider";
 import type { GrammarRule } from "@/types";
 
 export function GrammarRulesList({ rules }: { rules: GrammarRule[] }) {
+  const { t } = useTranslations();
+
   if (rules.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
         <BookMarked className="h-8 w-8" />
-        <p>No grammar rules added to this lesson yet.</p>
+        <p>{t("lesson.noGrammar")}</p>
       </div>
     );
   }

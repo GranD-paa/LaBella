@@ -8,7 +8,7 @@ import type { ActionResult } from "@/lib/action-result";
 export async function createVocabulary(values: unknown): Promise<ActionResult> {
   const parsed = vocabularySchema.safeParse(values);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return { error: "actions.errors.invalidInput" };
   }
 
   const repo = getDataRepository();
@@ -21,7 +21,7 @@ export async function createVocabulary(values: unknown): Promise<ActionResult> {
   });
 
   if (result.error) {
-    return { error: result.error };
+    return { error: "actions.errors.generic" };
   }
 
   revalidateAppContent(parsed.data.lessonId);
@@ -34,7 +34,7 @@ export async function updateVocabulary(
 ): Promise<ActionResult> {
   const parsed = vocabularySchema.safeParse(values);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return { error: "actions.errors.invalidInput" };
   }
 
   const repo = getDataRepository();
@@ -47,7 +47,7 @@ export async function updateVocabulary(
   });
 
   if (result.error) {
-    return { error: result.error };
+    return { error: "actions.errors.generic" };
   }
 
   revalidateAppContent(parsed.data.lessonId);
@@ -60,7 +60,7 @@ export async function deleteVocabulary(id: string): Promise<ActionResult> {
   const result = await repo.deleteVocabulary(id);
 
   if (result.error) {
-    return { error: result.error };
+    return { error: "actions.errors.generic" };
   }
 
   revalidateAppContent(row?.lesson_id);

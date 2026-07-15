@@ -1,13 +1,20 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 
 import { createQuizWithQuestions } from "@/app/admin/actions/quizzes";
-import { quizSchema, type QuizValues } from "@/lib/validations/admin";
+import { QuizQuestionFields } from "@/components/admin/quizzes/quiz-question-fields";
+import { LessonPicker } from "@/components/admin/lesson-picker";
+import { useTranslations } from "@/components/providers/locale-provider";
+import {
+  createQuizSchema,
+  type QuizValues,
+} from "@/lib/validations/i18n/admin-schemas";
+import { resolveMessage } from "@/lib/i18n/resolve-message";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,17 +34,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { LessonPicker } from "@/components/admin/lesson-picker";
-import { QuizQuestionFields } from "@/components/admin/quizzes/quiz-question-fields";
 import type { Lesson } from "@/types";
 
 const emptyQuestion = {
+  questionType: "multiple_choice" as const,
   questionText: "",
   optionA: "",
   optionB: "",
   optionC: "",
   optionD: "",
   correctOption: "a" as const,
+  expectedAnswer: "",
+  explanation: "",
 };
 
 export function QuizFormDialog({
@@ -47,8 +55,11 @@ export function QuizFormDialog({
   lessons: Lesson[];
   defaultLessonId?: string;
 }) {
+  const { t } = useTranslations();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  const quizSchema = useMemo(() => createQuizSchema(t), [t]);
 
   const defaultValues: QuizValues = {
     lessonId: defaultLessonId ?? lessons[0]?.id ?? "",
@@ -71,11 +82,11 @@ export function QuizFormDialog({
       const result = await createQuizWithQuestions(values);
 
       if ("error" in result) {
-        toast.error(result.error);
+        toast.error(resolveMessage(t, result.error));
         return;
       }
 
-      toast.success("Quiz created");
+      toast.success(t("admin.quizzes.quizCreated"));
       setOpen(false);
       form.reset({
         lessonId: values.lessonId,
@@ -102,15 +113,13 @@ export function QuizFormDialog({
       <DialogTrigger asChild>
         <Button disabled={!lessons.length}>
           <Plus className="h-4 w-4" />
-          New quiz
+          {t("admin.quizzes.newQuiz")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create a quiz</DialogTitle>
-          <DialogDescription>
-            Add a quiz with one or more multiple-choice questions.
-          </DialogDescription>
+          <DialogTitle>{t("admin.quizzes.createTitle")}</DialogTitle>
+          <DialogDescription>{t("admin.quizzes.createDescription")}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -119,7 +128,7 @@ export function QuizFormDialog({
               name="lessonId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Lesson</FormLabel>
+                  <FormLabel>{t("admin.fields.lesson")}</FormLabel>
                   <FormControl>
                     <LessonPicker
                       lessons={lessons}
@@ -137,10 +146,10 @@ export function QuizFormDialog({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Quiz title</FormLabel>
+                  <FormLabel>{t("admin.quizzes.quizTitle")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Lesson 1 Checkpoint"
+                      placeholder={t("admin.quizzes.titlePlaceholder")}
                       disabled={isPending}
                       {...field}
                     />
@@ -152,7 +161,9 @@ export function QuizFormDialog({
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Questions</h3>
+                <h3 className="text-sm font-medium">
+                  {t("admin.quizzes.questionsHeading")}
+                </h3>
                 <Button
                   type="button"
                   variant="outline"
@@ -161,7 +172,7 @@ export function QuizFormDialog({
                   disabled={isPending}
                 >
                   <Plus className="h-4 w-4" />
-                  Add question
+                  {t("admin.quizzes.addQuestion")}
                 </Button>
               </div>
               {questionsErrorMessage ? (
@@ -186,10 +197,10 @@ export function QuizFormDialog({
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Creating...
+                    {t("common.creating")}
                   </>
                 ) : (
-                  "Create quiz"
+                  t("admin.quizzes.createQuiz")
                 )}
               </Button>
             </DialogFooter>

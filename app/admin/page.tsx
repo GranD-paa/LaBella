@@ -2,13 +2,17 @@ import type { Metadata } from "next";
 
 import { requireAdmin } from "@/lib/supabase/admin-guard";
 import { AdminTabs, ADMIN_TAB_VALUES } from "@/components/admin/admin-tabs";
+import { AdminContentHeader } from "@/components/admin/admin-content-header";
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
 import { getDataRepository } from "@/lib/data";
 import { fetchAdminDashboardData } from "@/lib/dashboard-data";
 
-export const metadata: Metadata = {
-  title: "Admin Panel — LaBella",
-};
+import { createPageMetadata } from "@/lib/i18n/metadata";
+import { getServerTranslator } from "@/lib/i18n/server-locale";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return createPageMetadata("meta.admin");
+}
 
 const ADMIN_TABS = ADMIN_TAB_VALUES;
 
@@ -41,7 +45,9 @@ export default async function AdminPage({
     repo.getAllQuizQuestions(),
   ]);
 
-  const displayName = profile.full_name || user.email || "Admin";
+  const { t } = await getServerTranslator();
+  const displayName =
+    profile.full_name || user.email || t("common.adminFallback");
 
   return (
     <div className="space-y-8">
@@ -53,14 +59,7 @@ export default async function AdminPage({
       />
 
       <div className="space-y-4">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">
-            Content management
-          </h2>
-          <p className="text-muted-foreground">
-            Create, edit, and publish lessons, vocabulary, grammar, and quizzes.
-          </p>
-        </div>
+        <AdminContentHeader />
 
         <AdminTabs
           defaultTab={defaultTab}

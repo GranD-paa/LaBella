@@ -6,6 +6,7 @@ import { deleteQuiz } from "@/app/admin/actions/quizzes";
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
 import { QuizEditDialog } from "@/components/admin/quizzes/quiz-edit-dialog";
 import { QuizFormDialog } from "@/components/admin/quizzes/quiz-form-dialog";
+import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -24,6 +25,14 @@ import {
 } from "@/components/ui/table";
 import type { Lesson, Quiz, QuizQuestion } from "@/types";
 
+function pluralize(
+  count: number,
+  singular: string,
+  plural: string
+) {
+  return count === 1 ? singular : plural;
+}
+
 export function QuizzesTable({
   lessons,
   quizzes,
@@ -33,6 +42,8 @@ export function QuizzesTable({
   quizzes: Quiz[];
   quizQuestions: QuizQuestion[];
 }) {
+  const { t } = useTranslations();
+
   const sortedLessons = [...lessons].sort(
     (a, b) => a.order_number - b.order_number
   );
@@ -53,11 +64,12 @@ export function QuizzesTable({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <div>
-          <CardTitle>All quizzes</CardTitle>
+          <CardTitle>{t("admin.quizzes.allQuizzes")}</CardTitle>
           <CardDescription>
-            {quizzes.length} {quizzes.length === 1 ? "quiz" : "quizzes"} across{" "}
-            {groupedLessons.length}{" "}
-            {groupedLessons.length === 1 ? "lesson" : "lessons"}
+            {t("admin.quizzes.tableSummary", {
+              quizCount: quizzes.length,
+              lessonCount: groupedLessons.length,
+            })}
           </CardDescription>
         </div>
         <QuizFormDialog lessons={lessons} />
@@ -66,7 +78,7 @@ export function QuizzesTable({
         {groupedLessons.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-10 text-center text-muted-foreground">
             <ListChecks className="h-8 w-8" />
-            <p>No quizzes yet. Create your first quiz above.</p>
+            <p>{t("admin.quizzes.empty")}</p>
           </div>
         ) : (
           <div className="space-y-8">
@@ -76,18 +88,24 @@ export function QuizzesTable({
                   <h3 className="font-semibold">{lesson.title}</h3>
                   <Badge variant="outline">
                     {lessonQuizzes.length}{" "}
-                    {lessonQuizzes.length === 1 ? "quiz" : "quizzes"}
+                    {pluralize(
+                      lessonQuizzes.length,
+                      t("admin.quizzes.quizSingular"),
+                      t("admin.quizzes.quizPlural")
+                    )}
                   </Badge>
                 </div>
                 <div className="overflow-x-auto rounded-lg border">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Quiz title</TableHead>
+                        <TableHead>{t("admin.quizzes.quizTitle")}</TableHead>
                         <TableHead className="hidden sm:table-cell">
-                          Questions
+                          {t("admin.quizzes.questionsColumn")}
                         </TableHead>
-                        <TableHead className="w-40 text-right">Actions</TableHead>
+                        <TableHead className="w-40 text-right">
+                          {t("common.actions")}
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -113,9 +131,12 @@ export function QuizzesTable({
                                   questions={questions}
                                 />
                                 <DeleteConfirmDialog
-                                  title="Delete this quiz?"
-                                  description={`This will permanently delete "${quiz.title}" and all of its questions.`}
-                                  successMessage="Quiz deleted"
+                                  title={t("admin.quizzes.deleteQuizTitle")}
+                                  description={t(
+                                    "admin.quizzes.deleteQuizDescription",
+                                    { title: quiz.title }
+                                  )}
+                                  successMessage={t("admin.quizzes.quizDeleted")}
                                   onConfirm={() => deleteQuiz(quiz.id)}
                                 />
                               </div>

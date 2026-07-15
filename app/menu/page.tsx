@@ -3,10 +3,12 @@ import { redirect } from "next/navigation";
 
 import { MainMenu } from "@/components/menu/main-menu";
 import { getDataRepository } from "@/lib/data";
+import { createPageMetadata } from "@/lib/i18n/metadata";
+import { getServerTranslator } from "@/lib/i18n/server-locale";
 
-export const metadata: Metadata = {
-  title: "Main Menu — LaBella",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return createPageMetadata("meta.menu");
+}
 
 export default async function MenuPage() {
   const repo = getDataRepository();
@@ -16,8 +18,10 @@ export default async function MenuPage() {
     redirect("/login");
   }
 
+  const { t } = await getServerTranslator();
   const profile = await repo.getProfileById(user.id);
-  const displayName = profile?.full_name || user.email?.split("@")[0] || "there";
+  const displayName =
+    profile?.full_name || user.email?.split("@")[0] || t("common.guestName");
 
   return <MainMenu displayName={displayName} />;
 }

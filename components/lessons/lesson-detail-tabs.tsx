@@ -5,6 +5,7 @@ import { BookMarked, Languages, ListChecks } from "lucide-react";
 import { GrammarRulesList } from "@/components/lessons/grammar-rules-list";
 import { QuizTabContent } from "@/components/lessons/quiz-tab-content";
 import { VocabularyFlashcards } from "@/components/lessons/vocabulary-flashcards";
+import { useTranslations } from "@/components/providers/locale-provider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { GrammarRule, Quiz, UserQuizAttempt, Vocabulary } from "@/types";
 
@@ -19,20 +20,22 @@ export function LessonDetailTabs({
   quiz: Quiz | null;
   quizAttempt: UserQuizAttempt | null;
 }) {
+  const { t } = useTranslations();
+
   return (
     <Tabs defaultValue="vocabulary" className="w-full">
       <TabsList className="grid h-auto w-full grid-cols-3 p-1">
         <TabsTrigger value="vocabulary" className="gap-2 py-2">
           <Languages className="h-4 w-4" />
-          Vocabulary
+          {t("lesson.vocabulary")}
         </TabsTrigger>
         <TabsTrigger value="grammar" className="gap-2 py-2">
           <BookMarked className="h-4 w-4" />
-          Grammar
+          {t("lesson.grammar")}
         </TabsTrigger>
         <TabsTrigger value="quiz" className="gap-2 py-2">
           <ListChecks className="h-4 w-4" />
-          Quiz
+          {t("lesson.quiz")}
         </TabsTrigger>
       </TabsList>
 

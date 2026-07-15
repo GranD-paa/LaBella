@@ -1,56 +1,29 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowLeft, GraduationCap } from "lucide-react";
 
+import { AppHeader } from "@/components/layout/app-header";
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import {
+  PricingHeaderActions,
+  PricingHero,
+} from "@/components/pricing/pricing-i18n";
 import { SubscriptionCards } from "@/components/pricing/subscription-cards";
-import { Button } from "@/components/ui/button";
+import { createPageMetadata } from "@/lib/i18n/metadata";
 
-export const metadata: Metadata = {
-  title: "Pricing — LaBella",
-  description: "Choose the plan that fits your language learning journey.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return createPageMetadata("meta.pricing", "meta.pricingDescription");
+}
 
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-brand-gradient-subtle">
-      <header className="brand-header">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="brand-header-link">
-            <GraduationCap className="h-5 w-5 text-brand-accent" />
-            LaBella
-          </Link>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="brand-header-btn" asChild>
-              <Link href="/login">Sign in</Link>
-            </Button>
-            <Button
-              size="sm"
-              className="bg-primary font-semibold text-primary-foreground hover:bg-primary/90"
-              asChild
-            >
-              <Link href="/sign-up">Get started</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <AppHeader
+        homeHref="/login"
+        left={<LanguageSwitcher />}
+        right={<PricingHeaderActions />}
+      />
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16">
-        <div className="mb-10 space-y-4 text-center">
-          <Button variant="ghost" size="sm" asChild className="mb-2">
-            <Link href="/">
-              <ArrowLeft className="h-4 w-4" />
-              Back to home
-            </Link>
-          </Button>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Simple, transparent pricing
-          </h1>
-          <p className="mx-auto max-w-2xl text-muted-foreground">
-            Start for free and upgrade when you&apos;re ready. All plans include
-            access to our core learning experience.
-          </p>
-        </div>
-
+        <PricingHero />
         <SubscriptionCards />
       </main>
     </div>

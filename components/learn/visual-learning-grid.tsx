@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { Eye, Volume2 } from "lucide-react";
 
+import { useTranslations } from "@/components/providers/locale-provider";
 import type { Vocabulary } from "@/types";
 
 export function VisualLearningGrid({
@@ -8,16 +11,14 @@ export function VisualLearningGrid({
 }: {
   vocabulary: Vocabulary[];
 }) {
+  const { t } = useTranslations();
   const visualItems = vocabulary.filter((item) => item.image_url);
 
   if (visualItems.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
         <Eye className="h-8 w-8" />
-        <p>
-          Visual materials for this level will appear here once images are added
-          to vocabulary entries.
-        </p>
+        <p>{t("learn.visualEmpty")}</p>
       </div>
     );
   }
@@ -43,7 +44,7 @@ export function VisualLearningGrid({
               <h3 className="text-2xl font-bold tracking-tight">{item.word}</h3>
               <span className="inline-flex items-center gap-1 rounded-full bg-brand-accent/10 px-2.5 py-1 text-xs font-medium text-brand-accent">
                 <Volume2 className="h-3.5 w-3.5" />
-                Pronunciation
+                {t("lesson.pronunciation")}
               </span>
             </div>
             <p className="text-lg text-muted-foreground">{item.translation}</p>

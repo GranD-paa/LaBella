@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { Shield, ShieldOff, Users } from "lucide-react";
 
 import { updateUserAdminStatus } from "@/app/admin/actions/users";
+import { resolveMessage } from "@/lib/i18n/resolve-message";
+import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,12 +27,6 @@ import {
 } from "@/components/ui/table";
 import type { AdminDashboardData } from "@/lib/dashboard-data";
 
-function formatDate(dateString: string) {
-  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
-    new Date(dateString)
-  );
-}
-
 export function UsersManager({
   users,
   currentUserId,
@@ -40,15 +36,16 @@ export function UsersManager({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const { t, formatDate } = useTranslations();
 
   function handleRoleChange(userId: string, promote: boolean) {
     startTransition(async () => {
       const result = await updateUserAdminStatus(userId, promote);
       if ("error" in result) {
-        toast.error(result.error);
+        toast.error(resolveMessage(t, result.error));
         return;
       }
-      toast.success(promote ? "User promoted to admin" : "Admin access removed");
+      toast.success(promote ? t("admin.users.promoted") : t("admin.users.demoted"));
       router.refresh();
     });
   }
@@ -58,26 +55,24 @@ export function UsersManager({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5 text-brand-accent" />
-          User Management
+          {t("admin.users.title")}
         </CardTitle>
-        <CardDescription>
-          View registered users and manage admin permissions.
-        </CardDescription>
+        <CardDescription>{t("admin.users.description")}</CardDescription>
       </CardHeader>
       <CardContent>
         {users.length === 0 ? (
           <div className="rounded-lg border border-dashed py-12 text-center text-muted-foreground">
-            No users registered yet.
+            {t("admin.users.noUsers")}
           </div>
         ) : (
           <div className="overflow-x-auto rounded-lg border border-white/10">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="hidden sm:table-cell">Role</TableHead>
-                  <TableHead className="hidden md:table-cell">Joined</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t("admin.users.name")}</TableHead>
+                  <TableHead className="hidden sm:table-cell">{t("admin.users.role")}</TableHead>
+                  <TableHead className="hidden md:table-cell">{t("admin.users.joined")}</TableHead>
+                  <TableHead className="text-right">{t("admin.users.actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -86,10 +81,10 @@ export function UsersManager({
                     <TableCell>
                       <div className="space-y-1">
                         <p className="font-medium">
-                          {user.fullName || "Unnamed user"}
+                          {user.fullName || t("admin.users.unnamed")}
                         </p>
                         <p className="text-xs text-muted-foreground sm:hidden">
-                          {user.isAdmin ? "Admin" : "Learner"}
+                          {user.isAdmin ? t("common.admin") : t("common.learner")}
                         </p>
                       </div>
                     </TableCell>
@@ -102,11 +97,11 @@ export function UsersManager({
                         }
                         variant={user.isAdmin ? "default" : "secondary"}
                       >
-                        {user.isAdmin ? "Admin" : "Learner"}
+                        {user.isAdmin ? t("common.admin") : t("common.learner")}
                       </Badge>
                     </TableCell>
                     <TableCell className="hidden text-muted-foreground md:table-cell">
-                      {formatDate(user.createdAt)}
+                      {formatDate(user.createdAt, { dateStyle: "medium" })}
                     </TableCell>
                     <TableCell>
                       <div className="flex justify-end">
@@ -118,7 +113,7 @@ export function UsersManager({
                             onClick={() => handleRoleChange(user.id, false)}
                           >
                             <ShieldOff className="h-4 w-4" />
-                            <span className="hidden sm:inline">Demote</span>
+                            <span className="hidden sm:inline">{t("admin.users.demote")}</span>
                           </Button>
                         ) : (
                           <Button
@@ -128,7 +123,7 @@ export function UsersManager({
                             onClick={() => handleRoleChange(user.id, true)}
                           >
                             <Shield className="h-4 w-4" />
-                            <span className="hidden sm:inline">Promote</span>
+                            <span className="hidden sm:inline">{t("admin.users.promote")}</span>
                           </Button>
                         )}
                       </div>

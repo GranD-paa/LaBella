@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { Languages } from "lucide-react";
 
+import { useTranslations } from "@/components/providers/locale-provider";
 import type { Vocabulary } from "@/types";
 
 export function VocabularyFlashcards({
@@ -8,11 +11,13 @@ export function VocabularyFlashcards({
 }: {
   vocabulary: Vocabulary[];
 }) {
+  const { t } = useTranslations();
+
   if (vocabulary.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
         <Languages className="h-8 w-8" />
-        <p>No vocabulary added to this lesson yet.</p>
+        <p>{t("lesson.noVocabulary")}</p>
       </div>
     );
   }

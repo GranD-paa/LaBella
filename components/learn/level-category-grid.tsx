@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   BookMarked,
@@ -6,6 +8,7 @@ import {
   ListChecks,
 } from "lucide-react";
 
+import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -15,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CATEGORY_DEFINITIONS } from "@/lib/curriculum/languages";
+import { CATEGORY_MESSAGE_KEYS } from "@/lib/i18n/content-keys";
 import type { LanguageSlug, LevelSlug } from "@/lib/curriculum/types";
 import { cn } from "@/lib/utils";
 
@@ -43,6 +47,8 @@ export function LevelCategoryGrid({
   levelCode: string;
   levelTitle: string;
 }) {
+  const { t } = useTranslations();
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -50,14 +56,13 @@ export function LevelCategoryGrid({
           {levelCode}
         </Badge>
         <h1 className="text-3xl font-bold tracking-tight">{levelTitle}</h1>
-        <p className="text-muted-foreground">
-          Choose a learning category to continue your Italian journey.
-        </p>
+        <p className="text-muted-foreground">{t("learn.chooseCategory")}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         {CATEGORY_DEFINITIONS.map((category) => {
           const Icon = CATEGORY_ICONS[category.slug];
+          const messageKey = CATEGORY_MESSAGE_KEYS[category.slug];
           return (
             <Link
               key={category.slug}
@@ -75,12 +80,12 @@ export function LevelCategoryGrid({
                   <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-secondary/40 text-brand-accent transition-transform group-hover:scale-110">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <CardTitle>{category.title}</CardTitle>
-                  <CardDescription>{category.description}</CardDescription>
+                  <CardTitle>{t(`${messageKey}.title`)}</CardTitle>
+                  <CardDescription>{t(`${messageKey}.description`)}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <span className="text-sm font-medium text-brand-accent">
-                    Open module →
+                    {t("common.openModule")}
                   </span>
                 </CardContent>
               </Card>

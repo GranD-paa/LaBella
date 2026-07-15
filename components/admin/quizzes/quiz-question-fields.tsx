@@ -3,6 +3,7 @@
 import type { Control } from "react-hook-form";
 import { Trash2 } from "lucide-react";
 
+import { useTranslations } from "@/components/providers/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,13 +22,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import type { QuizValues } from "@/lib/validations/admin";
+import type { QuizValues } from "@/lib/validations/i18n/admin-schemas";
 
-const OPTIONS = [
-  { key: "optionA", letter: "a", label: "Option A" },
-  { key: "optionB", letter: "b", label: "Option B" },
-  { key: "optionC", letter: "c", label: "Option C" },
-  { key: "optionD", letter: "d", label: "Option D" },
+const OPTION_KEYS = [
+  { key: "optionA", letter: "a", labelKey: "admin.quizzes.optionA" },
+  { key: "optionB", letter: "b", labelKey: "admin.quizzes.optionB" },
+  { key: "optionC", letter: "c", labelKey: "admin.quizzes.optionC" },
+  { key: "optionD", letter: "d", labelKey: "admin.quizzes.optionD" },
 ] as const;
 
 export function QuizQuestionFields({
@@ -43,11 +44,13 @@ export function QuizQuestionFields({
   canRemove: boolean;
   disabled?: boolean;
 }) {
+  const { t } = useTranslations();
+
   return (
     <Card className="border-dashed">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">
-          Question {index + 1}
+          {t("admin.quizzes.questionLabel", { number: index + 1 })}
         </CardTitle>
         {canRemove ? (
           <Button
@@ -57,7 +60,7 @@ export function QuizQuestionFields({
             className="text-destructive hover:bg-destructive/10 hover:text-destructive"
             onClick={onRemove}
             disabled={disabled}
-            aria-label="Remove question"
+            aria-label={t("admin.quizzes.removeQuestionAria")}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -69,10 +72,10 @@ export function QuizQuestionFields({
           name={`questions.${index}.questionText`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Question text</FormLabel>
+              <FormLabel>{t("admin.quizzes.questionText")}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="What is the Spanish word for 'hello'?"
+                  placeholder={t("admin.quizzes.questionTextPlaceholder")}
                   disabled={disabled}
                   {...field}
                 />
@@ -83,14 +86,14 @@ export function QuizQuestionFields({
         />
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {OPTIONS.map((option) => (
+          {OPTION_KEYS.map((option) => (
             <FormField
               key={option.key}
               control={control}
               name={`questions.${index}.${option.key}`}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{option.label}</FormLabel>
+                  <FormLabel>{t(option.labelKey)}</FormLabel>
                   <FormControl>
                     <Input disabled={disabled} {...field} />
                   </FormControl>
@@ -106,14 +109,14 @@ export function QuizQuestionFields({
           name={`questions.${index}.correctOption`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Correct answer</FormLabel>
+              <FormLabel>{t("admin.quizzes.correctAnswer")}</FormLabel>
               <FormControl>
                 <RadioGroup
                   value={field.value}
                   onValueChange={field.onChange}
                   className="flex flex-wrap gap-4"
                 >
-                  {OPTIONS.map((option) => (
+                  {OPTION_KEYS.map((option) => (
                     <div key={option.letter} className="flex items-center gap-2">
                       <RadioGroupItem
                         value={option.letter}
@@ -124,7 +127,7 @@ export function QuizQuestionFields({
                         htmlFor={`q${index}-${option.letter}`}
                         className="font-normal"
                       >
-                        {option.label}
+                        {t(option.labelKey)}
                       </Label>
                     </div>
                   ))}

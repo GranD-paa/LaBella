@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 
 import { SignInForm } from "@/components/auth/sign-in-form";
+import { createPageMetadata } from "@/lib/i18n/metadata";
 
-export const metadata: Metadata = {
-  title: "Sign in — LaBella",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return createPageMetadata("meta.login");
+}
 
 export default async function LoginPage({
   searchParams,

@@ -9,7 +9,7 @@ import type { SignInValues, SignUpValues } from "@/lib/validations/auth";
 
 type ActionResult = { error: string } | { success: true; message: string };
 
-function formatAuthError(message: string) {
+function formatAuthErrorKey(message: string) {
   const normalized = message.toLowerCase();
 
   if (
@@ -18,10 +18,17 @@ function formatAuthError(message: string) {
     normalized.includes("econnreset") ||
     normalized.includes("network")
   ) {
-    return "Cannot reach the authentication server. Check your internet connection, VPN/firewall settings, and that your Supabase project is active, then try again.";
+    return "actions.errors.authServerUnreachable";
   }
 
-  return message;
+  if (
+    normalized.includes("invalid login credentials") ||
+    normalized.includes("invalid email or password")
+  ) {
+    return "actions.errors.invalidCredentials";
+  }
+
+  return "actions.errors.generic";
 }
 
 function getSafeRedirectPath(path?: string) {
@@ -42,7 +49,7 @@ export async function signInAction(
 ): Promise<ActionResult | void> {
   const parsed = signInSchema.safeParse(values);
   if (!parsed.success) {
-    return { error: "Please check your email and password and try again." };
+    return { error: "actions.errors.invalidCredentials" };
   }
 
   const repo = getDataRepository();
@@ -52,7 +59,7 @@ export async function signInAction(
   );
 
   if (result.error) {
-    return { error: formatAuthError(result.error) };
+    return { error: formatAuthErrorKey(result.error) };
   }
 
   redirect(getSafeRedirectPath(redirectTo));
@@ -63,13 +70,12 @@ export async function signUpAction(
 ): Promise<ActionResult | void> {
   const parsed = signUpSchema.safeParse(values);
   if (!parsed.success) {
-    return { error: "Please double-check the form and try again." };
+    return { error: "actions.errors.formCheck" };
   }
 
   if (isLocalDataMode()) {
     return {
-      error:
-        "Local development mode uses seeded accounts. Sign in with the sample admin or user credentials.",
+      error: "actions.errors.localModeSignUp",
     };
   }
 
@@ -84,7 +90,7 @@ export async function signUpAction(
   });
 
   if (error) {
-    return { error: formatAuthError(error.message) };
+    return { error: formatAuthErrorKey(error.message) };
   }
 
   if (data.session) {
@@ -93,7 +99,7 @@ export async function signUpAction(
 
   return {
     success: true,
-    message: "Check your inbox to confirm your email before signing in.",
+    message: "actions.errors.confirmEmail",
   };
 }
 

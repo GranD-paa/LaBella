@@ -20,6 +20,7 @@ import {
 import { deleteGrammarRule } from "@/app/admin/actions/grammar";
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
 import { GrammarEditDialog } from "@/components/admin/grammar/grammar-edit-dialog";
+import { useTranslations } from "@/components/providers/locale-provider";
 import type { GrammarRule, Lesson } from "@/types";
 
 export function GrammarTable({
@@ -29,31 +30,37 @@ export function GrammarTable({
   grammarRules: GrammarRule[];
   lessons: Lesson[];
 }) {
+  const { t } = useTranslations();
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Grammar rules for this lesson</CardTitle>
-        <CardDescription>{grammarRules.length} rules</CardDescription>
+        <CardTitle>{t("admin.grammar.tableTitle")}</CardTitle>
+        <CardDescription>
+          {t("admin.grammar.ruleCount", { count: grammarRules.length })}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {grammarRules.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-10 text-center text-muted-foreground">
             <BookOpenCheck className="h-8 w-8" />
-            <p>No grammar rules for this lesson yet.</p>
+            <p>{t("admin.grammar.empty")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Title</TableHead>
+                  <TableHead>{t("common.title")}</TableHead>
                   <TableHead className="hidden md:table-cell">
-                    Description
+                    {t("common.description")}
                   </TableHead>
                   <TableHead className="hidden md:table-cell">
-                    Example
+                    {t("common.example")}
                   </TableHead>
-                  <TableHead className="w-24 text-right">Actions</TableHead>
+                  <TableHead className="w-24 text-right">
+                    {t("common.actions")}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -61,10 +68,10 @@ export function GrammarTable({
                   <TableRow key={rule.id}>
                     <TableCell className="font-medium">{rule.title}</TableCell>
                     <TableCell className="hidden max-w-xs truncate text-muted-foreground md:table-cell">
-                      {rule.description || "—"}
+                      {rule.description || t("common.noValue")}
                     </TableCell>
                     <TableCell className="hidden max-w-xs truncate text-muted-foreground md:table-cell">
-                      {rule.example || "—"}
+                      {rule.example || t("common.noValue")}
                     </TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-1">
@@ -73,9 +80,11 @@ export function GrammarTable({
                           lessons={lessons}
                         />
                         <DeleteConfirmDialog
-                          title="Delete this grammar rule?"
-                          description={`This will permanently delete "${rule.title}".`}
-                          successMessage="Grammar rule deleted"
+                          title={t("admin.grammar.deleteTitle")}
+                          description={t("admin.grammar.deleteDescription", {
+                            title: rule.title,
+                          })}
+                          successMessage={t("admin.grammar.deleted")}
                           onConfirm={() => deleteGrammarRule(rule.id)}
                         />
                       </div>

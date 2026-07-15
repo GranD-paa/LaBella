@@ -59,7 +59,12 @@ export interface DataRepository {
   getQuizQuestionsByQuizId(quizId: string): Promise<QuizQuestion[]>;
   getAllQuizQuestions(): Promise<QuizQuestion[]>;
   getQuizQuestionAnswers(quizId: string): Promise<
-    Array<{ id: string; correct_option: string }>
+    Array<{
+      id: string;
+      correct_option: string;
+      question_type: "multiple_choice" | "written";
+      expected_answer: string | null;
+    }>
   >;
 
   // Quiz attempts
@@ -111,15 +116,26 @@ export interface DataRepository {
   createQuizWithQuestions(input: {
     lessonId: string;
     title: string;
+    languageSlug?: string;
+    levelSlug?: string;
+    sectionSlug?: string;
+    status?: "draft" | "published";
     questions: Array<{
+      questionType?: "multiple_choice" | "written";
       questionText: string;
-      optionA: string;
-      optionB: string;
-      optionC: string;
-      optionD: string;
-      correctOption: "a" | "b" | "c" | "d";
+      optionA?: string;
+      optionB?: string;
+      optionC?: string;
+      optionD?: string;
+      correctOption?: "a" | "b" | "c" | "d";
+      expectedAnswer?: string;
+      explanation?: string;
     }>;
   }): Promise<{ error?: string }>;
+  updateQuizStatus(
+    id: string,
+    status: "draft" | "published"
+  ): Promise<{ error?: string }>;
   updateQuizTitle(id: string, title: string): Promise<{ error?: string }>;
   deleteQuiz(id: string): Promise<{ error?: string }>;
   addQuizQuestion(

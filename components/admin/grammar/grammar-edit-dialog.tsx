@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -8,9 +8,10 @@ import { Loader2, Pencil } from "lucide-react";
 
 import { updateGrammarRule } from "@/app/admin/actions/grammar";
 import {
-  grammarRuleSchema,
+  createGrammarRuleSchema,
   type GrammarRuleValues,
-} from "@/lib/validations/admin";
+} from "@/lib/validations/i18n/admin-schemas";
+import { resolveMessage } from "@/lib/i18n/resolve-message";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -32,6 +33,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { LessonPicker } from "@/components/admin/lesson-picker";
+import { useTranslations } from "@/components/providers/locale-provider";
 import type { GrammarRule, Lesson } from "@/types";
 
 export function GrammarEditDialog({
@@ -41,8 +43,11 @@ export function GrammarEditDialog({
   grammarRule: GrammarRule;
   lessons: Lesson[];
 }) {
+  const { t } = useTranslations();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  const grammarRuleSchema = useMemo(() => createGrammarRuleSchema(t), [t]);
 
   const defaultValues: GrammarRuleValues = {
     lessonId: grammarRule.lesson_id,
@@ -60,10 +65,10 @@ export function GrammarEditDialog({
     startTransition(async () => {
       const result = await updateGrammarRule(grammarRule.id, values);
       if ("error" in result) {
-        toast.error(result.error);
+        toast.error(resolveMessage(t, result.error));
         return;
       }
-      toast.success("Grammar rule updated");
+      toast.success(t("admin.grammar.updated"));
       setOpen(false);
     });
   }
@@ -77,15 +82,19 @@ export function GrammarEditDialog({
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Edit grammar rule">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t("admin.grammar.editAriaLabel")}
+        >
           <Pencil className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit grammar rule</DialogTitle>
+          <DialogTitle>{t("admin.grammar.editTitle")}</DialogTitle>
           <DialogDescription>
-            Update &ldquo;{grammarRule.title}&rdquo;.
+            {t("admin.grammar.editDescription", { title: grammarRule.title })}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -95,7 +104,7 @@ export function GrammarEditDialog({
               name="lessonId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Lesson</FormLabel>
+                  <FormLabel>{t("admin.fields.lesson")}</FormLabel>
                   <FormControl>
                     <LessonPicker
                       lessons={lessons}
@@ -112,7 +121,7 @@ export function GrammarEditDialog({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>{t("common.title")}</FormLabel>
                   <FormControl>
                     <Input disabled={isPending} {...field} />
                   </FormControl>
@@ -125,7 +134,7 @@ export function GrammarEditDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t("common.description")}</FormLabel>
                   <FormControl>
                     <Textarea disabled={isPending} {...field} />
                   </FormControl>
@@ -138,7 +147,7 @@ export function GrammarEditDialog({
               name="example"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Example</FormLabel>
+                  <FormLabel>{t("common.example")}</FormLabel>
                   <FormControl>
                     <Textarea disabled={isPending} {...field} />
                   </FormControl>
@@ -151,10 +160,10 @@ export function GrammarEditDialog({
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Saving...
+                    {t("common.saving")}
                   </>
                 ) : (
-                  "Save changes"
+                  t("common.saveChanges")
                 )}
               </Button>
             </DialogFooter>

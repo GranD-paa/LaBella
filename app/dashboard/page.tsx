@@ -8,10 +8,12 @@ import {
   fetchAdminDashboardData,
   fetchUserDashboardData,
 } from "@/lib/dashboard-data";
+import { createPageMetadata } from "@/lib/i18n/metadata";
+import { getServerTranslator } from "@/lib/i18n/server-locale";
 
-export const metadata: Metadata = {
-  title: "Dashboard — LaBella",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return createPageMetadata("meta.dashboard");
+}
 
 export default async function DashboardPage() {
   const repo = getDataRepository();
@@ -21,8 +23,10 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  const { t } = await getServerTranslator();
   const profile = await repo.getProfileById(user.id);
-  const displayName = profile?.full_name || user.email || "there";
+  const displayName =
+    profile?.full_name || user.email || t("common.guestName");
 
   if (profile?.is_admin) {
     const adminData = await fetchAdminDashboardData(repo);

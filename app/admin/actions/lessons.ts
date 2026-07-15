@@ -8,7 +8,7 @@ import type { ActionResult } from "@/lib/action-result";
 export async function createLesson(values: unknown): Promise<ActionResult> {
   const parsed = lessonSchema.safeParse(values);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return { error: "actions.errors.invalidInput" };
   }
 
   const repo = getDataRepository();
@@ -19,7 +19,7 @@ export async function createLesson(values: unknown): Promise<ActionResult> {
   });
 
   if (result.error) {
-    return { error: result.error };
+    return { error: "actions.errors.generic" };
   }
 
   revalidateAppContent();
@@ -32,7 +32,7 @@ export async function updateLesson(
 ): Promise<ActionResult> {
   const parsed = lessonSchema.safeParse(values);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return { error: "actions.errors.invalidInput" };
   }
 
   const repo = getDataRepository();
@@ -43,7 +43,7 @@ export async function updateLesson(
   });
 
   if (result.error) {
-    return { error: result.error };
+    return { error: "actions.errors.generic" };
   }
 
   revalidateAppContent(id);
@@ -55,7 +55,7 @@ export async function deleteLesson(id: string): Promise<ActionResult> {
   const result = await repo.deleteLesson(id);
 
   if (result.error) {
-    return { error: result.error };
+    return { error: "actions.errors.generic" };
   }
 
   revalidateAppContent();

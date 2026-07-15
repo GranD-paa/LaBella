@@ -9,7 +9,10 @@ import {
   Lock,
 } from "lucide-react";
 
+import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { CURRICULUM_MESSAGE_KEYS } from "@/lib/i18n/content-keys";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +21,10 @@ export function CourseLevelAccordion({
 }: {
   language: CurriculumLanguage;
 }) {
-  const [openLevel, setOpenLevel] = useState<string | null>(language.levels[0]?.slug ?? null);
+  const { t } = useTranslations();
+  const [openLevel, setOpenLevel] = useState<string | null>(
+    language.levels[0]?.slug ?? null
+  );
 
   return (
     <div className="space-y-3">
@@ -32,7 +38,7 @@ export function CourseLevelAccordion({
           >
             <button
               type="button"
-              className="flex w-full items-center justify-between gap-4 p-5 text-left"
+              className="flex w-full items-center justify-between gap-4 p-5 text-start"
               onClick={() =>
                 setOpenLevel((current) =>
                   current === level.slug ? null : level.slug
@@ -69,14 +75,14 @@ export function CourseLevelAccordion({
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <Badge variant="secondary" className="gap-1">
                       <Layers className="h-3 w-3" />
-                      4 learning categories
+                      {t("learn.fourCategories")}
                     </Badge>
                     <Link
                       href={`/learn/${language.slug}/${level.slug}`}
                       className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-brand transition hover:bg-primary/90"
                     >
                       <BookOpen className="h-4 w-4" />
-                      Open {level.code}
+                      {t("learn.openLevel", { code: level.code })}
                     </Link>
                   </div>
                 </div>
@@ -94,17 +100,27 @@ export function ComingSoonLanguage({
 }: {
   language: CurriculumLanguage;
 }) {
+  const { t } = useTranslations();
+  const contentKey = CURRICULUM_MESSAGE_KEYS[language.slug];
+  const headline = contentKey ? t(`${contentKey}.headline`) : language.headline;
+  const description = contentKey
+    ? t(`${contentKey}.description`)
+    : language.description;
+
   return (
     <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed py-20 text-center">
       <span className="text-5xl">{language.flagEmoji}</span>
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold">{language.headline}</h1>
-        <p className="max-w-md text-muted-foreground">{language.description}</p>
+        <h1 className="text-2xl font-semibold">{headline}</h1>
+        <p className="max-w-md text-muted-foreground">{description}</p>
       </div>
       <Badge variant="secondary" className="gap-1">
         <Lock className="h-3 w-3" />
-        Coming soon
+        {t("common.comingSoon")}
       </Badge>
+      <Button variant="outline" asChild>
+        <Link href="/learn/italian">{t("learn.exploreItalian")}</Link>
+      </Button>
     </div>
   );
 }

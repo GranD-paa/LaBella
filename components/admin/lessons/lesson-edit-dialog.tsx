@@ -1,13 +1,17 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2, Pencil } from "lucide-react";
 
 import { updateLesson } from "@/app/admin/actions/lessons";
-import { lessonSchema, type LessonValues } from "@/lib/validations/admin";
+import {
+  createLessonSchema,
+  type LessonValues,
+} from "@/lib/validations/i18n/admin-schemas";
+import { resolveMessage } from "@/lib/i18n/resolve-message";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,11 +32,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useTranslations } from "@/components/providers/locale-provider";
 import type { Lesson } from "@/types";
 
 export function LessonEditDialog({ lesson }: { lesson: Lesson }) {
+  const { t } = useTranslations();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  const lessonSchema = useMemo(() => createLessonSchema(t), [t]);
 
   const form = useForm<LessonValues>({
     resolver: zodResolver(lessonSchema),
@@ -47,10 +55,10 @@ export function LessonEditDialog({ lesson }: { lesson: Lesson }) {
     startTransition(async () => {
       const result = await updateLesson(lesson.id, values);
       if ("error" in result) {
-        toast.error(result.error);
+        toast.error(resolveMessage(t, result.error));
         return;
       }
-      toast.success("Lesson updated");
+      toast.success(t("admin.lessons.updated"));
       setOpen(false);
     });
   }
@@ -70,15 +78,19 @@ export function LessonEditDialog({ lesson }: { lesson: Lesson }) {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Edit lesson">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t("admin.lessons.editAriaLabel")}
+        >
           <Pencil className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit lesson</DialogTitle>
+          <DialogTitle>{t("admin.lessons.editTitle")}</DialogTitle>
           <DialogDescription>
-            Update the details for &ldquo;{lesson.title}&rdquo;.
+            {t("admin.lessons.editDescription", { title: lesson.title })}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -88,7 +100,7 @@ export function LessonEditDialog({ lesson }: { lesson: Lesson }) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>{t("common.title")}</FormLabel>
                   <FormControl>
                     <Input disabled={isPending} {...field} />
                   </FormControl>
@@ -101,7 +113,7 @@ export function LessonEditDialog({ lesson }: { lesson: Lesson }) {
               name="orderNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Order number</FormLabel>
+                  <FormLabel>{t("admin.fields.orderNumber")}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -121,7 +133,7 @@ export function LessonEditDialog({ lesson }: { lesson: Lesson }) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t("common.description")}</FormLabel>
                   <FormControl>
                     <Textarea disabled={isPending} {...field} />
                   </FormControl>
@@ -134,10 +146,10 @@ export function LessonEditDialog({ lesson }: { lesson: Lesson }) {
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Saving...
+                    {t("common.saving")}
                   </>
                 ) : (
-                  "Save changes"
+                  t("common.saveChanges")
                 )}
               </Button>
             </DialogFooter>

@@ -1,0 +1,659 @@
+{
+  "common": {
+    "loading": "در حال بارگذاری...",
+    "save": "ذخیره",
+    "cancel": "لغو",
+    "delete": "حذف",
+    "edit": "ویرایش",
+    "back": "بازگشت",
+    "continue": "ادامه",
+    "submit": "ارسال",
+    "questions": "سؤال",
+    "of": "از",
+    "available": "فعال",
+    "comingSoon": "به‌زودی",
+    "new": "جدید",
+    "admin": "مدیر",
+    "learner": "یادگیرنده",
+    "openModule": "باز کردن بخش ←",
+    "saving": "در حال ذخیره...",
+    "saveChanges": "ذخیره تغییرات",
+    "deleting": "در حال حذف...",
+    "adding": "در حال افزودن...",
+    "creating": "در حال ایجاد...",
+    "deletedSuccess": "با موفقیت حذف شد",
+    "actions": "اقدامات",
+    "order": "ترتیب",
+    "title": "عنوان",
+    "description": "توضیحات",
+    "example": "مثال",
+    "image": "تصویر",
+    "noValue": "—",
+    "guestName": "کاربر",
+    "adminFallback": "مدیر"
+  },
+  "locale": {
+    "label": "زبان",
+    "persian": "فارسی",
+    "italian": "ایتالیایی",
+    "english": "انگلیسی"
+  },
+  "nav": {
+    "mainMenu": "منوی اصلی",
+    "dashboard": "داشبورد",
+    "profile": "پروفایل",
+    "signOut": "خروج",
+    "adminPanel": "پنل مدیریت",
+    "openUserMenu": "باز کردن منوی کاربر"
+  },
+  "auth": {
+    "welcomeBack": "خوش آمدید",
+    "signInSubtitle": "برای ادامه مسیر یادگیری زبان وارد شوید",
+    "email": "ایمیل",
+    "password": "رمز عبور",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "••••••••",
+    "rememberMe": "مرا به خاطر بسپار",
+    "rememberMeHint": "نشست امن شما فعال می‌ماند تا بدون ورود مجدد بازگردید. رمز عبور هرگز به‌صورت محلی ذخیره نمی‌شود.",
+    "signingIn": "در حال ورود...",
+    "signIn": "ورود",
+    "noAccount": "حساب کاربری ندارید؟",
+    "signUp": "ثبت‌نام",
+    "signUpTitle": "حساب کاربری بسازید",
+    "signUpSubtitle": "امروز یادگیری یک زبان جدید را شروع کنید",
+    "fullName": "نام کامل",
+    "fullNamePlaceholder": "علی رضایی",
+    "confirmPassword": "تأیید رمز عبور",
+    "creatingAccount": "در حال ایجاد حساب...",
+    "createAccount": "ایجاد حساب",
+    "hasAccount": "قبلاً حساب دارید؟",
+    "quote": "هر درس شما را یک قدم به روانی نزدیک‌تر می‌کند.",
+    "quoteSubtitle": "واژگان، گرامر و آزمون‌ها — همه در یک جا.",
+    "validation": {
+      "emailRequired": "ایمیل الزامی است",
+      "invalidEmail": "آدرس ایمیل نامعتبر است",
+      "passwordRequired": "رمز عبور الزامی است",
+      "fullNameMin": "نام کامل باید حداقل ۲ کاراکتر باشد",
+      "fullNameMax": "نام کامل بیش از حد طولانی است",
+      "passwordMin": "رمز عبور باید حداقل ۸ کاراکتر باشد",
+      "passwordLowercase": "رمز عبور باید شامل حرف کوچک باشد",
+      "passwordUppercase": "رمز عبور باید شامل حرف بزرگ باشد",
+      "passwordNumber": "رمز عبور باید شامل عدد باشد",
+      "confirmPasswordRequired": "لطفاً رمز عبور را تأیید کنید",
+      "passwordsMismatch": "رمزهای عبور مطابقت ندارند"
+    }
+  },
+  "menu": {
+    "badge": "منوی اصلی",
+    "greeting": "مسیر یادگیری خود را انتخاب کنید، {name}",
+    "subtitle": "یک زبان را برای شروع انتخاب کنید. داشبورد پیشرفت شما را جدا از این بخش یادگیری دنبال می‌کند.",
+    "openDashboard": "باز کردن داشبورد",
+    "coursesTitle": "دوره‌های زبانی",
+    "coursesSubtitle": "ایتالیایی اکنون فعال است. زبان‌های بیشتر در راه هستند.",
+    "startLearning": "شروع یادگیری",
+    "pathPreparing": "مسیر این زبان در حال آماده‌سازی است."
+  },
+  "curriculum": {
+    "italian": {
+      "headline": "یادگیری زبان ایتالیایی",
+      "description": "مسیر ساختاریافته A1 الهام‌گرفته از منابع معتبر آموزشی و کتاب‌های درسی."
+    },
+    "english": {
+      "headline": "یادگیری زبان انگلیسی",
+      "description": "مهارت‌های ارتباطی جهانی از سطح مبتدی تا پیشرفته."
+    },
+    "german": {
+      "headline": "یادگیری زبان آلمانی",
+      "description": "پیشرفت گرامری شفاف و واژگان کاربردی روزمره."
+    },
+    "turkish": {
+      "headline": "یادگیری زبان ترکی",
+      "description": "ماژول‌های گام‌به‌گام برای خواندن، گفتار و فرهنگ."
+    }
+  },
+  "learn": {
+    "backToMenu": "بازگشت به منوی اصلی",
+    "courseLevels": "سطوح دوره",
+    "courseLevelsHint": "یک ماژول را باز کنید و بخش‌های گرامر، واژگان، یادگیری تصویری و آزمون را ببینید.",
+    "chooseCategory": "یک دسته یادگیری برای ادامه مسیر ایتالیایی انتخاب کنید.",
+    "backToCategories": "بازگشت به دسته‌های {code}",
+    "contentPreparing": "محتوای {code} در حال آماده‌سازی است. بعداً سر بزنید یا از مدیر بخواهید درس {order} را اضافه کند.",
+    "categories": {
+      "grammar": {
+        "title": "گرامر",
+        "description": "درس‌های گرامری ساختاریافته با توضیحات و مثال‌های روشن."
+      },
+      "vocabulary": {
+        "title": "واژگان مهم",
+        "description": "کلمات و عبارات ضروری بر اساس موضوع."
+      },
+      "visual": {
+        "title": "یادگیری تصویری",
+        "description": "درس‌های تصویری برای تقویت حافظه با تصاویر."
+      },
+      "quiz": {
+        "title": "آزمون",
+        "description": "آزمون‌های تعاملی برای پیگیری نتایج و عملکرد."
+      }
+    },
+    "comingSoonTitle": "{name} به‌زودی",
+    "comingSoonDescription": "مسیر کامل یادگیری برای این زبان در حال ساخت است. بعداً سر بزنید یا فعلاً ایتالیایی را امتحان کنید.",
+    "exploreItalian": "کاوش ایتالیایی",
+    "fourCategories": "۴ دسته یادگیری",
+    "openLevel": "باز کردن {code}",
+    "backToLevels": "بازگشت به سطوح {name}",
+    "visualEmpty": "مواد تصویری این سطح پس از افزودن تصاویر به واژگان اینجا نمایش داده می‌شود."
+  },
+  "profile": {
+    "badge": "پروفایل",
+    "title": "پروفایل شما",
+    "subtitle": "جزئیات حساب و تاریخچه آزمون‌های خود را ببینید.",
+    "backToDashboard": "بازگشت به داشبورد",
+    "account": "حساب کاربری",
+    "accountDescription": "اطلاعات شخصی شما",
+    "fullName": "نام کامل",
+    "email": "ایمیل",
+    "notSet": "تنظیم نشده",
+    "quizHistory": "تاریخچه آزمون",
+    "quizHistoryHint": "همه آزمون‌هایی که تکمیل کرده‌اید.",
+    "unknownLesson": "درس نامشخص",
+    "noAttempts": "هنوز تلاشی برای آزمون ندارید. یک آزمون درس را تکمیل کنید تا تاریخچه اینجا نمایش داده شود.",
+    "lessonName": "نام درس",
+    "score": "نمره (%)",
+    "date": "تاریخ"
+  },
+  "lesson": {
+    "badge": "درس",
+    "backToItalian": "بازگشت به دوره ایتالیایی",
+    "viewLesson": "مشاهده درس",
+    "noDescription": "توضیحی برای این درس ارائه نشده است.",
+    "vocabulary": "واژگان",
+    "grammar": "گرامر",
+    "quiz": "آزمون",
+    "noVocabulary": "هنوز واژگانی به این درس اضافه نشده است.",
+    "noGrammar": "هنوز قاعده گرامری به این درس اضافه نشده است.",
+    "pronunciation": "تلفظ"
+  },
+  "dashboard": {
+    "user": {
+      "badge": "داشبورد یادگیرنده",
+      "welcome": "خوش آمدید، {name}",
+      "subtitle": "پیشرفت، آمار و دستاوردهای خود را دنبال کنید. زبان‌ها را از منوی اصلی انتخاب کنید.",
+      "continueLearning": "ادامه یادگیری",
+      "mainMenu": "منوی اصلی",
+      "viewProfile": "مشاهده پروفایل",
+      "quizzesCompleted": "آزمون‌های تکمیل‌شده",
+      "ofTotal": "از {total} کل",
+      "averageScore": "میانگین نمره",
+      "acrossAttempts": "در تمام تلاش‌ها",
+      "availableQuizzes": "آزمون‌های موجود",
+      "readyToTake": "آماده شرکت",
+      "achievements": "دستاوردها",
+      "milestonesUnlocked": "نقاط عطف باز شده",
+      "keepGoing": "ادامه بده!",
+      "startFirstQuiz": "اولین آزمون را شروع کنید",
+      "learningProgress": "پیشرفت یادگیری",
+      "percentCompleted": "{percent}% از آزمون‌ها تکمیل شده",
+      "availableQuizzesTitle": "آزمون‌های موجود",
+      "availableQuizzesHint": "آزمون‌هایی که هنوز شرکت نکرده‌اید.",
+      "startQuiz": "شروع آزمون",
+      "achievementsTitle": "دستاوردها",
+      "achievementsHint": "با یادگیری نقاط عطف را باز کنید.",
+      "activityHistory": "تاریخچه فعالیت",
+      "activityHint": "نتایج اخیر آزمون و نقاط عطف یادگیری.",
+      "noActivity": "هنوز فعالیتی نیست. از مسیر یادگیری ایتالیایی یک آزمون شروع کنید.",
+      "goToItalian": "رفتن به دوره ایتالیایی"
+    },
+    "admin": {
+      "badge": "داشبورد مدیر",
+      "hello": "سلام، {name}",
+      "subtitle": "آزمون‌ها را مدیریت کنید، فعالیت یادگیرندگان را پایش کنید و پلتفرم یادگیری زبان را از یک مرکز کنترل کنید.",
+      "fullManagement": "پنل مدیریت کامل",
+      "totalUsers": "کل کاربران",
+      "registeredLearners": "یادگیرندگان ثبت‌شده",
+      "totalQuizzes": "کل آزمون‌ها",
+      "acrossLessons": "در {count} درس",
+      "completionRate": "نرخ تکمیل",
+      "quizzesWithAttempts": "آزمون‌های دارای تلاش",
+      "avgScore": "میانگین نمره",
+      "totalAttempts": "{count} تلاش کل",
+      "recentActivity": "فعالیت اخیر",
+      "recentActivityHint": "آخرین ارسال‌های آزمون از یادگیرندگان.",
+      "noActivity": "هنوز فعالیت آزمونی نیست.",
+      "quizPerformance": "عملکرد آزمون‌ها",
+      "quizPerformanceHint": "تعداد تلاش و میانگین نمره هر آزمون.",
+      "noQuizzes": "هنوز آزمونی ساخته نشده.",
+      "quiz": "آزمون",
+      "attempts": "تلاش‌ها",
+      "avg": "میانگین",
+      "quickActions": "اقدامات سریع",
+      "quickActionsHint": "وارد کارهای رایج مدیریتی شوید.",
+      "manageQuizzes": "مدیریت آزمون‌ها و محتوا",
+      "manageUsers": "مدیریت کاربران",
+      "contentManagement": "مدیریت محتوا",
+      "contentManagementHint": "درس‌ها، واژگان، گرامر و آزمون‌ها را بسازید، ویرایش و منتشر کنید."
+    },
+    "achievements": {
+      "firstSteps": {
+        "title": "اولین گام‌ها",
+        "description": "اولین آزمون را تکمیل کنید"
+      },
+      "quizExplorer": {
+        "title": "کاوشگر آزمون",
+        "description": "۳ آزمون را تکمیل کنید"
+      },
+      "highAchiever": {
+        "title": "عملکرد برتر",
+        "description": "۸۰٪ یا بیشتر در یک آزمون کسب کنید"
+      },
+      "perfectScore": {
+        "title": "نمره کامل",
+        "description": "۱۰۰٪ در هر آزمونی کسب کنید"
+      },
+      "dedicatedLearner": {
+        "title": "یادگیرنده پرتلاش",
+        "description": "۵ آزمون را تکمیل کنید"
+      }
+    }
+  },
+  "quiz": {
+    "label": "آزمون",
+    "backToQuizzes": "بازگشت به آزمون‌ها",
+    "alreadyCompleted": "شما قبلاً این آزمون را تکمیل کرده‌اید.",
+    "answersLocked": "پاسخ‌های شما قفل شده و قابل تغییر نیستند.",
+    "yourScore": "نمره شما: {score}%",
+    "answerAll": "به هر سؤال پاسخ دهید، سپس آماده بودن ارسال کنید.",
+    "noQuestions": "این آزمون هنوز سؤالی ندارد.",
+    "questionProgress": "سؤال {current} از {total}",
+    "multipleChoice": "چندگزینه‌ای",
+    "writtenAnswer": "پاسخ نوشتاری",
+    "typeAnswer": "پاسخ خود را اینجا بنویسید...",
+    "explanationLabel": "توضیح",
+    "previous": "قبلی",
+    "nextQuestion": "سؤال بعدی",
+    "submitAnswers": "ارسال پاسخ‌ها",
+    "submitting": "در حال ارسال...",
+    "browse": {
+      "backToDashboard": "بازگشت به داشبورد",
+      "stepLanguage": "مرحله ۱ · زبان",
+      "chooseLanguage": "یک زبان انتخاب کنید",
+      "browseSubtitle": "آزمون‌های منتشرشده را بر اساس زبان، سطح، درس و بخش مرور کنید.",
+      "stepLevel": "مرحله ۲ · سطح",
+      "levelsSubtitle": "یک سطح دوره انتخاب کنید تا به درس‌ها و بخش‌ها بروید.",
+      "stepLesson": "مرحله ۳ · درس",
+      "stepSection": "مرحله ۴ · بخش‌های یادگیری",
+      "stepAvailable": "مرحله ۵ · آزمون‌های موجود",
+      "chooseSection": "یک بخش یادگیری برای یافتن آزمون‌های موجود انتخاب کنید.",
+      "noPublished": "هنوز آزمون منتشرشده‌ای در این بخش نیست.",
+      "checkBack": "بعداً سر بزنید یا بخش دیگری را امتحان کنید.",
+      "completed": "آزمون تکمیل شد!",
+      "scored": "شما {score}% در «{title}» کسب کردید.",
+      "alreadyDone": "شما قبلاً این آزمون را تکمیل کرده‌اید.",
+      "startQuiz": "شروع آزمون",
+      "completedBadge": "{score}% تکمیل‌شده",
+      "backToLanguages": "بازگشت به زبان‌ها",
+      "backToLevels": "بازگشت به سطوح",
+      "backToSections": "بازگشت به بخش‌ها",
+      "levelsTitle": "سطوح {name}",
+      "lessonPreparing": "محتوای درس برای این سطح در حال آماده‌سازی است.",
+      "unitFallback": "واحد {code}"
+    },
+    "lesson": {
+      "noQuiz": "هنوز آزمونی برای این درس موجود نیست.",
+      "ready": "آماده‌اید آنچه یاد گرفته‌اید را بسنجید؟",
+      "browseAll": "مرور همه آزمون‌ها"
+    }
+  },
+  "dev": {
+    "banner": "حالت توسعه محلی فعال — استفاده از داده آزمایشی در حافظه (بدون درخواست Supabase). مدیر: {adminEmail} · کاربر: {userEmail}"
+  },
+  "admin": {
+    "tabs": {
+      "lessons": "درس‌ها",
+      "vocabulary": "واژگان",
+      "grammar": "گرامر",
+      "quizzes": "آزمون‌ها",
+      "users": "کاربران"
+    },
+    "delete": {
+      "ariaLabel": "حذف"
+    },
+    "lessonPicker": {
+      "selectLesson": "یک درس انتخاب کنید",
+      "createLessonFirst": "ابتدا یک درس ایجاد کنید"
+    },
+    "fields": {
+      "orderNumber": "شماره ترتیب",
+      "lesson": "درس",
+      "word": "کلمه",
+      "translation": "ترجمه",
+      "imageUrl": "آدرس تصویر",
+      "imageUrlOptional": "آدرس تصویر (اختیاری)",
+      "exampleSentence": "جمله نمونه",
+      "exampleSentenceOptional": "جمله نمونه (اختیاری)",
+      "descriptionOptional": "توضیحات (اختیاری)",
+      "exampleOptional": "مثال (اختیاری)"
+    },
+    "placeholders": {
+      "lessonTitle": "سلام و معرفی",
+      "lessonDescription": "یادگیرندگان از این درس چه چیزی یاد می‌گیرند؟",
+      "word": "Hola",
+      "translation": "Hello",
+      "imageUrl": "https://...",
+      "grammarTitle": "زمان حال فعل 'ser'"
+    },
+    "lessons": {
+      "addTitle": "افزودن درس جدید",
+      "addDescription": "درس‌ها واژگان، قواعد گرامری و آزمون‌ها را گروه‌بندی می‌کنند.",
+      "addLesson": "افزودن درس",
+      "created": "درس ایجاد شد",
+      "editTitle": "ویرایش درس",
+      "editAriaLabel": "ویرایش درس",
+      "editDescription": "جزئیات «{title}» را به‌روزرسانی کنید.",
+      "updated": "درس به‌روزرسانی شد",
+      "existingTitle": "درس‌های موجود",
+      "total": "{count} مورد",
+      "empty": "هنوز درسی نیست. اولین درس را در بالا ایجاد کنید.",
+      "deleteTitle": "این درس حذف شود؟",
+      "deleteDescription": "«{title}» به‌همراه تمام واژگان، قواعد گرامری و آزمون‌های آن برای همیشه حذف می‌شود.",
+      "deleted": "درس حذف شد"
+    },
+    "vocabulary": {
+      "createLessonFirst": "قبل از افزودن واژگان، ابتدا در تب درس‌ها یک درس ایجاد کنید.",
+      "addTitle": "افزودن واژگان",
+      "addDescription": "یک درس انتخاب کنید، سپس کلمه و ترجمه آن را اضافه کنید.",
+      "addButton": "افزودن واژگان",
+      "added": "واژگان اضافه شد",
+      "tableTitle": "واژگان این درس",
+      "wordCount": "{count} کلمه",
+      "empty": "هنوز واژگانی برای این درس نیست.",
+      "editTitle": "ویرایش واژگان",
+      "editAriaLabel": "ویرایش واژگان",
+      "editDescription": "«{word}» را به‌روزرسانی کنید.",
+      "updated": "واژگان به‌روزرسانی شد",
+      "deleteTitle": "این واژه حذف شود؟",
+      "deleteDescription": "«{word}» برای همیشه حذف می‌شود.",
+      "deleted": "واژگان حذف شد"
+    },
+    "grammar": {
+      "createLessonFirst": "قبل از افزودن قواعد گرامری، ابتدا در تب درس‌ها یک درس ایجاد کنید.",
+      "addTitle": "افزودن قاعده گرامری",
+      "addDescription": "یک درس انتخاب کنید، سپس یک قاعده گرامری با مثال اضافه کنید.",
+      "addButton": "افزودن قاعده گرامری",
+      "added": "قاعده گرامری اضافه شد",
+      "tableTitle": "قواعد گرامری این درس",
+      "ruleCount": "{count} قاعده",
+      "empty": "هنوز قاعده گرامری برای این درس نیست.",
+      "editTitle": "ویرایش قاعده گرامری",
+      "editAriaLabel": "ویرایش قاعده گرامری",
+      "editDescription": "«{title}» را به‌روزرسانی کنید.",
+      "updated": "قاعده گرامری به‌روزرسانی شد",
+      "deleteTitle": "این قاعده گرامری حذف شود؟",
+      "deleteDescription": "«{title}» برای همیشه حذف می‌شود.",
+      "deleted": "قاعده گرامری حذف شد"
+    },
+    "quizzes": {
+      "pageBadge": "مدیریت آزمون",
+      "pageHello": "مرکز آزمون، {name}",
+      "pageSubtitle": "آزمون‌ها را در زبان‌ها، سطوح، درس‌ها و بخش‌ها ایجاد، منتشر و پایش کنید.",
+      "fullAdminPanel": "پنل کامل مدیریت",
+      "statTotalQuizzes": "کل آزمون‌ها",
+      "statPublishedDrafts": "{published} منتشرشده · {drafts} پیش‌نویس",
+      "statQuestions": "کل سؤالات",
+      "statQuestionsDesc": "در همه آزمون‌ها",
+      "statAttempts": "کل تلاش‌ها",
+      "statAttemptsDesc": "ارسال‌های یادگیرندگان",
+      "statAverageScore": "میانگین نمره",
+      "statAverageScoreDesc": "در همه تلاش‌ها",
+      "wizardTitle": "ایجاد آزمون جدید",
+      "wizardDescription": "مراحل را برای پیکربندی زبان، سطح، درس، بخش و سؤالات دنبال کنید.",
+      "stepLanguage": "زبان",
+      "stepLevel": "سطح",
+      "stepLesson": "درس",
+      "stepSection": "بخش",
+      "stepQuestions": "سؤالات",
+      "selectLanguage": "انتخاب زبان",
+      "selectLevel": "انتخاب سطح",
+      "selectedLesson": "درس مرتبط",
+      "noLessonMapped": "درسی برای این سطح تعریف نشده",
+      "quizTitle": "عنوان آزمون",
+      "wizardTitlePlaceholder": "مثلاً آزمون سلام و معرفی A1",
+      "learningSection": "بخش یادگیری",
+      "publishStatus": "وضعیت انتشار",
+      "saveAsDraft": "ذخیره به‌عنوان پیش‌نویس",
+      "publishNow": "انتشار فوری",
+      "quizQuestions": "سؤالات آزمون",
+      "addQuestion": "افزودن سؤال",
+      "createQuiz": "ایجاد آزمون",
+      "quizPublished": "آزمون منتشر شد",
+      "quizSavedDraft": "آزمون به‌عنوان پیش‌نویس ذخیره شد",
+      "movedToDraft": "آزمون به پیش‌نویس منتقل شد",
+      "createLessonFirst": "قبل از افزودن آزمون، ابتدا در تب درس‌ها یک درس ایجاد کنید.",
+      "allQuizzes": "همه آزمون‌ها",
+      "tableSummary": "{count} آزمون برای درس انتخاب‌شده",
+      "empty": "هنوز آزمونی برای این درس نیست.",
+      "quizSingular": "آزمون",
+      "quizPlural": "آزمون",
+      "questionsColumn": "سؤالات",
+      "deleteQuizTitle": "این آزمون حذف شود؟",
+      "deleteQuizDescription": "«{title}» به‌همراه همه سؤالات آن برای همیشه حذف می‌شود.",
+      "quizDeleted": "آزمون حذف شد",
+      "managementSummary": "{count} آزمون · {published} منتشرشده",
+      "filterLanguage": "فیلتر بر اساس زبان",
+      "allLanguages": "همه زبان‌ها",
+      "filterStatus": "فیلتر بر اساس وضعیت",
+      "allStatus": "همه وضعیت‌ها",
+      "noFilterMatch": "آزمونی با فیلترهای انتخاب‌شده یافت نشد.",
+      "quizColumn": "آزمون",
+      "pathColumn": "مسیر",
+      "statusColumn": "وضعیت",
+      "statsColumn": "آمار",
+      "statusPublished": "منتشرشده",
+      "statusDraft": "پیش‌نویس",
+      "questionCountLesson": "{count} سؤال · {lesson}",
+      "attemptCount": "{count} تلاش",
+      "avgScore": "میانگین {score}٪",
+      "previewQuizAria": "پیش‌نمایش آزمون",
+      "unpublish": "لغو انتشار",
+      "publish": "انتشار",
+      "questionLabel": "سؤال {number}",
+      "removeQuestionAria": "حذف سؤال",
+      "questionType": "نوع سؤال",
+      "selectType": "انتخاب نوع",
+      "questionText": "متن سؤال",
+      "wizardQuestionPlaceholder": "سؤالی که یادگیرندگان می‌بینند را وارد کنید...",
+      "expectedAnswer": "پاسخ مورد انتظار",
+      "expectedAnswerPlaceholder": "پاسخ صحیح نوشتاری",
+      "correctAnswer": "پاسخ صحیح",
+      "explanationOptional": "توضیح (اختیاری)",
+      "explanationPlaceholder": "پس از ارسال آزمون نمایش داده می‌شود",
+      "optionA": "گزینه الف",
+      "optionB": "گزینه ب",
+      "optionC": "گزینه ج",
+      "optionD": "گزینه د",
+      "newQuiz": "آزمون جدید",
+      "createTitle": "ایجاد آزمون سریع",
+      "createDescription": "یک آزمون چندگزینه‌ای به یک درس موجود اضافه کنید.",
+      "quizCreated": "آزمون ایجاد شد",
+      "titlePlaceholder": "عنوان آزمون",
+      "questionsHeading": "سؤالات",
+      "editTitle": "ویرایش آزمون",
+      "editDescription": "عنوان آزمون را به‌روزرسانی کنید و سؤالات را مدیریت کنید.",
+      "titleUpdated": "عنوان آزمون به‌روزرسانی شد",
+      "questionAdded": "سؤال اضافه شد",
+      "questionUpdated": "سؤال به‌روزرسانی شد",
+      "saveTitle": "ذخیره عنوان",
+      "existingQuestions": "سؤالات موجود",
+      "questionSingular": "سؤال",
+      "questionPlural": "سؤال",
+      "noQuestionsYet": "هنوز سؤالی نیست. در پایین یکی اضافه کنید.",
+      "questionColumn": "سؤال",
+      "correctColumn": "صحیح",
+      "editQuestionAria": "ویرایش سؤال",
+      "deleteQuestionTitle": "این سؤال حذف شود؟",
+      "questionDeleted": "سؤال حذف شد",
+      "editQuestionHeading": "ویرایش سؤال",
+      "cancelEdit": "لغو ویرایش",
+      "saveQuestionChanges": "ذخیره تغییرات",
+      "addNewQuestion": "افزودن سؤال جدید",
+      "questionTextPlaceholder": "کلمه ایتالیایی «سلام» چیست؟",
+      "sections": {
+        "grammar": {
+          "title": "گرامر",
+          "description": "آزمون‌های گرامری"
+        },
+        "vocabulary": {
+          "title": "واژگان",
+          "description": "آزمون‌های واژگان"
+        },
+        "visual": {
+          "title": "تصویری",
+          "description": "آزمون‌های یادگیری تصویری"
+        },
+        "quiz": {
+          "title": "آزمون",
+          "description": "آزمون‌های عمومی درس"
+        },
+        "custom": {
+          "title": "سفارشی",
+          "description": "آزمون‌های بخش سفارشی"
+        }
+      }
+    },
+    "users": {
+      "title": "مدیریت کاربران",
+      "description": "کاربران ثبت‌شده را ببینید و مجوزهای مدیر را مدیریت کنید.",
+      "noUsers": "هنوز کاربری ثبت‌نام نکرده است.",
+      "name": "نام",
+      "role": "نقش",
+      "joined": "عضویت",
+      "actions": "اقدامات",
+      "unnamed": "کاربر بدون نام",
+      "demote": "تنزل",
+      "promote": "ارتقا",
+      "promoted": "کاربر به مدیر ارتقا یافت",
+      "demoted": "دسترسی مدیر حذف شد"
+    }
+  },
+  "pricing": {
+    "signIn": "ورود",
+    "getStarted": "شروع کنید",
+    "backHome": "بازگشت به خانه",
+    "title": "قیمت‌گذاری ساده و شفاف",
+    "subtitle": "رایگان شروع کنید و وقتی آماده بودید ارتقا دهید. همه طرح‌ها شامل تجربه یادگیری اصلی ما هستند.",
+    "mostPopular": "محبوب‌ترین",
+    "paymentSoon": "اتصال درگاه پرداخت به‌زودی!",
+    "checkoutSoon": "پرداخت {plan} در به‌روزرسانی آینده در دسترس خواهد بود.",
+    "plans": {
+      "free": {
+        "name": "رایگان",
+        "period": "برای همیشه",
+        "description": "همه چیز برای شروع.",
+        "cta": "طرح فعلی",
+        "features": {
+          "lessons": "دسترسی به همه درس‌های عمومی",
+          "flashcards": "فلش‌کارت واژگان",
+          "grammar": "توضیحات گرامری",
+          "quizAttempt": "یک تلاش آزمون برای هر درس"
+        }
+      },
+      "monthly": {
+        "name": "حرفه‌ای ماهانه",
+        "period": "در ماه",
+        "description": "ابزارهای پیشرفته یادگیری را باز کنید.",
+        "cta": "اشتراک",
+        "features": {
+          "allFree": "همه امکانات رایگان",
+          "unlimited": "تلاش مجدد نامحدود آزمون",
+          "analytics": "تحلیل پیشرفت",
+          "offline": "دسترسی آفلاین به درس‌ها (PWA)",
+          "support": "پشتیبانی اولویت‌دار"
+        }
+      },
+      "yearly": {
+        "name": "حرفه‌ای سالانه",
+        "period": "در سال",
+        "description": "بهترین ارزش برای یادگیرندگان متعهد.",
+        "cta": "خرید سالانه",
+        "features": {
+          "allMonthly": "همه امکانات حرفه‌ای ماهانه",
+          "save": "۲۷٪ صرفه‌جویی نسبت به ماهانه",
+          "bonus": "درس‌های ویژه اضافی",
+          "certificate": "گواهی تکمیل",
+          "earlyAccess": "دسترسی زودهنگام به ویژگی‌های جدید"
+        }
+      }
+    }
+  },
+  "meta": {
+    "siteTitle": "لا‌بلا — هر درس، یک قدم به روانی",
+    "siteDescription": "لا‌بلا به شما کمک می‌کند واژگان، گرامر و مهارت‌های شنیداری را با درس‌های کوتاه و آزمون‌ها یاد بگیرید.",
+    "siteName": "LaBella",
+    "login": "ورود — LaBella",
+    "signUp": "ثبت‌نام — LaBella",
+    "menu": "منوی اصلی — LaBella",
+    "dashboard": "داشبورد — LaBella",
+    "profile": "پروفایل — LaBella",
+    "pricing": "قیمت‌گذاری — LaBella",
+    "pricingDescription": "طرحی را انتخاب کنید که با مسیر یادگیری زبان شما سازگار است.",
+    "admin": "مدیریت — LaBella",
+    "adminQuizzes": "مدیریت آزمون — LaBella",
+    "quizBrowse": "مرور آزمون‌ها — LaBella",
+    "quiz": "آزمون — LaBella",
+    "languageCourse": "دوره زبان — LaBella",
+    "level": "سطح — LaBella",
+    "lessonCategory": "دسته درس — LaBella",
+    "lesson": "درس — LaBella"
+  },
+  "actions": {
+    "errors": {
+      "invalidInput": "ورودی نامعتبر است. لطفاً فرم را بررسی و دوباره تلاش کنید.",
+      "invalidCredentials": "لطفاً ایمیل و رمز عبور را بررسی و دوباره تلاش کنید.",
+      "formCheck": "لطفاً فرم را دوباره بررسی کنید.",
+      "localModeSignUp": "حالت توسعه محلی از حساب‌های ازپیش‌ساخته استفاده می‌کند. با حساب نمونه مدیر یا کاربر وارد شوید.",
+      "authServerUnreachable": "اتصال به سرور احراز هویت برقرار نشد. اتصال اینترنت، VPN/فایروال و فعال بودن پروژه Supabase را بررسی کنید.",
+      "confirmEmail": "قبل از ورود، ایمیل خود را برای تأیید بررسی کنید.",
+      "mustSignIn": "برای ارسال آزمون باید وارد شوید.",
+      "alreadyAttempted": "شما قبلاً این آزمون را انجام داده‌اید.",
+      "quizNotFound": "آزمون یافت نشد.",
+      "quizUnavailable": "این آزمون هنوز در دسترس نیست.",
+      "quizNoQuestions": "این آزمون سؤالی ندارد.",
+      "answerAll": "لطفاً قبل از ارسال به همه سؤالات پاسخ دهید.",
+      "invalidSubmission": "ارسال نامعتبر است.",
+      "generic": "مشکلی پیش آمد. لطفاً دوباره تلاش کنید."
+    }
+  },
+  "validation": {
+    "admin": {
+      "maxChars": "حداکثر {max} کاراکتر مجاز است",
+      "titleMin": "عنوان باید حداقل ۲ کاراکتر باشد",
+      "titleMax": "عنوان بیش از حد طولانی است",
+      "orderNumber": "ترتیب باید عدد باشد",
+      "orderInt": "ترتیب باید عدد صحیح باشد",
+      "orderMin": "ترتیب باید ۰ یا بیشتر باشد",
+      "selectLesson": "لطفاً یک درس انتخاب کنید",
+      "wordRequired": "کلمه الزامی است",
+      "wordMax": "کلمه بیش از حد طولانی است",
+      "translationRequired": "ترجمه الزامی است",
+      "translationMax": "ترجمه بیش از حد طولانی است",
+      "invalidUrl": "باید یک URL معتبر باشد",
+      "questionRequired": "متن سؤال الزامی است",
+      "optionARequired": "گزینه الف الزامی است",
+      "optionBRequired": "گزینه ب الزامی است",
+      "optionCRequired": "گزینه ج الزامی است",
+      "optionDRequired": "گزینه د الزامی است",
+      "selectCorrect": "پاسخ صحیح را انتخاب کنید",
+      "expectedAnswerRequired": "پاسخ مورد انتظار الزامی است",
+      "selectLevel": "یک سطح دوره انتخاب کنید",
+      "minOneQuestion": "حداقل یک سؤال اضافه کنید"
+    },
+    "quiz": {
+      "selectAnswer": "لطفاً یک پاسخ انتخاب کنید",
+      "provideAnswer": "لطفاً پاسخی وارد کنید",
+      "invalidQuiz": "آزمون نامعتبر است"
+    }
+  },
+  "brand": {
+    "goToMenu": "رفتن به منوی اصلی"
+  }
+}

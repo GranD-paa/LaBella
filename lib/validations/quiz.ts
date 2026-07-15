@@ -6,14 +6,22 @@ const answerOptionSchema = z.enum(["a", "b", "c", "d"], {
 
 export const submitQuizSchema = z.object({
   quizId: z.string().uuid("Invalid quiz"),
-  answers: z.record(z.string().uuid(), answerOptionSchema),
+  answers: z.record(z.string().uuid(), z.string().min(1, "Please provide an answer")),
 });
 
 export type SubmitQuizValues = z.infer<typeof submitQuizSchema>;
 
-export function createSubmitQuizSchema(questionIds: string[]) {
+export function createSubmitQuizSchema(
+  questions: Array<{ id: string; question_type?: "multiple_choice" | "written" }>
+) {
   const answerFields = Object.fromEntries(
-    questionIds.map((id) => [id, answerOptionSchema])
+    questions.map((question) => {
+      const schema =
+        question.question_type === "written"
+          ? z.string().min(1, "Please provide an answer")
+          : answerOptionSchema;
+      return [question.id, schema];
+    })
   );
 
   return z.object({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 import { signUpAction } from "@/app/actions/auth";
-import { signUpSchema, type SignUpValues } from "@/lib/validations/auth";
+import { useTranslations } from "@/components/providers/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,11 +20,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { resolveMessage } from "@/lib/i18n/resolve-message";
+import { createSignUpSchema } from "@/lib/validations/i18n/auth-schemas";
+import type { SignUpValues } from "@/lib/validations/auth";
 
 export function SignUpForm() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
+  const { t } = useTranslations();
+  const signUpSchema = useMemo(() => createSignUpSchema(t), [t]);
 
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
@@ -41,12 +46,13 @@ export function SignUpForm() {
     startTransition(async () => {
       const result = await signUpAction(values);
       if (result && "error" in result) {
-        setFormError(result.error);
-        toast.error(result.error);
+        const errorMessage = resolveMessage(t, result.error);
+        setFormError(errorMessage);
+        toast.error(errorMessage);
         return;
       }
       if (result && "success" in result) {
-        toast.success(result.message);
+        toast.success(resolveMessage(t, result.message));
         router.push("/login");
       }
     });
@@ -56,11 +62,9 @@ export function SignUpForm() {
     <div className="space-y-6">
       <div className="space-y-1 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
-          Create your account
+          {t("auth.signUpTitle")}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Start learning a new language today
-        </p>
+        <p className="text-sm text-muted-foreground">{t("auth.signUpSubtitle")}</p>
       </div>
 
       <Form {...form}>
@@ -70,10 +74,10 @@ export function SignUpForm() {
             name="fullName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full name</FormLabel>
+                <FormLabel>{t("auth.fullName")}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Jane Doe"
+                    placeholder={t("auth.fullNamePlaceholder")}
                     autoComplete="name"
                     disabled={isPending}
                     {...field}
@@ -89,11 +93,11 @@ export function SignUpForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t("auth.email")}</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder={t("auth.emailPlaceholder")}
                     autoComplete="email"
                     disabled={isPending}
                     {...field}
@@ -109,11 +113,11 @@ export function SignUpForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t("auth.password")}</FormLabel>
                 <FormControl>
                   <Input
                     type="password"
-                    placeholder="••••••••"
+                    placeholder={t("auth.passwordPlaceholder")}
                     autoComplete="new-password"
                     disabled={isPending}
                     {...field}
@@ -129,11 +133,11 @@ export function SignUpForm() {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Confirm password</FormLabel>
+                <FormLabel>{t("auth.confirmPassword")}</FormLabel>
                 <FormControl>
                   <Input
                     type="password"
-                    placeholder="••••••••"
+                    placeholder={t("auth.passwordPlaceholder")}
                     autoComplete="new-password"
                     disabled={isPending}
                     {...field}
@@ -145,31 +149,29 @@ export function SignUpForm() {
           />
 
           {formError ? (
-            <p className="text-sm font-medium text-destructive">
-              {formError}
-            </p>
+            <p className="text-sm font-medium text-destructive">{formError}</p>
           ) : null}
 
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Creating account...
+                {t("auth.creatingAccount")}
               </>
             ) : (
-              "Create account"
+              t("auth.createAccount")
             )}
           </Button>
         </form>
       </Form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        {t("auth.hasAccount")}{" "}
         <Link
           href="/login"
           className="font-medium text-foreground underline-offset-4 hover:underline"
         >
-          Sign in
+          {t("auth.signIn")}
         </Link>
       </p>
     </div>

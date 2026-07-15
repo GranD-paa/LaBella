@@ -1,5 +1,8 @@
+"use client";
+
 import { History } from "lucide-react";
 
+import { useTranslations } from "@/components/providers/locale-provider";
 import {
   Table,
   TableBody,
@@ -16,19 +19,14 @@ export type QuizAttemptHistoryRow = {
   lessonName: string;
 };
 
-function formatDate(dateString: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(dateString));
-}
-
 export function QuizHistoryTable({ attempts }: { attempts: QuizAttemptHistoryRow[] }) {
+  const { t, formatDate } = useTranslations();
+
   if (attempts.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
         <History className="h-8 w-8" />
-        <p>No quiz attempts yet. Complete a lesson quiz to see your history here.</p>
+        <p>{t("profile.noAttempts")}</p>
       </div>
     );
   }
@@ -38,18 +36,23 @@ export function QuizHistoryTable({ attempts }: { attempts: QuizAttemptHistoryRow
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Lesson Name</TableHead>
-            <TableHead>Score (%)</TableHead>
-            <TableHead>Date</TableHead>
+            <TableHead>{t("profile.lessonName")}</TableHead>
+            <TableHead>{t("profile.score")}</TableHead>
+            <TableHead>{t("profile.date")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {attempts.map((attempt) => (
             <TableRow key={attempt.id}>
-              <TableCell className="font-medium">{attempt.lessonName}</TableCell>
+              <TableCell className="font-medium">
+                {attempt.lessonName || t("profile.unknownLesson")}
+              </TableCell>
               <TableCell>{attempt.score}%</TableCell>
               <TableCell className="text-muted-foreground">
-                {formatDate(attempt.created_at)}
+                {formatDate(attempt.created_at, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
               </TableCell>
             </TableRow>
           ))}

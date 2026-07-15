@@ -68,6 +68,15 @@
     background-image: theme("backgroundImage.brand-radial");
     background-attachment: fixed;
   }
+
+  html[lang="fa"] body,
+  body.locale-fa {
+    font-family: var(--font-fa), var(--font-sans), system-ui, sans-serif;
+  }
+
+  [dir="rtl"] .rtl-flip {
+    transform: scaleX(-1);
+  }
 }
 
 @layer components {

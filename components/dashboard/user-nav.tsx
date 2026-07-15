@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { signOutAction } from "@/app/actions/auth";
+import { useTranslations } from "@/components/providers/locale-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,7 +48,8 @@ export function UserNav({
   isAdmin?: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
-  const roleLabel = isAdmin ? "Admin" : "Learner";
+  const { t } = useTranslations();
+  const roleLabel = isAdmin ? t("common.admin") : t("common.learner");
   const RoleIcon = isAdmin ? ShieldCheck : UserIcon;
 
   return (
@@ -56,7 +58,7 @@ export function UserNav({
         <Button
           variant="ghost"
           className="relative h-9 w-9 rounded-full"
-          aria-label="Open user menu"
+          aria-label={t("nav.openUserMenu")}
         >
           <Avatar className="h-9 w-9">
             <AvatarImage src={avatarUrl ?? undefined} alt={fullName ?? roleLabel} />
@@ -82,20 +84,20 @@ export function UserNav({
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/menu">
-            <Home className="mr-2 h-4 w-4" />
-            Main Menu
+            <Home className="me-2 h-4 w-4" />
+            {t("nav.mainMenu")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/profile">
-            <UserCircle className="mr-2 h-4 w-4" />
-            Profile
+            <UserCircle className="me-2 h-4 w-4" />
+            {t("nav.profile")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/dashboard">
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Dashboard
+            <LayoutDashboard className="me-2 h-4 w-4" />
+            {t("nav.dashboard")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -107,8 +109,8 @@ export function UserNav({
             });
           }}
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          Sign out
+          <LogOut className="me-2 h-4 w-4" />
+          {t("nav.signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

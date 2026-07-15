@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { VocabularyForm } from "@/components/admin/vocabulary/vocabulary-form";
 import { VocabularyTable } from "@/components/admin/vocabulary/vocabulary-table";
+import { useTranslations } from "@/components/providers/locale-provider";
 import type { Lesson, Vocabulary } from "@/types";
 
 export function VocabularyManager({
@@ -13,6 +14,7 @@ export function VocabularyManager({
   lessons: Lesson[];
   vocabulary: Vocabulary[];
 }) {
+  const { t } = useTranslations();
   const sortedLessons = [...lessons].sort(
     (a, b) => a.order_number - b.order_number
   );
@@ -23,7 +25,7 @@ export function VocabularyManager({
   if (lessons.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-10 text-center text-muted-foreground">
-        Create a lesson first in the Lessons tab before adding vocabulary.
+        {t("admin.vocabulary.createLessonFirst")}
       </div>
     );
   }

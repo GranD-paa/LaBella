@@ -8,7 +8,7 @@ import type { ActionResult } from "@/lib/action-result";
 export async function createGrammarRule(values: unknown): Promise<ActionResult> {
   const parsed = grammarRuleSchema.safeParse(values);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return { error: "actions.errors.invalidInput" };
   }
 
   const repo = getDataRepository();
@@ -20,7 +20,7 @@ export async function createGrammarRule(values: unknown): Promise<ActionResult> 
   });
 
   if (result.error) {
-    return { error: result.error };
+    return { error: "actions.errors.generic" };
   }
 
   revalidateAppContent(parsed.data.lessonId);
@@ -33,7 +33,7 @@ export async function updateGrammarRule(
 ): Promise<ActionResult> {
   const parsed = grammarRuleSchema.safeParse(values);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return { error: "actions.errors.invalidInput" };
   }
 
   const repo = getDataRepository();
@@ -45,7 +45,7 @@ export async function updateGrammarRule(
   });
 
   if (result.error) {
-    return { error: result.error };
+    return { error: "actions.errors.generic" };
   }
 
   revalidateAppContent(parsed.data.lessonId);
@@ -58,7 +58,7 @@ export async function deleteGrammarRule(id: string): Promise<ActionResult> {
   const result = await repo.deleteGrammarRule(id);
 
   if (result.error) {
-    return { error: result.error };
+    return { error: "actions.errors.generic" };
   }
 
   revalidateAppContent(row?.lesson_id);

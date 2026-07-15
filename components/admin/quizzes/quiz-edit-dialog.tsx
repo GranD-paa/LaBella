@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -15,12 +15,14 @@ import {
 } from "@/app/admin/actions/quizzes";
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
 import { SingleQuizQuestionForm } from "@/components/admin/quizzes/single-quiz-question-form";
+import { useTranslations } from "@/components/providers/locale-provider";
 import {
-  quizQuestionSchema,
-  quizTitleSchema,
+  createQuizQuestionSchema,
+  createQuizTitleSchema,
   type QuizQuestionValues,
   type QuizTitleValues,
-} from "@/lib/validations/admin";
+} from "@/lib/validations/i18n/admin-schemas";
+import { resolveMessage } from "@/lib/i18n/resolve-message";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,23 +54,33 @@ import {
 import type { Quiz, QuizQuestion } from "@/types";
 
 const emptyQuestion: QuizQuestionValues = {
+  questionType: "multiple_choice",
   questionText: "",
   optionA: "",
   optionB: "",
   optionC: "",
   optionD: "",
   correctOption: "a",
+  expectedAnswer: "",
+  explanation: "",
 };
 
 function toQuestionValues(question: QuizQuestion): QuizQuestionValues {
   return {
+    questionType: question.question_type ?? "multiple_choice",
     questionText: question.question_text,
     optionA: question.option_a,
     optionB: question.option_b,
     optionC: question.option_c,
     optionD: question.option_d,
     correctOption: question.correct_option,
+    expectedAnswer: question.expected_answer ?? "",
+    explanation: question.explanation ?? "",
   };
+}
+
+function pluralize(count: number, singular: string, plural: string) {
+  return count === 1 ? singular : plural;
 }
 
 export function QuizEditDialog({
@@ -78,12 +90,16 @@ export function QuizEditDialog({
   quiz: Quiz;
   questions: QuizQuestion[];
 }) {
+  const { t } = useTranslations();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
     null
   );
+
+  const quizTitleSchema = useMemo(() => createQuizTitleSchema(t), [t]);
+  const quizQuestionSchema = useMemo(() => createQuizQuestionSchema(t), [t]);
 
   const titleForm = useForm<QuizTitleValues>({
     resolver: zodResolver(quizTitleSchema),
@@ -116,10 +132,10 @@ export function QuizEditDialog({
     startTransition(async () => {
       const result = await updateQuizTitle(quiz.id, values);
       if ("error" in result) {
-        toast.error(result.error);
+        toast.error(resolveMessage(t, result.error));
         return;
       }
-      refreshAfterMutation("Quiz title updated");
+      refreshAfterMutation(t("admin.quizzes.titleUpdated"));
     });
   }
 
@@ -127,10 +143,10 @@ export function QuizEditDialog({
     startTransition(async () => {
       const result = await addQuizQuestion(quiz.id, values);
       if ("error" in result) {
-        toast.error(result.error);
+        toast.error(resolveMessage(t, result.error));
         return;
       }
-      refreshAfterMutation("Question added");
+      refreshAfterMutation(t("admin.quizzes.questionAdded"));
     });
   }
 
@@ -140,10 +156,10 @@ export function QuizEditDialog({
     startTransition(async () => {
       const result = await updateQuizQuestion(editingQuestionId, values);
       if ("error" in result) {
-        toast.error(result.error);
+        toast.error(resolveMessage(t, result.error));
         return;
       }
-      refreshAfterMutation("Question updated");
+      refreshAfterMutation(t("admin.quizzes.questionUpdated"));
     });
   }
 
@@ -167,15 +183,13 @@ export function QuizEditDialog({
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm">
           <Pencil className="h-4 w-4" />
-          Edit
+          {t("common.edit")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit quiz</DialogTitle>
-          <DialogDescription>
-            Update the quiz title and manage its questions individually.
-          </DialogDescription>
+          <DialogTitle>{t("admin.quizzes.editTitle")}</DialogTitle>
+          <DialogDescription>{t("admin.quizzes.editDescription")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-8">
@@ -189,7 +203,7 @@ export function QuizEditDialog({
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quiz title</FormLabel>
+                    <FormLabel>{t("admin.quizzes.quizTitle")}</FormLabel>
                     <div className="flex flex-col gap-2 sm:flex-row">
                       <FormControl>
                         <Input disabled={isPending} {...field} />
@@ -198,7 +212,7 @@ export function QuizEditDialog({
                         {isPending ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
-                          "Save title"
+                          t("admin.quizzes.saveTitle")
                         )}
                       </Button>
                     </div>
@@ -211,16 +225,22 @@ export function QuizEditDialog({
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium">Existing questions</h3>
+              <h3 className="text-sm font-medium">
+                {t("admin.quizzes.existingQuestions")}
+              </h3>
               <Badge variant="secondary">
                 {sortedQuestions.length}{" "}
-                {sortedQuestions.length === 1 ? "question" : "questions"}
+                {pluralize(
+                  sortedQuestions.length,
+                  t("admin.quizzes.questionSingular"),
+                  t("admin.quizzes.questionPlural")
+                )}
               </Badge>
             </div>
 
             {sortedQuestions.length === 0 ? (
               <div className="rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
-                No questions yet. Add one below.
+                {t("admin.quizzes.noQuestionsYet")}
               </div>
             ) : (
               <div className="overflow-x-auto rounded-lg border">
@@ -228,11 +248,13 @@ export function QuizEditDialog({
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-12">#</TableHead>
-                      <TableHead>Question</TableHead>
+                      <TableHead>{t("admin.quizzes.questionColumn")}</TableHead>
                       <TableHead className="hidden sm:table-cell">
-                        Correct
+                        {t("admin.quizzes.correctColumn")}
                       </TableHead>
-                      <TableHead className="w-28 text-right">Actions</TableHead>
+                      <TableHead className="w-28 text-right">
+                        {t("common.actions")}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -251,15 +273,17 @@ export function QuizEditDialog({
                               type="button"
                               variant="ghost"
                               size="icon"
-                              aria-label="Edit question"
+                              aria-label={t("admin.quizzes.editQuestionAria")}
                               onClick={() => startEditingQuestion(question)}
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
                             <DeleteConfirmDialog
-                              title="Delete this question?"
-                              description="This question will be permanently removed from the quiz."
-                              successMessage="Question deleted"
+                              title={t("admin.quizzes.deleteQuestionTitle")}
+                              description={t(
+                                "admin.quizzes.deleteQuestionDescription"
+                              )}
+                              successMessage={t("admin.quizzes.questionDeleted")}
                               onConfirm={async () => {
                                 const result = await deleteQuizQuestion(
                                   question.id
@@ -286,14 +310,16 @@ export function QuizEditDialog({
           {editingQuestionId ? (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Edit question</h3>
+                <h3 className="text-sm font-medium">
+                  {t("admin.quizzes.editQuestionHeading")}
+                </h3>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => setEditingQuestionId(null)}
                 >
-                  Cancel edit
+                  {t("admin.quizzes.cancelEdit")}
                 </Button>
               </div>
               <Form {...editQuestionForm}>
@@ -310,10 +336,10 @@ export function QuizEditDialog({
                       {isPending ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          Saving...
+                          {t("common.saving")}
                         </>
                       ) : (
-                        "Save question changes"
+                        t("admin.quizzes.saveQuestionChanges")
                       )}
                     </Button>
                   </DialogFooter>
@@ -323,7 +349,9 @@ export function QuizEditDialog({
           ) : null}
 
           <div className="space-y-3">
-            <h3 className="text-sm font-medium">Add a new question</h3>
+            <h3 className="text-sm font-medium">
+              {t("admin.quizzes.addNewQuestion")}
+            </h3>
             <Form {...addQuestionForm}>
               <form
                 onSubmit={addQuestionForm.handleSubmit(handleAddQuestion)}
@@ -338,12 +366,12 @@ export function QuizEditDialog({
                     {isPending ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Adding...
+                        {t("common.adding")}
                       </>
                     ) : (
                       <>
                         <Plus className="h-4 w-4" />
-                        Add question
+                        {t("admin.quizzes.addQuestion")}
                       </>
                     )}
                   </Button>

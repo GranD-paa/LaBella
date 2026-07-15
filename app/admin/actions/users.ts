@@ -12,7 +12,7 @@ export async function updateUserAdminStatus(
   const result = await repo.updateUserAdminStatus(userId, isAdmin);
 
   if (result.error) {
-    return { error: result.error };
+    return { error: "actions.errors.generic" };
   }
 
   revalidateAppContent();

@@ -6,6 +6,7 @@ import { VocabularyManager } from "@/components/admin/vocabulary/vocabulary-mana
 import { GrammarManager } from "@/components/admin/grammar/grammar-manager";
 import { QuizManager } from "@/components/admin/quizzes/quiz-manager";
 import { UsersManager } from "@/components/admin/users-manager";
+import { useTranslations } from "@/components/providers/locale-provider";
 import type { AdminDashboardData } from "@/lib/dashboard-data";
 import type { GrammarRule, Lesson, Quiz, QuizQuestion, Vocabulary } from "@/types";
 
@@ -38,23 +39,25 @@ export function AdminTabs({
   users: AdminDashboardData["users"];
   currentUserId: string;
 }) {
+  const { t } = useTranslations();
+
   return (
     <Tabs defaultValue={defaultTab} className="space-y-6">
       <TabsList className="grid h-auto w-full grid-cols-2 gap-2 p-1 sm:grid-cols-5">
         <TabsTrigger value="lessons" className="py-2">
-          Lessons
+          {t("admin.tabs.lessons")}
         </TabsTrigger>
         <TabsTrigger value="vocabulary" className="py-2">
-          Vocabulary
+          {t("admin.tabs.vocabulary")}
         </TabsTrigger>
         <TabsTrigger value="grammar" className="py-2">
-          Grammar
+          {t("admin.tabs.grammar")}
         </TabsTrigger>
         <TabsTrigger value="quizzes" className="py-2">
-          Quizzes
+          {t("admin.tabs.quizzes")}
         </TabsTrigger>
         <TabsTrigger value="users" className="py-2">
-          Users
+          {t("admin.tabs.users")}
         </TabsTrigger>
       </TabsList>
 

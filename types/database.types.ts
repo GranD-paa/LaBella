@@ -138,18 +138,30 @@ export interface Database {
           id: string;
           lesson_id: string;
           title: string;
+          language_slug: string;
+          level_slug: string;
+          section_slug: string;
+          status: "draft" | "published";
           created_at: string;
         };
         Insert: {
           id?: string;
           lesson_id: string;
           title: string;
+          language_slug?: string;
+          level_slug?: string;
+          section_slug?: string;
+          status?: "draft" | "published";
           created_at?: string;
         };
         Update: {
           id?: string;
           lesson_id?: string;
           title?: string;
+          language_slug?: string;
+          level_slug?: string;
+          section_slug?: string;
+          status?: "draft" | "published";
           created_at?: string;
         };
         Relationships: [
@@ -172,6 +184,9 @@ export interface Database {
           option_c: string;
           option_d: string;
           correct_option: "a" | "b" | "c" | "d";
+          question_type: "multiple_choice" | "written";
+          expected_answer: string | null;
+          explanation: string | null;
           created_at: string;
         };
         Insert: {
@@ -183,6 +198,9 @@ export interface Database {
           option_c: string;
           option_d: string;
           correct_option: "a" | "b" | "c" | "d";
+          question_type?: "multiple_choice" | "written";
+          expected_answer?: string | null;
+          explanation?: string | null;
           created_at?: string;
         };
         Update: {
@@ -194,6 +212,9 @@ export interface Database {
           option_c?: string;
           option_d?: string;
           correct_option?: "a" | "b" | "c" | "d";
+          question_type?: "multiple_choice" | "written";
+          expected_answer?: string | null;
+          explanation?: string | null;
           created_at?: string;
         };
         Relationships: [

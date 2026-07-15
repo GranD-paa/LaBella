@@ -1,13 +1,17 @@
 "use client";
 
-import { useTransition } from "react";
+import { useMemo, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 
 import { createLesson } from "@/app/admin/actions/lessons";
-import { lessonSchema, type LessonValues } from "@/lib/validations/admin";
+import {
+  createLessonSchema,
+  type LessonValues,
+} from "@/lib/validations/i18n/admin-schemas";
+import { resolveMessage } from "@/lib/i18n/resolve-message";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,9 +30,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useTranslations } from "@/components/providers/locale-provider";
 
 export function LessonForm() {
+  const { t } = useTranslations();
   const [isPending, startTransition] = useTransition();
+
+  const lessonSchema = useMemo(() => createLessonSchema(t), [t]);
 
   const form = useForm<LessonValues>({
     resolver: zodResolver(lessonSchema),
@@ -39,10 +47,10 @@ export function LessonForm() {
     startTransition(async () => {
       const result = await createLesson(values);
       if ("error" in result) {
-        toast.error(result.error);
+        toast.error(resolveMessage(t, result.error));
         return;
       }
-      toast.success("Lesson created");
+      toast.success(t("admin.lessons.created"));
       form.reset({ title: "", description: "", orderNumber: 0 });
     });
   }
@@ -50,10 +58,8 @@ export function LessonForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add a new lesson</CardTitle>
-        <CardDescription>
-          Lessons group vocabulary, grammar rules, and quizzes together.
-        </CardDescription>
+        <CardTitle>{t("admin.lessons.addTitle")}</CardTitle>
+        <CardDescription>{t("admin.lessons.addDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -66,10 +72,10 @@ export function LessonForm() {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>{t("common.title")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Greetings & Introductions"
+                      placeholder={t("admin.placeholders.lessonTitle")}
                       disabled={isPending}
                       {...field}
                     />
@@ -84,7 +90,7 @@ export function LessonForm() {
               name="orderNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Order number</FormLabel>
+                  <FormLabel>{t("admin.fields.orderNumber")}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -105,10 +111,10 @@ export function LessonForm() {
               name="description"
               render={({ field }) => (
                 <FormItem className="sm:col-span-2">
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t("common.description")}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="What will learners get out of this lesson?"
+                      placeholder={t("admin.placeholders.lessonDescription")}
                       disabled={isPending}
                       {...field}
                     />
@@ -123,12 +129,12 @@ export function LessonForm() {
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Creating...
+                    {t("common.creating")}
                   </>
                 ) : (
                   <>
                     <Plus className="h-4 w-4" />
-                    Add lesson
+                    {t("admin.lessons.addLesson")}
                   </>
                 )}
               </Button>

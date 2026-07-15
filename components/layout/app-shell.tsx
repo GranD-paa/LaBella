@@ -1,9 +1,7 @@
-import Link from "next/link";
-import { GraduationCap, ShieldCheck } from "lucide-react";
-
+import { AppHeader } from "@/components/layout/app-header";
+import { AppHeaderLeft } from "@/components/layout/app-header-left";
 import { UserNav } from "@/components/dashboard/user-nav";
 import { getDataRepository } from "@/lib/data";
-import { Button } from "@/components/ui/button";
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
   const repo = getDataRepository();
@@ -22,35 +20,17 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="brand-header">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link href="/menu" className="brand-header-link">
-            <GraduationCap className="h-5 w-5 text-brand-accent" />
-            LaBella
-          </Link>
-          <div className="flex items-center gap-2">
-            {isAdmin ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="brand-header-btn"
-                asChild
-              >
-                <Link href="/admin">
-                  <ShieldCheck className="h-4 w-4" />
-                  Admin Panel
-                </Link>
-              </Button>
-            ) : null}
-            <UserNav
-              fullName={fullName}
-              email={user?.email ?? null}
-              avatarUrl={avatarUrl}
-              isAdmin={isAdmin}
-            />
-          </div>
-        </div>
-      </header>
+      <AppHeader
+        left={<AppHeaderLeft isAdmin={isAdmin} />}
+        right={
+          <UserNav
+            fullName={fullName}
+            email={user?.email ?? null}
+            avatarUrl={avatarUrl}
+            isAdmin={isAdmin}
+          />
+        }
+      />
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">{children}</main>
     </div>
   );

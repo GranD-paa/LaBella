@@ -136,6 +136,8 @@ export function createLocalRepository(): DataRepository {
         .map((question) => ({
           id: question.id,
           correct_option: question.correct_option,
+          question_type: question.question_type ?? "multiple_choice",
+          expected_answer: question.expected_answer ?? null,
         }));
     },
 
@@ -262,30 +264,53 @@ export function createLocalRepository(): DataRepository {
       return {};
     },
 
-    async createQuizWithQuestions({ lessonId, title, questions }) {
+    async createQuizWithQuestions({
+      lessonId,
+      title,
+      languageSlug = "italian",
+      levelSlug = "a1-1",
+      sectionSlug = "quiz",
+      status = "draft",
+      questions,
+    }) {
       const store = getLocalStore();
       const quizId = createLocalId("quiz");
       store.quizzes.push({
         id: quizId,
         lesson_id: lessonId,
         title,
+        language_slug: languageSlug,
+        level_slug: levelSlug,
+        section_slug: sectionSlug,
+        status,
         created_at: new Date().toISOString(),
       });
 
       for (const question of questions) {
+        const questionType = question.questionType ?? "multiple_choice";
         store.quizQuestions.push({
           id: createLocalId("question"),
           quiz_id: quizId,
           question_text: question.questionText,
-          option_a: question.optionA,
-          option_b: question.optionB,
-          option_c: question.optionC,
-          option_d: question.optionD,
-          correct_option: question.correctOption,
+          option_a: questionType === "written" ? "-" : (question.optionA ?? "-"),
+          option_b: questionType === "written" ? "-" : (question.optionB ?? "-"),
+          option_c: questionType === "written" ? "-" : (question.optionC ?? "-"),
+          option_d: questionType === "written" ? "-" : (question.optionD ?? "-"),
+          correct_option: questionType === "written" ? "a" : (question.correctOption ?? "a"),
+          question_type: questionType,
+          expected_answer: question.expectedAnswer ?? null,
+          explanation: question.explanation ?? null,
           created_at: new Date().toISOString(),
         });
       }
 
+      return {};
+    },
+
+    async updateQuizStatus(id, status) {
+      const quiz = getLocalStore().quizzes.find((entry) => entry.id === id);
+      if (!quiz) return { error: "Quiz not found." };
+      quiz.status = status;
       return {};
     },
 
@@ -318,6 +343,9 @@ export function createLocalRepository(): DataRepository {
         option_c: input.option_c,
         option_d: input.option_d,
         correct_option: input.correct_option,
+        question_type: input.question_type ?? "multiple_choice",
+        expected_answer: input.expected_answer ?? null,
+        explanation: input.explanation ?? null,
         created_at: new Date().toISOString(),
       });
       return {};

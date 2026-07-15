@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   Award,
@@ -12,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { StatCard } from "@/components/dashboard/stat-card";
+import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +25,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { UserDashboardData } from "@/lib/dashboard-data";
+import { ACHIEVEMENT_MESSAGE_KEYS } from "@/lib/i18n/content-keys";
 import { cn } from "@/lib/utils";
 
 const ACHIEVEMENT_ICONS = {
@@ -32,12 +36,6 @@ const ACHIEVEMENT_ICONS = {
   flame: Flame,
 };
 
-function formatDate(dateString: string) {
-  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
-    new Date(dateString)
-  );
-}
-
 export function UserDashboard({
   data,
   displayName,
@@ -45,6 +43,7 @@ export function UserDashboard({
   data: UserDashboardData;
   displayName: string;
 }) {
+  const { t, formatDate } = useTranslations();
   const earnedCount = data.achievements.filter((a) => a.earned).length;
   const progressPercent =
     data.stats.totalQuizzes > 0
@@ -59,14 +58,13 @@ export function UserDashboard({
         <div className="absolute inset-0 bg-brand-gradient opacity-20" />
         <div className="relative space-y-4">
           <Badge className="border-brand-accent/30 bg-brand-accent/10 text-brand-accent hover:bg-brand-accent/15">
-            Learner Dashboard
+            {t("dashboard.user.badge")}
           </Badge>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Welcome back, {displayName}
+            {t("dashboard.user.welcome", { name: displayName })}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Track your progress, statistics, and achievements. Choose languages
-            from the Main Menu.
+            {t("dashboard.user.subtitle")}
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
             <Button
@@ -75,14 +73,14 @@ export function UserDashboard({
             >
               <Link href="/learn/italian">
                 <PlayCircle className="h-4 w-4" />
-                Continue learning
+                {t("dashboard.user.continueLearning")}
               </Link>
             </Button>
             <Button variant="outline" asChild className="border-white/20 bg-white/5">
-              <Link href="/menu">Main menu</Link>
+              <Link href="/menu">{t("dashboard.user.mainMenu")}</Link>
             </Button>
             <Button variant="outline" asChild className="border-white/20 bg-white/5">
-              <Link href="/profile">View profile</Link>
+              <Link href="/profile">{t("dashboard.user.viewProfile")}</Link>
             </Button>
           </div>
         </div>
@@ -90,38 +88,46 @@ export function UserDashboard({
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          title="Quizzes completed"
+          title={t("dashboard.user.quizzesCompleted")}
           value={data.stats.completedQuizzes}
-          description={`of ${data.stats.totalQuizzes} total`}
+          description={t("dashboard.user.ofTotal", {
+            total: data.stats.totalQuizzes,
+          })}
           icon={CheckCircle2}
         />
         <StatCard
-          title="Average score"
+          title={t("dashboard.user.averageScore")}
           value={`${data.stats.averageScore}%`}
-          description="Across all attempts"
+          description={t("dashboard.user.acrossAttempts")}
           icon={Trophy}
         />
         <StatCard
-          title="Available quizzes"
+          title={t("dashboard.user.availableQuizzes")}
           value={data.stats.availableQuizzes}
-          description="Ready to take"
+          description={t("dashboard.user.readyToTake")}
           icon={ListChecks}
         />
         <StatCard
-          title="Achievements"
+          title={t("dashboard.user.achievements")}
           value={`${earnedCount}/${data.achievements.length}`}
-          description="Milestones unlocked"
+          description={t("dashboard.user.milestonesUnlocked")}
           icon={Award}
-          trend={earnedCount > 0 ? "Keep going!" : "Start your first quiz"}
+          trend={
+            earnedCount > 0
+              ? t("dashboard.user.keepGoing")
+              : t("dashboard.user.startFirstQuiz")
+          }
         />
       </section>
 
       <section className="brand-surface p-6">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold">Learning progress</h2>
+            <h2 className="text-lg font-semibold">
+              {t("dashboard.user.learningProgress")}
+            </h2>
             <p className="text-sm text-muted-foreground">
-              {progressPercent}% of quizzes completed
+              {t("dashboard.user.percentCompleted", { percent: progressPercent })}
             </p>
           </div>
           <span className="text-2xl font-bold text-brand-accent">
@@ -139,9 +145,11 @@ export function UserDashboard({
       {data.availableQuizDetails.length > 0 ? (
         <section className="space-y-4">
           <div>
-            <h2 className="text-xl font-semibold">Available quizzes</h2>
+            <h2 className="text-xl font-semibold">
+              {t("dashboard.user.availableQuizzesTitle")}
+            </h2>
             <p className="text-sm text-muted-foreground">
-              Quizzes you haven&apos;t taken yet.
+              {t("dashboard.user.availableQuizzesHint")}
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -153,10 +161,12 @@ export function UserDashboard({
                 </CardHeader>
                 <CardContent className="flex items-center justify-between">
                   <Badge variant="secondary">
-                    {quiz.questionCount} questions
+                    {quiz.questionCount} {t("common.questions")}
                   </Badge>
                   <Button size="sm" asChild>
-                    <Link href={`/quiz/${quiz.quizId}`}>Start quiz</Link>
+                    <Link href={`/quiz/${quiz.quizId}`}>
+                      {t("dashboard.user.startQuiz")}
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -167,14 +177,17 @@ export function UserDashboard({
 
       <section className="space-y-4">
         <div>
-          <h2 className="text-xl font-semibold">Achievements</h2>
+          <h2 className="text-xl font-semibold">
+            {t("dashboard.user.achievementsTitle")}
+          </h2>
           <p className="text-sm text-muted-foreground">
-            Unlock milestones as you learn.
+            {t("dashboard.user.achievementsHint")}
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {data.achievements.map((achievement) => {
             const Icon = ACHIEVEMENT_ICONS[achievement.icon];
+            const messageKey = ACHIEVEMENT_MESSAGE_KEYS[achievement.id];
             return (
               <div
                 key={achievement.id}
@@ -196,9 +209,15 @@ export function UserDashboard({
                   <Icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="font-medium">{achievement.title}</p>
+                  <p className="font-medium">
+                    {messageKey
+                      ? t(`${messageKey}.title`)
+                      : achievement.title}
+                  </p>
                   <p className="text-sm text-muted-foreground">
-                    {achievement.description}
+                    {messageKey
+                      ? t(`${messageKey}.description`)
+                      : achievement.description}
                   </p>
                 </div>
               </div>
@@ -209,9 +228,11 @@ export function UserDashboard({
 
       <section className="space-y-4">
         <div>
-          <h2 className="text-xl font-semibold">Activity history</h2>
+          <h2 className="text-xl font-semibold">
+            {t("dashboard.user.activityHistory")}
+          </h2>
           <p className="text-sm text-muted-foreground">
-            Recent quiz results and learning milestones.
+            {t("dashboard.user.activityHint")}
           </p>
         </div>
         {data.completedQuizDetails.length > 0 ? (
@@ -224,7 +245,8 @@ export function UserDashboard({
                 <div>
                   <p className="font-medium">{quiz.quizTitle}</p>
                   <p className="text-sm text-muted-foreground">
-                    {quiz.lessonTitle} · {formatDate(quiz.completedAt)}
+                    {quiz.lessonTitle} ·{" "}
+                    {formatDate(quiz.completedAt, { dateStyle: "medium" })}
                   </p>
                 </div>
                 <Badge className="bg-primary/15 text-primary hover:bg-primary/20">
@@ -235,9 +257,9 @@ export function UserDashboard({
           </div>
         ) : (
           <div className="rounded-xl border border-dashed py-12 text-center text-muted-foreground">
-            <p>No activity yet. Start a quiz from the Italian learning path.</p>
+            <p>{t("dashboard.user.noActivity")}</p>
             <Button className="mt-4" asChild>
-              <Link href="/learn/italian">Go to Italian course</Link>
+              <Link href="/learn/italian">{t("dashboard.user.goToItalian")}</Link>
             </Button>
           </div>
         )}
