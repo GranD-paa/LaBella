@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, ShieldCheck } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 
 import { requireAdmin } from "@/lib/supabase/admin-guard";
 import { Badge } from "@/components/ui/badge";
@@ -18,8 +18,11 @@ export default async function AdminLayout({
       <header className="brand-header">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="brand-header-link">
-              <ShieldCheck className="h-5 w-5 text-brand-accent" />
+            <Link href="/menu" className="brand-header-link">
+              <LayoutDashboard className="h-5 w-5 text-brand-accent" />
+              LaBella
+            </Link>
+            <Link href="/admin" className="text-sm font-medium text-white/80 hover:text-white">
               Admin Panel
             </Link>
             <Badge className="border-brand-accent/30 bg-brand-accent/15 text-brand-accent hover:bg-brand-accent/20">
@@ -33,9 +36,9 @@ export default async function AdminLayout({
               className="brand-header-btn"
               asChild
             >
-              <Link href="/dashboard">
+              <Link href="/menu">
                 <LayoutDashboard className="h-4 w-4" />
-                Back to app
+                Main Menu
               </Link>
             </Button>
             <UserNav

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
 import { UserDashboard } from "@/components/dashboard/user-dashboard";
-import { createClient } from "@/lib/supabase/server";
+import { getDataRepository } from "@/lib/data";
 import {
   fetchAdminDashboardData,
   fetchUserDashboardData,
@@ -14,25 +14,18 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const repo = getDataRepository();
+  const user = await repo.getAuthUser();
 
   if (!user) {
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name, is_admin")
-    .eq("id", user.id)
-    .single();
-
+  const profile = await repo.getProfileById(user.id);
   const displayName = profile?.full_name || user.email || "there";
 
   if (profile?.is_admin) {
-    const adminData = await fetchAdminDashboardData(supabase);
+    const adminData = await fetchAdminDashboardData(repo);
     return (
       <AdminDashboard
         data={adminData}
@@ -42,11 +35,7 @@ export default async function DashboardPage() {
     );
   }
 
-  const userData = await fetchUserDashboardData(
-    supabase,
-    user.id,
-    user.email ?? null
-  );
+  const userData = await fetchUserDashboardData(repo, user.id, user.email);
 
   return <UserDashboard data={userData} displayName={displayName} />;
 }

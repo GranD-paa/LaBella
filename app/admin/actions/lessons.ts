@@ -1,14 +1,9 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { getDataRepository } from "@/lib/data";
 import { lessonSchema } from "@/lib/validations/admin";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
-
-// Row Level Security (see supabase/schema.sql) is the ultimate enforcement
-// point: only profiles with is_admin = true can write to `lessons`. If a
-// non-admin somehow calls these actions, Postgres rejects the write and we
-// surface its error message below.
 
 export async function createLesson(values: unknown): Promise<ActionResult> {
   const parsed = lessonSchema.safeParse(values);
@@ -16,15 +11,15 @@ export async function createLesson(values: unknown): Promise<ActionResult> {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.from("lessons").insert({
+  const repo = getDataRepository();
+  const result = await repo.createLesson({
     title: parsed.data.title,
     description: parsed.data.description || null,
-    order_number: parsed.data.orderNumber,
+    orderNumber: parsed.data.orderNumber,
   });
 
-  if (error) {
-    return { error: error.message };
+  if (result.error) {
+    return { error: result.error };
   }
 
   revalidateAppContent();
@@ -40,18 +35,15 @@ export async function updateLesson(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("lessons")
-    .update({
-      title: parsed.data.title,
-      description: parsed.data.description || null,
-      order_number: parsed.data.orderNumber,
-    })
-    .eq("id", id);
+  const repo = getDataRepository();
+  const result = await repo.updateLesson(id, {
+    title: parsed.data.title,
+    description: parsed.data.description || null,
+    orderNumber: parsed.data.orderNumber,
+  });
 
-  if (error) {
-    return { error: error.message };
+  if (result.error) {
+    return { error: result.error };
   }
 
   revalidateAppContent(id);
@@ -59,13 +51,13 @@ export async function updateLesson(
 }
 
 export async function deleteLesson(id: string): Promise<ActionResult> {
-  const supabase = await createClient();
-  const { error } = await supabase.from("lessons").delete().eq("id", id);
+  const repo = getDataRepository();
+  const result = await repo.deleteLesson(id);
 
-  if (error) {
-    return { error: error.message };
+  if (result.error) {
+    return { error: result.error };
   }
 
-  revalidateAppContent(id);
+  revalidateAppContent();
   return { success: true };
 }

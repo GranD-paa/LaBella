@@ -3,7 +3,7 @@
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import { redirect } from "next/navigation";
 
-import { createClient } from "@/lib/supabase/server";
+import { getDataRepository } from "@/lib/data";
 import { submitQuizSchema } from "@/lib/validations/quiz";
 import type { ActionResult } from "@/lib/action-result";
 
@@ -15,10 +15,8 @@ export async function submitQuizAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid submission" };
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const repo = getDataRepository();
+  const user = await repo.getAuthUser();
 
   if (!user) {
     return { error: "You must be signed in to submit a quiz." };
@@ -26,13 +24,7 @@ export async function submitQuizAction(
 
   const { quizId, answers } = parsed.data;
 
-  const { data: existingAttempt } = await supabase
-    .from("user_quiz_attempts")
-    .select("id, score")
-    .eq("user_id", user.id)
-    .eq("quiz_id", quizId)
-    .maybeSingle();
-
+  const existingAttempt = await repo.getAttemptByUserAndQuiz(user.id, quizId);
   if (existingAttempt) {
     return {
       error: "You have already attempted this quiz.",
@@ -40,19 +32,16 @@ export async function submitQuizAction(
     };
   }
 
-  const [{ data: quiz }, { data: questions }] = await Promise.all([
-    supabase.from("quizzes").select("lesson_id").eq("id", quizId).single(),
-    supabase
-      .from("quiz_questions")
-      .select("id, correct_option")
-      .eq("quiz_id", quizId),
+  const [quiz, questions] = await Promise.all([
+    repo.getQuizById(quizId),
+    repo.getQuizQuestionAnswers(quizId),
   ]);
 
   if (!quiz) {
     return { error: "Quiz not found." };
   }
 
-  if (!questions || questions.length === 0) {
+  if (questions.length === 0) {
     return { error: "This quiz has no questions." };
   }
 
@@ -71,21 +60,18 @@ export async function submitQuizAction(
 
   const score = Math.round((correctCount / questions.length) * 100);
 
-  const { error: insertError } = await supabase.from("user_quiz_attempts").insert({
-    user_id: user.id,
-    quiz_id: quizId,
+  const result = await repo.createQuizAttempt({
+    userId: user.id,
+    quizId,
     score,
-    answers_json: answers,
+    answersJson: answers,
   });
 
-  if (insertError) {
-    if (insertError.code === "23505") {
-      return {
-        error: "You have already attempted this quiz.",
-        code: 409,
-      };
-    }
-    return { error: insertError.message };
+  if (result.error) {
+    return {
+      error: result.error,
+      code: result.code,
+    };
   }
 
   revalidateAppContent(quiz.lesson_id);

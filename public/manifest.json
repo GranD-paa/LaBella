@@ -2,7 +2,7 @@
   "name": "LaBella",
   "short_name": "LaBella",
   "description": "Learn a language through vocabulary, grammar, and interactive quizzes with LaBella.",
-  "start_url": "/dashboard",
+  "start_url": "/login",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

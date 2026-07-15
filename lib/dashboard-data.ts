@@ -1,9 +1,5 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-
-import type { Database } from "@/types/database.types";
+import type { DataRepository } from "@/lib/data/repository";
 import type { Lesson, Profile, Quiz, UserQuizAttempt } from "@/types";
-
-type Client = SupabaseClient<Database>;
 
 export type UserDashboardData = {
   profile: Pick<Profile, "full_name" | "avatar_url"> | null;
@@ -75,45 +71,40 @@ export type AdminDashboardData = {
 };
 
 export async function fetchUserDashboardData(
-  supabase: Client,
+  repo: DataRepository,
   userId: string,
   email: string | null
 ): Promise<UserDashboardData> {
-  const [
-    { data: profile },
-    { data: lessons },
-    { data: quizzes },
-    { data: attempts },
-    { data: quizQuestions },
-  ] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("full_name, avatar_url")
-      .eq("id", userId)
-      .single(),
-    supabase.from("lessons").select("*").order("order_number", { ascending: true }),
-    supabase.from("quizzes").select("*").order("created_at"),
-    supabase
-      .from("user_quiz_attempts")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false }),
-    supabase.from("quiz_questions").select("id, quiz_id"),
-  ]);
+  const [profile, lessons, quizzes, attempts, quizQuestions] =
+    await Promise.all([
+      repo.getProfileById(userId),
+      repo.getLessons(),
+      repo.getQuizzes(),
+      repo.getAttemptsByUserId(userId),
+      Promise.all(
+        (await repo.getQuizzes()).map(async (quiz) => {
+          const questions = await repo.getQuizQuestionsByQuizId(quiz.id);
+          return questions.map((question) => ({
+            id: question.id,
+            quiz_id: quiz.id,
+          }));
+        })
+      ).then((groups) => groups.flat()),
+    ]);
 
-  const lessonMap = new Map((lessons ?? []).map((l) => [l.id, l]));
-  const attemptedQuizIds = new Set((attempts ?? []).map((a) => a.quiz_id));
+  const lessonMap = new Map(lessons.map((lesson) => [lesson.id, lesson]));
+  const attemptedQuizIds = new Set(attempts.map((attempt) => attempt.quiz_id));
 
-  const questionCountByQuiz = (quizQuestions ?? []).reduce<Record<string, number>>(
-    (acc, q) => {
-      acc[q.quiz_id] = (acc[q.quiz_id] ?? 0) + 1;
+  const questionCountByQuiz = quizQuestions.reduce<Record<string, number>>(
+    (acc, question) => {
+      acc[question.quiz_id] = (acc[question.quiz_id] ?? 0) + 1;
       return acc;
     },
     {}
   );
 
-  const completedQuizDetails = (attempts ?? []).map((attempt) => {
-    const quiz = (quizzes ?? []).find((q) => q.id === attempt.quiz_id);
+  const completedQuizDetails = attempts.map((attempt) => {
+    const quiz = quizzes.find((entry) => entry.id === attempt.quiz_id);
     const lesson = quiz ? lessonMap.get(quiz.lesson_id) : undefined;
     return {
       attemptId: attempt.id,
@@ -126,7 +117,7 @@ export async function fetchUserDashboardData(
     };
   });
 
-  const availableQuizDetails = (quizzes ?? [])
+  const availableQuizDetails = quizzes
     .filter((quiz) => !attemptedQuizIds.has(quiz.id))
     .map((quiz) => {
       const lesson = lessonMap.get(quiz.lesson_id);
@@ -139,10 +130,10 @@ export async function fetchUserDashboardData(
       };
     });
 
-  const scores = (attempts ?? []).map((a) => a.score);
+  const scores = attempts.map((attempt) => attempt.score);
   const averageScore =
     scores.length > 0
-      ? Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length)
+      ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length)
       : 0;
 
   const achievements = buildAchievements(
@@ -152,17 +143,19 @@ export async function fetchUserDashboardData(
   );
 
   return {
-    profile: profile ?? null,
+    profile: profile
+      ? { full_name: profile.full_name, avatar_url: profile.avatar_url }
+      : null,
     email,
-    lessons: lessons ?? [],
-    quizzes: quizzes ?? [],
-    attempts: attempts ?? [],
+    lessons,
+    quizzes,
+    attempts,
     stats: {
       completedQuizzes: completedQuizDetails.length,
       availableQuizzes: availableQuizDetails.length,
       averageScore,
-      lessonsCount: lessons?.length ?? 0,
-      totalQuizzes: quizzes?.length ?? 0,
+      lessonsCount: lessons.length,
+      totalQuizzes: quizzes.length,
     },
     completedQuizDetails,
     availableQuizDetails,
@@ -171,65 +164,49 @@ export async function fetchUserDashboardData(
 }
 
 export async function fetchAdminDashboardData(
-  supabase: Client
+  repo: DataRepository
 ): Promise<AdminDashboardData> {
-  const [
-    { data: profiles },
-    { data: quizzes },
-    { data: attempts },
-    { data: lessons },
-  ] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("id, full_name, is_admin, created_at")
-      .order("created_at", { ascending: false }),
-    supabase.from("quizzes").select("*, lessons(title)").order("created_at"),
-    supabase
-      .from("user_quiz_attempts")
-      .select("id, score, created_at, user_id, quiz_id, profiles(full_name), quizzes(title)")
-      .order("created_at", { ascending: false })
-      .limit(20),
-    supabase.from("lessons").select("id"),
+  const [profiles, quizzes, lessons, allAttempts] = await Promise.all([
+    repo.getAllProfiles(),
+    repo.getQuizzes(),
+    repo.getLessons(),
+    repo.getAllAttempts(),
   ]);
 
-  const totalUsers = profiles?.length ?? 0;
-  const totalQuizzes = quizzes?.length ?? 0;
-  const totalLessons = lessons?.length ?? 0;
+  const lessonMap = new Map(lessons.map((lesson) => [lesson.id, lesson]));
+  const profileMap = new Map(
+    profiles.map((profile) => [profile.id, profile.full_name])
+  );
+  const quizMap = new Map(quizzes.map((quiz) => [quiz.id, quiz]));
 
-  const allAttempts = await supabase
-    .from("user_quiz_attempts")
-    .select("score, quiz_id");
-
-  const attemptRows = allAttempts.data ?? [];
   const averageScore =
-    attemptRows.length > 0
+    allAttempts.length > 0
       ? Math.round(
-          attemptRows.reduce((sum, row) => sum + row.score, 0) /
-            attemptRows.length
+          allAttempts.reduce((sum, attempt) => sum + attempt.score, 0) /
+            allAttempts.length
         )
       : 0;
 
-  const uniqueCompletions = new Set(
-    attemptRows.map((row) => `${row.quiz_id}`)
-  ).size;
+  const uniqueCompletions = new Set(allAttempts.map((attempt) => attempt.quiz_id))
+    .size;
   const completionRate =
-    totalQuizzes > 0
-      ? Math.round((uniqueCompletions / totalQuizzes) * 100)
+    quizzes.length > 0
+      ? Math.round((uniqueCompletions / quizzes.length) * 100)
       : 0;
 
-  const quizPerformanceMap = attemptRows.reduce<
+  const quizPerformanceMap = allAttempts.reduce<
     Record<string, { total: number; count: number }>
-  >((acc, row) => {
-    if (!acc[row.quiz_id]) {
-      acc[row.quiz_id] = { total: 0, count: 0 };
+  >((acc, attempt) => {
+    if (!acc[attempt.quiz_id]) {
+      acc[attempt.quiz_id] = { total: 0, count: 0 };
     }
-    acc[row.quiz_id].total += row.score;
-    acc[row.quiz_id].count += 1;
+    acc[attempt.quiz_id].total += attempt.score;
+    acc[attempt.quiz_id].count += 1;
     return acc;
   }, {});
 
-  const quizPerformance = (quizzes ?? []).map((quiz) => {
-    const lesson = quiz.lessons as { title: string } | null | undefined;
+  const quizPerformance = quizzes.map((quiz) => {
+    const lesson = lessonMap.get(quiz.lesson_id);
     const perf = quizPerformanceMap[quiz.id];
     return {
       quizId: quiz.id,
@@ -240,34 +217,36 @@ export async function fetchAdminDashboardData(
     };
   });
 
-  const recentActivity = (attempts ?? []).map((attempt) => {
-    const profile = attempt.profiles as { full_name: string | null } | null;
-    const quiz = attempt.quizzes as { title: string } | null;
-    return {
-      id: attempt.id,
-      userName: profile?.full_name ?? "Learner",
-      quizTitle: quiz?.title ?? "Unknown quiz",
-      score: attempt.score,
-      createdAt: attempt.created_at,
-    };
-  });
+  const recentActivity = [...allAttempts]
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .slice(0, 20)
+    .map((attempt) => {
+      const quiz = quizMap.get(attempt.quiz_id);
+      return {
+        id: attempt.id,
+        userName: profileMap.get(attempt.user_id) ?? "Learner",
+        quizTitle: quiz?.title ?? "Unknown quiz",
+        score: attempt.score,
+        createdAt: attempt.created_at,
+      };
+    });
 
   return {
     stats: {
-      totalUsers,
-      totalQuizzes,
-      totalAttempts: attemptRows.length,
+      totalUsers: profiles.length,
+      totalQuizzes: quizzes.length,
+      totalAttempts: allAttempts.length,
       completionRate,
       averageScore,
-      totalLessons,
+      totalLessons: lessons.length,
     },
     quizPerformance,
     recentActivity,
-    users: (profiles ?? []).map((p) => ({
-      id: p.id,
-      fullName: p.full_name,
-      isAdmin: p.is_admin,
-      createdAt: p.created_at,
+    users: profiles.map((profile) => ({
+      id: profile.id,
+      fullName: profile.full_name,
+      isAdmin: profile.is_admin,
+      createdAt: profile.created_at,
     })),
   };
 }
@@ -277,8 +256,8 @@ function buildAchievements(
   averageScore: number,
   scores: number[]
 ) {
-  const hasPerfect = scores.some((s) => s === 100);
-  const hasHighScore = scores.some((s) => s >= 80);
+  const hasPerfect = scores.some((score) => score === 100);
+  const hasHighScore = scores.some((score) => score >= 80);
 
   return [
     {

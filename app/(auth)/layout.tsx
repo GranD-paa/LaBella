@@ -11,7 +11,7 @@ export default function AuthLayout({
       <div className="relative hidden flex-col justify-between overflow-hidden bg-brand-gradient p-10 text-white lg:flex">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(251,191,36,0.12),transparent_45%),radial-gradient(circle_at_80%_60%,rgba(255,255,255,0.08),transparent_40%)]" />
         <Link
-          href="/"
+          href="/login"
           className="relative z-10 flex items-center gap-2 text-lg font-semibold"
         >
           <GraduationCap className="h-6 w-6 text-brand-accent" />

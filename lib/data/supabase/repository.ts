@@ -1,0 +1,380 @@
+import { createClient } from "@/lib/supabase/server";
+import type { DataRepository } from "@/lib/data/repository";
+
+export function createSupabaseRepository(): DataRepository {
+  return {
+    async getAuthUser() {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      return user?.email ? { id: user.id, email: user.email } : null;
+    },
+
+    async signInWithPassword(email, password) {
+      const supabase = await createClient();
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return error ? { error: error.message } : {};
+    },
+
+    async signOut() {
+      const supabase = await createClient();
+      await supabase.auth.signOut();
+    },
+
+    async getProfileById(userId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url, is_admin, created_at")
+        .eq("id", userId)
+        .single();
+      return data;
+    },
+
+    async getAllProfiles() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url, is_admin, created_at")
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+
+    async updateUserAdminStatus(userId, isAdmin) {
+      const supabase = await createClient();
+      const authUser = await this.getAuthUser();
+      if (!authUser) return { error: "You must be signed in." };
+
+      const currentProfile = await this.getProfileById(authUser.id);
+      if (!currentProfile?.is_admin) {
+        return { error: "Only admins can manage user roles." };
+      }
+
+      if (userId === authUser.id && !isAdmin) {
+        return { error: "You cannot remove your own admin access." };
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({ is_admin: isAdmin })
+        .eq("id", userId);
+
+      return error ? { error: error.message } : {};
+    },
+
+    async getLessons() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("lessons")
+        .select("*")
+        .order("order_number", { ascending: true });
+      return data ?? [];
+    },
+
+    async getLessonById(id) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("lessons")
+        .select("*")
+        .eq("id", id)
+        .single();
+      return data;
+    },
+
+    async getLessonByOrderNumber(orderNumber) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("lessons")
+        .select("*")
+        .eq("order_number", orderNumber)
+        .order("created_at")
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+
+    async getVocabularyByLessonId(lessonId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("vocabulary")
+        .select("*")
+        .eq("lesson_id", lessonId)
+        .order("created_at");
+      return data ?? [];
+    },
+
+    async getAllVocabulary() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("vocabulary")
+        .select("*")
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+
+    async getGrammarRulesByLessonId(lessonId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("grammar_rules")
+        .select("*")
+        .eq("lesson_id", lessonId)
+        .order("created_at");
+      return data ?? [];
+    },
+
+    async getAllGrammarRules() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("grammar_rules")
+        .select("*")
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+
+    async getQuizzes() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("quizzes")
+        .select("*")
+        .order("created_at");
+      return data ?? [];
+    },
+
+    async getQuizById(id) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("quizzes")
+        .select("*")
+        .eq("id", id)
+        .single();
+      return data;
+    },
+
+    async getQuizQuestionsByQuizId(quizId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("quiz_questions")
+        .select("*")
+        .eq("quiz_id", quizId)
+        .order("created_at");
+      return data ?? [];
+    },
+
+    async getAllQuizQuestions() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("quiz_questions")
+        .select("*")
+        .order("created_at");
+      return data ?? [];
+    },
+
+    async getQuizQuestionAnswers(quizId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("quiz_questions")
+        .select("id, correct_option")
+        .eq("quiz_id", quizId);
+      return data ?? [];
+    },
+
+    async getAttemptsByUserId(userId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("user_quiz_attempts")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+
+    async getAttemptByUserAndQuiz(userId, quizId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("user_quiz_attempts")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("quiz_id", quizId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+
+    async getAllAttempts() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("user_quiz_attempts")
+        .select("*");
+      return data ?? [];
+    },
+
+    async createQuizAttempt({ userId, quizId, score, answersJson }) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("user_quiz_attempts").insert({
+        user_id: userId,
+        quiz_id: quizId,
+        score,
+        answers_json: answersJson,
+      });
+
+      if (error) {
+        if (error.code === "23505") {
+          return {
+            error: "You have already attempted this quiz.",
+            code: 409,
+          };
+        }
+        return { error: error.message };
+      }
+
+      return {};
+    },
+
+    async createLesson({ title, description, orderNumber }) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("lessons").insert({
+        title,
+        description,
+        order_number: orderNumber,
+      });
+      return error ? { error: error.message } : {};
+    },
+
+    async updateLesson(id, { title, description, orderNumber }) {
+      const supabase = await createClient();
+      const { error } = await supabase
+        .from("lessons")
+        .update({
+          title,
+          description,
+          order_number: orderNumber,
+        })
+        .eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
+    async deleteLesson(id) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("lessons").delete().eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
+    async createVocabulary(input) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("vocabulary").insert(input);
+      return error ? { error: error.message } : {};
+    },
+
+    async updateVocabulary(id, input) {
+      const supabase = await createClient();
+      const { error } = await supabase
+        .from("vocabulary")
+        .update(input)
+        .eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
+    async deleteVocabulary(id) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("vocabulary").delete().eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
+    async createGrammarRule(input) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("grammar_rules").insert(input);
+      return error ? { error: error.message } : {};
+    },
+
+    async updateGrammarRule(id, input) {
+      const supabase = await createClient();
+      const { error } = await supabase
+        .from("grammar_rules")
+        .update(input)
+        .eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
+    async deleteGrammarRule(id) {
+      const supabase = await createClient();
+      const { error } = await supabase
+        .from("grammar_rules")
+        .delete()
+        .eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
+    async createQuizWithQuestions({ lessonId, title, questions }) {
+      const supabase = await createClient();
+      const { data: quiz, error: quizError } = await supabase
+        .from("quizzes")
+        .insert({ lesson_id: lessonId, title })
+        .select("id")
+        .single();
+
+      if (quizError || !quiz) {
+        return { error: quizError?.message ?? "Failed to create quiz." };
+      }
+
+      const rows = questions.map((question) => ({
+        quiz_id: quiz.id,
+        question_text: question.questionText,
+        option_a: question.optionA,
+        option_b: question.optionB,
+        option_c: question.optionC,
+        option_d: question.optionD,
+        correct_option: question.correctOption,
+      }));
+
+      const { error } = await supabase.from("quiz_questions").insert(rows);
+      return error ? { error: error.message } : {};
+    },
+
+    async updateQuizTitle(id, title) {
+      const supabase = await createClient();
+      const { error } = await supabase
+        .from("quizzes")
+        .update({ title })
+        .eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
+    async deleteQuiz(id) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("quizzes").delete().eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
+    async addQuizQuestion(quizId, input) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("quiz_questions").insert({
+        quiz_id: quizId,
+        ...input,
+      });
+      return error ? { error: error.message } : {};
+    },
+
+    async updateQuizQuestion(id, input) {
+      const supabase = await createClient();
+      const { error } = await supabase
+        .from("quiz_questions")
+        .update(input)
+        .eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
+    async deleteQuizQuestion(id) {
+      const supabase = await createClient();
+      const { error } = await supabase
+        .from("quiz_questions")
+        .delete()
+        .eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+  };
+}

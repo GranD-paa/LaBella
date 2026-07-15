@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/supabase/admin-guard";
 import { AdminTabs, ADMIN_TAB_VALUES } from "@/components/admin/admin-tabs";
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
-import { createClient } from "@/lib/supabase/server";
+import { getDataRepository } from "@/lib/data";
 import { fetchAdminDashboardData } from "@/lib/dashboard-data";
 
 export const metadata: Metadata = {
@@ -23,25 +23,22 @@ export default async function AdminPage({
     : "quizzes";
 
   const { user, profile } = await requireAdmin();
-  const supabase = await createClient();
+  const repo = getDataRepository();
 
   const [
     adminData,
-    { data: lessons },
-    { data: vocabulary },
-    { data: grammarRules },
-    { data: quizzes },
-    { data: quizQuestions },
+    lessons,
+    vocabulary,
+    grammarRules,
+    quizzes,
+    quizQuestions,
   ] = await Promise.all([
-    fetchAdminDashboardData(supabase),
-    supabase.from("lessons").select("*").order("order_number"),
-    supabase.from("vocabulary").select("*").order("created_at", { ascending: false }),
-    supabase
-      .from("grammar_rules")
-      .select("*")
-      .order("created_at", { ascending: false }),
-    supabase.from("quizzes").select("*").order("created_at", { ascending: false }),
-    supabase.from("quiz_questions").select("*").order("created_at"),
+    fetchAdminDashboardData(repo),
+    repo.getLessons(),
+    repo.getAllVocabulary(),
+    repo.getAllGrammarRules(),
+    repo.getQuizzes(),
+    repo.getAllQuizQuestions(),
   ]);
 
   const displayName = profile.full_name || user.email || "Admin";
@@ -67,11 +64,11 @@ export default async function AdminPage({
 
         <AdminTabs
           defaultTab={defaultTab}
-          lessons={lessons ?? []}
-          vocabulary={vocabulary ?? []}
-          grammarRules={grammarRules ?? []}
-          quizzes={quizzes ?? []}
-          quizQuestions={quizQuestions ?? []}
+          lessons={lessons}
+          vocabulary={vocabulary}
+          grammarRules={grammarRules}
+          quizzes={quizzes}
+          quizQuestions={quizQuestions}
           users={adminData.users}
           currentUserId={user.id}
         />

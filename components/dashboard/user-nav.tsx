@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTransition } from "react";
 import {
+  Home,
   LayoutDashboard,
   LogOut,
   ShieldCheck,
@@ -79,6 +80,12 @@ export function UserNav({
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/menu">
+            <Home className="mr-2 h-4 w-4" />
+            Main Menu
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/profile">
             <UserCircle className="mr-2 h-4 w-4" />

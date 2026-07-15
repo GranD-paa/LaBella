@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   Award,
-  BookOpen,
   CheckCircle2,
   Flame,
   ListChecks,
@@ -12,7 +11,6 @@ import {
   Zap,
 } from "lucide-react";
 
-import { LessonCard } from "@/components/lessons/lesson-card";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -66,22 +64,23 @@ export function UserDashboard({
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Welcome back, {displayName}
           </h1>
-          <p className="max-w-2xl text-muted-foreground">
-            Track your progress, complete quizzes, and keep building your
-            language skills one lesson at a time.
+          <p className="text-sm text-muted-foreground">
+            Track your progress, statistics, and achievements. Choose languages
+            from the Main Menu.
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
-            {data.lessons[0] ? (
-              <Button
-                asChild
-                className="bg-primary font-semibold text-primary-foreground shadow-brand hover:bg-primary/90"
-              >
-                <Link href={`/lesson/${data.lessons[0].id}`}>
-                  <PlayCircle className="h-4 w-4" />
-                  Continue learning
-                </Link>
-              </Button>
-            ) : null}
+            <Button
+              asChild
+              className="bg-primary font-semibold text-primary-foreground shadow-brand hover:bg-primary/90"
+            >
+              <Link href="/learn/italian">
+                <PlayCircle className="h-4 w-4" />
+                Continue learning
+              </Link>
+            </Button>
+            <Button variant="outline" asChild className="border-white/20 bg-white/5">
+              <Link href="/menu">Main menu</Link>
+            </Button>
             <Button variant="outline" asChild className="border-white/20 bg-white/5">
               <Link href="/profile">View profile</Link>
             </Button>
@@ -166,33 +165,6 @@ export function UserDashboard({
         </section>
       ) : null}
 
-      {data.completedQuizDetails.length > 0 ? (
-        <section className="space-y-4">
-          <div>
-            <h2 className="text-xl font-semibold">Completed quizzes</h2>
-            <p className="text-sm text-muted-foreground">Your recent results.</p>
-          </div>
-          <div className="grid gap-3">
-            {data.completedQuizDetails.slice(0, 5).map((quiz) => (
-              <div
-                key={quiz.attemptId}
-                className="brand-surface flex flex-wrap items-center justify-between gap-3 p-4"
-              >
-                <div>
-                  <p className="font-medium">{quiz.quizTitle}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {quiz.lessonTitle} · {formatDate(quiz.completedAt)}
-                  </p>
-                </div>
-                <Badge className="bg-primary/15 text-primary hover:bg-primary/20">
-                  {quiz.score}%
-                </Badge>
-              </div>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
       <section className="space-y-4">
         <div>
           <h2 className="text-xl font-semibold">Achievements</h2>
@@ -237,21 +209,36 @@ export function UserDashboard({
 
       <section className="space-y-4">
         <div>
-          <h2 className="text-xl font-semibold">Your lessons</h2>
+          <h2 className="text-xl font-semibold">Activity history</h2>
           <p className="text-sm text-muted-foreground">
-            Browse all available learning content.
+            Recent quiz results and learning milestones.
           </p>
         </div>
-        {data.lessons.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {data.lessons.map((lesson) => (
-              <LessonCard key={lesson.id} lesson={lesson} />
+        {data.completedQuizDetails.length > 0 ? (
+          <div className="grid gap-3">
+            {data.completedQuizDetails.slice(0, 6).map((quiz) => (
+              <div
+                key={quiz.attemptId}
+                className="brand-surface flex flex-wrap items-center justify-between gap-3 p-4"
+              >
+                <div>
+                  <p className="font-medium">{quiz.quizTitle}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {quiz.lessonTitle} · {formatDate(quiz.completedAt)}
+                  </p>
+                </div>
+                <Badge className="bg-primary/15 text-primary hover:bg-primary/20">
+                  {quiz.score}%
+                </Badge>
+              </div>
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
-            <BookOpen className="h-8 w-8" />
-            <p>No lessons available yet. Check back soon!</p>
+          <div className="rounded-xl border border-dashed py-12 text-center text-muted-foreground">
+            <p>No activity yet. Start a quiz from the Italian learning path.</p>
+            <Button className="mt-4" asChild>
+              <Link href="/learn/italian">Go to Italian course</Link>
+            </Button>
           </div>
         )}
       </section>

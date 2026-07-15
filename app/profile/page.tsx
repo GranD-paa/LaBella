@@ -12,61 +12,47 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/server";
+import { getDataRepository } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Profile — LaBella",
 };
 
 export default async function ProfilePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const repo = getDataRepository();
+  const user = await repo.getAuthUser();
 
   if (!user) {
     redirect("/login");
   }
 
-  const [{ data: profile }, { data: attempts }] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("id", user.id)
-      .single(),
-    supabase
-      .from("user_quiz_attempts")
-      .select(
-        `
-        id,
-        score,
-        created_at,
-        quizzes (
-          title,
-          lessons (
-            title
-          )
-        )
-      `
-      )
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false }),
+  const [profile, attempts, quizzes, lessons] = await Promise.all([
+    repo.getProfileById(user.id),
+    repo.getAttemptsByUserId(user.id),
+    repo.getQuizzes(),
+    repo.getLessons(),
   ]);
 
-  const historyRows =
-    attempts?.map((attempt) => {
-      const quiz = attempt.quizzes as
-        | { title: string; lessons: { title: string } | null }
-        | null
-        | undefined;
+  const lessonMap = new Map(lessons.map((lesson) => [lesson.id, lesson.title]));
+  const quizMap = new Map(
+    quizzes.map((quiz) => [
+      quiz.id,
+      {
+        title: quiz.title,
+        lessonTitle: lessonMap.get(quiz.lesson_id) ?? quiz.title,
+      },
+    ])
+  );
 
-      return {
-        id: attempt.id,
-        score: attempt.score,
-        created_at: attempt.created_at,
-        lessonName: quiz?.lessons?.title ?? quiz?.title ?? "Unknown lesson",
-      };
-    }) ?? [];
+  const historyRows = attempts.map((attempt) => {
+    const quiz = quizMap.get(attempt.quiz_id);
+    return {
+      id: attempt.id,
+      score: attempt.score,
+      created_at: attempt.created_at,
+      lessonName: quiz?.lessonTitle ?? "Unknown lesson",
+    };
+  });
 
   return (
     <div className="space-y-8">

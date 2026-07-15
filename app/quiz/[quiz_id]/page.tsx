@@ -5,7 +5,7 @@ import { ArrowLeft, ListChecks } from "lucide-react";
 
 import { QuizForm } from "@/components/quiz/quiz-form";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/server";
+import { getDataRepository } from "@/lib/data";
 
 type PageProps = {
   params: Promise<{ quiz_id: string }>;
@@ -13,12 +13,8 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { quiz_id } = await params;
-  const supabase = await createClient();
-  const { data: quiz } = await supabase
-    .from("quizzes")
-    .select("title")
-    .eq("id", quiz_id)
-    .single();
+  const repo = getDataRepository();
+  const quiz = await repo.getQuizById(quiz_id);
 
   return {
     title: quiz ? `${quiz.title} — LaBella` : "Quiz — LaBella",
@@ -27,40 +23,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function QuizPage({ params }: PageProps) {
   const { quiz_id } = await params;
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const repo = getDataRepository();
+  const user = await repo.getAuthUser();
 
   if (!user) {
     redirect("/login");
   }
 
-  const { data: quiz } = await supabase
-    .from("quizzes")
-    .select("id, title, lesson_id")
-    .eq("id", quiz_id)
-    .single();
-
+  const quiz = await repo.getQuizById(quiz_id);
   if (!quiz) {
     notFound();
   }
 
-  const [{ data: existingAttempt }, { data: questions }] = await Promise.all([
-    supabase
-      .from("user_quiz_attempts")
-      .select("id, score, answers_json")
-      .eq("user_id", user.id)
-      .eq("quiz_id", quiz_id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    supabase
-      .from("quiz_questions")
-      .select("id, question_text, option_a, option_b, option_c, option_d")
-      .eq("quiz_id", quiz_id)
-      .order("created_at"),
+  const [existingAttempt, questions] = await Promise.all([
+    repo.getAttemptByUserAndQuiz(user.id, quiz_id),
+    repo.getQuizQuestionsByQuizId(quiz_id),
   ]);
 
   const hasCompleted = Boolean(existingAttempt);
@@ -89,7 +66,7 @@ export default async function QuizPage({ params }: PageProps) {
         </div>
       </div>
 
-      {questions && questions.length > 0 ? (
+      {questions.length > 0 ? (
         <QuizForm
           quizId={quiz.id}
           lessonId={quiz.lesson_id}

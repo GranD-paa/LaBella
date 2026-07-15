@@ -1,7 +1,14 @@
 import { type NextRequest } from "next/server";
+
+import { updateLocalSession } from "@/lib/auth/local-middleware";
+import { isLocalDataMode } from "@/lib/config/data-source";
 import { updateSession } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
+  if (isLocalDataMode()) {
+    return updateLocalSession(request);
+  }
+
   return await updateSession(request);
 }
 

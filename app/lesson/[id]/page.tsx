@@ -5,7 +5,7 @@ import { ArrowLeft, BookOpen } from "lucide-react";
 
 import { LessonDetailTabs } from "@/components/lessons/lesson-detail-tabs";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/server";
+import { getDataRepository } from "@/lib/data";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -13,12 +13,8 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: lesson } = await supabase
-    .from("lessons")
-    .select("title")
-    .eq("id", id)
-    .single();
+  const repo = getDataRepository();
+  const lesson = await repo.getLessonById(id);
 
   return {
     title: lesson ? `${lesson.title} — LaBella` : "Lesson — LaBella",
@@ -27,67 +23,34 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function LessonPage({ params }: PageProps) {
   const { id } = await params;
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data: lesson } = await supabase
-    .from("lessons")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const repo = getDataRepository();
+  const user = await repo.getAuthUser();
+  const lesson = await repo.getLessonById(id);
 
   if (!lesson) {
     notFound();
   }
 
-  const [
-    { data: vocabulary },
-    { data: grammarRules },
-    { data: quizzes },
-  ] = await Promise.all([
-    supabase
-      .from("vocabulary")
-      .select("*")
-      .eq("lesson_id", id)
-      .order("created_at"),
-    supabase
-      .from("grammar_rules")
-      .select("*")
-      .eq("lesson_id", id)
-      .order("created_at"),
-    supabase
-      .from("quizzes")
-      .select("*")
-      .eq("lesson_id", id)
-      .order("created_at")
-      .limit(1),
+  const [vocabulary, grammarRules, quizzes] = await Promise.all([
+    repo.getVocabularyByLessonId(id),
+    repo.getGrammarRulesByLessonId(id),
+    repo.getQuizzes(),
   ]);
 
-  const quiz = quizzes?.[0] ?? null;
+  const quiz = quizzes.find((entry) => entry.lesson_id === id) ?? null;
 
   let quizAttempt = null;
   if (quiz && user) {
-    const { data } = await supabase
-      .from("user_quiz_attempts")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("quiz_id", quiz.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    quizAttempt = data;
+    quizAttempt = await repo.getAttemptByUserAndQuiz(user.id, quiz.id);
   }
 
   return (
     <div className="space-y-8">
       <div className="space-y-4">
         <Button variant="ghost" size="sm" asChild className="-ml-2 w-fit">
-          <Link href="/dashboard">
+          <Link href="/learn/italian">
             <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
+            Back to Italian course
           </Link>
         </Button>
 
@@ -104,8 +67,8 @@ export default async function LessonPage({ params }: PageProps) {
       </div>
 
       <LessonDetailTabs
-        vocabulary={vocabulary ?? []}
-        grammarRules={grammarRules ?? []}
+        vocabulary={vocabulary}
+        grammarRules={grammarRules}
         quiz={quiz}
         quizAttempt={quizAttempt}
       />

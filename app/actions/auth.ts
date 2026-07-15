@@ -1,7 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+
+import { isLocalDataMode } from "@/lib/config/data-source";
+import { getDataRepository } from "@/lib/data";
 import { signInSchema, signUpSchema } from "@/lib/validations/auth";
 import type { SignInValues, SignUpValues } from "@/lib/validations/auth";
 
@@ -22,22 +24,38 @@ function formatAuthError(message: string) {
   return message;
 }
 
+function getSafeRedirectPath(path?: string) {
+  if (!path || !path.startsWith("/") || path.startsWith("//")) {
+    return "/menu";
+  }
+
+  if (path === "/login" || path === "/sign-up") {
+    return "/menu";
+  }
+
+  return path;
+}
+
 export async function signInAction(
-  values: SignInValues
+  values: SignInValues,
+  redirectTo?: string
 ): Promise<ActionResult | void> {
   const parsed = signInSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "Please check your email and password and try again." };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const repo = getDataRepository();
+  const result = await repo.signInWithPassword(
+    parsed.data.email,
+    parsed.data.password
+  );
 
-  if (error) {
-    return { error: formatAuthError(error.message) };
+  if (result.error) {
+    return { error: formatAuthError(result.error) };
   }
 
-  redirect("/dashboard");
+  redirect(getSafeRedirectPath(redirectTo));
 }
 
 export async function signUpAction(
@@ -48,6 +66,14 @@ export async function signUpAction(
     return { error: "Please double-check the form and try again." };
   }
 
+  if (isLocalDataMode()) {
+    return {
+      error:
+        "Local development mode uses seeded accounts. Sign in with the sample admin or user credentials.",
+    };
+  }
+
+  const { createClient } = await import("@/lib/supabase/server");
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
@@ -61,10 +87,8 @@ export async function signUpAction(
     return { error: formatAuthError(error.message) };
   }
 
-  // If email confirmation is enabled in the Supabase project, `session`
-  // will be null until the user confirms their email address.
   if (data.session) {
-    redirect("/dashboard");
+    redirect("/menu");
   }
 
   return {
@@ -74,7 +98,7 @@ export async function signUpAction(
 }
 
 export async function signOutAction() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
+  const repo = getDataRepository();
+  await repo.signOut();
   redirect("/login");
 }

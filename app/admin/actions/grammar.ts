@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { getDataRepository } from "@/lib/data";
 import { grammarRuleSchema } from "@/lib/validations/admin";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
@@ -11,16 +11,16 @@ export async function createGrammarRule(values: unknown): Promise<ActionResult> 
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.from("grammar_rules").insert({
+  const repo = getDataRepository();
+  const result = await repo.createGrammarRule({
     lesson_id: parsed.data.lessonId,
     title: parsed.data.title,
     description: parsed.data.description || null,
     example: parsed.data.example || null,
   });
 
-  if (error) {
-    return { error: error.message };
+  if (result.error) {
+    return { error: result.error };
   }
 
   revalidateAppContent(parsed.data.lessonId);
@@ -36,19 +36,16 @@ export async function updateGrammarRule(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("grammar_rules")
-    .update({
-      lesson_id: parsed.data.lessonId,
-      title: parsed.data.title,
-      description: parsed.data.description || null,
-      example: parsed.data.example || null,
-    })
-    .eq("id", id);
+  const repo = getDataRepository();
+  const result = await repo.updateGrammarRule(id, {
+    lesson_id: parsed.data.lessonId,
+    title: parsed.data.title,
+    description: parsed.data.description || null,
+    example: parsed.data.example || null,
+  });
 
-  if (error) {
-    return { error: error.message };
+  if (result.error) {
+    return { error: result.error };
   }
 
   revalidateAppContent(parsed.data.lessonId);
@@ -56,21 +53,12 @@ export async function updateGrammarRule(
 }
 
 export async function deleteGrammarRule(id: string): Promise<ActionResult> {
-  const supabase = await createClient();
+  const repo = getDataRepository();
+  const row = (await repo.getAllGrammarRules()).find((item) => item.id === id);
+  const result = await repo.deleteGrammarRule(id);
 
-  const { data: row } = await supabase
-    .from("grammar_rules")
-    .select("lesson_id")
-    .eq("id", id)
-    .single();
-
-  const { error } = await supabase
-    .from("grammar_rules")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    return { error: error.message };
+  if (result.error) {
+    return { error: result.error };
   }
 
   revalidateAppContent(row?.lesson_id);

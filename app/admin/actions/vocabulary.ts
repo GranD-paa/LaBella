@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { getDataRepository } from "@/lib/data";
 import { vocabularySchema } from "@/lib/validations/admin";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
@@ -11,8 +11,8 @@ export async function createVocabulary(values: unknown): Promise<ActionResult> {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.from("vocabulary").insert({
+  const repo = getDataRepository();
+  const result = await repo.createVocabulary({
     lesson_id: parsed.data.lessonId,
     word: parsed.data.word,
     translation: parsed.data.translation,
@@ -20,8 +20,8 @@ export async function createVocabulary(values: unknown): Promise<ActionResult> {
     example_sentence: parsed.data.exampleSentence || null,
   });
 
-  if (error) {
-    return { error: error.message };
+  if (result.error) {
+    return { error: result.error };
   }
 
   revalidateAppContent(parsed.data.lessonId);
@@ -37,20 +37,17 @@ export async function updateVocabulary(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("vocabulary")
-    .update({
-      lesson_id: parsed.data.lessonId,
-      word: parsed.data.word,
-      translation: parsed.data.translation,
-      image_url: parsed.data.imageUrl || null,
-      example_sentence: parsed.data.exampleSentence || null,
-    })
-    .eq("id", id);
+  const repo = getDataRepository();
+  const result = await repo.updateVocabulary(id, {
+    lesson_id: parsed.data.lessonId,
+    word: parsed.data.word,
+    translation: parsed.data.translation,
+    image_url: parsed.data.imageUrl || null,
+    example_sentence: parsed.data.exampleSentence || null,
+  });
 
-  if (error) {
-    return { error: error.message };
+  if (result.error) {
+    return { error: result.error };
   }
 
   revalidateAppContent(parsed.data.lessonId);
@@ -58,18 +55,12 @@ export async function updateVocabulary(
 }
 
 export async function deleteVocabulary(id: string): Promise<ActionResult> {
-  const supabase = await createClient();
+  const repo = getDataRepository();
+  const row = (await repo.getAllVocabulary()).find((item) => item.id === id);
+  const result = await repo.deleteVocabulary(id);
 
-  const { data: row } = await supabase
-    .from("vocabulary")
-    .select("lesson_id")
-    .eq("id", id)
-    .single();
-
-  const { error } = await supabase.from("vocabulary").delete().eq("id", id);
-
-  if (error) {
-    return { error: error.message };
+  if (result.error) {
+    return { error: result.error };
   }
 
   revalidateAppContent(row?.lesson_id);
