@@ -3,7 +3,7 @@ export const adminQuizzesEn = {
   pageHello: "Quiz hub, {name}",
   pageSubtitle:
     "Create, publish, and monitor quizzes across languages, levels, lessons, and sections.",
-  fullAdminPanel: "Full admin panel",
+  fullAdminPanel: "Admin",
   statTotalQuizzes: "Total quizzes",
   statPublishedDrafts: "{published} published · {drafts} drafts",
   statQuestions: "Total questions",

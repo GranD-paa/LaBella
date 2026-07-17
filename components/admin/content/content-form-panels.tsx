@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -16,6 +16,7 @@ import { WizardQuestionFields } from "@/components/admin/quizzes/wizard-question
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
@@ -469,6 +470,8 @@ export function VideoContentPanel({
   );
 }
 
+const MAX_QUIZ_QUESTIONS = 20;
+
 export function QuizContentPanel({
   context,
   onSuccess,
@@ -478,6 +481,7 @@ export function QuizContentPanel({
 }) {
   const { t } = useTranslations();
   const [isPending, startTransition] = useTransition();
+  const [questionCount, setQuestionCount] = useState(1);
   const schema = useMemo(() => createStructuredQuizSchema(t), [t]);
 
   const form = useForm<StructuredQuizValues>({
@@ -493,10 +497,23 @@ export function QuizContentPanel({
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, replace } = useFieldArray({
     control: form.control,
     name: "questions",
   });
+
+  function applyQuestionCount(count: number) {
+    const clamped = Math.min(
+      MAX_QUIZ_QUESTIONS,
+      Math.max(1, Number.isFinite(count) ? Math.round(count) : 1)
+    );
+    setQuestionCount(clamped);
+    const current = form.getValues("questions");
+    const next = Array.from({ length: clamped }, (_, index) => ({
+      ...(current[index] ?? { ...emptyQuestion }),
+    }));
+    replace(next);
+  }
 
   function submit(status: "draft" | "published") {
     startTransition(async () => {
@@ -520,6 +537,7 @@ export function QuizContentPanel({
         status: "draft",
         questions: [{ ...emptyQuestion }],
       });
+      setQuestionCount(1);
       onSuccess(status === "published");
     });
   }
@@ -552,30 +570,76 @@ export function QuizContentPanel({
             )}
           />
 
-          <div className="flex items-center justify-between gap-3">
-            <h4 className="text-sm font-medium">{t("admin.quizzes.quizQuestions")}</h4>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => append({ ...emptyQuestion })}
-              disabled={isPending}
-            >
-              <Plus className="h-4 w-4" />
-              {t("admin.quizzes.addQuestion")}
-            </Button>
+          <div className="rounded-lg border border-white/10 bg-muted/20 p-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="space-y-1">
+                <Label htmlFor="quiz-question-count">
+                  {t("admin.content.quiz.questionCountLabel")}
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  {t("admin.content.quiz.questionCountHint")}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 shrink-0"
+                  disabled={isPending || questionCount <= 1}
+                  onClick={() => applyQuestionCount(questionCount - 1)}
+                >
+                  −
+                </Button>
+                <Input
+                  id="quiz-question-count"
+                  type="number"
+                  min={1}
+                  max={MAX_QUIZ_QUESTIONS}
+                  value={questionCount}
+                  disabled={isPending}
+                  className="h-9 w-20 text-center"
+                  onChange={(event) => {
+                    const value = Number.parseInt(event.target.value, 10);
+                    if (!Number.isNaN(value)) {
+                      applyQuestionCount(value);
+                    }
+                  }}
+                  onBlur={(event) => {
+                    const value = Number.parseInt(event.target.value, 10);
+                    applyQuestionCount(Number.isNaN(value) ? 1 : value);
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 shrink-0"
+                  disabled={isPending || questionCount >= MAX_QUIZ_QUESTIONS}
+                  onClick={() => applyQuestionCount(questionCount + 1)}
+                >
+                  +
+                </Button>
+              </div>
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              {t("admin.content.quiz.questionsGenerated", { count: fields.length })}
+            </p>
           </div>
 
-          {fields.map((fieldItem, index) => (
-            <WizardQuestionFields
-              key={fieldItem.id}
-              control={form.control}
-              index={index}
-              onRemove={() => remove(index)}
-              canRemove={fields.length > 1}
-              disabled={isPending}
-            />
-          ))}
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium">{t("admin.quizzes.quizQuestions")}</h4>
+            {fields.map((fieldItem, index) => (
+              <WizardQuestionFields
+                key={fieldItem.id}
+                control={form.control}
+                index={index}
+                onRemove={() => {}}
+                canRemove={false}
+                disabled={isPending}
+              />
+            ))}
+          </div>
 
           <ContentActionBar
             isPending={isPending}

@@ -46,7 +46,7 @@ export const en = {
     dashboard: "Dashboard",
     profile: "Profile",
     signOut: "Sign out",
-    adminPanel: "Admin Panel",
+    adminPanel: "Admin",
     openUserMenu: "Open user menu",
   },
   auth: {

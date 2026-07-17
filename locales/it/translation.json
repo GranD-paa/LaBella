@@ -43,7 +43,7 @@
     "dashboard": "Dashboard",
     "profile": "Profilo",
     "signOut": "Esci",
-    "adminPanel": "Pannello admin",
+    "adminPanel": "Admin",
     "openUserMenu": "Apri menu utente"
   },
   "auth": {
@@ -417,11 +417,13 @@
       "wizardDescription": "Aggiungi contenuti didattici passo dopo passo: lingua, lezione, sezione e poi crea e pubblica quando sei pronto.",
       "stepLanguage": "Lingua",
       "stepLesson": "Lezione",
-      "stepCategory": "Sezione",
+      "stepCategory": "Categoria",
+      "stepContentType": "Tipo di contenuto",
       "stepCreate": "Crea",
       "askLanguage": "Per quale lingua vuoi aggiungere contenuto?",
       "askLesson": "A quale lezione vuoi aggiungere contenuto?",
-      "askCategory": "In quale sezione vuoi aggiungere contenuto?",
+      "askCategory": "Quale categoria di contenuto vuoi aggiungere?",
+      "askContentType": "Quale tipo di contenuto vuoi aggiungere?",
       "selectedLanguage": "Lingua selezionata",
       "selectedLesson": "Lezione selezionata",
       "selectedCategory": "Sezione selezionata",
@@ -479,14 +481,17 @@
         "formTitle": "Crea quiz",
         "formDescription": "Crea domande a scelta multipla e scritte. Nulla viene pubblicato finché non scegli Pubblica.",
         "quizTitle": "Titolo del quiz",
-        "quizTitlePlaceholder": "es. Quiz saluti A1"
+        "quizTitlePlaceholder": "es. Quiz saluti A1",
+        "questionCountLabel": "Numero di domande",
+        "questionCountHint": "Scegli quante domande creare prima di compilarle.",
+        "questionsGenerated": "{count} campi domanda pronti"
       }
     },
     "quizzes": {
       "pageBadge": "Gestione quiz",
       "pageHello": "Hub quiz, {name}",
       "pageSubtitle": "Crea, pubblica e monitora i quiz tra lingue, livelli, lezioni e sezioni.",
-      "fullAdminPanel": "Pannello admin completo",
+      "fullAdminPanel": "Admin",
       "statTotalQuizzes": "Quiz totali",
       "statPublishedDrafts": "{published} pubblicati · {drafts} bozze",
       "statQuestions": "Domande totali",

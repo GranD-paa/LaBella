@@ -47,7 +47,7 @@ export const it: Messages = {
     dashboard: "Dashboard",
     profile: "Profilo",
     signOut: "Esci",
-    adminPanel: "Pannello admin",
+    adminPanel: "Admin",
     openUserMenu: "Apri menu utente",
   },
   auth: {

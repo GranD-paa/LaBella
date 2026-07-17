@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 
-import { ContentCreationWizard } from "@/components/admin/content/content-creation-wizard";
+import { CreateContentSection } from "@/components/admin/quizzes/create-content-section";
 import { QuizManagementTable } from "@/components/admin/quizzes/quiz-management-table";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
@@ -52,7 +52,7 @@ export function AdminQuizzesPageView({
         </div>
       </section>
 
-      <ContentCreationWizard lessons={lessons} />
+      <CreateContentSection lessons={lessons} />
 
       <QuizManagementTable
         quizzes={quizzes}

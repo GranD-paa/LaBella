@@ -47,7 +47,7 @@ export const fa: Messages = {
     dashboard: "داشبورد",
     profile: "پروفایل",
     signOut: "خروج",
-    adminPanel: "پنل مدیریت",
+    adminPanel: "مدیر",
     openUserMenu: "باز کردن منوی کاربر",
   },
   auth: {
