@@ -14,7 +14,7 @@ export const adminQuizzesFa = {
   statAverageScoreDesc: "در همه تلاش‌ها",
   wizardTitle: "ایجاد آزمون جدید",
   wizardDescription:
-    "مراحل را برای پیکربندی زبان، سطح، درس، بخش و سؤالات دنبال کنید.",
+    "مراحل را برای پیکربندی زبان، سطح، بخش، درس و سؤالات دنبال کنید.",
   stepLanguage: "زبان",
   stepLevel: "سطح",
   stepLesson: "درس",
@@ -49,6 +49,14 @@ export const adminQuizzesFa = {
     "«{title}» به‌همراه همه سؤالات آن برای همیشه حذف می‌شود.",
   quizDeleted: "آزمون حذف شد",
   managementSummary: "{count} آزمون · {published} منتشرشده",
+  allQuizzesHint:
+    "همه آزمون‌ها را در زبان‌ها، سطوح و درس‌ها مرور، فیلتر و مدیریت کنید.",
+  showingResults: "نمایش {count} از {total}",
+  filtersLabel: "فیلترها",
+  resetFilters: "پاک کردن فیلترها",
+  publishedShort: "{count} منتشرشده",
+  draftShort: "{count} پیش‌نویس",
+  questionTypeBreakdown: "{mc} چندگزینه‌ای · {written} تشریحی",
   filterLanguage: "فیلتر بر اساس زبان",
   allLanguages: "همه زبان‌ها",
   filterStatus: "فیلتر بر اساس وضعیت",

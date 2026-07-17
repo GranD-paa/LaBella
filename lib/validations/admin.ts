@@ -56,6 +56,34 @@ export const grammarRuleSchema = z.object({
 
 export type GrammarRuleValues = z.infer<typeof grammarRuleSchema>;
 
+export const contentGrammarSchema = grammarRuleSchema.extend({
+  status: z.enum(["draft", "published"]).default("draft"),
+});
+
+export const contentVocabularySchema = vocabularySchema.extend({
+  imageUrl: z.string().url("Must be a valid URL").max(2000),
+  pronunciation: optionalText(200),
+  status: z.enum(["draft", "published"]).default("draft"),
+});
+
+export type ContentVocabularyValues = z.infer<typeof contentVocabularySchema>;
+
+export const videoLessonSchema = z.object({
+  lessonId: z.string().uuid("Please select a lesson"),
+  languageSlug: z.enum(["italian", "english", "german", "turkish"]),
+  levelSlug: z.string().min(1, "Select a course level"),
+  title: z
+    .string()
+    .min(2, "Title must be at least 2 characters")
+    .max(150, "Title is too long"),
+  description: optionalText(2000),
+  videoUrl: z.string().url("Must be a valid URL").max(2000),
+  thumbnailUrl: optionalText(2000),
+  status: z.enum(["draft", "published"]).default("draft"),
+});
+
+export type VideoLessonValues = z.infer<typeof videoLessonSchema>;
+
 export const quizQuestionSchema = z
   .object({
     questionType: z.enum(["multiple_choice", "written"]),

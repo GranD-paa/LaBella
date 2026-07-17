@@ -14,7 +14,7 @@ export const adminQuizzesIt = {
   statAverageScoreDesc: "Su tutti i tentativi",
   wizardTitle: "Crea un nuovo quiz",
   wizardDescription:
-    "Segui i passaggi per configurare lingua, livello, lezione, sezione e domande.",
+    "Segui i passaggi per configurare lingua, livello, sezione, lezione e domande.",
   stepLanguage: "Lingua",
   stepLevel: "Livello",
   stepLesson: "Lezione",
@@ -49,6 +49,14 @@ export const adminQuizzesIt = {
     'Questo eliminerà definitivamente "{title}" e tutte le sue domande.',
   quizDeleted: "Quiz eliminato",
   managementSummary: "{count} quiz · {published} pubblicati",
+  allQuizzesHint:
+    "Sfoglia, filtra e gestisci ogni quiz tra lingue, livelli e lezioni.",
+  showingResults: "Visualizzati {count} di {total}",
+  filtersLabel: "Filtri",
+  resetFilters: "Reimposta filtri",
+  publishedShort: "{count} pubblicati",
+  draftShort: "{count} bozze",
+  questionTypeBreakdown: "{mc} a scelta · {written} aperte",
   filterLanguage: "Filtra per lingua",
   allLanguages: "Tutte le lingue",
   filterStatus: "Filtra per stato",

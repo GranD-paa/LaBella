@@ -222,6 +222,26 @@
       "noActivity": "No quiz activity yet.",
       "quizPerformance": "Quiz performance",
       "quizPerformanceHint": "Attempt counts and average scores per quiz.",
+      "assignedQuizzes": "Course quiz overview",
+      "assignedQuizzesHint": "Track quiz assignment across all course levels (A1-1 to A1-10), including language path, section, and publication status.",
+      "noAssignedQuizzes": "No lessons have quizzes assigned yet.",
+      "columnLesson": "Course / lesson name",
+      "columnLanguage": "Learning language",
+      "columnLevel": "Course level",
+      "columnSection": "Lesson section",
+      "columnStatus": "Quiz status",
+      "columnDetails": "Quiz details",
+      "languageItalian": "Italian",
+      "languageEnglish": "English",
+      "languageGerman": "German",
+      "languageTurkish": "Turkish",
+      "statusNoQuiz": "Not assigned",
+      "multipleChoiceQuestions": "Multiple-choice questions",
+      "writtenQuestions": "Written questions",
+      "questionCountValue": "{count} questions",
+      "showQuizDetails": "Show question breakdown",
+      "hideQuizDetails": "Hide question breakdown",
+      "noQuizAssigned": "No quiz has been assigned to this course level yet.",
       "noQuizzes": "No quizzes created yet.",
       "quiz": "Quiz",
       "attempts": "Attempts",
@@ -392,6 +412,76 @@
       "deleteDescription": "This will permanently delete \"{title}\".",
       "deleted": "Grammar rule deleted"
     },
+    "content": {
+      "wizardTitle": "Create Content",
+      "wizardDescription": "Add educational content step by step: choose a language, target lesson, content category, then create and publish when ready.",
+      "stepLanguage": "Language",
+      "stepLesson": "Lesson",
+      "stepCategory": "Section",
+      "stepCreate": "Create",
+      "askLanguage": "Which language do you want to add content for?",
+      "askLesson": "Which lesson do you want to add content to?",
+      "askCategory": "Which section do you want to add content to?",
+      "selectedLanguage": "Selected language",
+      "selectedLesson": "Selected lesson",
+      "selectedCategory": "Selected section",
+      "noLessonMapped": "No lesson is mapped to this level yet. Create a lesson first.",
+      "contextSummary": "{language} · {level} · {lesson}",
+      "saveDraft": "Save as draft",
+      "publishContent": "Publish content",
+      "savedDraft": "Content saved as draft",
+      "publishedContent": "Content published",
+      "addAnother": "Add more content",
+      "startOver": "Start over",
+      "categories": {
+        "grammar": {
+          "title": "Grammar",
+          "description": "Explanations, examples, and grammar exercises",
+          "features": "Add explanations · Add examples · Add exercises"
+        },
+        "vocabulary": {
+          "title": "Important Vocabulary with Images",
+          "description": "Key words with meanings and visual support",
+          "features": "Add words · Add meanings · Add images · Add pronunciation"
+        },
+        "video": {
+          "title": "Video Lessons",
+          "description": "Video-based learning content for this lesson",
+          "features": "Add video URL · Add title · Add description"
+        },
+        "quiz": {
+          "title": "Quizzes",
+          "description": "Multiple-choice and written assessment questions",
+          "features": "Multiple choice · Written questions · Answers & explanations"
+        }
+      },
+      "grammar": {
+        "formTitle": "Add grammar content",
+        "formDescription": "Create a grammar explanation for the selected lesson.",
+        "exerciseLabel": "Exercise or usage note (optional)"
+      },
+      "vocabulary": {
+        "formTitle": "Add vocabulary with image",
+        "formDescription": "Add an important word with translation and a visual.",
+        "pronunciationLabel": "Pronunciation (optional)",
+        "pronunciationPlaceholder": "e.g. /ˈkiao/",
+        "imageRequired": "An image URL is required for vocabulary with images."
+      },
+      "video": {
+        "formTitle": "Add video lesson",
+        "formDescription": "Upload video content by providing a hosted video URL.",
+        "videoUrlLabel": "Video URL",
+        "videoUrlPlaceholder": "https://…",
+        "thumbnailLabel": "Thumbnail URL (optional)",
+        "thumbnailPlaceholder": "https://…"
+      },
+      "quiz": {
+        "formTitle": "Create quiz",
+        "formDescription": "Build multiple-choice and written questions. Nothing is published until you choose Publish.",
+        "quizTitle": "Quiz title",
+        "quizTitlePlaceholder": "e.g. A1 Greetings checkpoint"
+      }
+    },
     "quizzes": {
       "pageBadge": "Quiz management",
       "pageHello": "Quiz hub, {name}",
@@ -406,7 +496,7 @@
       "statAverageScore": "Average score",
       "statAverageScoreDesc": "Across all attempts",
       "wizardTitle": "Create a new quiz",
-      "wizardDescription": "Follow the steps to configure language, level, lesson, section, and questions.",
+      "wizardDescription": "Follow the steps to configure language, level, section, lesson, and questions.",
       "stepLanguage": "Language",
       "stepLevel": "Level",
       "stepLesson": "Lesson",
@@ -439,6 +529,13 @@
       "deleteQuizDescription": "This will permanently delete \"{title}\" and all its questions.",
       "quizDeleted": "Quiz deleted",
       "managementSummary": "{count} quizzes · {published} published",
+      "allQuizzesHint": "Browse, filter, and manage every quiz across languages, levels, and lessons.",
+      "showingResults": "Showing {count} of {total}",
+      "filtersLabel": "Filters",
+      "resetFilters": "Reset filters",
+      "publishedShort": "{count} published",
+      "draftShort": "{count} drafts",
+      "questionTypeBreakdown": "{mc} MC · {written} written",
       "filterLanguage": "Filter by language",
       "allLanguages": "All languages",
       "filterStatus": "Filter by status",

@@ -31,13 +31,18 @@ export default async function LessonPage({ params }: PageProps) {
     notFound();
   }
 
-  const [vocabulary, grammarRules, quizzes] = await Promise.all([
+  const [vocabularyData, grammarData, quizzes] = await Promise.all([
     repo.getVocabularyByLessonId(id),
     repo.getGrammarRulesByLessonId(id),
     repo.getQuizzes(),
   ]);
 
-  const quiz = quizzes.find((entry) => entry.lesson_id === id) ?? null;
+  const vocabulary = vocabularyData.filter((item) => item.status === "published");
+  const grammarRules = grammarData.filter((item) => item.status === "published");
+  const quiz =
+    quizzes.find(
+      (entry) => entry.lesson_id === id && entry.status === "published"
+    ) ?? null;
 
   let quizAttempt = null;
   if (quiz && user) {

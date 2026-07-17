@@ -85,8 +85,8 @@ export function QuizCreationWizard({
       [
         { id: 1, title: t("admin.quizzes.stepLanguage"), icon: Globe },
         { id: 2, title: t("admin.quizzes.stepLevel"), icon: Layers },
-        { id: 3, title: t("admin.quizzes.stepLesson"), icon: BookOpen },
-        { id: 4, title: t("admin.quizzes.stepSection"), icon: Sparkles },
+        { id: 3, title: t("admin.quizzes.stepSection"), icon: Sparkles },
+        { id: 4, title: t("admin.quizzes.stepLesson"), icon: BookOpen },
         { id: 5, title: t("admin.quizzes.stepQuestions"), icon: Check },
       ] as const,
     [t]
@@ -114,6 +114,7 @@ export function QuizCreationWizard({
 
   const languageSlug = form.watch("languageSlug");
   const levelSlug = form.watch("levelSlug");
+  const sectionSlug = form.watch("sectionSlug");
 
   const selectedLanguage = useMemo(
     () => LANGUAGES.find((language) => language.slug === languageSlug),
@@ -133,16 +134,29 @@ export function QuizCreationWizard({
     );
   }, [lessons, levelOptions, levelSlug]);
 
+  const selectedSectionLabel = useMemo(() => {
+    const titleKey = getQuizSectionTitleKey(sectionSlug);
+    const section = QUIZ_SECTIONS.find((entry) => entry.slug === sectionSlug);
+    return titleKey ? t(titleKey) : section?.title ?? sectionSlug;
+  }, [sectionSlug, t]);
+
   function goNext() {
-    if (step === 2 && lessonForLevel) {
+    if (step === 4) {
+      if (!lessonForLevel) {
+        form.setError("lessonId", {
+          type: "manual",
+          message: t("admin.quizzes.noLessonMapped"),
+        });
+        return;
+      }
       form.setValue("lessonId", lessonForLevel.id);
     }
 
     const fieldsByStep: Record<number, (keyof StructuredQuizValues)[]> = {
       1: ["languageSlug"],
       2: ["levelSlug"],
-      3: ["lessonId", "title"],
-      4: ["sectionSlug", "status"],
+      3: ["sectionSlug"],
+      4: ["lessonId", "title", "status"],
       5: ["questions"],
     };
 
@@ -287,7 +301,57 @@ export function QuizCreationWizard({
             ) : null}
 
             {step === 3 ? (
+              <FormField
+                control={form.control}
+                name="sectionSlug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("admin.quizzes.learningSection")}</FormLabel>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {QUIZ_SECTIONS.map((section) => {
+                        const titleKey = getQuizSectionTitleKey(section.slug);
+                        const descriptionKey = getQuizSectionDescriptionKey(
+                          section.slug
+                        );
+
+                        return (
+                          <button
+                            key={section.slug}
+                            type="button"
+                            disabled={isPending}
+                            onClick={() => field.onChange(section.slug)}
+                            className={cn(
+                              "rounded-lg border px-4 py-3 text-left transition-colors hover:border-brand-accent/50",
+                              field.value === section.slug &&
+                                "border-brand-accent bg-brand-accent/10"
+                            )}
+                          >
+                            <p className="font-semibold">
+                              {titleKey ? t(titleKey) : section.title}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {descriptionKey
+                                ? t(descriptionKey)
+                                : section.description}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : null}
+
+            {step === 4 ? (
               <div className="space-y-4">
+                <div className="rounded-xl border bg-muted/30 p-4">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {t("admin.quizzes.learningSection")}
+                  </p>
+                  <p className="mt-1 text-lg font-semibold">{selectedSectionLabel}</p>
+                </div>
                 <div className="rounded-xl border bg-muted/30 p-4">
                   <p className="text-sm font-medium text-muted-foreground">
                     {t("admin.quizzes.selectedLesson")}
@@ -298,6 +362,12 @@ export function QuizCreationWizard({
                   {lessonForLevel?.description ? (
                     <p className="mt-1 text-sm text-muted-foreground">
                       {lessonForLevel.description}
+                    </p>
+                  ) : null}
+                  {!lessonForLevel ? (
+                    <p className="mt-2 text-sm text-destructive">
+                      {form.formState.errors.lessonId?.message ??
+                        t("admin.quizzes.noLessonMapped")}
                     </p>
                   ) : null}
                 </div>
@@ -314,52 +384,6 @@ export function QuizCreationWizard({
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            ) : null}
-
-            {step === 4 ? (
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="sectionSlug"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("admin.quizzes.learningSection")}</FormLabel>
-                      <div className="grid gap-2 sm:grid-cols-2">
-                        {QUIZ_SECTIONS.map((section) => {
-                          const titleKey = getQuizSectionTitleKey(section.slug);
-                          const descriptionKey = getQuizSectionDescriptionKey(
-                            section.slug
-                          );
-
-                          return (
-                            <button
-                              key={section.slug}
-                              type="button"
-                              disabled={isPending}
-                              onClick={() => field.onChange(section.slug)}
-                              className={cn(
-                                "rounded-lg border px-4 py-3 text-left transition-colors hover:border-brand-accent/50",
-                                field.value === section.slug &&
-                                  "border-brand-accent bg-brand-accent/10"
-                              )}
-                            >
-                              <p className="font-semibold">
-                                {titleKey ? t(titleKey) : section.title}
-                              </p>
-                              <p className="text-sm text-muted-foreground">
-                                {descriptionKey
-                                  ? t(descriptionKey)
-                                  : section.description}
-                              </p>
-                            </button>
-                          );
-                        })}
-                      </div>
                       <FormMessage />
                     </FormItem>
                   )}

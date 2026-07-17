@@ -87,6 +87,6 @@ export function withQuizDefaults(quiz: Quiz, lessons: Lesson[]): ExtendedQuiz {
     language_slug: (quiz.language_slug as ExtendedQuiz["language_slug"]) ?? derived.language_slug,
     level_slug: (quiz.level_slug as ExtendedQuiz["level_slug"]) ?? derived.level_slug,
     section_slug: (quiz.section_slug as ExtendedQuiz["section_slug"]) ?? derived.section_slug,
-    status: quiz.status ?? "published",
+    status: quiz.status === "published" ? "published" : "draft",
   };
 }

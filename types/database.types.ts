@@ -68,6 +68,8 @@ export interface Database {
           translation: string;
           image_url: string | null;
           example_sentence: string | null;
+          pronunciation: string | null;
+          status: "draft" | "published";
           created_at: string;
         };
         Insert: {
@@ -77,6 +79,8 @@ export interface Database {
           translation: string;
           image_url?: string | null;
           example_sentence?: string | null;
+          pronunciation?: string | null;
+          status?: "draft" | "published";
           created_at?: string;
         };
         Update: {
@@ -86,6 +90,8 @@ export interface Database {
           translation?: string;
           image_url?: string | null;
           example_sentence?: string | null;
+          pronunciation?: string | null;
+          status?: "draft" | "published";
           created_at?: string;
         };
         Relationships: [
@@ -105,6 +111,7 @@ export interface Database {
           title: string;
           description: string | null;
           example: string | null;
+          status: "draft" | "published";
           created_at: string;
         };
         Insert: {
@@ -113,6 +120,7 @@ export interface Database {
           title: string;
           description?: string | null;
           example?: string | null;
+          status?: "draft" | "published";
           created_at?: string;
         };
         Update: {
@@ -121,6 +129,7 @@ export interface Database {
           title?: string;
           description?: string | null;
           example?: string | null;
+          status?: "draft" | "published";
           created_at?: string;
         };
         Relationships: [
@@ -265,6 +274,53 @@ export interface Database {
             columns: ["quiz_id"];
             isOneToOne: false;
             referencedRelation: "quizzes";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      video_lessons: {
+        Row: {
+          id: string;
+          lesson_id: string;
+          language_slug: string;
+          level_slug: string;
+          title: string;
+          description: string | null;
+          video_url: string;
+          thumbnail_url: string | null;
+          status: "draft" | "published";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          lesson_id: string;
+          language_slug?: string;
+          level_slug?: string;
+          title: string;
+          description?: string | null;
+          video_url: string;
+          thumbnail_url?: string | null;
+          status?: "draft" | "published";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          lesson_id?: string;
+          language_slug?: string;
+          level_slug?: string;
+          title?: string;
+          description?: string | null;
+          video_url?: string;
+          thumbnail_url?: string | null;
+          status?: "draft" | "published";
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "video_lessons_lesson_id_fkey";
+            columns: ["lesson_id"];
+            isOneToOne: false;
+            referencedRelation: "lessons";
             referencedColumns: ["id"];
           },
         ];

@@ -1,4 +1,5 @@
 import type { Messages } from "@/lib/i18n/types";
+import { adminContentFa } from "@/lib/i18n/messages/admin-content-fa";
 import { adminQuizzesFa } from "@/lib/i18n/messages/admin-quizzes-fa";
 
 export const fa: Messages = {
@@ -234,6 +235,27 @@ export const fa: Messages = {
       noActivity: "هنوز فعالیت آزمونی نیست.",
       quizPerformance: "عملکرد آزمون‌ها",
       quizPerformanceHint: "تعداد تلاش و میانگین نمره هر آزمون.",
+      assignedQuizzes: "نمای کلی آزمون‌های دوره",
+      assignedQuizzesHint:
+        "پیگیری اختصاص آزمون در همه سطوح دوره (A1-1 تا A1-10)، شامل مسیر زبان، بخش درس و وضعیت انتشار.",
+      noAssignedQuizzes: "هنوز آزمونی به درسی اختصاص داده نشده است.",
+      columnLesson: "نام دوره / درس",
+      columnLanguage: "زبان یادگیری",
+      columnLevel: "سطح دوره",
+      columnSection: "بخش درس",
+      columnStatus: "وضعیت آزمون",
+      columnDetails: "جزئیات آزمون",
+      languageItalian: "ایتالیایی",
+      languageEnglish: "انگلیسی",
+      languageGerman: "آلمانی",
+      languageTurkish: "ترکی",
+      statusNoQuiz: "اختصاص داده نشده",
+      multipleChoiceQuestions: "سؤالات چندگزینه‌ای",
+      writtenQuestions: "سؤالات تشریحی",
+      questionCountValue: "{count} سؤال",
+      showQuizDetails: "نمایش جزئیات سؤالات",
+      hideQuizDetails: "پنهان کردن جزئیات سؤالات",
+      noQuizAssigned: "هنوز آزمونی به این سطح دوره اختصاص داده نشده است.",
       noQuizzes: "هنوز آزمونی ساخته نشده.",
       quiz: "آزمون",
       attempts: "تلاش‌ها",
@@ -406,6 +428,7 @@ export const fa: Messages = {
       deleteDescription: "«{title}» برای همیشه حذف می‌شود.",
       deleted: "قاعده گرامری حذف شد",
     },
+    content: adminContentFa,
     quizzes: adminQuizzesFa,
     users: {
       title: "مدیریت کاربران",

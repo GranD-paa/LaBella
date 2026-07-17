@@ -5,6 +5,7 @@ import type {
   Quiz,
   QuizQuestion,
   UserQuizAttempt,
+  VideoLesson,
   Vocabulary,
 } from "@/types";
 
@@ -54,6 +55,8 @@ export interface DataRepository {
   getAllVocabulary(): Promise<Vocabulary[]>;
   getGrammarRulesByLessonId(lessonId: string): Promise<GrammarRule[]>;
   getAllGrammarRules(): Promise<GrammarRule[]>;
+  getVideoLessonsByLessonId(lessonId: string): Promise<VideoLesson[]>;
+  getAllVideoLessons(): Promise<VideoLesson[]>;
   getQuizzes(): Promise<Quiz[]>;
   getQuizById(id: string): Promise<Quiz | null>;
   getQuizQuestionsByQuizId(quizId: string): Promise<QuizQuestion[]>;
@@ -112,6 +115,10 @@ export interface DataRepository {
     input: Partial<Omit<GrammarRule, "id" | "created_at">>
   ): Promise<{ error?: string }>;
   deleteGrammarRule(id: string): Promise<{ error?: string }>;
+
+  createVideoLesson(
+    input: Omit<VideoLesson, "id" | "created_at">
+  ): Promise<{ error?: string }>;
 
   createQuizWithQuestions(input: {
     lessonId: string;

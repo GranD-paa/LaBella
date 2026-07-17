@@ -17,6 +17,7 @@ export async function createGrammarRule(values: unknown): Promise<ActionResult> 
     title: parsed.data.title,
     description: parsed.data.description || null,
     example: parsed.data.example || null,
+    status: "published",
   });
 
   if (result.error) {

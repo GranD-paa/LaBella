@@ -135,6 +135,25 @@ export function createSupabaseRepository(): DataRepository {
       return data ?? [];
     },
 
+    async getVideoLessonsByLessonId(lessonId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("video_lessons")
+        .select("*")
+        .eq("lesson_id", lessonId)
+        .order("created_at");
+      return data ?? [];
+    },
+
+    async getAllVideoLessons() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("video_lessons")
+        .select("*")
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+
     async getQuizzes() {
       const supabase = await createClient();
       const { data } = await supabase
@@ -313,6 +332,12 @@ export function createSupabaseRepository(): DataRepository {
         .from("grammar_rules")
         .delete()
         .eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
+    async createVideoLesson(input) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("video_lessons").insert(input);
       return error ? { error: error.message } : {};
     },
 

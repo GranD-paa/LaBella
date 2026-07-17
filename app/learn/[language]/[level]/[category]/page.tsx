@@ -63,8 +63,8 @@ export default async function CategoryPage({ params }: PageProps) {
       repo.getQuizzes(),
     ]);
 
-    vocabulary = vocabularyData;
-    grammarRules = grammarData;
+    vocabulary = vocabularyData.filter((item) => item.status === "published");
+    grammarRules = grammarData.filter((item) => item.status === "published");
     quiz =
       quizzes.find(
         (entry) =>

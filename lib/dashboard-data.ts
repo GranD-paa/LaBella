@@ -1,4 +1,5 @@
 import type { DataRepository } from "@/lib/data/repository";
+import { ITALIAN_LEVELS } from "@/lib/curriculum/italian";
 import type { Lesson, Profile, Quiz, UserQuizAttempt } from "@/types";
 
 export type UserDashboardData = {
@@ -48,12 +49,15 @@ export type AdminDashboardData = {
     averageScore: number;
     totalLessons: number;
   };
-  quizPerformance: Array<{
-    quizId: string;
-    quizTitle: string;
-    lessonTitle: string;
-    attemptCount: number;
-    averageScore: number;
+  levelQuizOverview: Array<{
+    levelCode: string;
+    lessonName: string;
+    languageSlug: string;
+    sectionSlug: string | null;
+    quizId: string | null;
+    status: "none" | "draft" | "published";
+    multipleChoiceCount: number;
+    writtenCount: number;
   }>;
   recentActivity: Array<{
     id: string;
@@ -166,14 +170,15 @@ export async function fetchUserDashboardData(
 export async function fetchAdminDashboardData(
   repo: DataRepository
 ): Promise<AdminDashboardData> {
-  const [profiles, quizzes, lessons, allAttempts] = await Promise.all([
-    repo.getAllProfiles(),
-    repo.getQuizzes(),
-    repo.getLessons(),
-    repo.getAllAttempts(),
-  ]);
+  const [profiles, quizzes, lessons, allAttempts, allQuestions] =
+    await Promise.all([
+      repo.getAllProfiles(),
+      repo.getQuizzes(),
+      repo.getLessons(),
+      repo.getAllAttempts(),
+      repo.getAllQuizQuestions(),
+    ]);
 
-  const lessonMap = new Map(lessons.map((lesson) => [lesson.id, lesson]));
   const profileMap = new Map(
     profiles.map((profile) => [profile.id, profile.full_name])
   );
@@ -194,26 +199,42 @@ export async function fetchAdminDashboardData(
       ? Math.round((uniqueCompletions / quizzes.length) * 100)
       : 0;
 
-  const quizPerformanceMap = allAttempts.reduce<
-    Record<string, { total: number; count: number }>
-  >((acc, attempt) => {
-    if (!acc[attempt.quiz_id]) {
-      acc[attempt.quiz_id] = { total: 0, count: 0 };
+  const quizByLessonId = new Map(quizzes.map((quiz) => [quiz.lesson_id, quiz]));
+  const lessonByOrder = new Map(
+    lessons.map((lesson) => [lesson.order_number, lesson])
+  );
+  const questionsByQuizId = allQuestions.reduce<
+    Record<string, { multipleChoice: number; written: number }>
+  >((acc, question) => {
+    if (!acc[question.quiz_id]) {
+      acc[question.quiz_id] = { multipleChoice: 0, written: 0 };
     }
-    acc[attempt.quiz_id].total += attempt.score;
-    acc[attempt.quiz_id].count += 1;
+    if (question.question_type === "written") {
+      acc[question.quiz_id].written += 1;
+    } else {
+      acc[question.quiz_id].multipleChoice += 1;
+    }
     return acc;
   }, {});
 
-  const quizPerformance = quizzes.map((quiz) => {
-    const lesson = lessonMap.get(quiz.lesson_id);
-    const perf = quizPerformanceMap[quiz.id];
+  const levelQuizOverview = ITALIAN_LEVELS.map((level) => {
+    const lesson = lessonByOrder.get(level.orderNumber);
+    const quiz = lesson ? quizByLessonId.get(lesson.id) : undefined;
+    const questionCounts = quiz ? questionsByQuizId[quiz.id] : undefined;
+
     return {
-      quizId: quiz.id,
-      quizTitle: quiz.title,
-      lessonTitle: lesson?.title ?? "Unknown lesson",
-      attemptCount: perf?.count ?? 0,
-      averageScore: perf ? Math.round(perf.total / perf.count) : 0,
+      levelCode: level.code,
+      lessonName: lesson?.title ?? level.title,
+      languageSlug: "italian",
+      sectionSlug: quiz?.section_slug ?? null,
+      quizId: quiz?.id ?? null,
+      status: !quiz
+        ? ("none" as const)
+        : quiz.status === "published"
+          ? ("published" as const)
+          : ("draft" as const),
+      multipleChoiceCount: questionCounts?.multipleChoice ?? 0,
+      writtenCount: questionCounts?.written ?? 0,
     };
   });
 
@@ -240,7 +261,7 @@ export async function fetchAdminDashboardData(
       averageScore,
       totalLessons: lessons.length,
     },
-    quizPerformance,
+    levelQuizOverview,
     recentActivity,
     users: profiles.map((profile) => ({
       id: profile.id,

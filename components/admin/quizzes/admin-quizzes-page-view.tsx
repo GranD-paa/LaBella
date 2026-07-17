@@ -1,36 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ListChecks, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 
-import { QuizCreationWizard } from "@/components/admin/quizzes/quiz-creation-wizard";
+import { ContentCreationWizard } from "@/components/admin/content/content-creation-wizard";
 import { QuizManagementTable } from "@/components/admin/quizzes/quiz-management-table";
 import { useTranslations } from "@/components/providers/locale-provider";
-import { StatCard } from "@/components/dashboard/stat-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { EnrichedQuiz } from "@/lib/quiz-management/data";
 import type { Lesson, QuizQuestion, UserQuizAttempt } from "@/types";
 
-type QuizManagementStats = {
-  totalQuizzes: number;
-  publishedQuizzes: number;
-  draftQuizzes: number;
-  totalQuestions: number;
-  totalAttempts: number;
-  averageScore: number;
-};
-
 export function AdminQuizzesPageView({
   displayName,
-  stats,
   quizzes,
   quizQuestions,
   attempts,
   lessons,
 }: {
   displayName: string;
-  stats: QuizManagementStats;
   quizzes: EnrichedQuiz[];
   quizQuestions: QuizQuestion[];
   attempts: UserQuizAttempt[];
@@ -64,37 +52,7 @@ export function AdminQuizzesPageView({
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          title={t("admin.quizzes.statTotalQuizzes")}
-          value={stats.totalQuizzes}
-          description={t("admin.quizzes.statPublishedDrafts", {
-            published: stats.publishedQuizzes,
-            drafts: stats.draftQuizzes,
-          })}
-          icon={ListChecks}
-        />
-        <StatCard
-          title={t("admin.quizzes.statQuestions")}
-          value={stats.totalQuestions}
-          description={t("admin.quizzes.statQuestionsDesc")}
-          icon={ListChecks}
-        />
-        <StatCard
-          title={t("admin.quizzes.statAttempts")}
-          value={stats.totalAttempts}
-          description={t("admin.quizzes.statAttemptsDesc")}
-          icon={ListChecks}
-        />
-        <StatCard
-          title={t("admin.quizzes.statAverageScore")}
-          value={`${stats.averageScore}%`}
-          description={t("admin.quizzes.statAverageScoreDesc")}
-          icon={ListChecks}
-        />
-      </section>
-
-      <QuizCreationWizard lessons={lessons} />
+      <ContentCreationWizard lessons={lessons} />
 
       <QuizManagementTable
         quizzes={quizzes}

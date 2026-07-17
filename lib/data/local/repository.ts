@@ -108,6 +108,18 @@ export function createLocalRepository(): DataRepository {
       );
     },
 
+    async getVideoLessonsByLessonId(lessonId) {
+      return getLocalStore()
+        .videoLessons.filter((item) => item.lesson_id === lessonId)
+        .sort((a, b) => a.created_at.localeCompare(b.created_at));
+    },
+
+    async getAllVideoLessons() {
+      return [...getLocalStore().videoLessons].sort((a, b) =>
+        b.created_at.localeCompare(a.created_at)
+      );
+    },
+
     async getQuizzes() {
       return [...getLocalStore().quizzes].sort((a, b) =>
         a.created_at.localeCompare(b.created_at)
@@ -223,6 +235,8 @@ export function createLocalRepository(): DataRepository {
     async createVocabulary(input) {
       getLocalStore().vocabulary.push({
         ...input,
+        pronunciation: input.pronunciation ?? null,
+        status: input.status ?? "published",
         id: createLocalId("vocab"),
         created_at: new Date().toISOString(),
       });
@@ -245,6 +259,7 @@ export function createLocalRepository(): DataRepository {
     async createGrammarRule(input) {
       getLocalStore().grammarRules.push({
         ...input,
+        status: input.status ?? "published",
         id: createLocalId("grammar"),
         created_at: new Date().toISOString(),
       });
@@ -261,6 +276,16 @@ export function createLocalRepository(): DataRepository {
     async deleteGrammarRule(id) {
       const store = getLocalStore();
       store.grammarRules = store.grammarRules.filter((item) => item.id !== id);
+      return {};
+    },
+
+    async createVideoLesson(input) {
+      getLocalStore().videoLessons.push({
+        ...input,
+        status: input.status ?? "draft",
+        id: createLocalId("video"),
+        created_at: new Date().toISOString(),
+      });
       return {};
     },
 

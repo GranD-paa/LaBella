@@ -18,6 +18,8 @@ export async function createVocabulary(values: unknown): Promise<ActionResult> {
     translation: parsed.data.translation,
     image_url: parsed.data.imageUrl || null,
     example_sentence: parsed.data.exampleSentence || null,
+    pronunciation: null,
+    status: "published",
   });
 
   if (result.error) {

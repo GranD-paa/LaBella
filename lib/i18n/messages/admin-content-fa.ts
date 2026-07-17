@@ -1,0 +1,72 @@
+export const adminContentFa = {
+  wizardTitle: "ایجاد محتوا",
+  wizardDescription:
+    "محتوای آموزشی را مرحله‌به‌مرحله اضافه کنید: زبان، درس هدف، بخش محتوا و سپس ایجاد و انتشار.",
+  stepLanguage: "زبان",
+  stepLesson: "درس",
+  stepCategory: "بخش",
+  stepCreate: "ایجاد",
+  askLanguage: "برای کدام زبان می‌خواهید محتوا اضافه کنید؟",
+  askLesson: "می‌خواهید محتوا را به کدام درس اضافه کنید؟",
+  askCategory: "می‌خواهید محتوا را در کدام بخش اضافه کنید؟",
+  selectedLanguage: "زبان انتخاب‌شده",
+  selectedLesson: "درس انتخاب‌شده",
+  selectedCategory: "بخش انتخاب‌شده",
+  noLessonMapped: "هنوز درسی برای این سطح تعریف نشده. ابتدا یک درس ایجاد کنید.",
+  contextSummary: "{language} · {level} · {lesson}",
+  saveDraft: "ذخیره به‌عنوان پیش‌نویس",
+  publishContent: "انتشار محتوا",
+  savedDraft: "محتوا به‌عنوان پیش‌نویس ذخیره شد",
+  publishedContent: "محتوا منتشر شد",
+  addAnother: "افزودن محتوای بیشتر",
+  startOver: "شروع دوباره",
+  categories: {
+    grammar: {
+      title: "گرامر",
+      description: "توضیحات، مثال‌ها و تمرین‌های گرامری",
+      features: "افزودن توضیح · افزودن مثال · افزودن تمرین",
+    },
+    vocabulary: {
+      title: "واژگان مهم با تصویر",
+      description: "واژه‌های کلیدی با معنی و پشتیبانی تصویری",
+      features: "افزودن واژه · افزودن معنی · افزودن تصویر · افزودن تلفظ",
+    },
+    video: {
+      title: "درس‌های ویدیویی",
+      description: "محتوای ویدیویی برای این درس",
+      features: "افزودن لینک ویدیو · افزودن عنوان · افزودن توضیح",
+    },
+    quiz: {
+      title: "آزمون‌ها",
+      description: "سؤالات چندگزینه‌ای و تشریحی",
+      features: "چندگزینه‌ای · سؤالات تشریحی · پاسخ و توضیح",
+    },
+  },
+  grammar: {
+    formTitle: "افزودن محتوای گرامر",
+    formDescription: "یک توضیح گرامری برای درس انتخاب‌شده ایجاد کنید.",
+    exerciseLabel: "تمرین یا نکته کاربرد (اختیاری)",
+  },
+  vocabulary: {
+    formTitle: "افزودن واژه با تصویر",
+    formDescription: "یک واژه مهم با ترجمه و تصویر اضافه کنید.",
+    pronunciationLabel: "تلفظ (اختیاری)",
+    pronunciationPlaceholder: "مثلاً /ˈkiao/",
+    imageRequired: "برای واژگان تصویری، آدرس تصویر الزامی است.",
+  },
+  video: {
+    formTitle: "افزودن درس ویدیویی",
+    formDescription: "با وارد کردن لینک ویدیو میزبانی‌شده، محتوا را اضافه کنید.",
+    videoUrlLabel: "آدرس ویدیو",
+    videoUrlPlaceholder: "https://…",
+    thumbnailLabel: "آدرس تصویر بندانگشتی (اختیاری)",
+    thumbnailPlaceholder: "https://…",
+  },
+  quiz: {
+    formTitle: "ایجاد آزمون",
+    formDescription:
+      "سؤالات چندگزینه‌ای و تشریحی بسازید. تا زمانی که «انتشار» را انتخاب نکنید، چیزی منتشر نمی‌شود.",
+    quizTitle: "عنوان آزمون",
+    quizTitlePlaceholder: "مثلاً آزمون سلام A1",
+  },
+} as const;

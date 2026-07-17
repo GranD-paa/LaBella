@@ -5,6 +5,7 @@ import type {
   Quiz,
   QuizQuestion,
   UserQuizAttempt,
+  VideoLesson,
   Vocabulary,
 } from "@/types";
 
@@ -16,6 +17,7 @@ export type LocalDatabase = {
   lessons: Lesson[];
   vocabulary: Vocabulary[];
   grammarRules: GrammarRule[];
+  videoLessons: VideoLesson[];
   quizzes: Quiz[];
   quizQuestions: QuizQuestion[];
   userQuizAttempts: UserQuizAttempt[];
@@ -109,6 +111,8 @@ export const LOCAL_SEED: LocalDatabase = {
       translation: "Hello / Bye",
       image_url: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=400&fit=crop",
       example_sentence: "Ciao, come stai?",
+      pronunciation: null,
+      status: "published",
       created_at: now,
     },
     {
@@ -118,6 +122,8 @@ export const LOCAL_SEED: LocalDatabase = {
       translation: "Good morning",
       image_url: "https://images.unsplash.com/photo-1499750310107-5fef28fd660f?w=400&h=400&fit=crop",
       example_sentence: "Buongiorno, signora Rossi.",
+      pronunciation: null,
+      status: "published",
       created_at: now,
     },
     {
@@ -127,6 +133,8 @@ export const LOCAL_SEED: LocalDatabase = {
       translation: "Thank you",
       image_url: null,
       example_sentence: "Grazie mille!",
+      pronunciation: null,
+      status: "published",
       created_at: now,
     },
     {
@@ -136,6 +144,8 @@ export const LOCAL_SEED: LocalDatabase = {
       translation: "My name is",
       image_url: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=400&fit=crop",
       example_sentence: "Mi chiamo Marco.",
+      pronunciation: null,
+      status: "published",
       created_at: now,
     },
     {
@@ -145,6 +155,8 @@ export const LOCAL_SEED: LocalDatabase = {
       translation: "To eat",
       image_url: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=400&fit=crop",
       example_sentence: "Mi piace mangiare la pasta.",
+      pronunciation: null,
+      status: "published",
       created_at: now,
     },
   ],
@@ -155,6 +167,7 @@ export const LOCAL_SEED: LocalDatabase = {
       title: "Subject pronouns",
       description: "Italian subject pronouns are often omitted because verb endings show the subject.",
       example: "(Io) parlo italiano. (Tu) parli bene.",
+      status: "published",
       created_at: now,
     },
     {
@@ -163,6 +176,7 @@ export const LOCAL_SEED: LocalDatabase = {
       title: "Formal vs informal greetings",
       description: "Use 'Lei' in formal contexts and 'tu' with friends and family.",
       example: "Buongiorno, come sta? / Ciao, come stai?",
+      status: "published",
       created_at: now,
     },
     {
@@ -171,9 +185,11 @@ export const LOCAL_SEED: LocalDatabase = {
       title: "Verb essere (to be)",
       description: "Essere is irregular and essential for introductions.",
       example: "Io sono Erfan. Tu sei studente.",
+      status: "published",
       created_at: now,
     },
   ],
+  videoLessons: [],
   quizzes: lessonIds.map((lessonId, index) => ({
     id: quizIds[index],
     lesson_id: lessonId,
@@ -181,7 +197,7 @@ export const LOCAL_SEED: LocalDatabase = {
     language_slug: "italian",
     level_slug: `a1-${index + 1}`,
     section_slug: "quiz",
-    status: "published" as const,
+    status: "draft" as const,
     created_at: now,
   })),
   quizQuestions: [

@@ -48,6 +48,17 @@ export function createVocabularySchema(t: Translator) {
   });
 }
 
+export function createContentVocabularySchema(t: Translator) {
+  return createVocabularySchema(t).extend({
+    imageUrl: z
+      .string()
+      .url(t("validation.admin.invalidUrl"))
+      .max(2000, t("validation.admin.maxChars", { max: 2000 })),
+    pronunciation: optionalText(t, 200),
+    status: z.enum(["draft", "published"]).default("draft"),
+  });
+}
+
 export function createGrammarRuleSchema(t: Translator) {
   return z.object({
     lessonId: z.string().uuid(t("validation.admin.selectLesson")),
@@ -57,6 +68,36 @@ export function createGrammarRuleSchema(t: Translator) {
       .max(150, t("validation.admin.titleMax")),
     description: optionalText(t, 2000),
     example: optionalText(t, 1000),
+  });
+}
+
+export function createContentGrammarRuleSchema(t: Translator) {
+  return createGrammarRuleSchema(t).extend({
+    status: z.enum(["draft", "published"]).default("draft"),
+  });
+}
+
+export function createVideoLessonSchema(t: Translator) {
+  return z.object({
+    lessonId: z.string().uuid(t("validation.admin.selectLesson")),
+    languageSlug: z.enum(["italian", "english", "german", "turkish"]),
+    levelSlug: z.string().min(1, t("validation.admin.selectLevel")),
+    title: z
+      .string()
+      .min(2, t("validation.admin.titleMin"))
+      .max(150, t("validation.admin.titleMax")),
+    description: optionalText(t, 2000),
+    videoUrl: z
+      .string()
+      .url(t("validation.admin.invalidUrl"))
+      .max(2000, t("validation.admin.maxChars", { max: 2000 })),
+    thumbnailUrl: z
+      .string()
+      .url(t("validation.admin.invalidUrl"))
+      .max(2000)
+      .optional()
+      .or(z.literal("")),
+    status: z.enum(["draft", "published"]).default("draft"),
   });
 }
 
@@ -165,8 +206,17 @@ export type LessonValues = z.infer<ReturnType<typeof createLessonSchema>>;
 export type VocabularyValues = z.infer<
   ReturnType<typeof createVocabularySchema>
 >;
+export type ContentVocabularyValues = z.infer<
+  ReturnType<typeof createContentVocabularySchema>
+>;
 export type GrammarRuleValues = z.infer<
   ReturnType<typeof createGrammarRuleSchema>
+>;
+export type ContentGrammarRuleValues = z.infer<
+  ReturnType<typeof createContentGrammarRuleSchema>
+>;
+export type VideoLessonValues = z.infer<
+  ReturnType<typeof createVideoLessonSchema>
 >;
 export type QuizQuestionValues = z.infer<
   ReturnType<typeof createQuizQuestionSchema>

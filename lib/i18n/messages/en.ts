@@ -1,3 +1,4 @@
+import { adminContentEn } from "@/lib/i18n/messages/admin-content-en";
 import { adminQuizzesEn } from "@/lib/i18n/messages/admin-quizzes-en";
 
 export const en = {
@@ -237,6 +238,27 @@ export const en = {
       noActivity: "No quiz activity yet.",
       quizPerformance: "Quiz performance",
       quizPerformanceHint: "Attempt counts and average scores per quiz.",
+      assignedQuizzes: "Course quiz overview",
+      assignedQuizzesHint:
+        "Track quiz assignment across all course levels (A1-1 to A1-10), including language path, section, and publication status.",
+      noAssignedQuizzes: "No lessons have quizzes assigned yet.",
+      columnLesson: "Course / lesson name",
+      columnLanguage: "Learning language",
+      columnLevel: "Course level",
+      columnSection: "Lesson section",
+      columnStatus: "Quiz status",
+      columnDetails: "Quiz details",
+      languageItalian: "Italian",
+      languageEnglish: "English",
+      languageGerman: "German",
+      languageTurkish: "Turkish",
+      statusNoQuiz: "Not assigned",
+      multipleChoiceQuestions: "Multiple-choice questions",
+      writtenQuestions: "Written questions",
+      questionCountValue: "{count} questions",
+      showQuizDetails: "Show question breakdown",
+      hideQuizDetails: "Hide question breakdown",
+      noQuizAssigned: "No quiz has been assigned to this course level yet.",
       noQuizzes: "No quizzes created yet.",
       quiz: "Quiz",
       attempts: "Attempts",
@@ -409,6 +431,7 @@ export const en = {
       deleteDescription: "This will permanently delete \"{title}\".",
       deleted: "Grammar rule deleted",
     },
+    content: adminContentEn,
     quizzes: adminQuizzesEn,
     users: {
       title: "User Management",

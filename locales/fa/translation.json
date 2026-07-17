@@ -222,6 +222,26 @@
       "noActivity": "هنوز فعالیت آزمونی نیست.",
       "quizPerformance": "عملکرد آزمون‌ها",
       "quizPerformanceHint": "تعداد تلاش و میانگین نمره هر آزمون.",
+      "assignedQuizzes": "نمای کلی آزمون‌های دوره",
+      "assignedQuizzesHint": "پیگیری اختصاص آزمون در همه سطوح دوره (A1-1 تا A1-10)، شامل مسیر زبان، بخش درس و وضعیت انتشار.",
+      "noAssignedQuizzes": "هنوز آزمونی به درسی اختصاص داده نشده است.",
+      "columnLesson": "نام دوره / درس",
+      "columnLanguage": "زبان یادگیری",
+      "columnLevel": "سطح دوره",
+      "columnSection": "بخش درس",
+      "columnStatus": "وضعیت آزمون",
+      "columnDetails": "جزئیات آزمون",
+      "languageItalian": "ایتالیایی",
+      "languageEnglish": "انگلیسی",
+      "languageGerman": "آلمانی",
+      "languageTurkish": "ترکی",
+      "statusNoQuiz": "اختصاص داده نشده",
+      "multipleChoiceQuestions": "سؤالات چندگزینه‌ای",
+      "writtenQuestions": "سؤالات تشریحی",
+      "questionCountValue": "{count} سؤال",
+      "showQuizDetails": "نمایش جزئیات سؤالات",
+      "hideQuizDetails": "پنهان کردن جزئیات سؤالات",
+      "noQuizAssigned": "هنوز آزمونی به این سطح دوره اختصاص داده نشده است.",
       "noQuizzes": "هنوز آزمونی ساخته نشده.",
       "quiz": "آزمون",
       "attempts": "تلاش‌ها",
@@ -392,6 +412,76 @@
       "deleteDescription": "«{title}» برای همیشه حذف می‌شود.",
       "deleted": "قاعده گرامری حذف شد"
     },
+    "content": {
+      "wizardTitle": "ایجاد محتوا",
+      "wizardDescription": "محتوای آموزشی را مرحله‌به‌مرحله اضافه کنید: زبان، درس هدف، بخش محتوا و سپس ایجاد و انتشار.",
+      "stepLanguage": "زبان",
+      "stepLesson": "درس",
+      "stepCategory": "بخش",
+      "stepCreate": "ایجاد",
+      "askLanguage": "برای کدام زبان می‌خواهید محتوا اضافه کنید؟",
+      "askLesson": "می‌خواهید محتوا را به کدام درس اضافه کنید؟",
+      "askCategory": "می‌خواهید محتوا را در کدام بخش اضافه کنید؟",
+      "selectedLanguage": "زبان انتخاب‌شده",
+      "selectedLesson": "درس انتخاب‌شده",
+      "selectedCategory": "بخش انتخاب‌شده",
+      "noLessonMapped": "هنوز درسی برای این سطح تعریف نشده. ابتدا یک درس ایجاد کنید.",
+      "contextSummary": "{language} · {level} · {lesson}",
+      "saveDraft": "ذخیره به‌عنوان پیش‌نویس",
+      "publishContent": "انتشار محتوا",
+      "savedDraft": "محتوا به‌عنوان پیش‌نویس ذخیره شد",
+      "publishedContent": "محتوا منتشر شد",
+      "addAnother": "افزودن محتوای بیشتر",
+      "startOver": "شروع دوباره",
+      "categories": {
+        "grammar": {
+          "title": "گرامر",
+          "description": "توضیحات، مثال‌ها و تمرین‌های گرامری",
+          "features": "افزودن توضیح · افزودن مثال · افزودن تمرین"
+        },
+        "vocabulary": {
+          "title": "واژگان مهم با تصویر",
+          "description": "واژه‌های کلیدی با معنی و پشتیبانی تصویری",
+          "features": "افزودن واژه · افزودن معنی · افزودن تصویر · افزودن تلفظ"
+        },
+        "video": {
+          "title": "درس‌های ویدیویی",
+          "description": "محتوای ویدیویی برای این درس",
+          "features": "افزودن لینک ویدیو · افزودن عنوان · افزودن توضیح"
+        },
+        "quiz": {
+          "title": "آزمون‌ها",
+          "description": "سؤالات چندگزینه‌ای و تشریحی",
+          "features": "چندگزینه‌ای · سؤالات تشریحی · پاسخ و توضیح"
+        }
+      },
+      "grammar": {
+        "formTitle": "افزودن محتوای گرامر",
+        "formDescription": "یک توضیح گرامری برای درس انتخاب‌شده ایجاد کنید.",
+        "exerciseLabel": "تمرین یا نکته کاربرد (اختیاری)"
+      },
+      "vocabulary": {
+        "formTitle": "افزودن واژه با تصویر",
+        "formDescription": "یک واژه مهم با ترجمه و تصویر اضافه کنید.",
+        "pronunciationLabel": "تلفظ (اختیاری)",
+        "pronunciationPlaceholder": "مثلاً /ˈkiao/",
+        "imageRequired": "برای واژگان تصویری، آدرس تصویر الزامی است."
+      },
+      "video": {
+        "formTitle": "افزودن درس ویدیویی",
+        "formDescription": "با وارد کردن لینک ویدیو میزبانی‌شده، محتوا را اضافه کنید.",
+        "videoUrlLabel": "آدرس ویدیو",
+        "videoUrlPlaceholder": "https://…",
+        "thumbnailLabel": "آدرس تصویر بندانگشتی (اختیاری)",
+        "thumbnailPlaceholder": "https://…"
+      },
+      "quiz": {
+        "formTitle": "ایجاد آزمون",
+        "formDescription": "سؤالات چندگزینه‌ای و تشریحی بسازید. تا زمانی که «انتشار» را انتخاب نکنید، چیزی منتشر نمی‌شود.",
+        "quizTitle": "عنوان آزمون",
+        "quizTitlePlaceholder": "مثلاً آزمون سلام A1"
+      }
+    },
     "quizzes": {
       "pageBadge": "مدیریت آزمون",
       "pageHello": "مرکز آزمون، {name}",
@@ -406,7 +496,7 @@
       "statAverageScore": "میانگین نمره",
       "statAverageScoreDesc": "در همه تلاش‌ها",
       "wizardTitle": "ایجاد آزمون جدید",
-      "wizardDescription": "مراحل را برای پیکربندی زبان، سطح، درس، بخش و سؤالات دنبال کنید.",
+      "wizardDescription": "مراحل را برای پیکربندی زبان، سطح، بخش، درس و سؤالات دنبال کنید.",
       "stepLanguage": "زبان",
       "stepLevel": "سطح",
       "stepLesson": "درس",
@@ -439,6 +529,13 @@
       "deleteQuizDescription": "«{title}» به‌همراه همه سؤالات آن برای همیشه حذف می‌شود.",
       "quizDeleted": "آزمون حذف شد",
       "managementSummary": "{count} آزمون · {published} منتشرشده",
+      "allQuizzesHint": "همه آزمون‌ها را در زبان‌ها، سطوح و درس‌ها مرور، فیلتر و مدیریت کنید.",
+      "showingResults": "نمایش {count} از {total}",
+      "filtersLabel": "فیلترها",
+      "resetFilters": "پاک کردن فیلترها",
+      "publishedShort": "{count} منتشرشده",
+      "draftShort": "{count} پیش‌نویس",
+      "questionTypeBreakdown": "{mc} چندگزینه‌ای · {written} تشریحی",
       "filterLanguage": "فیلتر بر اساس زبان",
       "allLanguages": "همه زبان‌ها",
       "filterStatus": "فیلتر بر اساس وضعیت",

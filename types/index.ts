@@ -5,6 +5,8 @@ export type Lesson = Database["public"]["Tables"]["lessons"]["Row"];
 export type Vocabulary = Database["public"]["Tables"]["vocabulary"]["Row"];
 export type GrammarRule =
   Database["public"]["Tables"]["grammar_rules"]["Row"];
+export type VideoLesson =
+  Database["public"]["Tables"]["video_lessons"]["Row"];
 export type Quiz = Database["public"]["Tables"]["quizzes"]["Row"];
 export type QuizQuestion =
   Database["public"]["Tables"]["quiz_questions"]["Row"];

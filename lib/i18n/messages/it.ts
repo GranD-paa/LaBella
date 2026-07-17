@@ -1,4 +1,5 @@
 import type { Messages } from "@/lib/i18n/types";
+import { adminContentIt } from "@/lib/i18n/messages/admin-content-it";
 import { adminQuizzesIt } from "@/lib/i18n/messages/admin-quizzes-it";
 
 export const it: Messages = {
@@ -239,6 +240,27 @@ export const it: Messages = {
       noActivity: "Nessuna attività quiz ancora.",
       quizPerformance: "Performance quiz",
       quizPerformanceHint: "Conteggio tentativi e punteggi medi per quiz.",
+      assignedQuizzes: "Panoramica quiz del corso",
+      assignedQuizzesHint:
+        "Monitora l'assegnazione dei quiz su tutti i livelli del corso (A1-1 a A1-10), con percorso linguistico, sezione e stato di pubblicazione.",
+      noAssignedQuizzes: "Nessuna lezione ha ancora un quiz assegnato.",
+      columnLesson: "Corso / nome lezione",
+      columnLanguage: "Lingua di apprendimento",
+      columnLevel: "Livello del corso",
+      columnSection: "Sezione della lezione",
+      columnStatus: "Stato del quiz",
+      columnDetails: "Dettagli quiz",
+      languageItalian: "Italiano",
+      languageEnglish: "Inglese",
+      languageGerman: "Tedesco",
+      languageTurkish: "Turco",
+      statusNoQuiz: "Non assegnato",
+      multipleChoiceQuestions: "Domande a scelta multipla",
+      writtenQuestions: "Domande a risposta scritta",
+      questionCountValue: "{count} domande",
+      showQuizDetails: "Mostra dettaglio domande",
+      hideQuizDetails: "Nascondi dettaglio domande",
+      noQuizAssigned: "Nessun quiz è stato ancora assegnato a questo livello del corso.",
       noQuizzes: "Nessun quiz creato ancora.",
       quiz: "Quiz",
       attempts: "Tentativi",
@@ -412,6 +434,7 @@ export const it: Messages = {
       deleteDescription: "Questo eliminerà definitivamente \"{title}\".",
       deleted: "Regola grammaticale eliminata",
     },
+    content: adminContentIt,
     quizzes: adminQuizzesIt,
     users: {
       title: "Gestione utenti",
