@@ -209,7 +209,7 @@ export function AdminDashboard({
                 </Link>
               </Button>
               <Button asChild variant="outline" className="border-white/20">
-                <Link href="/admin?tab=users">
+                <Link href="/admin">
                   {t("dashboard.admin.manageUsers")}
                 </Link>
               </Button>
@@ -218,142 +218,148 @@ export function AdminDashboard({
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          title={t("dashboard.admin.totalUsers")}
-          value={data.stats.totalUsers}
-          description={t("dashboard.admin.registeredLearners")}
-          icon={Users}
-        />
-        <StatCard
-          title={t("dashboard.admin.totalQuizzes")}
-          value={data.stats.totalQuizzes}
-          description={t("dashboard.admin.acrossLessons", {
-            count: data.stats.totalLessons,
-          })}
-          icon={ListChecks}
-        />
-        <StatCard
-          title={t("dashboard.admin.completionRate")}
-          value={`${data.stats.completionRate}%`}
-          description={t("dashboard.admin.quizzesWithAttempts")}
-          icon={TrendingUp}
-        />
-        <StatCard
-          title={t("dashboard.admin.avgScore")}
-          value={`${data.stats.averageScore}%`}
-          description={t("dashboard.admin.totalAttempts", {
-            count: data.stats.totalAttempts,
-          })}
-          icon={BarChart3}
-        />
-      </section>
+      {!showFullManagement ? (
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            title={t("dashboard.admin.totalUsers")}
+            value={data.stats.totalUsers}
+            description={t("dashboard.admin.registeredLearners")}
+            icon={Users}
+          />
+          <StatCard
+            title={t("dashboard.admin.totalQuizzes")}
+            value={data.stats.totalQuizzes}
+            description={t("dashboard.admin.acrossLessons", {
+              count: data.stats.totalLessons,
+            })}
+            icon={ListChecks}
+          />
+          <StatCard
+            title={t("dashboard.admin.completionRate")}
+            value={`${data.stats.completionRate}%`}
+            description={t("dashboard.admin.quizzesWithAttempts")}
+            icon={TrendingUp}
+          />
+          <StatCard
+            title={t("dashboard.admin.avgScore")}
+            value={`${data.stats.averageScore}%`}
+            description={t("dashboard.admin.totalAttempts", {
+              count: data.stats.totalAttempts,
+            })}
+            icon={BarChart3}
+          />
+        </section>
+      ) : null}
 
-      <section className="grid gap-6 lg:grid-cols-2">
-        <Card className="brand-surface">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-brand-accent" />
-              {t("dashboard.admin.recentActivity")}
-            </CardTitle>
-            <CardDescription>{t("dashboard.admin.recentActivityHint")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {data.recentActivity.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                {t("dashboard.admin.noActivity")}
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {data.recentActivity.slice(0, 6).map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-muted/30 px-3 py-2"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">
-                        {activity.userName}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {activity.quizTitle}
-                      </p>
+      {!showFullManagement ? (
+        <section className="grid gap-6 lg:grid-cols-2">
+          <Card className="brand-surface">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5 text-brand-accent" />
+                {t("dashboard.admin.recentActivity")}
+              </CardTitle>
+              <CardDescription>{t("dashboard.admin.recentActivityHint")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {data.recentActivity.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  {t("dashboard.admin.noActivity")}
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {data.recentActivity.slice(0, 6).map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-muted/30 px-3 py-2"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">
+                          {activity.userName}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {activity.quizTitle}
+                        </p>
+                      </div>
+                      <div className="text-end">
+                        <Badge variant="secondary">{activity.score}%</Badge>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {formatDate(activity.createdAt, {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          })}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-end">
-                      <Badge variant="secondary">{activity.score}%</Badge>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {formatDate(activity.createdAt, {
-                          dateStyle: "medium",
-                          timeStyle: "short",
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </section>
-
-      <section className="mx-auto w-full max-w-6xl">
-        <Card className="brand-surface">
-          <CardHeader className="items-center space-y-2 text-center">
-            <CardTitle className="flex w-full items-center justify-center gap-2">
-              <BookOpen className="h-5 w-5 shrink-0 text-brand-accent" />
-              {t("dashboard.admin.assignedQuizzes")}
-            </CardTitle>
-            <CardDescription className="max-w-3xl text-center">
-              {t("dashboard.admin.assignedQuizzesHint")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center px-6 pt-0">
-            <div className="w-full max-w-5xl overflow-x-auto rounded-lg border border-white/10">
-              <table className="w-full table-fixed caption-bottom text-sm [&_td]:!text-center [&_th]:!text-center">
-                <thead className="border-b [&_tr]:border-b">
-                  <tr className="border-b transition-colors">
-                    <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
-                      {t("dashboard.admin.columnLesson")}
-                    </th>
-                    <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
-                      {t("dashboard.admin.columnLanguage")}
-                    </th>
-                    <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
-                      {t("dashboard.admin.columnLevel")}
-                    </th>
-                    <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
-                      {t("dashboard.admin.columnSection")}
-                    </th>
-                    <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
-                      {t("dashboard.admin.columnStatus")}
-                    </th>
-                    <th className="h-10 w-16 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
-                      {t("dashboard.admin.columnDetails")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="[&_tr:last-child]:border-0">
-                  {data.levelQuizOverview.map((entry) => (
-                    <LevelQuizRowDetails
-                      key={entry.levelCode}
-                      entry={entry}
-                      expanded={expandedLevel === entry.levelCode}
-                      onToggle={() =>
-                        setExpandedLevel((current) =>
-                          current === entry.levelCode ? null : entry.levelCode
-                        )
-                      }
-                      t={t}
-                      languageLabel={languageLabel}
-                      sectionLabel={sectionLabel}
-                      statusLabel={statusLabel}
-                    />
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </section>
+      ) : null}
+
+      {!showFullManagement ? (
+        <section className="mx-auto w-full max-w-6xl">
+          <Card className="brand-surface">
+            <CardHeader className="items-center space-y-2 text-center">
+              <CardTitle className="flex w-full items-center justify-center gap-2">
+                <BookOpen className="h-5 w-5 shrink-0 text-brand-accent" />
+                {t("dashboard.admin.assignedQuizzes")}
+              </CardTitle>
+              <CardDescription className="max-w-3xl text-center">
+                {t("dashboard.admin.assignedQuizzesHint")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center px-6 pt-0">
+              <div className="w-full max-w-5xl overflow-x-auto rounded-lg border border-white/10">
+                <table className="w-full table-fixed caption-bottom text-sm [&_td]:!text-center [&_th]:!text-center">
+                  <thead className="border-b [&_tr]:border-b">
+                    <tr className="border-b transition-colors">
+                      <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
+                        {t("dashboard.admin.columnLesson")}
+                      </th>
+                      <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
+                        {t("dashboard.admin.columnLanguage")}
+                      </th>
+                      <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
+                        {t("dashboard.admin.columnLevel")}
+                      </th>
+                      <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
+                        {t("dashboard.admin.columnSection")}
+                      </th>
+                      <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
+                        {t("dashboard.admin.columnStatus")}
+                      </th>
+                      <th className="h-10 w-16 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
+                        {t("dashboard.admin.columnDetails")}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="[&_tr:last-child]:border-0">
+                    {data.levelQuizOverview.map((entry) => (
+                      <LevelQuizRowDetails
+                        key={entry.levelCode}
+                        entry={entry}
+                        expanded={expandedLevel === entry.levelCode}
+                        onToggle={() =>
+                          setExpandedLevel((current) =>
+                            current === entry.levelCode ? null : entry.levelCode
+                          )
+                        }
+                        t={t}
+                        languageLabel={languageLabel}
+                        sectionLabel={sectionLabel}
+                        statusLabel={statusLabel}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      ) : null}
     </div>
   );
 }
