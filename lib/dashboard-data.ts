@@ -1,5 +1,6 @@
 import type { DataRepository } from "@/lib/data/repository";
 import { ITALIAN_LEVELS } from "@/lib/curriculum/italian";
+import type { RoleSlug, UserStatus } from "@/lib/permissions/roles";
 import type { Lesson, Profile, Quiz, UserQuizAttempt } from "@/types";
 
 export type UserDashboardData = {
@@ -69,7 +70,10 @@ export type AdminDashboardData = {
   users: Array<{
     id: string;
     fullName: string | null;
+    email: string | null;
     isAdmin: boolean;
+    role: RoleSlug;
+    status: UserStatus;
     createdAt: string;
   }>;
 };
@@ -266,7 +270,10 @@ export async function fetchAdminDashboardData(
     users: profiles.map((profile) => ({
       id: profile.id,
       fullName: profile.full_name,
+      email: profile.email,
       isAdmin: profile.is_admin,
+      role: profile.role,
+      status: profile.status,
       createdAt: profile.created_at,
     })),
   };

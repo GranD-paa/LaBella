@@ -1,6 +1,7 @@
 import type { Messages } from "@/lib/i18n/types";
 import { adminContentIt } from "@/lib/i18n/messages/admin-content-it";
 import { adminQuizzesIt } from "@/lib/i18n/messages/admin-quizzes-it";
+import { adminUsersIt } from "@/lib/i18n/messages/admin-users-it";
 
 export const it: Messages = {
   common: {
@@ -436,20 +437,7 @@ export const it: Messages = {
     },
     content: adminContentIt,
     quizzes: adminQuizzesIt,
-    users: {
-      title: "Gestione utenti",
-      description: "Visualizza gli utenti registrati e gestisci i permessi admin.",
-      noUsers: "Nessun utente registrato ancora.",
-      name: "Nome",
-      role: "Ruolo",
-      joined: "Iscritto",
-      actions: "Azioni",
-      unnamed: "Utente senza nome",
-      demote: "Retrocedi",
-      promote: "Promuovi",
-      promoted: "Utente promosso ad admin",
-      demoted: "Accesso admin rimosso",
-    },
+    users: adminUsersIt,
   },
   pricing: {
     signIn: "Accedi",

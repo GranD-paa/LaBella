@@ -1,6 +1,7 @@
 import type { Messages } from "@/lib/i18n/types";
 import { adminContentFa } from "@/lib/i18n/messages/admin-content-fa";
 import { adminQuizzesFa } from "@/lib/i18n/messages/admin-quizzes-fa";
+import { adminUsersFa } from "@/lib/i18n/messages/admin-users-fa";
 
 export const fa: Messages = {
   common: {
@@ -430,20 +431,7 @@ export const fa: Messages = {
     },
     content: adminContentFa,
     quizzes: adminQuizzesFa,
-    users: {
-      title: "مدیریت کاربران",
-      description: "کاربران ثبت‌شده را ببینید و مجوزهای مدیر را مدیریت کنید.",
-      noUsers: "هنوز کاربری ثبت‌نام نکرده است.",
-      name: "نام",
-      role: "نقش",
-      joined: "عضویت",
-      actions: "اقدامات",
-      unnamed: "کاربر بدون نام",
-      demote: "تنزل",
-      promote: "ارتقا",
-      promoted: "کاربر به مدیر ارتقا یافت",
-      demoted: "دسترسی مدیر حذف شد",
-    },
+    users: adminUsersFa,
   },
   pricing: {
     signIn: "ورود",

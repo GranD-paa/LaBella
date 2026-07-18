@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
 import { requireAdmin } from "@/lib/supabase/admin-guard";
-import { AdminTabs, ADMIN_TAB_VALUES } from "@/components/admin/admin-tabs";
+import { AdminTabs } from "@/components/admin/admin-tabs";
 import { AdminContentHeader } from "@/components/admin/admin-content-header";
+import { ADMIN_TAB_VALUES } from "@/lib/admin-constants";
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
 import { getDataRepository } from "@/lib/data";
 import { fetchAdminDashboardData } from "@/lib/dashboard-data";

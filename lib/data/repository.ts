@@ -20,7 +20,14 @@ export type LocalAuthUser = AuthUser & {
 
 export type ProfileSummary = Pick<
   Profile,
-  "id" | "full_name" | "avatar_url" | "is_admin" | "created_at"
+  | "id"
+  | "full_name"
+  | "avatar_url"
+  | "email"
+  | "is_admin"
+  | "role"
+  | "status"
+  | "created_at"
 >;
 
 export type QuizAttemptWithRelations = UserQuizAttempt & {
@@ -46,6 +53,12 @@ export interface DataRepository {
   getProfileById(userId: string): Promise<ProfileSummary | null>;
   getAllProfiles(): Promise<ProfileSummary[]>;
   updateUserAdminStatus(userId: string, isAdmin: boolean): Promise<{ error?: string }>;
+  updateUserRole(userId: string, role: Profile["role"]): Promise<{ error?: string }>;
+  updateUserStatus(
+    userId: string,
+    status: Profile["status"]
+  ): Promise<{ error?: string }>;
+  sendPasswordResetEmail(email: string): Promise<{ error?: string }>;
 
   // Lessons & content
   getLessons(): Promise<Lesson[]>;

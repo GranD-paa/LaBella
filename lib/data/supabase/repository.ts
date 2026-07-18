@@ -13,11 +13,29 @@ export function createSupabaseRepository(): DataRepository {
 
     async signInWithPassword(email, password) {
       const supabase = await createClient();
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      return error ? { error: error.message } : {};
+      if (error) return { error: error.message };
+
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("status")
+          .eq("id", data.user.id)
+          .single();
+
+        if (profile?.status === "suspended") {
+          await supabase.auth.signOut();
+          return {
+            error:
+              "Your account has been suspended. Contact an administrator.",
+          };
+        }
+      }
+
+      return {};
     },
 
     async signOut() {
@@ -29,7 +47,7 @@ export function createSupabaseRepository(): DataRepository {
       const supabase = await createClient();
       const { data } = await supabase
         .from("profiles")
-        .select("id, full_name, avatar_url, is_admin, created_at")
+        .select("id, full_name, avatar_url, email, is_admin, role, status, created_at")
         .eq("id", userId)
         .single();
       return data;
@@ -39,7 +57,7 @@ export function createSupabaseRepository(): DataRepository {
       const supabase = await createClient();
       const { data } = await supabase
         .from("profiles")
-        .select("id, full_name, avatar_url, is_admin, created_at")
+        .select("id, full_name, avatar_url, email, is_admin, role, status, created_at")
         .order("created_at", { ascending: false });
       return data ?? [];
     },
@@ -58,11 +76,73 @@ export function createSupabaseRepository(): DataRepository {
         return { error: "You cannot remove your own admin access." };
       }
 
+      const { data: targetProfile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", userId)
+        .single();
+
+      const nextRole = isAdmin
+        ? targetProfile?.role === "learner" || !targetProfile?.role
+          ? "admin"
+          : targetProfile.role
+        : "learner";
+
       const { error } = await supabase
         .from("profiles")
-        .update({ is_admin: isAdmin })
+        .update({ is_admin: isAdmin, role: nextRole })
         .eq("id", userId);
 
+      return error ? { error: error.message } : {};
+    },
+
+    async updateUserRole(userId, role) {
+      const supabase = await createClient();
+      const authUser = await this.getAuthUser();
+      if (!authUser) return { error: "You must be signed in." };
+
+      const currentProfile = await this.getProfileById(authUser.id);
+      if (!currentProfile?.is_admin) {
+        return { error: "Only admins can manage user roles." };
+      }
+
+      if (userId === authUser.id && role === "learner") {
+        return { error: "You cannot remove your own admin access." };
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({ role, is_admin: role !== "learner" })
+        .eq("id", userId);
+
+      return error ? { error: error.message } : {};
+    },
+
+    async updateUserStatus(userId, status) {
+      const supabase = await createClient();
+      const authUser = await this.getAuthUser();
+      if (!authUser) return { error: "You must be signed in." };
+
+      const currentProfile = await this.getProfileById(authUser.id);
+      if (!currentProfile?.is_admin) {
+        return { error: "Only admins can manage user status." };
+      }
+
+      if (userId === authUser.id && status === "suspended") {
+        return { error: "You cannot suspend your own account." };
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({ status })
+        .eq("id", userId);
+
+      return error ? { error: error.message } : {};
+    },
+
+    async sendPasswordResetEmail(email) {
+      const supabase = await createClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
       return error ? { error: error.message } : {};
     },
 

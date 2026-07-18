@@ -20,11 +20,26 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   full_name text,
   avatar_url text,
+  email text,
   is_admin boolean not null default false,
-  created_at timestamptz not null default now()
+  role text not null default 'learner',
+  status text not null default 'active',
+  created_at timestamptz not null default now(),
+  constraint profiles_role_check check (role in (
+    'learner',
+    'limited_admin',
+    'quiz_manager',
+    'content_manager',
+    'admin',
+    'super_admin'
+  )),
+  constraint profiles_status_check check (status in ('active', 'suspended'))
 );
 
 comment on table public.profiles is 'Public profile data for each authenticated user.';
+
+create index if not exists profiles_role_idx on public.profiles (role);
+create index if not exists profiles_status_idx on public.profiles (status);
 
 -- =========================================================================
 -- 2. lessons
@@ -172,27 +187,36 @@ create policy "Admins can manage all profiles"
 
 -- Defense in depth: the "Users can update own profile" policy above lets a
 -- user update their own row, but must never let them flip their own
--- is_admin flag. Silently revert that column unless the caller is already
+-- is_admin flag, grant themselves a privileged role, or lift their own
+-- suspension. Silently revert those columns unless the caller is already
 -- an admin.
-create or replace function private.protect_profile_admin_flag()
+create or replace function private.protect_profile_privileged_fields()
 returns trigger
 language plpgsql
 security definer
 set search_path = ''
 as $$
 begin
-  if new.is_admin is distinct from old.is_admin and not private.is_admin() then
-    new.is_admin := old.is_admin;
+  if not private.is_admin() then
+    if new.is_admin is distinct from old.is_admin then
+      new.is_admin := old.is_admin;
+    end if;
+    if new.role is distinct from old.role then
+      new.role := old.role;
+    end if;
+    if new.status is distinct from old.status then
+      new.status := old.status;
+    end if;
   end if;
   return new;
 end;
 $$;
 
-drop trigger if exists protect_profile_admin_flag on public.profiles;
-create trigger protect_profile_admin_flag
+drop trigger if exists protect_profile_privileged_fields on public.profiles;
+create trigger protect_profile_privileged_fields
   before update on public.profiles
   for each row
-  execute function private.protect_profile_admin_flag();
+  execute function private.protect_profile_privileged_fields();
 
 -- -------------------------------------------------------------------------
 -- Course content policies (lessons, vocabulary, grammar_rules, quizzes,
@@ -296,11 +320,12 @@ security definer
 set search_path = ''
 as $$
 begin
-  insert into public.profiles (id, full_name, avatar_url)
+  insert into public.profiles (id, full_name, avatar_url, email)
   values (
     new.id,
     new.raw_user_meta_data ->> 'full_name',
-    new.raw_user_meta_data ->> 'avatar_url'
+    new.raw_user_meta_data ->> 'avatar_url',
+    new.email
   )
   on conflict (id) do nothing;
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import {
   Activity,
+  ArrowLeft,
   BarChart3,
   BookOpen,
   ChevronDown,
@@ -193,7 +194,14 @@ export function AdminDashboard({
               {t("dashboard.admin.subtitle")}
             </p>
           </div>
-          {!showFullManagement ? (
+          {showFullManagement ? (
+            <Button variant="outline" className="border-white/20" asChild>
+              <Link href="/dashboard">
+                <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+                {t("profile.backToDashboard")}
+              </Link>
+            </Button>
+          ) : (
             <div className="flex flex-wrap gap-2">
               <Button asChild variant="secondary">
                 <Link href="/admin/quizzes">
@@ -206,7 +214,7 @@ export function AdminDashboard({
                 </Link>
               </Button>
             </div>
-          ) : null}
+          )}
         </div>
       </section>
 

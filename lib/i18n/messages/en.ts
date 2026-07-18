@@ -1,5 +1,6 @@
 import { adminContentEn } from "@/lib/i18n/messages/admin-content-en";
 import { adminQuizzesEn } from "@/lib/i18n/messages/admin-quizzes-en";
+import { adminUsersEn } from "@/lib/i18n/messages/admin-users-en";
 
 export const en = {
   common: {
@@ -433,20 +434,7 @@ export const en = {
     },
     content: adminContentEn,
     quizzes: adminQuizzesEn,
-    users: {
-      title: "User Management",
-      description: "View registered users and manage admin permissions.",
-      noUsers: "No users registered yet.",
-      name: "Name",
-      role: "Role",
-      joined: "Joined",
-      actions: "Actions",
-      unnamed: "Unnamed user",
-      demote: "Demote",
-      promote: "Promote",
-      promoted: "User promoted to admin",
-      demoted: "Admin access removed",
-    },
+    users: adminUsersEn,
   },
   pricing: {
     signIn: "Sign in",

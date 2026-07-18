@@ -491,7 +491,7 @@
       "pageBadge": "Gestione quiz",
       "pageHello": "Hub quiz, {name}",
       "pageSubtitle": "Crea, pubblica e monitora i quiz tra lingue, livelli, lezioni e sezioni.",
-      "fullAdminPanel": "Admin",
+      "fullAdminPanel": "Torna alla dashboard",
       "statTotalQuizzes": "Quiz totali",
       "statPublishedDrafts": "{published} pubblicati · {drafts} bozze",
       "statQuestions": "Domande totali",
@@ -624,17 +624,114 @@
     },
     "users": {
       "title": "Gestione utenti",
-      "description": "Visualizza gli utenti registrati e gestisci i permessi admin.",
+      "description": "Cerca, gestisci e assegna ruoli a ogni utente registrato.",
+      "totalUsers": "{count} utenti totali",
+      "searchPlaceholder": "Cerca per nome, email o ID utente...",
+      "filterRole": "Ruolo",
+      "filterStatus": "Stato",
+      "allRoles": "Tutti i ruoli",
+      "allStatuses": "Tutti gli stati",
+      "statusActive": "Attivo",
+      "statusSuspended": "Sospeso",
       "noUsers": "Nessun utente registrato ancora.",
-      "name": "Nome",
-      "role": "Ruolo",
-      "joined": "Iscritto",
-      "actions": "Azioni",
+      "noResults": "Nessun utente corrisponde alla ricerca o ai filtri.",
+      "columnUser": "Utente",
+      "columnEmail": "Email",
+      "columnStatus": "Stato",
+      "columnRole": "Ruolo",
+      "columnJoined": "Registrato",
+      "columnActions": "Azioni",
       "unnamed": "Utente senza nome",
-      "demote": "Retrocedi",
-      "promote": "Promuovi",
+      "noEmail": "Nessuna email registrata",
+      "userId": "ID utente",
+      "copyId": "Copia ID",
+      "idCopied": "ID utente copiato",
+      "viewProfile": "Visualizza profilo",
+      "changeRole": "Cambia ruolo",
+      "promote": "Promuovi ad Admin",
+      "demote": "Rimuovi accesso admin",
+      "suspend": "Sospendi account",
+      "activate": "Riattiva account",
+      "resetPassword": "Reimposta password",
+      "you": "Tu",
+      "promoteConfirmTitle": "Promuovere questo utente ad Admin?",
+      "promoteConfirmDescription": "\"{name}\" otterrà accesso completo per gestire contenuti, quiz e utenti.",
+      "demoteConfirmTitle": "Rimuovere l'accesso admin?",
+      "demoteConfirmDescription": "\"{name}\" perderà tutti i permessi admin e diventerà un utente normale.",
+      "suspendConfirmTitle": "Sospendere questo account?",
+      "suspendConfirmDescription": "\"{name}\" non potrà accedere finché non verrà riattivato.",
+      "activateConfirmTitle": "Riattivare questo account?",
+      "activateConfirmDescription": "\"{name}\" potrà accedere di nuovo.",
+      "resetPasswordConfirmTitle": "Invia email di reimpostazione password?",
+      "resetPasswordConfirmDescription": "Un link sicuro di reimpostazione verrà inviato a {email}. La password memorizzata non viene mai mostrata.",
+      "resetPasswordSimulated": "Simulato in modalità sviluppo locale — in produzione, {email} riceverebbe un link di reimpostazione.",
+      "resetPasswordSent": "Email di reimpostazione password inviata a {email}",
       "promoted": "Utente promosso ad admin",
-      "demoted": "Accesso admin rimosso"
+      "demoted": "Accesso admin rimosso",
+      "roleUpdated": "Ruolo aggiornato",
+      "statusUpdated": "Stato account aggiornato",
+      "confirm": "Conferma",
+      "cannotModifySelf": "Non puoi eseguire questa azione sul tuo account.",
+      "profileDialog": {
+        "title": "Profilo utente",
+        "accountInfo": "Informazioni account",
+        "fullName": "Nome completo",
+        "email": "Email",
+        "role": "Ruolo",
+        "status": "Stato",
+        "joined": "Registrato il",
+        "userId": "ID utente",
+        "permissions": "Permessi attuali",
+        "permissionContent": "Gestisci contenuti",
+        "permissionQuizzes": "Gestisci quiz",
+        "permissionUsers": "Gestisci utenti",
+        "permissionRoles": "Gestisci ruoli",
+        "permissionFull": "Accesso completo alla piattaforma",
+        "close": "Chiudi"
+      },
+      "changeRoleDialog": {
+        "title": "Cambia ruolo per {name}",
+        "description": "Seleziona un nuovo ruolo. Le modifiche hanno effetto immediato.",
+        "selectLabel": "Ruolo",
+        "save": "Salva ruolo"
+      },
+      "roles": {
+        "superAdmin": {
+          "label": "Super Admin",
+          "description": "Accesso completo a tutte le funzionalità, inclusa la gestione di ruoli e permessi."
+        },
+        "admin": {
+          "label": "Admin",
+          "description": "Gestisce contenuti, quiz e utenti. Non può modificare i ruoli di altri admin."
+        },
+        "contentManager": {
+          "label": "Content Manager",
+          "description": "Crea e pubblica lezioni, vocabolario e contenuti grammaticali."
+        },
+        "quizManager": {
+          "label": "Quiz Manager",
+          "description": "Crea, modifica e pubblica quiz e domande."
+        },
+        "limitedAdmin": {
+          "label": "Admin limitato",
+          "description": "Accesso admin limitato per attività specifiche."
+        },
+        "learner": {
+          "label": "Studente",
+          "description": "Account studente standard senza accesso admin."
+        }
+      },
+      "permissionsPanel": {
+        "title": "Ruoli e permessi",
+        "description": "Riferimento per i livelli di accesso admin attuali e futuri. L'applicazione granulare dei permessi arriverà presto.",
+        "comingSoon": "La modifica granulare dei permessi arriverà presto.",
+        "manageAccess": "Gestisci accesso",
+        "permissionContent": "Contenuti",
+        "permissionQuizzes": "Quiz",
+        "permissionUsers": "Utenti",
+        "permissionRoles": "Ruoli",
+        "permissionFull": "Accesso completo"
+      }
     }
   },
   "pricing": {

@@ -3,7 +3,7 @@ export const adminQuizzesFa = {
   pageHello: "مرکز آزمون، {name}",
   pageSubtitle:
     "آزمون‌ها را در زبان‌ها، سطوح، درس‌ها و بخش‌ها ایجاد، منتشر و پایش کنید.",
-  fullAdminPanel: "مدیر",
+  fullAdminPanel: "بازگشت به داشبورد",
   statTotalQuizzes: "کل آزمون‌ها",
   statPublishedDrafts: "{published} منتشرشده · {drafts} پیش‌نویس",
   statQuestions: "کل سؤالات",

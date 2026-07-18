@@ -28,6 +28,14 @@ export function createLocalRepository(): DataRepository {
         return { error: "Invalid login credentials" };
       }
 
+      const profile = store.profiles.find((entry) => entry.id === user.id);
+      if (profile?.status === "suspended") {
+        return {
+          error:
+            "Your account has been suspended. Contact an administrator.",
+        };
+      }
+
       await setLocalSessionUserId(user.id);
       return {};
     },
@@ -63,6 +71,58 @@ export function createLocalRepository(): DataRepository {
       const profile = store.profiles.find((entry) => entry.id === userId);
       if (!profile) return { error: "User not found." };
       profile.is_admin = isAdmin;
+      profile.role = isAdmin
+        ? profile.role === "learner"
+          ? "admin"
+          : profile.role
+        : "learner";
+      return {};
+    },
+
+    async updateUserRole(userId, role) {
+      const authUser = await this.getAuthUser();
+      if (!authUser) return { error: "You must be signed in." };
+
+      const currentProfile = await this.getProfileById(authUser.id);
+      if (!currentProfile?.is_admin) {
+        return { error: "Only admins can manage user roles." };
+      }
+
+      if (userId === authUser.id && role === "learner") {
+        return { error: "You cannot remove your own admin access." };
+      }
+
+      const store = getLocalStore();
+      const profile = store.profiles.find((entry) => entry.id === userId);
+      if (!profile) return { error: "User not found." };
+      profile.role = role;
+      profile.is_admin = role !== "learner";
+      return {};
+    },
+
+    async updateUserStatus(userId, status) {
+      const authUser = await this.getAuthUser();
+      if (!authUser) return { error: "You must be signed in." };
+
+      const currentProfile = await this.getProfileById(authUser.id);
+      if (!currentProfile?.is_admin) {
+        return { error: "Only admins can manage user status." };
+      }
+
+      if (userId === authUser.id && status === "suspended") {
+        return { error: "You cannot suspend your own account." };
+      }
+
+      const store = getLocalStore();
+      const profile = store.profiles.find((entry) => entry.id === userId);
+      if (!profile) return { error: "User not found." };
+      profile.status = status;
+      return {};
+    },
+
+    async sendPasswordResetEmail() {
+      // Local dev mode has no email provider; treat as a successful no-op so
+      // the UI can surface a "simulated" confirmation toast.
       return {};
     },
 

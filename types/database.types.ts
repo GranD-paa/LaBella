@@ -17,21 +17,48 @@ export interface Database {
           id: string;
           full_name: string | null;
           avatar_url: string | null;
+          email: string | null;
           is_admin: boolean;
+          role:
+            | "learner"
+            | "limited_admin"
+            | "quiz_manager"
+            | "content_manager"
+            | "admin"
+            | "super_admin";
+          status: "active" | "suspended";
           created_at: string;
         };
         Insert: {
           id: string;
           full_name?: string | null;
           avatar_url?: string | null;
+          email?: string | null;
           is_admin?: boolean;
+          role?:
+            | "learner"
+            | "limited_admin"
+            | "quiz_manager"
+            | "content_manager"
+            | "admin"
+            | "super_admin";
+          status?: "active" | "suspended";
           created_at?: string;
         };
         Update: {
           id?: string;
           full_name?: string | null;
           avatar_url?: string | null;
+          email?: string | null;
           is_admin?: boolean;
+          role?:
+            | "learner"
+            | "limited_admin"
+            | "quiz_manager"
+            | "content_manager"
+            | "admin"
+            | "super_admin";
+          status?: "active" | "suspended";
           created_at?: string;
         };
         Relationships: [];

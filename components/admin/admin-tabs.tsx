@@ -5,20 +5,12 @@ import { LessonManager } from "@/components/admin/lessons/lesson-manager";
 import { VocabularyManager } from "@/components/admin/vocabulary/vocabulary-manager";
 import { GrammarManager } from "@/components/admin/grammar/grammar-manager";
 import { QuizManager } from "@/components/admin/quizzes/quiz-manager";
-import { UsersManager } from "@/components/admin/users-manager";
+import { UserManagementPanel } from "@/components/admin/users/user-management-panel";
+import { RolesPermissionsPanel } from "@/components/admin/users/roles-permissions-panel";
 import { useTranslations } from "@/components/providers/locale-provider";
+import type { AdminTabValue } from "@/lib/admin-constants";
 import type { AdminDashboardData } from "@/lib/dashboard-data";
 import type { GrammarRule, Lesson, Quiz, QuizQuestion, Vocabulary } from "@/types";
-
-export const ADMIN_TAB_VALUES = [
-  "lessons",
-  "vocabulary",
-  "grammar",
-  "quizzes",
-  "users",
-] as const;
-
-export type AdminTabValue = (typeof ADMIN_TAB_VALUES)[number];
 
 export function AdminTabs({
   defaultTab = "quizzes",
@@ -81,8 +73,9 @@ export function AdminTabs({
         />
       </TabsContent>
 
-      <TabsContent value="users">
-        <UsersManager users={users} currentUserId={currentUserId} />
+      <TabsContent value="users" className="space-y-6">
+        <UserManagementPanel users={users} currentUserId={currentUserId} />
+        <RolesPermissionsPanel />
       </TabsContent>
     </Tabs>
   );
