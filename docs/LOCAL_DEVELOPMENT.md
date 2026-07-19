@@ -24,7 +24,7 @@ npm.cmd run dev
 | Role  | Email | Password |
 |-------|-------|----------|
 | Admin | `erfanmalayri@outlook.com` | `451377e451377E` |
-| User  | `erfanmalayriii@google.com` | `451377e451377E` |
+| User  | `erfanmalayriii@gmail.com` | `451377e451377E` |
 
 ## Production mode
 

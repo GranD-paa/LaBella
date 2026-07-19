@@ -39,7 +39,7 @@ export const LOCAL_DEV_CREDENTIALS = {
     password: "451377e451377E",
   },
   user: {
-    email: "erfanmalayriii@google.com",
+    email: "erfanmalayriii@gmail.com",
     password: "451377e451377E",
   },
 } as const;
