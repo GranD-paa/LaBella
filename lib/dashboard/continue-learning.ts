@@ -9,10 +9,18 @@ export type ContinueLearningSnapshot = {
   flagEmoji: string;
   levelCode: string;
   levelSlug: string;
+  activeCourseTitle: string;
   lastActivityCategory: ContinueLearningCategory;
   lastActivityTopic: string;
   progressPercent: number;
   continueHref: string;
+};
+
+/** Placeholder metrics for future gamification (streak, goals, XP). */
+export type LearnerEngagementMetrics = {
+  streakDays: number | null;
+  dailyGoalProgress: number | null;
+  xpPoints: number | null;
 };
 
 type BuildContinueLearningInput = {
@@ -44,6 +52,7 @@ export function buildContinueLearningSnapshot(
 
   let levelSlug: string = defaultLevel?.slug ?? "a1-1";
   let levelCode = defaultLevel?.code ?? "A1-1";
+  let activeCourseTitle = defaultLevel?.title ?? "Foundations & Greetings";
   let lastActivityCategory: ContinueLearningCategory = "grammar";
   let lastActivityTopic = "";
 
@@ -51,9 +60,11 @@ export function buildContinueLearningSnapshot(
     const quiz = input.quizzes.find((entry) => entry.id === mostRecent.quizId);
     if (quiz?.level_slug) {
       levelSlug = quiz.level_slug;
-      levelCode =
-        ITALIAN_LEVELS.find((level) => level.slug === quiz.level_slug)?.code ??
-        levelCode;
+      const matchedLevel = ITALIAN_LEVELS.find(
+        (level) => level.slug === quiz.level_slug
+      );
+      levelCode = matchedLevel?.code ?? levelCode;
+      activeCourseTitle = matchedLevel?.title ?? activeCourseTitle;
     }
     lastActivityCategory = "quiz";
     lastActivityTopic = mostRecent.quizTitle;
@@ -66,9 +77,18 @@ export function buildContinueLearningSnapshot(
     flagEmoji: italian?.flagEmoji ?? "🇮🇹",
     levelCode,
     levelSlug,
+    activeCourseTitle,
     lastActivityCategory,
     lastActivityTopic,
     progressPercent,
     continueHref,
+  };
+}
+
+export function buildLearnerEngagementMetrics(): LearnerEngagementMetrics {
+  return {
+    streakDays: null,
+    dailyGoalProgress: null,
+    xpPoints: null,
   };
 }

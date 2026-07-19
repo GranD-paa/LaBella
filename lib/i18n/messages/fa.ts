@@ -190,6 +190,14 @@ export const fa: Messages = {
     user: {
       badge: "داشبورد یادگیرنده",
       welcome: "خوش آمدید، {name}",
+      hello: "سلام {name} 👋",
+      journeySubtitle: "سفر یادگیری زبان خود را ادامه دهید",
+      learningLabel: "یادگیری",
+      levelLabel: "سطح",
+      activeCourseLabel: "دوره فعال",
+      streakSummary: "{count} روز پی در پی",
+      dailyGoalSummary: "{percent}٪ هدف روزانه",
+      xpSummary: "{points} امتیاز",
       subtitle:
         "پیشرفت، آمار و دستاوردهای خود را دنبال کنید. زبان‌ها را از منوی اصلی انتخاب کنید.",
       continueLearning: "ادامه یادگیری",

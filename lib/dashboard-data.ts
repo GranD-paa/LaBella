@@ -2,7 +2,9 @@ import type { DataRepository } from "@/lib/data/repository";
 import { ITALIAN_LEVELS } from "@/lib/curriculum/italian";
 import {
   buildContinueLearningSnapshot,
+  buildLearnerEngagementMetrics,
   type ContinueLearningSnapshot,
+  type LearnerEngagementMetrics,
 } from "@/lib/dashboard/continue-learning";
 import type { RoleSlug, UserStatus } from "@/lib/permissions/roles";
 import type { Lesson, Profile, Quiz, UserQuizAttempt } from "@/types";
@@ -44,6 +46,7 @@ export type UserDashboardData = {
     icon: "trophy" | "star" | "zap" | "target" | "flame";
   }>;
   continueLearning: ContinueLearningSnapshot;
+  engagement: LearnerEngagementMetrics;
 };
 
 export type AdminDashboardData = {
@@ -180,6 +183,7 @@ export async function fetchUserDashboardData(
       completedQuizzes: completedQuizDetails.length,
       totalQuizzes: quizzes.length,
     }),
+    engagement: buildLearnerEngagementMetrics(),
   };
 }
 

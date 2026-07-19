@@ -195,6 +195,14 @@ export const it: Messages = {
     user: {
       badge: "Dashboard studente",
       welcome: "Bentornato, {name}",
+      hello: "Ciao {name} 👋",
+      journeySubtitle: "Continua il tuo percorso di apprendimento linguistico",
+      learningLabel: "Apprendimento",
+      levelLabel: "Livello",
+      activeCourseLabel: "Corso attivo",
+      streakSummary: "{count} giorni di fila",
+      dailyGoalSummary: "{percent}% obiettivo giornaliero",
+      xpSummary: "{points} XP",
       subtitle:
         "Monitora progressi, statistiche e traguardi. Scegli le lingue dal menu principale.",
       continueLearning: "Continua a imparare",

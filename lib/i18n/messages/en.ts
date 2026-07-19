@@ -193,6 +193,14 @@ export const en = {
     user: {
       badge: "Learner Dashboard",
       welcome: "Welcome back, {name}",
+      hello: "Hello {name} 👋",
+      journeySubtitle: "Continue your language learning journey",
+      learningLabel: "Learning",
+      levelLabel: "Level",
+      activeCourseLabel: "Active course",
+      streakSummary: "{count} day streak",
+      dailyGoalSummary: "{percent}% daily goal",
+      xpSummary: "{points} XP",
       subtitle:
         "Track your progress, statistics, and achievements. Choose languages from the Main Menu.",
       continueLearning: "Continue learning",

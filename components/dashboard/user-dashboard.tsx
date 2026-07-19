@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { ContinueLearningCard } from "@/components/dashboard/continue-learning-card";
+import { DashboardWelcomeHeader } from "@/components/dashboard/dashboard-welcome-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
@@ -54,28 +55,12 @@ export function UserDashboard({
 
   return (
     <div className="space-y-8">
-      <section className="brand-surface relative overflow-hidden p-6 sm:p-8">
-        <div className="absolute inset-0 bg-brand-gradient opacity-20" />
-        <div className="relative space-y-4">
-          <Badge className="border-brand-accent/30 bg-brand-accent/10 text-brand-accent hover:bg-brand-accent/15">
-            {t("dashboard.user.badge")}
-          </Badge>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            {t("dashboard.user.welcome", { name: displayName })}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {t("dashboard.user.subtitle")}
-          </p>
-          <div className="flex flex-wrap gap-3 pt-1">
-            <Button variant="outline" asChild className="border-white/20 bg-white/5">
-              <Link href="/menu">{t("dashboard.user.mainMenu")}</Link>
-            </Button>
-            <Button variant="outline" asChild className="border-white/20 bg-white/5">
-              <Link href="/profile">{t("dashboard.user.viewProfile")}</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      <DashboardWelcomeHeader
+        displayName={displayName}
+        avatarUrl={data.profile?.avatar_url}
+        snapshot={data.continueLearning}
+        engagement={data.engagement}
+      />
 
       <ContinueLearningCard snapshot={data.continueLearning} />
 
