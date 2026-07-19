@@ -6,13 +6,13 @@ import {
   CheckCircle2,
   Flame,
   ListChecks,
-  PlayCircle,
   Star,
   Target,
   Trophy,
   Zap,
 } from "lucide-react";
 
+import { ContinueLearningCard } from "@/components/dashboard/continue-learning-card";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
@@ -67,15 +67,6 @@ export function UserDashboard({
             {t("dashboard.user.subtitle")}
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
-            <Button
-              asChild
-              className="bg-primary font-semibold text-primary-foreground shadow-brand hover:bg-primary/90"
-            >
-              <Link href="/learn/italian">
-                <PlayCircle className="h-4 w-4" />
-                {t("dashboard.user.continueLearning")}
-              </Link>
-            </Button>
             <Button variant="outline" asChild className="border-white/20 bg-white/5">
               <Link href="/menu">{t("dashboard.user.mainMenu")}</Link>
             </Button>
@@ -85,6 +76,8 @@ export function UserDashboard({
           </div>
         </div>
       </section>
+
+      <ContinueLearningCard snapshot={data.continueLearning} />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
