@@ -48,7 +48,10 @@ export function LessonDetailTabs({
       </TabsContent>
 
       <TabsContent value="quiz" className="mt-6">
-        <QuizTabContent quiz={quiz} attempt={quizAttempt} />
+        <QuizTabContent
+          quiz={quiz}
+          attempts={quizAttempt ? [quizAttempt] : []}
+        />
       </TabsContent>
     </Tabs>
   );

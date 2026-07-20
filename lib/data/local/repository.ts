@@ -4,9 +4,14 @@ import {
   setLocalSessionUserId,
 } from "@/lib/auth/local-session";
 import type { DataRepository } from "@/lib/data/repository";
-import { createLocalId, getLocalStore } from "@/lib/data/local/store";
+import { createLocalId, getLocalStore, persistLocalStore } from "@/lib/data/local/store";
+import { deriveQuizMetadataFromLesson } from "@/lib/quiz-management/helpers";
 
 export function createLocalRepository(): DataRepository {
+  function commitStore() {
+    persistLocalStore();
+  }
+
   return {
     async getAuthUser() {
       const userId = await getLocalSessionUserId();
@@ -76,6 +81,7 @@ export function createLocalRepository(): DataRepository {
           ? "admin"
           : profile.role
         : "learner";
+      commitStore();
       return {};
     },
 
@@ -97,6 +103,7 @@ export function createLocalRepository(): DataRepository {
       if (!profile) return { error: "User not found." };
       profile.role = role;
       profile.is_admin = role !== "learner";
+      commitStore();
       return {};
     },
 
@@ -117,6 +124,7 @@ export function createLocalRepository(): DataRepository {
       const profile = store.profiles.find((entry) => entry.id === userId);
       if (!profile) return { error: "User not found." };
       profile.status = status;
+      commitStore();
       return {};
     },
 
@@ -161,6 +169,7 @@ export function createLocalRepository(): DataRepository {
         });
       }
 
+      commitStore();
       return {};
     },
 
@@ -289,6 +298,7 @@ export function createLocalRepository(): DataRepository {
         created_at: new Date().toISOString(),
       });
 
+      commitStore();
       return {};
     },
 
@@ -301,6 +311,7 @@ export function createLocalRepository(): DataRepository {
         order_number: orderNumber,
         created_at: new Date().toISOString(),
       });
+      commitStore();
       return {};
     },
 
@@ -310,6 +321,7 @@ export function createLocalRepository(): DataRepository {
       lesson.title = title;
       lesson.description = description;
       lesson.order_number = orderNumber;
+      commitStore();
       return {};
     },
 
@@ -327,6 +339,7 @@ export function createLocalRepository(): DataRepository {
       store.quizQuestions = store.quizQuestions.filter(
         (question) => !quizIds.includes(question.quiz_id)
       );
+      commitStore();
       return {};
     },
 
@@ -338,6 +351,7 @@ export function createLocalRepository(): DataRepository {
         id: createLocalId("vocab"),
         created_at: new Date().toISOString(),
       });
+      commitStore();
       return {};
     },
 
@@ -345,12 +359,14 @@ export function createLocalRepository(): DataRepository {
       const item = getLocalStore().vocabulary.find((entry) => entry.id === id);
       if (!item) return { error: "Vocabulary item not found." };
       Object.assign(item, input);
+      commitStore();
       return {};
     },
 
     async deleteVocabulary(id) {
       const store = getLocalStore();
       store.vocabulary = store.vocabulary.filter((item) => item.id !== id);
+      commitStore();
       return {};
     },
 
@@ -361,6 +377,7 @@ export function createLocalRepository(): DataRepository {
         id: createLocalId("grammar"),
         created_at: new Date().toISOString(),
       });
+      commitStore();
       return {};
     },
 
@@ -368,12 +385,14 @@ export function createLocalRepository(): DataRepository {
       const item = getLocalStore().grammarRules.find((entry) => entry.id === id);
       if (!item) return { error: "Grammar rule not found." };
       Object.assign(item, input);
+      commitStore();
       return {};
     },
 
     async deleteGrammarRule(id) {
       const store = getLocalStore();
       store.grammarRules = store.grammarRules.filter((item) => item.id !== id);
+      commitStore();
       return {};
     },
 
@@ -384,28 +403,38 @@ export function createLocalRepository(): DataRepository {
         id: createLocalId("video"),
         created_at: new Date().toISOString(),
       });
+      commitStore();
       return {};
     },
 
     async createQuizWithQuestions({
       lessonId,
       title,
-      languageSlug = "italian",
-      levelSlug = "a1-1",
-      sectionSlug = "quiz",
-      status = "draft",
+      languageSlug,
+      levelSlug,
+      sectionSlug,
+      status,
       questions,
     }) {
       const store = getLocalStore();
+      const lesson = store.lessons.find((entry) => entry.id === lessonId);
+      const derived = lesson
+        ? deriveQuizMetadataFromLesson(lesson)
+        : {
+            language_slug: "italian" as const,
+            level_slug: "a1-1" as const,
+            section_slug: "quiz" as const,
+          };
+
       const quizId = createLocalId("quiz");
       store.quizzes.push({
         id: quizId,
         lesson_id: lessonId,
         title,
-        language_slug: languageSlug,
-        level_slug: levelSlug,
-        section_slug: sectionSlug,
-        status,
+        language_slug: languageSlug ?? derived.language_slug,
+        level_slug: levelSlug ?? derived.level_slug,
+        section_slug: sectionSlug ?? derived.section_slug,
+        status: status ?? "published",
         created_at: new Date().toISOString(),
       });
 
@@ -427,6 +456,7 @@ export function createLocalRepository(): DataRepository {
         });
       }
 
+      commitStore();
       return {};
     },
 
@@ -434,6 +464,7 @@ export function createLocalRepository(): DataRepository {
       const quiz = getLocalStore().quizzes.find((entry) => entry.id === id);
       if (!quiz) return { error: "Quiz not found." };
       quiz.status = status;
+      commitStore();
       return {};
     },
 
@@ -441,6 +472,7 @@ export function createLocalRepository(): DataRepository {
       const quiz = getLocalStore().quizzes.find((entry) => entry.id === id);
       if (!quiz) return { error: "Quiz not found." };
       quiz.title = title;
+      commitStore();
       return {};
     },
 
@@ -453,6 +485,7 @@ export function createLocalRepository(): DataRepository {
       store.userQuizAttempts = store.userQuizAttempts.filter(
         (attempt) => attempt.quiz_id !== id
       );
+      commitStore();
       return {};
     },
 
@@ -471,6 +504,7 @@ export function createLocalRepository(): DataRepository {
         explanation: input.explanation ?? null,
         created_at: new Date().toISOString(),
       });
+      commitStore();
       return {};
     },
 
@@ -480,6 +514,7 @@ export function createLocalRepository(): DataRepository {
       );
       if (!question) return { error: "Question not found." };
       Object.assign(question, input);
+      commitStore();
       return {};
     },
 
@@ -488,6 +523,7 @@ export function createLocalRepository(): DataRepository {
       store.quizQuestions = store.quizQuestions.filter(
         (question) => question.id !== id
       );
+      commitStore();
       return {};
     },
   };

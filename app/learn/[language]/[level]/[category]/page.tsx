@@ -9,6 +9,7 @@ import {
 } from "@/lib/curriculum/languages";
 import { resolveLessonForLevel } from "@/lib/curriculum/resolve-lesson";
 import { getDataRepository } from "@/lib/data";
+import { findPublishedQuizzesForLevel } from "@/lib/quiz-management/helpers";
 import { getServerTranslator } from "@/lib/i18n/server-locale";
 
 type PageProps = {
@@ -67,29 +68,44 @@ export default async function CategoryPage({ params }: PageProps) {
 
   let vocabulary: import("@/types").Vocabulary[] = [];
   let grammarRules: import("@/types").GrammarRule[] = [];
-  let quiz: import("@/types").Quiz | null = null;
-  let quizAttempt: import("@/types").UserQuizAttempt | null = null;
+  let levelQuizzes: import("@/types").Quiz[] = [];
+  let quizAttempts: import("@/types").UserQuizAttempt[] = [];
+
+  const [lessons, allQuizzes, allQuestions] = await Promise.all([
+    repo.getLessons(),
+    repo.getQuizzes(),
+    repo.getAllQuizQuestions(),
+  ]);
+
+  const questionCountByQuiz = allQuestions.reduce<Record<string, number>>(
+    (counts, question) => {
+      counts[question.quiz_id] = (counts[question.quiz_id] ?? 0) + 1;
+      return counts;
+    },
+    {}
+  );
+
+  levelQuizzes = findPublishedQuizzesForLevel(allQuizzes, lessons, {
+    languageSlug: language.slug,
+    levelSlug: level.slug,
+    sectionSlug: "quiz",
+    lessonId: lesson?.id ?? null,
+  }).filter((entry) => (questionCountByQuiz[entry.id] ?? 0) > 0);
+
+  if (user && levelQuizzes.length > 0) {
+    const attempts = await repo.getAttemptsByUserId(user.id);
+    const quizIds = new Set(levelQuizzes.map((entry) => entry.id));
+    quizAttempts = attempts.filter((attempt) => quizIds.has(attempt.quiz_id));
+  }
 
   if (lesson) {
-    const [vocabularyData, grammarData, quizzes] = await Promise.all([
+    const [vocabularyData, grammarData] = await Promise.all([
       repo.getVocabularyByLessonId(lesson.id),
       repo.getGrammarRulesByLessonId(lesson.id),
-      repo.getQuizzes(),
     ]);
 
     vocabulary = vocabularyData.filter((item) => item.status === "published");
     grammarRules = grammarData.filter((item) => item.status === "published");
-    quiz =
-      quizzes.find(
-        (entry) =>
-          entry.lesson_id === lesson.id &&
-          entry.status === "published" &&
-          entry.section_slug === "quiz"
-      ) ?? null;
-
-    if (quiz && user) {
-      quizAttempt = await repo.getAttemptByUserAndQuiz(user.id, quiz.id);
-    }
   }
 
   return (
@@ -103,8 +119,8 @@ export default async function CategoryPage({ params }: PageProps) {
       lesson={lesson}
       vocabulary={vocabulary}
       grammarRules={grammarRules}
-      quiz={quiz}
-      quizAttempt={quizAttempt}
+      quizzes={levelQuizzes}
+      quizAttempts={quizAttempts}
     />
   );
 }

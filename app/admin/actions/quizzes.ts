@@ -60,6 +60,14 @@ export async function updateQuizStatusAction(
   status: "draft" | "published"
 ): Promise<ActionResult> {
   const repo = getDataRepository();
+
+  if (status === "published") {
+    const questions = await repo.getQuizQuestionsByQuizId(quizId);
+    if (questions.length === 0) {
+      return { error: "actions.errors.quizNoQuestions" };
+    }
+  }
+
   const lessonId = await getQuizLessonId(quizId);
   const result = await repo.updateQuizStatus(quizId, status);
 
@@ -74,8 +82,8 @@ export async function updateQuizStatusAction(
 
 function revalidateQuizPaths() {
   revalidatePath("/admin/quizzes");
-  revalidatePath("/quizzes");
-  revalidatePath("/quizzes/browse", "layout");
+  revalidatePath("/learn", "layout");
+  revalidatePath("/dashboard");
 }
 
 export async function createQuizWithQuestions(
@@ -90,6 +98,7 @@ export async function createQuizWithQuestions(
   const result = await repo.createQuizWithQuestions({
     lessonId: parsed.data.lessonId,
     title: parsed.data.title,
+    status: "published",
     questions: parsed.data.questions,
   });
 
@@ -98,6 +107,7 @@ export async function createQuizWithQuestions(
   }
 
   revalidateAppContent(parsed.data.lessonId);
+  revalidateQuizPaths();
   return { success: true };
 }
 

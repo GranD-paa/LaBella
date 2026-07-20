@@ -255,7 +255,7 @@ export const LOCAL_SEED: LocalDatabase = {
     language_slug: "italian",
     level_slug: `a1-${index + 1}`,
     section_slug: "quiz",
-    status: "draft" as const,
+    status: (index < 2 ? "published" : "draft") as "draft" | "published",
     created_at: now,
   })),
   quizQuestions: [
@@ -316,18 +316,6 @@ export const LOCAL_SEED: LocalDatabase = {
       created_at: now,
     },
   ],
-  userQuizAttempts: [
-    {
-      id: "60000000-0000-4000-8000-000000000001",
-      user_id: "710a5c03-ffbc-4032-a3d2-154458b15bdd",
-      quiz_id: quizIds[0],
-      score: 100,
-      answers_json: {
-        "50000000-0000-4000-8000-000000000001": "b",
-        "50000000-0000-4000-8000-000000000002": "b",
-      },
-      created_at: now,
-    },
-  ],
+  userQuizAttempts: [],
   learningStates: [],
 };

@@ -36,6 +36,9 @@ export const adminQuizzesFa = {
   quizPublished: "آزمون منتشر شد",
   quizSavedDraft: "آزمون به‌عنوان پیش‌نویس ذخیره شد",
   movedToDraft: "آزمون به پیش‌نویس منتقل شد",
+  cannotPublishWithoutQuestions:
+    "قبل از انتشار حداقل یک سؤال اضافه کنید. آزمون بدون سؤال برای یادگیرندگان نمایش داده نمی‌شود.",
+  noQuestionsHidden: "بدون سؤال — برای یادگیرندگان مخفی",
   createLessonFirst:
     "قبل از افزودن آزمون، ابتدا در تب درس‌ها یک درس ایجاد کنید.",
   allQuizzes: "همه آزمون‌ها",

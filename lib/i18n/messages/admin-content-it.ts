@@ -21,6 +21,8 @@ export const adminContentIt = {
   publishContent: "Pubblica contenuto",
   savedDraft: "Contenuto salvato come bozza",
   publishedContent: "Contenuto pubblicato",
+  publishedQuiz:
+    "Quiz pubblicato. Gli studenti lo vedranno in Impara → {level} → Quiz.",
   addAnother: "Aggiungi altro contenuto",
   startOver: "Ricomincia",
   categories: {
@@ -68,7 +70,7 @@ export const adminContentIt = {
   quiz: {
     formTitle: "Crea quiz",
     formDescription:
-      "Crea domande a scelta multipla e scritte. Nulla viene pubblicato finché non scegli Pubblica.",
+      "Crea domande a scelta multipla e scritte solo per la sezione Quiz. Grammatica e vocabolario hanno categorie separate e non compaiono qui.",
     quizTitle: "Titolo del quiz",
     quizTitlePlaceholder: "es. Quiz saluti A1",
     questionCountLabel: "Numero di domande",

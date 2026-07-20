@@ -4,6 +4,7 @@ import { revalidateAppContent } from "@/lib/revalidate-paths";
 import { redirect } from "next/navigation";
 
 import { getDataRepository } from "@/lib/data";
+import { getLearnQuizHref } from "@/lib/quiz-management/learn-path";
 import { scoreWrittenAnswer } from "@/lib/quiz-management/types";
 import { submitQuizSchema } from "@/lib/validations/quiz";
 import type { ActionResult } from "@/lib/action-result";
@@ -86,7 +87,5 @@ export async function submitQuizAction(
   }
 
   revalidateAppContent(quiz.lesson_id);
-  redirect(
-    `/quizzes/browse/${quiz.language_slug}/${quiz.level_slug}/${quiz.section_slug}?completed=${quiz.id}&score=${score}`
-  );
+  redirect(getLearnQuizHref(quiz));
 }

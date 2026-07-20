@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { DataRepository } from "@/lib/data/repository";
+import { deriveQuizMetadataFromLesson } from "@/lib/quiz-management/helpers";
 
 export function createSupabaseRepository(): DataRepository {
   return {
@@ -453,22 +454,36 @@ export function createSupabaseRepository(): DataRepository {
     async createQuizWithQuestions({
       lessonId,
       title,
-      languageSlug = "italian",
-      levelSlug = "a1-1",
-      sectionSlug = "quiz",
-      status = "draft",
+      languageSlug,
+      levelSlug,
+      sectionSlug,
+      status,
       questions,
     }) {
       const supabase = await createClient();
+      const { data: lesson } = await supabase
+        .from("lessons")
+        .select("*")
+        .eq("id", lessonId)
+        .maybeSingle();
+
+      const derived = lesson
+        ? deriveQuizMetadataFromLesson(lesson)
+        : {
+            language_slug: "italian" as const,
+            level_slug: "a1-1" as const,
+            section_slug: "quiz" as const,
+          };
+
       const { data: quiz, error: quizError } = await supabase
         .from("quizzes")
         .insert({
           lesson_id: lessonId,
           title,
-          language_slug: languageSlug,
-          level_slug: levelSlug,
-          section_slug: sectionSlug,
-          status,
+          language_slug: languageSlug ?? derived.language_slug,
+          level_slug: levelSlug ?? derived.level_slug,
+          section_slug: sectionSlug ?? derived.section_slug,
+          status: status ?? "published",
         })
         .select("id")
         .single();

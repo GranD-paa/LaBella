@@ -36,6 +36,9 @@ export const adminQuizzesEn = {
   quizPublished: "Quiz published",
   quizSavedDraft: "Quiz saved as draft",
   movedToDraft: "Quiz moved to draft",
+  cannotPublishWithoutQuestions:
+    "Add at least one question before publishing. Quizzes without questions are hidden from learners.",
+  noQuestionsHidden: "No questions — hidden from learners",
   createLessonFirst:
     "Create a lesson first in the Lessons tab before adding quizzes.",
   allQuizzes: "All quizzes",

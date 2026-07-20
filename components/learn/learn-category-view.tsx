@@ -23,8 +23,8 @@ export function LearnCategoryView({
   lesson,
   vocabulary,
   grammarRules,
-  quiz,
-  quizAttempt,
+  quizzes = [],
+  quizAttempts = [],
 }: {
   languageName: string;
   languageSlug: string;
@@ -35,8 +35,8 @@ export function LearnCategoryView({
   lesson: Lesson | null;
   vocabulary: Vocabulary[];
   grammarRules: GrammarRule[];
-  quiz: Quiz | null;
-  quizAttempt: UserQuizAttempt | null;
+  quizzes?: Quiz[];
+  quizAttempts?: UserQuizAttempt[];
 }) {
   const { t } = useTranslations();
   const messageKey = CATEGORY_MESSAGE_KEYS[category];
@@ -65,7 +65,7 @@ export function LearnCategoryView({
         ) : null}
       </div>
 
-      {!lesson ? (
+      {!lesson && category !== "quiz" ? (
         <div className="rounded-xl border border-dashed py-16 text-center text-muted-foreground">
           <p>
             {t("learn.contentPreparing", {
@@ -86,11 +86,7 @@ export function LearnCategoryView({
             <VisualLearningGrid vocabulary={vocabulary} />
           ) : null}
           {category === "quiz" ? (
-            <QuizTabContent
-              quiz={quiz}
-              attempt={quizAttempt}
-              browseHref={`/quizzes/browse/${languageSlug}/${levelSlug}/quiz`}
-            />
+            <QuizTabContent quizzes={quizzes} attempts={quizAttempts} />
           ) : null}
         </>
       )}

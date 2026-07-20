@@ -7,8 +7,6 @@ export function revalidateAppContent(lessonId?: string) {
   revalidatePath("/menu");
   revalidatePath("/dashboard");
   revalidatePath("/profile");
-  revalidatePath("/quizzes");
-  revalidatePath("/quizzes/browse", "layout");
   revalidatePath("/learn", "layout");
 
   if (lessonId) {

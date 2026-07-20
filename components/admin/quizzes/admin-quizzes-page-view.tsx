@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { CreateContentSection } from "@/components/admin/quizzes/create-content-section";
 import { QuizManagementTable } from "@/components/admin/quizzes/quiz-management-table";
@@ -25,6 +26,7 @@ export function AdminQuizzesPageView({
   lessons: Lesson[];
 }) {
   const { t } = useTranslations();
+  const router = useRouter();
 
   return (
     <div className="space-y-8">
@@ -52,7 +54,10 @@ export function AdminQuizzesPageView({
         </div>
       </section>
 
-      <CreateContentSection lessons={lessons} />
+      <CreateContentSection
+        lessons={lessons}
+        onSuccess={() => router.refresh()}
+      />
 
       <QuizManagementTable
         quizzes={quizzes}

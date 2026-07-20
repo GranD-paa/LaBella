@@ -134,7 +134,12 @@ export async function fetchUserDashboardData(
   });
 
   const availableQuizDetails = quizzes
-    .filter((quiz) => !attemptedQuizIds.has(quiz.id))
+    .filter(
+      (quiz) =>
+        !attemptedQuizIds.has(quiz.id) &&
+        quiz.status === "published" &&
+        (questionCountByQuiz[quiz.id] ?? 0) > 0
+    )
     .map((quiz) => {
       const lesson = lessonMap.get(quiz.lesson_id);
       return {

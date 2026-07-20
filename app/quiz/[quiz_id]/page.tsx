@@ -5,6 +5,7 @@ import { QuizForm } from "@/components/quiz/quiz-form";
 import { NoQuestionsMessage, QuizPageIntro } from "@/components/quiz/quiz-page-intro";
 import { getDataRepository } from "@/lib/data";
 import { isQuizAccessible } from "@/lib/quiz-management/data";
+import { getLearnQuizHref } from "@/lib/quiz-management/learn-path";
 
 import { getServerTranslator } from "@/lib/i18n/server-locale";
 
@@ -52,7 +53,7 @@ export default async function QuizPage({ params }: PageProps) {
   ]);
 
   const hasCompleted = Boolean(existingAttempt);
-  const backHref = `/quizzes/browse/${quiz.language_slug}/${quiz.level_slug}/${quiz.section_slug}`;
+  const backHref = getLearnQuizHref(quiz);
 
   return (
     <div className="space-y-8">

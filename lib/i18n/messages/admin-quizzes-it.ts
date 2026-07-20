@@ -36,6 +36,9 @@ export const adminQuizzesIt = {
   quizPublished: "Quiz pubblicato",
   quizSavedDraft: "Quiz salvato come bozza",
   movedToDraft: "Quiz spostato in bozza",
+  cannotPublishWithoutQuestions:
+    "Aggiungi almeno una domanda prima di pubblicare. I quiz senza domande sono nascosti agli studenti.",
+  noQuestionsHidden: "Nessuna domanda — nascosto agli studenti",
   createLessonFirst:
     "Crea prima una lezione nella scheda Lezioni prima di aggiungere quiz.",
   allQuizzes: "Tutti i quiz",

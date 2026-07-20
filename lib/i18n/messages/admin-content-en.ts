@@ -20,6 +20,8 @@ export const adminContentEn = {
   publishContent: "Publish content",
   savedDraft: "Content saved as draft",
   publishedContent: "Content published",
+  publishedQuiz:
+    "Quiz published. Learners will see it at Learn → {level} → Quiz.",
   addAnother: "Add more content",
   startOver: "Start over",
   categories: {
@@ -67,7 +69,7 @@ export const adminContentEn = {
   quiz: {
     formTitle: "Create quiz",
     formDescription:
-      "Build multiple-choice and written questions. Nothing is published until you choose Publish.",
+      "Build multiple-choice and written questions for the Quiz section only. Grammar and vocabulary use their own categories and will not appear here.",
     quizTitle: "Quiz title",
     quizTitlePlaceholder: "e.g. A1 Greetings checkpoint",
     questionCountLabel: "Question count",

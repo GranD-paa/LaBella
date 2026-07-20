@@ -525,7 +525,9 @@ export function QuizContentPanel({
       }
       toast.success(
         status === "published"
-          ? t("admin.content.publishedContent")
+          ? t("admin.content.publishedQuiz", {
+              level: context.levelSlug.toUpperCase(),
+            })
           : t("admin.content.savedDraft")
       );
       form.reset({
@@ -643,8 +645,18 @@ export function QuizContentPanel({
 
           <ContentActionBar
             isPending={isPending}
-            onSaveDraft={() => form.handleSubmit(() => submit("draft"))()}
-            onPublish={() => form.handleSubmit(() => submit("published"))()}
+            onSaveDraft={() =>
+              form.handleSubmit(
+                () => submit("draft"),
+                () => toast.error(t("actions.errors.formCheck"))
+              )()
+            }
+            onPublish={() =>
+              form.handleSubmit(
+                () => submit("published"),
+                () => toast.error(t("actions.errors.formCheck"))
+              )()
+            }
           />
         </form>
       </Form>

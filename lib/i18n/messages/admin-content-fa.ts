@@ -20,6 +20,8 @@ export const adminContentFa = {
   publishContent: "انتشار محتوا",
   savedDraft: "محتوا به‌عنوان پیش‌نویس ذخیره شد",
   publishedContent: "محتوا منتشر شد",
+  publishedQuiz:
+    "آزمون منتشر شد. یادگیرندگان آن را در یادگیری → {level} → آزمون می‌بینند.",
   addAnother: "افزودن محتوای بیشتر",
   startOver: "شروع دوباره",
   categories: {
@@ -67,7 +69,7 @@ export const adminContentFa = {
   quiz: {
     formTitle: "ایجاد آزمون",
     formDescription:
-      "سؤالات چندگزینه‌ای و تشریحی بسازید. تا زمانی که «انتشار» را انتخاب نکنید، چیزی منتشر نمی‌شود.",
+      "سؤالات چندگزینه‌ای و تشریحی فقط برای بخش آزمون بسازید. گرامر و واژگان دسته جدا دارند و اینجا نمایش داده نمی‌شوند.",
     quizTitle: "عنوان آزمون",
     quizTitlePlaceholder: "مثلاً آزمون سلام A1",
     questionCountLabel: "تعداد سؤالات",

@@ -17,7 +17,7 @@ npm.cmd run dev
 - No Supabase network requests
 - Auth uses seeded local accounts via secure HTTP-only cookie session
 - Lessons, quizzes, vocabulary, grammar, and progress use in-memory mock data
-- Admin CRUD updates the in-memory store until the dev server restarts
+- Admin CRUD updates the local JSON store in `.local-data/database.json` and survives dev server restarts
 
 ## Sample accounts
 

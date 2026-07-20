@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   BarChart3,
   BookOpen,
@@ -106,6 +107,7 @@ export function QuizManagementTable({
   attempts: UserQuizAttempt[];
 }) {
   const { t } = useTranslations();
+  const router = useRouter();
   const [languageFilter, setLanguageFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -140,8 +142,18 @@ export function QuizManagementTable({
     setStatusFilter("all");
   }
 
-  function toggleStatus(quizId: string, current: "draft" | "published") {
+  function toggleStatus(
+    quizId: string,
+    current: "draft" | "published",
+    questionCount: number
+  ) {
     const next = current === "published" ? "draft" : "published";
+
+    if (next === "published" && questionCount === 0) {
+      toast.error(t("admin.quizzes.cannotPublishWithoutQuestions"));
+      return;
+    }
+
     setPendingId(quizId);
     startTransition(async () => {
       const result = await updateQuizStatusAction(quizId, next);
@@ -155,6 +167,7 @@ export function QuizManagementTable({
           ? t("admin.quizzes.quizPublished")
           : t("admin.quizzes.movedToDraft")
       );
+      router.refresh();
     });
   }
 
@@ -188,7 +201,11 @@ export function QuizManagementTable({
               written: writtenCount,
             })}
           </span>
-        ) : null}
+        ) : (
+          <Badge variant="destructive" className="text-[10px]">
+            {t("admin.quizzes.noQuestionsHidden")}
+          </Badge>
+        )}
       </div>
     );
   }
@@ -400,7 +417,7 @@ export function QuizManagementTable({
                             questions={questions}
                             isUpdating={isUpdating}
                             onToggleStatus={() =>
-                              toggleStatus(quiz.id, quiz.status)
+                              toggleStatus(quiz.id, quiz.status, questions.length)
                             }
                             t={t}
                           />
@@ -460,7 +477,9 @@ export function QuizManagementTable({
                         quiz={quiz}
                         questions={questions}
                         isUpdating={isUpdating}
-                        onToggleStatus={() => toggleStatus(quiz.id, quiz.status)}
+                        onToggleStatus={() =>
+                          toggleStatus(quiz.id, quiz.status, questions.length)
+                        }
                         t={t}
                       />
                     </div>
