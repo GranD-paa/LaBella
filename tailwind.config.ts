@@ -90,10 +90,26 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "quiz-shake": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "20%, 60%": { transform: "translateX(-5px)" },
+          "40%, 80%": { transform: "translateX(5px)" },
+        },
+        "quiz-pop": {
+          "0%": { transform: "scale(0.98)", opacity: "0.7" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        "quiz-reveal": {
+          "0%": { transform: "translateY(8px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "quiz-shake": "quiz-shake 0.4s ease-in-out",
+        "quiz-pop": "quiz-pop 0.35s ease-out",
+        "quiz-reveal": "quiz-reveal 0.4s ease-out",
       },
     },
   },

@@ -100,3 +100,11 @@
     @apply text-brand-accent;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-quiz-shake,
+  .animate-quiz-pop,
+  .animate-quiz-reveal {
+    animation: none !important;
+  }
+}

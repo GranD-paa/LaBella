@@ -370,6 +370,22 @@ export const it: Messages = {
     submitAnswers: "Invia risposte",
     submitting: "Invio in corso...",
     reviewAttempt: "Rivedi",
+    checkAnswer: "Verifica risposta",
+    yourAnswer: "La tua risposta",
+    correctAnswer: "Risposta corretta",
+    takeHint: "Seleziona una risposta per continuare. Ogni risposta si blocca dopo la scelta.",
+    feedback: {
+      success: {
+        "0": "Corretto!",
+        "1": "Eccellente!",
+        "2": "Ottimo lavoro!",
+      },
+      error: {
+        "0": "Sbagliato",
+        "1": "Cerca di ricordarlo",
+        "2": "Non proprio",
+      },
+    },
     browse: {
       backToDashboard: "Torna alla dashboard",
       stepLanguage: "Passo 1 · Lingua",

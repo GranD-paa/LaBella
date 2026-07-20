@@ -355,6 +355,22 @@
     "submitAnswers": "Submit answers",
     "submitting": "Submitting...",
     "reviewAttempt": "Review",
+    "checkAnswer": "Check answer",
+    "yourAnswer": "Your answer",
+    "correctAnswer": "Correct answer",
+    "takeHint": "Select an answer to continue. Each response locks after you choose.",
+    "feedback": {
+      "success": {
+        "0": "Correct!",
+        "1": "Excellent!",
+        "2": "Great job!"
+      },
+      "error": {
+        "0": "Incorrect",
+        "1": "Try to remember this",
+        "2": "Not quite"
+      }
+    },
     "browse": {
       "backToDashboard": "Back to dashboard",
       "stepLanguage": "Step 1 · Language",

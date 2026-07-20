@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { QuizForm } from "@/components/quiz/quiz-form";
 import { NoQuestionsMessage, QuizPageIntro } from "@/components/quiz/quiz-page-intro";
 import { getDataRepository } from "@/lib/data";
+import { mergeGradedQuestions } from "@/lib/quiz/merge-graded-questions";
 import { isQuizAccessible } from "@/lib/quiz-management/data";
 import { getLearnQuizHref } from "@/lib/quiz-management/learn-path";
 
@@ -47,10 +48,13 @@ export default async function QuizPage({ params }: PageProps) {
     notFound();
   }
 
-  const [existingAttempt, questions] = await Promise.all([
+  const [existingAttempt, questions, answerKey] = await Promise.all([
     repo.getAttemptByUserAndQuiz(user.id, quiz_id),
     repo.getQuizQuestionsByQuizId(quiz_id),
+    repo.getQuizQuestionAnswers(quiz_id),
   ]);
+
+  const gradedQuestions = mergeGradedQuestions(questions, answerKey);
 
   const hasCompleted = Boolean(existingAttempt);
   const backHref = getLearnQuizHref(quiz);
@@ -68,7 +72,7 @@ export default async function QuizPage({ params }: PageProps) {
           quizId={quiz.id}
           lessonId={quiz.lesson_id}
           backHref={backHref}
-          questions={questions}
+          questions={gradedQuestions}
           locked={hasCompleted}
           existingScore={existingAttempt?.score}
           savedAnswers={existingAttempt?.answers_json}

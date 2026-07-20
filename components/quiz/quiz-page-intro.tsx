@@ -33,7 +33,7 @@ export function QuizPageIntro({
         </div>
         <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
         <p className="text-muted-foreground">
-          {hasCompleted ? t("quiz.alreadyCompleted") : t("quiz.answerAll")}
+          {hasCompleted ? t("quiz.alreadyCompleted") : t("quiz.takeHint")}
         </p>
       </div>
     </div>
