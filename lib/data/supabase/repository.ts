@@ -146,6 +146,35 @@ export function createSupabaseRepository(): DataRepository {
       return error ? { error: error.message } : {};
     },
 
+    async getLearningState(userId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("user_learning_state")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+      return data ?? null;
+    },
+
+    async upsertLearningState(
+      userId,
+      { languageSlug, levelSlug, lessonId = null, sectionSlug = null }
+    ) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("user_learning_state").upsert(
+        {
+          user_id: userId,
+          language_slug: languageSlug,
+          level_slug: levelSlug,
+          lesson_id: lessonId,
+          section_slug: sectionSlug,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" }
+      );
+      return error ? { error: error.message } : {};
+    },
+
     async getLessons() {
       const supabase = await createClient();
       const { data } = await supabase

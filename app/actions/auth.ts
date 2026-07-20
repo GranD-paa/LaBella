@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { isLocalDataMode } from "@/lib/config/data-source";
 import { getDataRepository } from "@/lib/data";
+import { resolveContinueLearningPath } from "@/lib/curriculum/learning-state";
 import { signInSchema, signUpSchema } from "@/lib/validations/auth";
 import type { SignInValues, SignUpValues } from "@/lib/validations/auth";
 
@@ -31,8 +32,8 @@ function formatAuthErrorKey(message: string) {
   return "actions.errors.generic";
 }
 
-function getSafeRedirectPath(path?: string) {
-  if (!path || !path.startsWith("/") || path.startsWith("//")) {
+function getSafeRedirectPath(path: string) {
+  if (!path.startsWith("/") || path.startsWith("//")) {
     return "/menu";
   }
 
@@ -62,7 +63,20 @@ export async function signInAction(
     return { error: formatAuthErrorKey(result.error) };
   }
 
-  redirect(getSafeRedirectPath(redirectTo));
+  // An explicit redirectTo means the user was bounced here from a specific
+  // protected page (e.g. a deep link) — honor that instead of resuming their
+  // last learning position.
+  if (redirectTo) {
+    redirect(getSafeRedirectPath(redirectTo));
+  }
+
+  const user = await repo.getAuthUser();
+  const learningState = user ? await repo.getLearningState(user.id) : null;
+
+  // No explicit destination requested: send returning learners straight back
+  // into their last active language/level/section, and first-time learners
+  // to the Main Menu to choose a language.
+  redirect(resolveContinueLearningPath(learningState));
 }
 
 export async function signUpAction(

@@ -115,6 +115,27 @@ create table if not exists public.user_quiz_attempts (
 );
 
 -- =========================================================================
+-- 8. user_learning_state
+-- =========================================================================
+-- One row per learner: their last active language, level, lesson, and
+-- section. Used to resume the course automatically right after login.
+create table if not exists public.user_learning_state (
+  user_id uuid primary key references public.profiles (id) on delete cascade,
+  language_slug text not null,
+  level_slug text,
+  lesson_id uuid references public.lessons (id) on delete set null,
+  section_slug text,
+  updated_at timestamptz not null default now(),
+  constraint user_learning_state_section_check check (
+    section_slug is null
+    or section_slug in ('grammar', 'vocabulary', 'visual', 'quiz')
+  )
+);
+
+comment on table public.user_learning_state is
+  'Tracks each learner''s last active language/level/lesson/section so navigation can resume it after login.';
+
+-- =========================================================================
 -- Indexes on foreign keys / common lookup columns
 -- =========================================================================
 create index if not exists vocabulary_lesson_id_idx on public.vocabulary (lesson_id);
@@ -124,6 +145,7 @@ create index if not exists quiz_questions_quiz_id_idx on public.quiz_questions (
 create index if not exists user_quiz_attempts_user_id_idx on public.user_quiz_attempts (user_id);
 create index if not exists user_quiz_attempts_quiz_id_idx on public.user_quiz_attempts (quiz_id);
 create index if not exists lessons_order_number_idx on public.lessons (order_number);
+create index if not exists user_learning_state_language_idx on public.user_learning_state (language_slug);
 
 -- =========================================================================
 -- Row Level Security
@@ -135,6 +157,7 @@ alter table public.grammar_rules enable row level security;
 alter table public.quizzes enable row level security;
 alter table public.quiz_questions enable row level security;
 alter table public.user_quiz_attempts enable row level security;
+alter table public.user_learning_state enable row level security;
 
 alter table public.profiles force row level security;
 alter table public.lessons force row level security;
@@ -143,6 +166,7 @@ alter table public.grammar_rules force row level security;
 alter table public.quizzes force row level security;
 alter table public.quiz_questions force row level security;
 alter table public.user_quiz_attempts force row level security;
+alter table public.user_learning_state force row level security;
 
 -- -------------------------------------------------------------------------
 -- Helper: private.is_admin() — security definer so it can read
@@ -306,6 +330,36 @@ create policy "Users can insert own quiz attempts"
 drop policy if exists "Admins can manage all quiz attempts" on public.user_quiz_attempts;
 create policy "Admins can manage all quiz attempts"
   on public.user_quiz_attempts for all
+  to authenticated
+  using (private.is_admin())
+  with check (private.is_admin());
+
+-- -------------------------------------------------------------------------
+-- user_learning_state policies: users only see/write their own resume
+-- position; admins can see everything for support/analytics.
+-- -------------------------------------------------------------------------
+drop policy if exists "Users can view own learning state" on public.user_learning_state;
+create policy "Users can view own learning state"
+  on public.user_learning_state for select
+  to authenticated
+  using ((select auth.uid()) = user_id or private.is_admin());
+
+drop policy if exists "Users can insert own learning state" on public.user_learning_state;
+create policy "Users can insert own learning state"
+  on public.user_learning_state for insert
+  to authenticated
+  with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can update own learning state" on public.user_learning_state;
+create policy "Users can update own learning state"
+  on public.user_learning_state for update
+  to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Admins can manage all learning state" on public.user_learning_state;
+create policy "Admins can manage all learning state"
+  on public.user_learning_state for all
   to authenticated
   using (private.is_admin())
   with check (private.is_admin());

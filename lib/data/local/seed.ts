@@ -4,6 +4,7 @@ import type {
   Profile,
   Quiz,
   QuizQuestion,
+  UserLearningState,
   UserQuizAttempt,
   VideoLesson,
   Vocabulary,
@@ -21,6 +22,7 @@ export type LocalDatabase = {
   quizzes: Quiz[];
   quizQuestions: QuizQuestion[];
   userQuizAttempts: UserQuizAttempt[];
+  learningStates: UserLearningState[];
 };
 
 const now = "2026-07-15T08:00:00.000Z";
@@ -327,4 +329,5 @@ export const LOCAL_SEED: LocalDatabase = {
       created_at: now,
     },
   ],
+  learningStates: [],
 };

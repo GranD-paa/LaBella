@@ -18,13 +18,6 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import type { UserDashboardData } from "@/lib/dashboard-data";
 import { ACHIEVEMENT_MESSAGE_KEYS } from "@/lib/i18n/content-keys";
 import { cn } from "@/lib/utils";
@@ -46,12 +39,6 @@ export function UserDashboard({
 }) {
   const { t, formatDate } = useTranslations();
   const earnedCount = data.achievements.filter((a) => a.earned).length;
-  const progressPercent =
-    data.stats.totalQuizzes > 0
-      ? Math.round(
-          (data.stats.completedQuizzes / data.stats.totalQuizzes) * 100
-        )
-      : 0;
 
   return (
     <div className="space-y-8">
@@ -97,61 +84,6 @@ export function UserDashboard({
           }
         />
       </section>
-
-      <section className="brand-surface p-6">
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold">
-              {t("dashboard.user.learningProgress")}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.user.percentCompleted", { percent: progressPercent })}
-            </p>
-          </div>
-          <span className="text-2xl font-bold text-brand-accent">
-            {progressPercent}%
-          </span>
-        </div>
-        <div className="h-3 overflow-hidden rounded-full bg-muted">
-          <div
-            className="h-full rounded-full bg-brand-gradient transition-all duration-700"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-      </section>
-
-      {data.availableQuizDetails.length > 0 ? (
-        <section className="space-y-4">
-          <div>
-            <h2 className="text-xl font-semibold">
-              {t("dashboard.user.availableQuizzesTitle")}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.user.availableQuizzesHint")}
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {data.availableQuizDetails.slice(0, 4).map((quiz) => (
-              <Card key={quiz.quizId} className="brand-surface">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{quiz.quizTitle}</CardTitle>
-                  <CardDescription>{quiz.lessonTitle}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex items-center justify-between">
-                  <Badge variant="secondary">
-                    {quiz.questionCount} {t("common.questions")}
-                  </Badge>
-                  <Button size="sm" asChild>
-                    <Link href={`/quiz/${quiz.quizId}`}>
-                      {t("dashboard.user.startQuiz")}
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      ) : null}
 
       <section className="space-y-4">
         <div>

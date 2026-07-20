@@ -126,6 +126,44 @@ export function createLocalRepository(): DataRepository {
       return {};
     },
 
+    async getLearningState(userId) {
+      return (
+        getLocalStore().learningStates.find(
+          (entry) => entry.user_id === userId
+        ) ?? null
+      );
+    },
+
+    async upsertLearningState(
+      userId,
+      { languageSlug, levelSlug, lessonId = null, sectionSlug = null }
+    ) {
+      const store = getLocalStore();
+      const existing = store.learningStates.find(
+        (entry) => entry.user_id === userId
+      );
+      const updatedAt = new Date().toISOString();
+
+      if (existing) {
+        existing.language_slug = languageSlug;
+        existing.level_slug = levelSlug;
+        existing.lesson_id = lessonId;
+        existing.section_slug = sectionSlug;
+        existing.updated_at = updatedAt;
+      } else {
+        store.learningStates.push({
+          user_id: userId,
+          language_slug: languageSlug,
+          level_slug: levelSlug,
+          lesson_id: lessonId,
+          section_slug: sectionSlug,
+          updated_at: updatedAt,
+        });
+      }
+
+      return {};
+    },
+
     async getLessons() {
       return [...getLocalStore().lessons].sort(
         (a, b) => a.order_number - b.order_number

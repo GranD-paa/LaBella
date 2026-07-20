@@ -4,6 +4,7 @@ import type {
   Profile,
   Quiz,
   QuizQuestion,
+  UserLearningState,
   UserQuizAttempt,
   VideoLesson,
   Vocabulary,
@@ -59,6 +60,20 @@ export interface DataRepository {
     status: Profile["status"]
   ): Promise<{ error?: string }>;
   sendPasswordResetEmail(email: string): Promise<{ error?: string }>;
+
+  // Learning state — the learner's last active language, level, lesson, and
+  // section. Used to restore navigation position after login. Works for any
+  // current or future language since it is keyed by slug, not a fixed enum.
+  getLearningState(userId: string): Promise<UserLearningState | null>;
+  upsertLearningState(
+    userId: string,
+    input: {
+      languageSlug: string;
+      levelSlug: string;
+      lessonId?: string | null;
+      sectionSlug?: string | null;
+    }
+  ): Promise<{ error?: string }>;
 
   // Lessons & content
   getLessons(): Promise<Lesson[]>;

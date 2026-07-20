@@ -12,3 +12,5 @@ export type QuizQuestion =
   Database["public"]["Tables"]["quiz_questions"]["Row"];
 export type UserQuizAttempt =
   Database["public"]["Tables"]["user_quiz_attempts"]["Row"];
+export type UserLearningState =
+  Database["public"]["Tables"]["user_learning_state"]["Row"];

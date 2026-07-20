@@ -14,7 +14,7 @@ export default async function LoginPage({
 }) {
   const { redirectedFrom } = await searchParams;
   const redirectTo =
-    redirectedFrom && redirectedFrom.startsWith("/") ? redirectedFrom : "/menu";
+    redirectedFrom && redirectedFrom.startsWith("/") ? redirectedFrom : undefined;
 
   return <SignInForm redirectTo={redirectTo} />;
 }

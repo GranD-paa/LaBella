@@ -51,6 +51,20 @@ export default async function CategoryPage({ params }: PageProps) {
   const user = await repo.getAuthUser();
   const { lesson } = await resolveLessonForLevel(repo, languageSlug, levelSlug);
 
+  if (user) {
+    try {
+      await repo.upsertLearningState(user.id, {
+        languageSlug: language.slug,
+        levelSlug: level.slug,
+        lessonId: lesson?.id ?? null,
+        sectionSlug: category,
+      });
+    } catch {
+      // Persisting the resume position is best-effort and must never block
+      // rendering the learning content itself.
+    }
+  }
+
   let vocabulary: import("@/types").Vocabulary[] = [];
   let grammarRules: import("@/types").GrammarRule[] = [];
   let quiz: import("@/types").Quiz | null = null;

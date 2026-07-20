@@ -352,6 +352,48 @@ export interface Database {
           },
         ];
       };
+      user_learning_state: {
+        Row: {
+          user_id: string;
+          language_slug: string;
+          level_slug: string | null;
+          lesson_id: string | null;
+          section_slug: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          language_slug: string;
+          level_slug?: string | null;
+          lesson_id?: string | null;
+          section_slug?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          language_slug?: string;
+          level_slug?: string | null;
+          lesson_id?: string | null;
+          section_slug?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_learning_state_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_learning_state_lesson_id_fkey";
+            columns: ["lesson_id"];
+            isOneToOne: false;
+            referencedRelation: "lessons";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
