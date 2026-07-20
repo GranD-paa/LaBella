@@ -224,7 +224,7 @@ export function QuizForm({
         <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-8">
           {questions.map((question, index) => {
             const isWritten = question.question_type === "written";
-            const isVisible = locked || index === currentStep;
+            const isVisible = locked ? true : index === currentStep;
             const questionFeedback = feedback[question.id];
 
             if (!isVisible) {
@@ -434,23 +434,6 @@ export function QuizForm({
 
           {locked ? (
             <div className="flex flex-wrap gap-3">
-              {currentStep > 0 ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setCurrentStep((step) => step - 1)}
-                >
-                  {t("quiz.previous")}
-                </Button>
-              ) : null}
-              {currentStep < questions.length - 1 ? (
-                <Button
-                  type="button"
-                  onClick={() => setCurrentStep((step) => step + 1)}
-                >
-                  {t("quiz.nextQuestion")}
-                </Button>
-              ) : null}
               <Button asChild variant="outline" className="w-full sm:w-auto">
                 <Link href={returnHref}>{t("common.back")}</Link>
               </Button>

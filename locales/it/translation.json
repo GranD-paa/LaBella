@@ -260,6 +260,9 @@
       "startQuiz": "Inizia quiz",
       "achievementsTitle": "Traguardi",
       "achievementsHint": "Sblocca traguardi mentre impari.",
+      "achievementsProgress": "{earned}/{total} sbloccati",
+      "achievementsExpand": "Mostra traguardi",
+      "achievementsCollapse": "Nascondi traguardi",
       "activityHistory": "Cronologia attività",
       "activityHint": "Risultati recenti dei quiz e traguardi di apprendimento.",
       "noActivity": "Nessuna attività. Inizia un quiz dal percorso italiano.",
@@ -324,6 +327,10 @@
         "title": "Primi passi",
         "description": "Completa il tuo primo quiz"
       },
+      "warmUpWarrior": {
+        "title": "Guerriero del riscaldamento",
+        "description": "Completa 2 quiz"
+      },
       "quizExplorer": {
         "title": "Esploratore di quiz",
         "description": "Completa 3 quiz"
@@ -336,9 +343,37 @@
         "title": "Punteggio perfetto",
         "description": "Ottieni 100% in qualsiasi quiz"
       },
+      "sharpMind": {
+        "title": "Mente acuta",
+        "description": "Raggiungi una media del 70% nei tuoi quiz"
+      },
       "dedicatedLearner": {
         "title": "Studente dedicato",
         "description": "Completa 5 quiz"
+      },
+      "halfWayHero": {
+        "title": "Eroe a metà strada",
+        "description": "Completa metà dei quiz disponibili"
+      },
+      "flawlessTrio": {
+        "title": "Trio impeccabile",
+        "description": "Ottieni 80% o più negli ultimi 3 quiz"
+      },
+      "quizChampion": {
+        "title": "Campione dei quiz",
+        "description": "Completa 7 quiz"
+      },
+      "excellence": {
+        "title": "Eccellenza",
+        "description": "Raggiungi una media del 90% nei tuoi quiz"
+      },
+      "comeback": {
+        "title": "Storia di riscatto",
+        "description": "Migliora il punteggio dal primo all'ultimo quiz"
+      },
+      "completionist": {
+        "title": "Completista",
+        "description": "Completa tutti i quiz disponibili"
       }
     }
   },

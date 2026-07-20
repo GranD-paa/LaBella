@@ -43,7 +43,19 @@ export type UserDashboardData = {
     title: string;
     description: string;
     earned: boolean;
-    icon: "trophy" | "star" | "zap" | "target" | "flame";
+    icon:
+      | "trophy"
+      | "star"
+      | "zap"
+      | "target"
+      | "flame"
+      | "crown"
+      | "medal"
+      | "rocket"
+      | "bookOpen"
+      | "sparkles"
+      | "gem"
+      | "compass";
   }>;
   continueLearning: ContinueLearningSnapshot;
   engagement: LearnerEngagementMetrics;
@@ -161,7 +173,8 @@ export async function fetchUserDashboardData(
   const achievements = buildAchievements(
     completedQuizDetails.length,
     averageScore,
-    scores
+    scores,
+    quizzes.length
   );
 
   return {
@@ -305,10 +318,18 @@ export async function fetchAdminDashboardData(
 function buildAchievements(
   completedCount: number,
   averageScore: number,
-  scores: number[]
+  scores: number[],
+  totalQuizzes: number
 ) {
   const hasPerfect = scores.some((score) => score === 100);
   const hasHighScore = scores.some((score) => score >= 80);
+  const hasStrongRun =
+    scores.length >= 3 && scores.slice(-3).every((score) => score >= 80);
+  const hasImproved =
+    scores.length >= 2 && scores[scores.length - 1] > scores[0];
+  const completionTarget = Math.max(totalQuizzes, 1);
+  const halfWayTarget = Math.max(Math.ceil(completionTarget / 2), 1);
+  const championTarget = Math.min(7, completionTarget);
 
   return [
     {
@@ -317,6 +338,13 @@ function buildAchievements(
       description: "Complete your first quiz",
       earned: completedCount >= 1,
       icon: "star" as const,
+    },
+    {
+      id: "warm-up-warrior",
+      title: "Warm-Up Warrior",
+      description: "Complete 2 quizzes",
+      earned: completedCount >= 2,
+      icon: "flame" as const,
     },
     {
       id: "quiz-explorer",
@@ -340,11 +368,60 @@ function buildAchievements(
       icon: "zap" as const,
     },
     {
+      id: "sharp-mind",
+      title: "Sharp Mind",
+      description: "Reach a 70% average across your quizzes",
+      earned: averageScore >= 70 && completedCount > 0,
+      icon: "sparkles" as const,
+    },
+    {
       id: "dedicated",
       title: "Dedicated Learner",
       description: "Complete 5 quizzes",
       earned: completedCount >= 5,
-      icon: "flame" as const,
+      icon: "medal" as const,
+    },
+    {
+      id: "half-way-hero",
+      title: "Halfway Hero",
+      description: "Complete half of the available quizzes",
+      earned: completedCount >= halfWayTarget,
+      icon: "compass" as const,
+    },
+    {
+      id: "flawless-trio",
+      title: "Flawless Trio",
+      description: "Score 80% or higher on your last 3 quizzes",
+      earned: hasStrongRun,
+      icon: "gem" as const,
+    },
+    {
+      id: "quiz-champion",
+      title: "Quiz Champion",
+      description: "Complete 7 quizzes",
+      earned: completedCount >= championTarget,
+      icon: "medal" as const,
+    },
+    {
+      id: "excellence",
+      title: "Excellence",
+      description: "Reach a 90% average across your quizzes",
+      earned: averageScore >= 90 && completedCount > 0,
+      icon: "rocket" as const,
+    },
+    {
+      id: "comeback",
+      title: "Comeback Story",
+      description: "Improve your score from your first to latest quiz",
+      earned: hasImproved,
+      icon: "bookOpen" as const,
+    },
+    {
+      id: "completionist",
+      title: "Completionist",
+      description: "Complete every available quiz",
+      earned: totalQuizzes > 0 && completedCount >= totalQuizzes,
+      icon: "crown" as const,
     },
   ];
 }

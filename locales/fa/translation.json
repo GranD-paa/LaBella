@@ -260,6 +260,9 @@
       "startQuiz": "شروع آزمون",
       "achievementsTitle": "دستاوردها",
       "achievementsHint": "با یادگیری نقاط عطف را باز کنید.",
+      "achievementsProgress": "{earned} از {total} باز شده",
+      "achievementsExpand": "نمایش دستاوردها",
+      "achievementsCollapse": "بستن دستاوردها",
       "activityHistory": "تاریخچه فعالیت",
       "activityHint": "نتایج اخیر آزمون و نقاط عطف یادگیری.",
       "noActivity": "هنوز فعالیتی نیست. از مسیر یادگیری ایتالیایی یک آزمون شروع کنید.",
@@ -324,6 +327,10 @@
         "title": "اولین گام‌ها",
         "description": "اولین آزمون را تکمیل کنید"
       },
+      "warmUpWarrior": {
+        "title": "جنگجوی گرم‌کردن",
+        "description": "۲ آزمون را تکمیل کنید"
+      },
       "quizExplorer": {
         "title": "کاوشگر آزمون",
         "description": "۳ آزمون را تکمیل کنید"
@@ -336,9 +343,37 @@
         "title": "نمره کامل",
         "description": "۱۰۰٪ در هر آزمونی کسب کنید"
       },
+      "sharpMind": {
+        "title": "ذهن تیز",
+        "description": "میانگین ۷۰٪ در آزمون‌های خود داشته باشید"
+      },
       "dedicatedLearner": {
         "title": "یادگیرنده پرتلاش",
         "description": "۵ آزمون را تکمیل کنید"
+      },
+      "halfWayHero": {
+        "title": "قهرمان نیمه‌راه",
+        "description": "نیمی از آزمون‌های موجود را تکمیل کنید"
+      },
+      "flawlessTrio": {
+        "title": "سه‌گانه بی‌نقص",
+        "description": "در ۳ آزمون آخر ۸۰٪ یا بیشتر بگیرید"
+      },
+      "quizChampion": {
+        "title": "قهرمان آزمون",
+        "description": "۷ آزمون را تکمیل کنید"
+      },
+      "excellence": {
+        "title": "تعالی",
+        "description": "میانگین ۹۰٪ در آزمون‌های خود داشته باشید"
+      },
+      "comeback": {
+        "title": "داستان بازگشت",
+        "description": "نمره آخرین آزمون از اولین آزمون بهتر باشد"
+      },
+      "completionist": {
+        "title": "تکمیل‌کننده",
+        "description": "همه آزمون‌های موجود را تکمیل کنید"
       }
     }
   },

@@ -276,6 +276,9 @@ export const en = {
       startQuiz: "Start quiz",
       achievementsTitle: "Achievements",
       achievementsHint: "Unlock milestones as you learn.",
+      achievementsProgress: "{earned}/{total} unlocked",
+      achievementsExpand: "Show achievements",
+      achievementsCollapse: "Hide achievements",
       activityHistory: "Activity history",
       activityHint: "Recent quiz results and learning milestones.",
       noActivity: "No activity yet. Start a quiz from the Italian learning path.",
@@ -343,6 +346,7 @@ export const en = {
     },
     achievements: {
       firstSteps: { title: "First Steps", description: "Complete your first quiz" },
+      warmUpWarrior: { title: "Warm-Up Warrior", description: "Complete 2 quizzes" },
       quizExplorer: { title: "Quiz Explorer", description: "Complete 3 quizzes" },
       highAchiever: {
         title: "High Achiever",
@@ -352,9 +356,37 @@ export const en = {
         title: "Perfect Score",
         description: "Get 100% on any quiz",
       },
+      sharpMind: {
+        title: "Sharp Mind",
+        description: "Reach a 70% average across your quizzes",
+      },
       dedicatedLearner: {
         title: "Dedicated Learner",
         description: "Complete 5 quizzes",
+      },
+      halfWayHero: {
+        title: "Halfway Hero",
+        description: "Complete half of the available quizzes",
+      },
+      flawlessTrio: {
+        title: "Flawless Trio",
+        description: "Score 80% or higher on your last 3 quizzes",
+      },
+      quizChampion: {
+        title: "Quiz Champion",
+        description: "Complete 7 quizzes",
+      },
+      excellence: {
+        title: "Excellence",
+        description: "Reach a 90% average across your quizzes",
+      },
+      comeback: {
+        title: "Comeback Story",
+        description: "Improve your score from your first to latest quiz",
+      },
+      completionist: {
+        title: "Completionist",
+        description: "Complete every available quiz",
       },
     },
   },
