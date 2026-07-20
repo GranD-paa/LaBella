@@ -96,7 +96,49 @@
   "curriculum": {
     "italian": {
       "headline": "Learn Italian Language",
-      "description": "Structured A1 pathway inspired by trusted textbooks and classroom resources."
+      "description": "Structured A1 pathway inspired by trusted textbooks and classroom resources.",
+      "levels": {
+        "a1-1": {
+          "title": "Foundations & Greetings",
+          "description": "Alphabet, pronunciation, and essential greetings."
+        },
+        "a1-2": {
+          "title": "Introducing Yourself",
+          "description": "Personal details, countries, and nationalities."
+        },
+        "a1-3": {
+          "title": "Daily Routines",
+          "description": "Common verbs, time expressions, and habits."
+        },
+        "a1-4": {
+          "title": "Family & Relationships",
+          "description": "Family members, possessives, and descriptions."
+        },
+        "a1-5": {
+          "title": "Food & Dining",
+          "description": "Restaurant vocabulary and ordering phrases."
+        },
+        "a1-6": {
+          "title": "Shopping & Prices",
+          "description": "Numbers, quantities, and marketplace language."
+        },
+        "a1-7": {
+          "title": "Travel & Directions",
+          "description": "Transport, locations, and asking for help."
+        },
+        "a1-8": {
+          "title": "Health & Wellbeing",
+          "description": "Body, symptoms, and pharmacy conversations."
+        },
+        "a1-9": {
+          "title": "Work & Studies",
+          "description": "Professions, schedules, and classroom language."
+        },
+        "a1-10": {
+          "title": "Review & A1 Checkpoint",
+          "description": "Consolidate grammar, vocabulary, and exam-style practice."
+        }
+      }
     },
     "english": {
       "headline": "Learn English Language",
@@ -115,7 +157,10 @@
     "backToMenu": "Back to Main Menu",
     "courseLevels": "Course levels",
     "courseLevelsHint": "Expand a module and open its grammar, vocabulary, visual, and quiz sections.",
-    "chooseCategory": "Choose a learning category to continue your Italian journey.",
+    "chooseCategory": "Choose a module below to continue your learning path.",
+    "chooseCategoryTitle": "What would you like to study today?",
+    "moduleCount": "{count} modules",
+    "quizCount": "{count} quizzes",
     "backToCategories": "Back to {code} categories",
     "contentPreparing": "Content for {code} is being prepared. Check back soon or ask an admin to add lesson {order} in the admin panel.",
     "categories": {
@@ -309,6 +354,7 @@
     "nextQuestion": "Next question",
     "submitAnswers": "Submit answers",
     "submitting": "Submitting...",
+    "reviewAttempt": "Review",
     "browse": {
       "backToDashboard": "Back to dashboard",
       "stepLanguage": "Step 1 · Language",

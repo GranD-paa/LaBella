@@ -13,6 +13,9 @@ import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CURRICULUM_MESSAGE_KEYS } from "@/lib/i18n/content-keys";
+import {
+  getLocalizedLevel,
+} from "@/lib/curriculum/localize";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +33,7 @@ export function CourseLevelAccordion({
     <div className="space-y-3">
       {language.levels.map((level) => {
         const isOpen = openLevel === level.slug;
+        const localizedLevel = getLocalizedLevel(language.slug, level, t);
 
         return (
           <div
@@ -50,9 +54,9 @@ export function CourseLevelAccordion({
                   {level.code}
                 </div>
                 <div>
-                  <p className="font-semibold">{level.title}</p>
+                  <p className="font-semibold">{localizedLevel.title}</p>
                   <p className="text-sm text-muted-foreground">
-                    {level.description}
+                    {localizedLevel.description}
                   </p>
                 </div>
               </div>

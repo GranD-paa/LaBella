@@ -70,7 +70,7 @@ export function buildContinueLearningSnapshot(
     lastActivityTopic = mostRecent.quizTitle;
   }
 
-  const continueHref = `/learn/${italian?.slug ?? "italian"}/${levelSlug}/${lastActivityCategory === "quiz" ? "grammar" : lastActivityCategory}`;
+  const continueHref = `/learn/${italian?.slug ?? "italian"}/${levelSlug}`;
 
   return {
     languageSlug: italian?.slug ?? "italian",

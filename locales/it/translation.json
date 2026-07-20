@@ -96,7 +96,49 @@
   "curriculum": {
     "italian": {
       "headline": "Impara la lingua italiana",
-      "description": "Percorso A1 strutturato ispirato a libri di testo e risorse didattiche affidabili."
+      "description": "Percorso A1 strutturato ispirato a libri di testo e risorse didattiche affidabili.",
+      "levels": {
+        "a1-1": {
+          "title": "Fondamenti e saluti",
+          "description": "Alfabeto, pronuncia e saluti essenziali."
+        },
+        "a1-2": {
+          "title": "Presentarsi",
+          "description": "Dati personali, paesi e nazionalità."
+        },
+        "a1-3": {
+          "title": "Routine quotidiane",
+          "description": "Verbi comuni, espressioni di tempo e abitudini."
+        },
+        "a1-4": {
+          "title": "Famiglia e relazioni",
+          "description": "Familiari, possessivi e descrizioni."
+        },
+        "a1-5": {
+          "title": "Cibo e ristorante",
+          "description": "Vocabolario del ristorante e frasi per ordinare."
+        },
+        "a1-6": {
+          "title": "Shopping e prezzi",
+          "description": "Numeri, quantità e linguaggio del mercato."
+        },
+        "a1-7": {
+          "title": "Viaggi e indicazioni",
+          "description": "Trasporti, luoghi e chiedere aiuto."
+        },
+        "a1-8": {
+          "title": "Salute e benessere",
+          "description": "Corpo, sintomi e conversazioni in farmacia."
+        },
+        "a1-9": {
+          "title": "Lavoro e studi",
+          "description": "Professioni, orari e linguaggio scolastico."
+        },
+        "a1-10": {
+          "title": "Ripasso e verifica A1",
+          "description": "Consolidare grammatica, vocabolario e pratica d'esame."
+        }
+      }
     },
     "english": {
       "headline": "Impara la lingua inglese",
@@ -115,7 +157,10 @@
     "backToMenu": "Torna al menu principale",
     "courseLevels": "Livelli del corso",
     "courseLevelsHint": "Espandi un modulo e apri grammatica, vocabolario, apprendimento visivo e quiz.",
-    "chooseCategory": "Scegli una categoria per continuare il tuo percorso italiano.",
+    "chooseCategory": "Scegli un modulo qui sotto per continuare il tuo percorso.",
+    "chooseCategoryTitle": "Cosa vuoi studiare oggi?",
+    "moduleCount": "{count} moduli",
+    "quizCount": "{count} quiz",
     "backToCategories": "Torna alle categorie {code}",
     "contentPreparing": "I contenuti per {code} sono in preparazione. Torna presto o chiedi a un admin di aggiungere la lezione {order}.",
     "categories": {
@@ -309,6 +354,7 @@
     "nextQuestion": "Domanda successiva",
     "submitAnswers": "Invia risposte",
     "submitting": "Invio in corso...",
+    "reviewAttempt": "Rivedi",
     "browse": {
       "backToDashboard": "Torna alla dashboard",
       "stepLanguage": "Passo 1 · Lingua",

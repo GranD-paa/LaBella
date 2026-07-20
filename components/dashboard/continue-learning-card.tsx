@@ -2,6 +2,7 @@
 
 import { useTranslations } from "@/components/providers/locale-provider";
 import type { ContinueLearningSnapshot } from "@/lib/dashboard/continue-learning";
+import { getLocalizedLanguageName } from "@/lib/curriculum/localize";
 import { cn } from "@/lib/utils";
 
 export function ContinueLearningCard({
@@ -11,7 +12,7 @@ export function ContinueLearningCard({
 }) {
   const { t } = useTranslations();
 
-  const languageName = t("locale.italian");
+  const languageName = getLocalizedLanguageName(snapshot.languageSlug as "italian", t);
   const categoryLabel = t(
     `learn.categories.${snapshot.lastActivityCategory}.title`
   );

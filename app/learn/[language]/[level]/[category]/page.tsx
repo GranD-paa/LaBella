@@ -110,11 +110,8 @@ export default async function CategoryPage({ params }: PageProps) {
 
   return (
     <LearnCategoryView
-      languageName={language.name}
-      languageSlug={language.slug}
-      levelCode={level.code}
-      levelSlug={level.slug}
-      levelOrderNumber={level.orderNumber}
+      language={language}
+      level={level}
       category={category}
       lesson={lesson}
       vocabulary={vocabulary}

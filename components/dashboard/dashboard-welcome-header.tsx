@@ -10,6 +10,11 @@ import type {
   ContinueLearningSnapshot,
   LearnerEngagementMetrics,
 } from "@/lib/dashboard/continue-learning";
+import {
+  getLocalizedLanguageName,
+  getLocalizedLevel,
+} from "@/lib/curriculum/localize";
+import { ITALIAN_LEVELS } from "@/lib/curriculum/italian";
 
 type DashboardWelcomeHeaderProps = {
   displayName: string;
@@ -34,7 +39,13 @@ export function DashboardWelcomeHeader({
   engagement,
 }: DashboardWelcomeHeaderProps) {
   const { t } = useTranslations();
-  const languageName = t("locale.italian");
+  const languageName = getLocalizedLanguageName(snapshot.languageSlug as "italian", t);
+  const levelDefinition = ITALIAN_LEVELS.find(
+    (entry) => entry.slug === snapshot.levelSlug
+  );
+  const activeCourseTitle = levelDefinition
+    ? getLocalizedLevel(snapshot.languageSlug as "italian", levelDefinition, t).title
+    : snapshot.activeCourseTitle;
 
   const hasEngagementMetrics =
     engagement.streakDays !== null ||
@@ -89,7 +100,7 @@ export function DashboardWelcomeHeader({
                 {t("dashboard.user.activeCourseLabel")}
               </dt>
               <dd className="text-base font-semibold sm:text-lg">
-                {snapshot.activeCourseTitle}
+                {activeCourseTitle}
               </dd>
             </div>
           </dl>

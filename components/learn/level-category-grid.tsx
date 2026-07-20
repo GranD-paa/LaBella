@@ -1,12 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  BookMarked,
-  Eye,
-  Languages,
-  ListChecks,
-} from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
@@ -18,74 +13,131 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CATEGORY_DEFINITIONS } from "@/lib/curriculum/languages";
+import {
+  CATEGORY_ACCENTS,
+  CATEGORY_ICON_BG,
+  CATEGORY_ICONS,
+} from "@/lib/curriculum/category-theme";
+import {
+  getLocalizedLanguageName,
+  getLocalizedLevel,
+} from "@/lib/curriculum/localize";
 import { CATEGORY_MESSAGE_KEYS } from "@/lib/i18n/content-keys";
-import type { LanguageSlug, LevelSlug } from "@/lib/curriculum/types";
+import type {
+  CurriculumLanguage,
+  CurriculumLevel,
+} from "@/lib/curriculum/types";
 import { cn } from "@/lib/utils";
 
-const CATEGORY_ICONS = {
-  grammar: BookMarked,
-  vocabulary: Languages,
-  visual: Eye,
-  quiz: ListChecks,
-} as const;
+type LevelCategoryGridProps = {
+  language: CurriculumLanguage;
+  level: CurriculumLevel;
+};
 
-const CATEGORY_ACCENTS = {
-  grammar: "from-violet-500/15 to-purple-500/5",
-  vocabulary: "from-sky-500/15 to-blue-500/5",
-  visual: "from-amber-500/15 to-yellow-500/5",
-  quiz: "from-emerald-500/15 to-green-500/5",
-} as const;
-
-export function LevelCategoryGrid({
-  language,
-  level,
-  levelCode,
-  levelTitle,
-}: {
-  language: LanguageSlug;
-  level: LevelSlug;
-  levelCode: string;
-  levelTitle: string;
-}) {
+export function LevelCategoryGrid({ language, level }: LevelCategoryGridProps) {
   const { t } = useTranslations();
+  const languageLabel = getLocalizedLanguageName(language.slug, t);
+  const localizedLevel = getLocalizedLevel(language.slug, level, t);
+  const moduleCount = CATEGORY_DEFINITIONS.length;
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Badge className="border-brand-accent/30 bg-brand-accent/10 text-brand-accent">
-          {levelCode}
-        </Badge>
-        <h1 className="text-3xl font-bold tracking-tight">{levelTitle}</h1>
-        <p className="text-muted-foreground">{t("learn.chooseCategory")}</p>
-      </div>
+    <div className="space-y-8">
+      <section className="brand-surface relative overflow-hidden rounded-2xl border border-white/10 p-6 sm:p-8">
+        <div className="absolute inset-0 bg-brand-gradient opacity-20" />
+        <div className="pointer-events-none absolute -end-10 -top-10 h-40 w-40 rounded-full bg-brand-accent/15 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-16 start-8 h-32 w-32 rounded-full bg-secondary/20 blur-3xl" />
+
+        <div className="relative space-y-6">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="text-3xl sm:text-4xl" aria-hidden>
+              {language.flagEmoji}
+            </span>
+            <Badge
+              variant="outline"
+              className="border-white/15 bg-white/5 text-foreground"
+            >
+              {languageLabel}
+            </Badge>
+            <Badge className="border-brand-accent/30 bg-brand-accent/15 text-brand-accent hover:bg-brand-accent/15">
+              {level.code}
+            </Badge>
+          </div>
+
+          <div className="space-y-3">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              {localizedLevel.title}
+            </h1>
+            {localizedLevel.description ? (
+              <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+                {localizedLevel.description}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-accent/15 text-brand-accent">
+                <Sparkles className="h-4 w-4" />
+              </div>
+              <div className="space-y-1">
+                <p className="font-medium text-foreground">
+                  {t("learn.chooseCategoryTitle")}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {t("learn.chooseCategory")}
+                </p>
+              </div>
+            </div>
+            <Badge
+              variant="secondary"
+              className="w-fit shrink-0 border-white/10 bg-white/5 text-xs font-medium uppercase tracking-wide"
+            >
+              {t("learn.moduleCount", { count: moduleCount })}
+            </Badge>
+          </div>
+        </div>
+      </section>
 
       <div className="grid gap-4 sm:grid-cols-2">
         {CATEGORY_DEFINITIONS.map((category) => {
           const Icon = CATEGORY_ICONS[category.slug];
           const messageKey = CATEGORY_MESSAGE_KEYS[category.slug];
+
           return (
             <Link
               key={category.slug}
-              href={category.href(language, level)}
+              href={category.href(language.slug, level.slug)}
               className="group block"
             >
-              <Card className="brand-surface h-full overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-brand-accent/30 hover:shadow-brand">
+              <Card className="brand-surface h-full overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-brand-accent/35 hover:shadow-brand">
                 <div
                   className={cn(
-                    "h-1.5 bg-gradient-to-r",
+                    "h-1 bg-gradient-to-r",
                     CATEGORY_ACCENTS[category.slug]
                   )}
                 />
-                <CardHeader>
-                  <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-secondary/40 text-brand-accent transition-transform group-hover:scale-110">
+                <CardHeader className="space-y-4">
+                  <div
+                    className={cn(
+                      "flex h-12 w-12 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-105",
+                      CATEGORY_ICON_BG[category.slug]
+                    )}
+                  >
                     <Icon className="h-5 w-5" />
                   </div>
-                  <CardTitle>{t(`${messageKey}.title`)}</CardTitle>
-                  <CardDescription>{t(`${messageKey}.description`)}</CardDescription>
+                  <div className="space-y-2">
+                    <CardTitle className="text-xl">{t(`${messageKey}.title`)}</CardTitle>
+                    <CardDescription className="text-sm leading-relaxed">
+                      {t(`${messageKey}.description`)}
+                    </CardDescription>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <span className="text-sm font-medium text-brand-accent">
+                  <span className="inline-flex items-center gap-1 text-sm font-semibold text-brand-accent transition-transform group-hover:gap-2">
                     {t("common.openModule")}
+                    <span aria-hidden className="transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5">
+                      ←
+                    </span>
                   </span>
                 </CardContent>
               </Card>
