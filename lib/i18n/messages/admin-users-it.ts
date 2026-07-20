@@ -69,6 +69,17 @@ export const adminUsersIt = {
     permissionRoles: "Gestisci ruoli",
     permissionFull: "Accesso completo alla piattaforma",
     close: "Chiudi",
+    quizAttempts: "Risultati quiz",
+    quizAttemptsLoading: "Caricamento cronologia quiz…",
+    quizAttemptsEmpty: "Questo studente non ha ancora completato quiz.",
+    quizAttemptsLoadError: "Impossibile caricare la cronologia quiz.",
+    quizChecklistSummary: "{correct}/{total} corrette",
+    correctCount: "{count} corrette",
+    incorrectCount: "{count} errate",
+    userAnswer: "Risposta dello studente",
+    correctAnswer: "Risposta corretta",
+    quizChecklistUnavailable:
+      "La checklist dettagliata non è disponibile per questo tentativo.",
   },
   changeRoleDialog: {
     title: "Cambia ruolo per {name}",

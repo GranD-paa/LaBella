@@ -1,12 +1,14 @@
 import { z } from "zod";
 
+import { entityIdRecordSchema, entityIdSchema } from "@/lib/validations/entity-id";
+
 const answerOptionSchema = z.enum(["a", "b", "c", "d"], {
   message: "Please select an answer",
 });
 
 export const submitQuizSchema = z.object({
-  quizId: z.string().uuid("Invalid quiz"),
-  answers: z.record(z.string().uuid(), z.string().min(1, "Please provide an answer")),
+  quizId: entityIdSchema("Invalid quiz"),
+  answers: entityIdRecordSchema("Please provide an answer"),
 });
 
 export type SubmitQuizValues = z.infer<typeof submitQuizSchema>;
@@ -25,7 +27,7 @@ export function createSubmitQuizSchema(
   );
 
   return z.object({
-    quizId: z.string().uuid("Invalid quiz"),
+    quizId: entityIdSchema("Invalid quiz"),
     answers: z.object(answerFields),
   });
 }

@@ -39,6 +39,7 @@ export default async function ProfilePage() {
     const quiz = quizMap.get(attempt.quiz_id);
     return {
       id: attempt.id,
+      quizId: attempt.quiz_id,
       score: attempt.score,
       created_at: attempt.created_at,
       lessonName: quiz?.lessonTitle ?? "",

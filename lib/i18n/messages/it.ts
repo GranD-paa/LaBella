@@ -282,6 +282,14 @@ export const it: Messages = {
       activityHint: "Risultati recenti dei quiz e traguardi di apprendimento.",
       noActivity: "Nessuna attività. Inizia un quiz dal percorso italiano.",
       goToItalian: "Vai al corso di italiano",
+      quizSubmittedTitle: "Grazie per aver completato il quiz!",
+      quizSubmittedDescription:
+        "Le tue risposte sono state salvate. Continua ad imparare dalla dashboard.",
+      quizSubmittedDescriptionWithScore:
+        "Il tuo punteggio è {score}%. Le risposte sono state salvate — continua con la prossima lezione.",
+      quizSubmittedToast: "Quiz inviato con successo. Grazie!",
+      quizSubmittedToastWithScore:
+        "Quiz inviato — il tuo punteggio è {score}%. Grazie!",
     },
     admin: {
       badge: "Dashboard admin",

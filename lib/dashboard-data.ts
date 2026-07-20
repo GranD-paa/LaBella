@@ -91,12 +91,13 @@ export async function fetchUserDashboardData(
   userId: string,
   email: string | null
 ): Promise<UserDashboardData> {
-  const [profile, lessons, quizzes, attempts, quizQuestions] =
+  const [profile, lessons, quizzes, attempts, learningState, quizQuestions] =
     await Promise.all([
       repo.getProfileById(userId),
       repo.getLessons(),
       repo.getQuizzes(),
       repo.getAttemptsByUserId(userId),
+      repo.getLearningState(userId),
       Promise.all(
         (await repo.getQuizzes()).map(async (quiz) => {
           const questions = await repo.getQuizQuestionsByQuizId(quiz.id);
@@ -187,6 +188,7 @@ export async function fetchUserDashboardData(
       completedQuizDetails,
       completedQuizzes: completedQuizDetails.length,
       totalQuizzes: quizzes.length,
+      learningState,
     }),
     engagement: buildLearnerEngagementMetrics(),
   };

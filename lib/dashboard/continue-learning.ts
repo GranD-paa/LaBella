@@ -1,6 +1,6 @@
 import { LANGUAGES } from "@/lib/curriculum/languages";
 import { ITALIAN_LEVELS } from "@/lib/curriculum/italian";
-import type { Quiz, UserQuizAttempt } from "@/types";
+import type { Quiz, UserLearningState, UserQuizAttempt } from "@/types";
 
 export type ContinueLearningCategory = "grammar" | "vocabulary" | "quiz" | "visual";
 
@@ -33,7 +33,17 @@ type BuildContinueLearningInput = {
   }>;
   completedQuizzes: number;
   totalQuizzes: number;
+  learningState?: UserLearningState | null;
 };
+
+function resolveLevelFromSlug(levelSlug: string) {
+  const matchedLevel = ITALIAN_LEVELS.find((level) => level.slug === levelSlug);
+  return {
+    levelSlug,
+    levelCode: matchedLevel?.code ?? levelSlug.toUpperCase(),
+    activeCourseTitle: matchedLevel?.title ?? levelSlug,
+  };
+}
 
 export function buildContinueLearningSnapshot(
   input: BuildContinueLearningInput
@@ -56,24 +66,37 @@ export function buildContinueLearningSnapshot(
   let lastActivityCategory: ContinueLearningCategory = "grammar";
   let lastActivityTopic = "";
 
-  if (mostRecent) {
+  if (input.learningState?.level_slug) {
+    const resolved = resolveLevelFromSlug(input.learningState.level_slug);
+    levelSlug = resolved.levelSlug;
+    levelCode = resolved.levelCode;
+    activeCourseTitle = resolved.activeCourseTitle;
+
+    if (
+      input.learningState.section_slug === "grammar" ||
+      input.learningState.section_slug === "vocabulary" ||
+      input.learningState.section_slug === "quiz" ||
+      input.learningState.section_slug === "visual"
+    ) {
+      lastActivityCategory = input.learningState.section_slug;
+    }
+  } else if (mostRecent) {
     const quiz = input.quizzes.find((entry) => entry.id === mostRecent.quizId);
     if (quiz?.level_slug) {
-      levelSlug = quiz.level_slug;
-      const matchedLevel = ITALIAN_LEVELS.find(
-        (level) => level.slug === quiz.level_slug
-      );
-      levelCode = matchedLevel?.code ?? levelCode;
-      activeCourseTitle = matchedLevel?.title ?? activeCourseTitle;
+      const resolved = resolveLevelFromSlug(quiz.level_slug);
+      levelSlug = resolved.levelSlug;
+      levelCode = resolved.levelCode;
+      activeCourseTitle = resolved.activeCourseTitle;
     }
     lastActivityCategory = "quiz";
     lastActivityTopic = mostRecent.quizTitle;
   }
 
-  const continueHref = `/learn/${italian?.slug ?? "italian"}/${levelSlug}`;
+  const languageSlug = input.learningState?.language_slug ?? italian?.slug ?? "italian";
+  const continueHref = `/learn/${languageSlug}/${levelSlug}`;
 
   return {
-    languageSlug: italian?.slug ?? "italian",
+    languageSlug,
     flagEmoji: italian?.flagEmoji ?? "🇮🇹",
     levelCode,
     levelSlug,

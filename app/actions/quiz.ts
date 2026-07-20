@@ -4,8 +4,9 @@ import { revalidateAppContent } from "@/lib/revalidate-paths";
 import { redirect } from "next/navigation";
 
 import { getDataRepository } from "@/lib/data";
-import { getLearnQuizHref } from "@/lib/quiz-management/learn-path";
-import { scoreWrittenAnswer } from "@/lib/quiz-management/types";
+import { advanceLearningAfterQuiz } from "@/lib/quiz/advance-learning";
+import { buildQuizAttemptAnswersJson } from "@/lib/quiz/attempt-payload";
+import { gradeAnswer } from "@/lib/quiz/grading";
 import { submitQuizSchema } from "@/lib/validations/quiz";
 import type { ActionResult } from "@/lib/action-result";
 
@@ -36,7 +37,7 @@ export async function submitQuizAction(
 
   const [quiz, questions, profile] = await Promise.all([
     repo.getQuizById(quizId),
-    repo.getQuizQuestionAnswers(quizId),
+    repo.getQuizQuestionsByQuizId(quizId),
     repo.getProfileById(user.id),
   ]);
 
@@ -60,23 +61,19 @@ export async function submitQuizAction(
 
   let correctCount = 0;
   for (const question of questions) {
-    const userAnswer = answers[question.id];
-    if (question.question_type === "written") {
-      if (scoreWrittenAnswer(userAnswer, question.expected_answer)) {
-        correctCount++;
-      }
-    } else if (userAnswer === question.correct_option) {
+    if (gradeAnswer(question, answers[question.id])) {
       correctCount++;
     }
   }
 
   const score = Math.round((correctCount / questions.length) * 100);
+  const answersJson = buildQuizAttemptAnswersJson(questions, answers);
 
   const result = await repo.createQuizAttempt({
     userId: user.id,
     quizId,
     score,
-    answersJson: answers,
+    answersJson,
   });
 
   if (result.error) {
@@ -86,6 +83,8 @@ export async function submitQuizAction(
     };
   }
 
+  await advanceLearningAfterQuiz(repo, user.id, quiz);
+
   revalidateAppContent(quiz.lesson_id);
-  redirect(getLearnQuizHref(quiz));
+  redirect(`/dashboard?quizSubmitted=1&score=${score}`);
 }

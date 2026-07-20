@@ -60,13 +60,17 @@ export function ProfileView({ fullName, email, historyRows }: ProfileViewProps) 
         </CardContent>
       </Card>
 
-      <div className="space-y-4">
-        <div>
-          <h2 className="text-xl font-semibold">{t("profile.quizHistory")}</h2>
-          <p className="text-sm text-muted-foreground">{t("profile.quizHistoryHint")}</p>
+      <section className="brand-surface space-y-5 rounded-2xl border border-white/10 p-6 shadow-brand sm:p-8">
+        <div className="space-y-2 text-center">
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            {t("profile.quizHistory")}
+          </h2>
+          <p className="mx-auto max-w-lg text-sm text-muted-foreground">
+            {t("profile.quizHistoryHint")}
+          </p>
         </div>
         <QuizHistoryTable attempts={historyRows} />
-      </div>
+      </section>
     </div>
   );
 }

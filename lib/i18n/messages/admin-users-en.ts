@@ -69,6 +69,17 @@ export const adminUsersEn = {
     permissionRoles: "Manage roles",
     permissionFull: "Full platform access",
     close: "Close",
+    quizAttempts: "Quiz results",
+    quizAttemptsLoading: "Loading quiz history…",
+    quizAttemptsEmpty: "This learner has not completed any quizzes yet.",
+    quizAttemptsLoadError: "Could not load quiz history.",
+    quizChecklistSummary: "{correct}/{total} correct",
+    correctCount: "{count} correct",
+    incorrectCount: "{count} incorrect",
+    userAnswer: "Learner answer",
+    correctAnswer: "Correct answer",
+    quizChecklistUnavailable:
+      "Detailed answer checklist is not available for this attempt.",
   },
   changeRoleDialog: {
     title: "Change role for {name}",

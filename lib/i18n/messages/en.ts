@@ -280,6 +280,14 @@ export const en = {
       activityHint: "Recent quiz results and learning milestones.",
       noActivity: "No activity yet. Start a quiz from the Italian learning path.",
       goToItalian: "Go to Italian course",
+      quizSubmittedTitle: "Thank you for completing the quiz!",
+      quizSubmittedDescription:
+        "Your answers have been saved. Continue learning from your dashboard.",
+      quizSubmittedDescriptionWithScore:
+        "Your score is {score}%. Your answers have been saved — keep going with the next lesson.",
+      quizSubmittedToast: "Quiz submitted successfully. Thank you!",
+      quizSubmittedToastWithScore:
+        "Quiz submitted — your score is {score}%. Thank you!",
     },
     admin: {
       badge: "Admin Dashboard",

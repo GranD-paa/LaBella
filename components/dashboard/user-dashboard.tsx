@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import {
   Award,
@@ -14,6 +15,7 @@ import {
 
 import { ContinueLearningCard } from "@/components/dashboard/continue-learning-card";
 import { DashboardWelcomeHeader } from "@/components/dashboard/dashboard-welcome-header";
+import { QuizSubmittedBanner } from "@/components/dashboard/quiz-submitted-banner";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +44,10 @@ export function UserDashboard({
 
   return (
     <div className="space-y-8">
+      <Suspense fallback={null}>
+        <QuizSubmittedBanner />
+      </Suspense>
+
       <DashboardWelcomeHeader
         displayName={displayName}
         avatarUrl={data.profile?.avatar_url}

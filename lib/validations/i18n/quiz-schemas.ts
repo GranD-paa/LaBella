@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { entityIdSchema } from "@/lib/validations/entity-id";
+
 type Translator = (
   key: string,
   params?: Record<string, string | number>
@@ -24,16 +26,16 @@ export function createSubmitQuizSchema(
   );
 
   return z.object({
-    quizId: z.string().uuid(t("validation.quiz.invalidQuiz")),
+    quizId: entityIdSchema(t("validation.quiz.invalidQuiz")),
     answers: z.object(answerFields),
   });
 }
 
 export function createBaseSubmitQuizSchema(t: Translator) {
   return z.object({
-    quizId: z.string().uuid(t("validation.quiz.invalidQuiz")),
+    quizId: entityIdSchema(t("validation.quiz.invalidQuiz")),
     answers: z.record(
-      z.string().uuid(),
+      z.string().min(1),
       z.string().min(1, t("validation.quiz.provideAnswer"))
     ),
   });

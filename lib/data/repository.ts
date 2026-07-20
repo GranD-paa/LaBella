@@ -9,6 +9,7 @@ import type {
   VideoLesson,
   Vocabulary,
 } from "@/types";
+import type { Json } from "@/types/database.types";
 
 export type AuthUser = {
   id: string;
@@ -109,7 +110,7 @@ export interface DataRepository {
     userId: string;
     quizId: string;
     score: number;
-    answersJson: Record<string, string>;
+    answersJson: Json;
   }): Promise<{ error?: string; code?: number }>;
 
   // Admin content mutations

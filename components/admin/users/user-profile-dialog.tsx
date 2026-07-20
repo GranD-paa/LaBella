@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { ROLE_DEFINITIONS } from "@/lib/permissions/roles";
+import { UserQuizAttemptsPanel } from "@/components/admin/users/user-quiz-attempts-panel";
 import type { ManagedUser } from "@/components/admin/users/types";
 
 const PERMISSION_ROWS = [
@@ -39,7 +40,7 @@ export function UserProfileDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t("admin.users.profileDialog.title")}</DialogTitle>
           <DialogDescription>{displayName}</DialogDescription>
@@ -122,6 +123,15 @@ export function UserProfileDialog({
                 );
               })}
             </ul>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {t("admin.users.profileDialog.quizAttempts")}
+            </p>
+            <UserQuizAttemptsPanel userId={user.id} />
           </div>
         </div>
       </DialogContent>

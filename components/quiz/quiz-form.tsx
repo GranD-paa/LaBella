@@ -33,6 +33,7 @@ import {
   createSubmitQuizSchema,
   type SubmitQuizValues,
 } from "@/lib/validations/i18n/quiz-schemas";
+import { parseStoredAnswers } from "@/lib/quiz/attempt-payload";
 import { cn } from "@/lib/utils";
 import type { Json } from "@/types/database.types";
 
@@ -47,17 +48,6 @@ type QuestionFeedback = {
   isCorrect: boolean;
   userAnswer: string;
 };
-
-function parseSavedAnswers(answersJson: Json): Record<string, string> {
-  if (
-    typeof answersJson === "object" &&
-    answersJson !== null &&
-    !Array.isArray(answersJson)
-  ) {
-    return answersJson as Record<string, string>;
-  }
-  return {};
-}
 
 function buildInitialFeedback(
   questions: GradedQuizQuestion[],
@@ -105,7 +95,7 @@ export function QuizForm({
   const reducedMotion = useReducedMotion();
 
   const lockedAnswers = useMemo(
-    () => (savedAnswers ? parseSavedAnswers(savedAnswers) : {}),
+    () => (savedAnswers ? parseStoredAnswers(savedAnswers) : {}),
     [savedAnswers]
   );
 
@@ -162,11 +152,18 @@ export function QuizForm({
       return;
     }
 
+    const answers = { ...values.answers };
+    for (const question of questions) {
+      if (!answers[question.id]?.trim() && feedback[question.id]) {
+        answers[question.id] = feedback[question.id].userAnswer;
+      }
+    }
+
     setFormError(null);
     startTransition(async () => {
       const result = await submitQuizAction({
         quizId,
-        answers: values.answers,
+        answers,
       });
       if (result && "error" in result) {
         const errorMessage = resolveMessage(t, result.error);
@@ -174,6 +171,16 @@ export function QuizForm({
         toast.error(errorMessage);
       }
     });
+  }
+
+  function onInvalid() {
+    const firstError = Object.values(form.formState.errors.answers ?? {})[0];
+    const message =
+      typeof firstError === "object" && firstError && "message" in firstError
+        ? String(firstError.message)
+        : t("actions.errors.invalidSubmission");
+    setFormError(message);
+    toast.error(message);
   }
 
   return (
@@ -214,7 +221,7 @@ export function QuizForm({
       )}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-8">
           {questions.map((question, index) => {
             const isWritten = question.question_type === "written";
             const isVisible = locked || index === currentStep;

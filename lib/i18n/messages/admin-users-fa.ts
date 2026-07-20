@@ -68,6 +68,17 @@ export const adminUsersFa = {
     permissionRoles: "مدیریت نقش‌ها",
     permissionFull: "دسترسی کامل به پلتفرم",
     close: "بستن",
+    quizAttempts: "نتایج آزمون",
+    quizAttemptsLoading: "در حال بارگذاری تاریخچه آزمون…",
+    quizAttemptsEmpty: "این یادگیرنده هنوز آزمونی تکمیل نکرده است.",
+    quizAttemptsLoadError: "بارگذاری تاریخچه آزمون ممکن نشد.",
+    quizChecklistSummary: "{correct} از {total} درست",
+    correctCount: "{count} درست",
+    incorrectCount: "{count} نادرست",
+    userAnswer: "پاسخ یادگیرنده",
+    correctAnswer: "پاسخ صحیح",
+    quizChecklistUnavailable:
+      "چک‌لیست جزئیات پاسخ برای این تلاش در دسترس نیست.",
   },
   changeRoleDialog: {
     title: "تغییر نقش برای {name}",

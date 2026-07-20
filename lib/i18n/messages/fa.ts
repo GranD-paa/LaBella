@@ -277,6 +277,13 @@ export const fa: Messages = {
       activityHint: "نتایج اخیر آزمون و نقاط عطف یادگیری.",
       noActivity: "هنوز فعالیتی نیست. از مسیر یادگیری ایتالیایی یک آزمون شروع کنید.",
       goToItalian: "رفتن به دوره ایتالیایی",
+      quizSubmittedTitle: "از تکمیل آزمون متشکریم!",
+      quizSubmittedDescription:
+        "پاسخ‌های شما ذخیره شد. از داشبورد یادگیری را ادامه دهید.",
+      quizSubmittedDescriptionWithScore:
+        "نمره شما {score}% است. پاسخ‌ها ذخیره شد — درس بعدی را ادامه دهید.",
+      quizSubmittedToast: "آزمون با موفقیت ثبت شد. متشکریم!",
+      quizSubmittedToastWithScore: "آزمون ثبت شد — نمره شما {score}%. متشکریم!",
     },
     admin: {
       badge: "داشبورد مدیر",
