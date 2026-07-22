@@ -136,3 +136,18 @@ export function computeNextCodeForBand(
   const code = `${band}-${nextNumber}`;
   return { code, slug: code.toLowerCase() };
 }
+
+/** Next order number within one language's curriculum (not global lessons). */
+export function computeNextOrderNumberForLanguage(
+  levels: CurriculumLevel[]
+): number {
+  let highest = 0;
+
+  for (const level of levels) {
+    if (level.orderNumber > highest) {
+      highest = level.orderNumber;
+    }
+  }
+
+  return highest + 1;
+}

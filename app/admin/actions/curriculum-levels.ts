@@ -1,7 +1,11 @@
 "use server";
 
 import type { ActionResult } from "@/lib/action-result";
-import { getAdminCurriculumLevelsByLanguage, computeNextCodeForBand } from "@/lib/curriculum/level-overrides";
+import {
+  computeNextCodeForBand,
+  computeNextOrderNumberForLanguage,
+  getAdminCurriculumLevelsByLanguage,
+} from "@/lib/curriculum/level-overrides";
 import { isLanguageSlug } from "@/lib/curriculum/languages";
 import { CEFR_BANDS, type CefrBand } from "@/lib/curriculum/types";
 import { getDataRepository } from "@/lib/data";
@@ -64,9 +68,7 @@ export async function addCurriculumLevelAction(
     return { error: "actions.errors.generic" };
   }
 
-  const lessons = await repo.getLessons();
-  const nextOrderNumber =
-    lessons.reduce((max, lesson) => Math.max(max, lesson.order_number), 0) + 1;
+  const nextOrderNumber = computeNextOrderNumberForLanguage(currentLevels);
 
   const trimmedDescription = description.trim();
 
