@@ -27,6 +27,24 @@ export function createLessonSchema(t: Translator) {
   });
 }
 
+export function createCurriculumLevelSchema(t: Translator) {
+  return z.object({
+    title: z
+      .string()
+      .min(2, t("validation.admin.titleMin"))
+      .max(150, t("validation.admin.titleMax")),
+    description: optionalText(t, 2000),
+  });
+}
+
+export function createAddCurriculumLevelSchema(t: Translator) {
+  return createCurriculumLevelSchema(t).extend({
+    band: z.enum(["A1", "A2", "B1", "B2", "C1", "C2"], {
+      error: t("validation.admin.selectLevel"),
+    }),
+  });
+}
+
 export function createVocabularySchema(t: Translator) {
   return z.object({
     lessonId: z.string().uuid(t("validation.admin.selectLesson")),
@@ -203,6 +221,12 @@ export function createQuizSchema(t: Translator) {
 }
 
 export type LessonValues = z.infer<ReturnType<typeof createLessonSchema>>;
+export type CurriculumLevelValues = z.infer<
+  ReturnType<typeof createCurriculumLevelSchema>
+>;
+export type AddCurriculumLevelValues = z.infer<
+  ReturnType<typeof createAddCurriculumLevelSchema>
+>;
 export type VocabularyValues = z.infer<
   ReturnType<typeof createVocabularySchema>
 >;

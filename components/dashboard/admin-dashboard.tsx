@@ -148,11 +148,13 @@ export function AdminDashboard({
   data,
   displayName,
   showFullManagement = false,
+  isSuperAdmin = false,
 }: {
   data: AdminDashboardData;
   displayName: string;
   currentUserId?: string;
   showFullManagement?: boolean;
+  isSuperAdmin?: boolean;
 }) {
   const { t, formatDate } = useTranslations();
   const [expandedLevel, setExpandedLevel] = useState<string | null>(null);
@@ -213,6 +215,13 @@ export function AdminDashboard({
                   {t("dashboard.admin.manageUsers")}
                 </Link>
               </Button>
+              {isSuperAdmin ? (
+                <Button asChild variant="outline" className="border-white/20">
+                  <Link href="/admin/languages">
+                    {t("dashboard.admin.manageLanguages")}
+                  </Link>
+                </Button>
+              ) : null}
             </div>
           )}
         </div>

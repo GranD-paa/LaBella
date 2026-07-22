@@ -343,6 +343,7 @@ export const it: Messages = {
       quickActionsHint: "Accedi rapidamente alle attività admin comuni.",
       manageQuizzes: "Gestisci quiz e contenuti",
       manageUsers: "Gestisci utenti",
+      manageLanguages: "Gestisci lingue",
       contentManagement: "Gestione contenuti",
       contentManagementHint:
         "Crea, modifica e pubblica lezioni, vocabolario, grammatica e quiz.",

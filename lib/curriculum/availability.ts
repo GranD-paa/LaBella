@@ -1,19 +1,30 @@
 import { LANGUAGES } from "@/lib/curriculum/languages";
+import { mergeLevelOverrides } from "@/lib/curriculum/level-overrides";
 import type { CurriculumLanguage, LanguageSlug } from "@/lib/curriculum/types";
 import type { DataRepository } from "@/lib/data/repository";
 
 /**
- * Returns the full language list with each `available` flag resolved from
- * the persisted super-admin overrides (falling back to the static default
- * in `lib/curriculum/languages.ts` when no override exists yet).
+ * Returns the full language list with each `available` flag and `levels`
+ * list resolved from the persisted super-admin overrides (falling back to
+ * the static defaults in `lib/curriculum/languages.ts` when no override
+ * exists yet). This is what every learner-facing page should use so that
+ * renamed or newly added levels show up immediately.
  */
 export async function getLanguagesWithAvailability(
   repo: DataRepository
 ): Promise<CurriculumLanguage[]> {
-  const overrides = await repo.getLanguageAvailability();
+  const [availabilityOverrides, levelOverrides] = await Promise.all([
+    repo.getLanguageAvailability(),
+    repo.getCurriculumLevelOverrides(),
+  ]);
+
   return LANGUAGES.map((language) => ({
     ...language,
-    available: overrides[language.slug] ?? language.available,
+    available: availabilityOverrides[language.slug] ?? language.available,
+    levels: mergeLevelOverrides(
+      language.levels,
+      levelOverrides.filter((row) => row.languageSlug === language.slug)
+    ),
   }));
 }
 

@@ -1,4 +1,9 @@
 export const adminLanguagesFa = {
+  pageBadge: "مدیریت زبان",
+  pageHello: "مرکز مدیریت زبان، {name}",
+  pageSubtitle:
+    "بخش‌های زبانی دوره را برای یادگیرندگان در سطح کل پلتفرم باز یا بسته کنید.",
+  backToDashboard: "بازگشت به داشبورد",
   title: "مدیریت زبان‌ها",
   description:
     "بخش‌های زبانی دیگر را برای کاربران فعال کنید یا در حالت «به‌زودی» نگه دارید. فقط ادمین کل می‌تواند این تنظیم را تغییر دهد.",
@@ -18,4 +23,39 @@ export const adminLanguagesFa = {
     "زبان «{name}» دوباره از دید کاربران پنهان و «به‌زودی» علامت‌گذاری می‌شود.",
   openedSuccess: "زبان {name} اکنون فعال است",
   closedSuccess: "زبان {name} اکنون «به‌زودی» علامت‌گذاری شد",
+  curriculum: {
+    title: "شخصی‌سازی درس‌ها و سطوح",
+    description:
+      "اسم مراحل درسی را تغییر بده و با افزودن سطح‌های جدید CEFR (مثل A2، B1، B2) هر زبانی را فراتر از A1 گسترش بده. برای هر سطح جدید، به‌صورت خودکار یک جای محتوای مستقل ساخته می‌شود.",
+    levelsCount: "{count} سطح",
+    defaultBadge: "سطح پایه",
+    defaultBadgeHint: "این سطح از قبل محتوای واقعی دارد — قابل تغییر نام است ولی حذف نمی‌شود.",
+    customBadge: "سفارشی",
+    emptyState: "هنوز هیچ سطحی برای این زبان ثبت نشده — با «افزودن سطح» اولین مرحله را بساز.",
+    addLevel: "افزودن سطح",
+    addLevelTitle: "افزودن سطح جدید",
+    addLevelDescription:
+      "یک سطح جدید به برنامه درسی {language} اضافه می‌شود. یک جای محتوای متناظر هم به‌صورت خودکار ساخته می‌شود تا بلافاصله بتوانی برایش محتوا بسازی.",
+    band: "مرحله CEFR",
+    levelCodePreview: "کد سطح",
+    levelTitleLabel: "عنوان سطح",
+    levelTitlePlaceholder: "مثلاً: تسلط بر زمان گذشته",
+    levelDescriptionLabel: "توضیح سطح",
+    create: "ساخت سطح",
+    editAriaLabel: "ویرایش سطح",
+    editLevelTitle: "تغییر نام سطح",
+    editLevelDescription: "عنوان و توضیحی که کاربران برای {code} می‌بینند را به‌روز کن.",
+    saveChanges: "ذخیره تغییرات",
+    resetToDefault: "بازگشت به حالت پیش‌فرض",
+    resetConfirmTitle: "سطح {code} به نام پیش‌فرضش برگردد؟",
+    resetConfirmDescription: "عنوان و توضیح اصلی برای {code} بازگردانده می‌شود.",
+    deleteLevelTitle: "حذف {code}؟",
+    deleteLevelDescription:
+      "سطح {code} از برنامه درسی {language} حذف می‌شود و کاربران آن را نخواهند دید. محتوایی که قبلاً برای آن ساخته شده حفظ می‌شود ولی پنهان خواهد بود.",
+    levelAdded: "سطح {code} به {language} اضافه شد",
+    levelUpdated: "سطح {code} به‌روزرسانی شد",
+    levelDeleted: "سطح {code} حذف شد",
+    levelReset: "سطح {code} به نام پیش‌فرض بازگشت",
+    cannotDeleteDefault: "سطوح پایه قابل حذف نیستند، فقط می‌توان نامشان را تغییر داد یا بازنشانی کرد.",
+  },
 };

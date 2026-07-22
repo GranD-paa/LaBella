@@ -341,6 +341,7 @@ export const en = {
       quickActionsHint: "Jump into common admin tasks.",
       manageQuizzes: "Manage quizzes & content",
       manageUsers: "Manage users",
+      manageLanguages: "Manage languages",
       contentManagement: "Content management",
       contentManagementHint:
         "Create, edit, and publish lessons, vocabulary, grammar, and quizzes.",

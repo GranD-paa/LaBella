@@ -152,6 +152,30 @@ comment on table public.language_settings is
   'Super-admin toggles for opening additional language courses (e.g. German, Turkish, English) from "coming soon" to active.';
 
 -- =========================================================================
+-- 10. curriculum_level_overrides
+-- =========================================================================
+-- Super-admin customization of a language's curriculum structure: renaming
+-- a default level's title/description (is_custom = false), or adding a
+-- brand-new level for a later CEFR stage such as A2/B1/B2 (is_custom =
+-- true). Missing rows simply mean "use the static default" from
+-- `lib/curriculum/{italian,english,german,turkish}.ts`.
+create table if not exists public.curriculum_level_overrides (
+  id uuid primary key default gen_random_uuid(),
+  language_slug text not null,
+  slug text not null,
+  code text not null,
+  title text not null,
+  description text not null default '',
+  order_number integer not null,
+  is_custom boolean not null default false,
+  updated_at timestamptz not null default now(),
+  unique (language_slug, slug)
+);
+
+comment on table public.curriculum_level_overrides is
+  'Super-admin renames of default curriculum levels and brand-new levels (e.g. A2/B1/B2) added per language.';
+
+-- =========================================================================
 -- Indexes on foreign keys / common lookup columns
 -- =========================================================================
 create index if not exists vocabulary_lesson_id_idx on public.vocabulary (lesson_id);
@@ -175,6 +199,7 @@ alter table public.quiz_questions enable row level security;
 alter table public.user_quiz_attempts enable row level security;
 alter table public.user_learning_state enable row level security;
 alter table public.language_settings enable row level security;
+alter table public.curriculum_level_overrides enable row level security;
 
 alter table public.profiles force row level security;
 alter table public.lessons force row level security;
@@ -185,6 +210,7 @@ alter table public.quiz_questions force row level security;
 alter table public.user_quiz_attempts force row level security;
 alter table public.user_learning_state force row level security;
 alter table public.language_settings force row level security;
+alter table public.curriculum_level_overrides force row level security;
 
 -- -------------------------------------------------------------------------
 -- Helper: private.is_admin() — security definer so it can read
@@ -396,6 +422,25 @@ create policy "Language settings are viewable by authenticated users"
 drop policy if exists "Admins can manage language settings" on public.language_settings;
 create policy "Admins can manage language settings"
   on public.language_settings for all
+  to authenticated
+  using (private.is_admin())
+  with check (private.is_admin());
+
+-- -------------------------------------------------------------------------
+-- curriculum_level_overrides policies: any signed-in learner can read the
+-- current curriculum structure (needed to render /learn pages), but only
+-- admins can add or rename levels. The super-admin-only restriction for
+-- *creating/deleting* levels is enforced in the server action layer.
+-- -------------------------------------------------------------------------
+drop policy if exists "Curriculum level overrides are viewable by authenticated users" on public.curriculum_level_overrides;
+create policy "Curriculum level overrides are viewable by authenticated users"
+  on public.curriculum_level_overrides for select
+  to authenticated
+  using (true);
+
+drop policy if exists "Admins can manage curriculum level overrides" on public.curriculum_level_overrides;
+create policy "Admins can manage curriculum level overrides"
+  on public.curriculum_level_overrides for all
   to authenticated
   using (private.is_admin())
   with check (private.is_admin());

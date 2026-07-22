@@ -337,6 +337,7 @@ export const fa: Messages = {
       quickActionsHint: "وارد کارهای رایج مدیریتی شوید.",
       manageQuizzes: "مدیریت آزمون‌ها و محتوا",
       manageUsers: "مدیریت کاربران",
+      manageLanguages: "مدیریت زبان‌ها",
       contentManagement: "مدیریت محتوا",
       contentManagementHint:
         "درس‌ها، واژگان، گرامر و آزمون‌ها را بسازید، ویرایش و منتشر کنید.",

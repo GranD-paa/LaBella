@@ -11,6 +11,7 @@ import type {
 } from "@/types";
 
 import type { LocalAuthUser } from "@/lib/data/repository";
+import type { CurriculumLevelOverrideRow } from "@/lib/curriculum/level-overrides";
 
 export type LocalDatabase = {
   users: LocalAuthUser[];
@@ -27,6 +28,9 @@ export type LocalDatabase = {
   // Missing keys fall back to the static default in
   // lib/curriculum/languages.ts (only Italian is active by default).
   languageSettings: Record<string, boolean>;
+  // Super-admin renames of default curriculum levels and brand-new levels
+  // (e.g. A2/B1/B2) added from the Language Management page.
+  curriculumLevelOverrides: CurriculumLevelOverrideRow[];
 };
 
 const now = "2026-07-15T08:00:00.000Z";
@@ -323,4 +327,5 @@ export const LOCAL_SEED: LocalDatabase = {
   userQuizAttempts: [],
   learningStates: [],
   languageSettings: {},
+  curriculumLevelOverrides: [],
 };

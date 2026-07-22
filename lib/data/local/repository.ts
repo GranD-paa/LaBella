@@ -153,6 +153,36 @@ export function createLocalRepository(): DataRepository {
       return {};
     },
 
+    async getCurriculumLevelOverrides() {
+      return [...getLocalStore().curriculumLevelOverrides];
+    },
+
+    async upsertCurriculumLevelOverride(row) {
+      const store = getLocalStore();
+      const index = store.curriculumLevelOverrides.findIndex(
+        (entry) =>
+          entry.languageSlug === row.languageSlug && entry.slug === row.slug
+      );
+
+      if (index >= 0) {
+        store.curriculumLevelOverrides[index] = row;
+      } else {
+        store.curriculumLevelOverrides.push(row);
+      }
+
+      commitStore();
+      return {};
+    },
+
+    async deleteCurriculumLevelOverride(languageSlug, slug) {
+      const store = getLocalStore();
+      store.curriculumLevelOverrides = store.curriculumLevelOverrides.filter(
+        (entry) => !(entry.languageSlug === languageSlug && entry.slug === slug)
+      );
+      commitStore();
+      return {};
+    },
+
     async getLearningState(userId) {
       return (
         getLocalStore().learningStates.find(

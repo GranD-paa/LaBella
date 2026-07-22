@@ -175,6 +175,52 @@ export function createSupabaseRepository(): DataRepository {
       return error ? { error: error.message } : {};
     },
 
+    async getCurriculumLevelOverrides() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("curriculum_level_overrides")
+        .select("language_slug, slug, code, title, description, order_number, is_custom")
+        .order("order_number", { ascending: true });
+
+      return (data ?? []).map((row) => ({
+        languageSlug: row.language_slug,
+        slug: row.slug,
+        code: row.code,
+        title: row.title,
+        description: row.description,
+        orderNumber: row.order_number,
+        isCustom: row.is_custom,
+      }));
+    },
+
+    async upsertCurriculumLevelOverride(row) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("curriculum_level_overrides").upsert(
+        {
+          language_slug: row.languageSlug,
+          slug: row.slug,
+          code: row.code,
+          title: row.title,
+          description: row.description,
+          order_number: row.orderNumber,
+          is_custom: row.isCustom,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "language_slug,slug" }
+      );
+      return error ? { error: error.message } : {};
+    },
+
+    async deleteCurriculumLevelOverride(languageSlug, slug) {
+      const supabase = await createClient();
+      const { error } = await supabase
+        .from("curriculum_level_overrides")
+        .delete()
+        .eq("language_slug", languageSlug)
+        .eq("slug", slug);
+      return error ? { error: error.message } : {};
+    },
+
     async getLearningState(userId) {
       const supabase = await createClient();
       const { data } = await supabase

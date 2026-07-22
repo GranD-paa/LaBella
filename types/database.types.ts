@@ -412,6 +412,42 @@ export interface Database {
         };
         Relationships: [];
       };
+      curriculum_level_overrides: {
+        Row: {
+          id: string;
+          language_slug: string;
+          slug: string;
+          code: string;
+          title: string;
+          description: string;
+          order_number: number;
+          is_custom: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          language_slug: string;
+          slug: string;
+          code: string;
+          title: string;
+          description?: string;
+          order_number: number;
+          is_custom?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          language_slug?: string;
+          slug?: string;
+          code?: string;
+          title?: string;
+          description?: string;
+          order_number?: number;
+          is_custom?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

@@ -49,6 +49,11 @@ function loadPersistedStore(): LocalDatabase | null {
       parsed.languageSettings = {};
     }
 
+    // Backward-compat: older persisted files predate `curriculumLevelOverrides`.
+    if (!Array.isArray(parsed.curriculumLevelOverrides)) {
+      parsed.curriculumLevelOverrides = [];
+    }
+
     return parsed;
   } catch {
     return null;

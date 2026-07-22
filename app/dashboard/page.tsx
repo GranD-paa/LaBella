@@ -35,6 +35,7 @@ export default async function DashboardPage() {
         data={adminData}
         displayName={displayName}
         currentUserId={user.id}
+        isSuperAdmin={profile.role === "super_admin"}
       />
     );
   }

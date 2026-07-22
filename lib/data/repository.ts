@@ -10,6 +10,7 @@ import type {
   Vocabulary,
 } from "@/types";
 import type { Json } from "@/types/database.types";
+import type { CurriculumLevelOverrideRow } from "@/lib/curriculum/level-overrides";
 
 export type AuthUser = {
   id: string;
@@ -69,6 +70,18 @@ export interface DataRepository {
   setLanguageAvailability(
     languageSlug: string,
     enabled: boolean
+  ): Promise<{ error?: string }>;
+
+  // Curriculum level customization — super-admin renames of default levels
+  // and brand-new levels (e.g. A2/B1/B2) added on top of the static
+  // defaults in lib/curriculum/{italian,english,german,turkish}.ts.
+  getCurriculumLevelOverrides(): Promise<CurriculumLevelOverrideRow[]>;
+  upsertCurriculumLevelOverride(
+    row: CurriculumLevelOverrideRow
+  ): Promise<{ error?: string }>;
+  deleteCurriculumLevelOverride(
+    languageSlug: string,
+    slug: string
   ): Promise<{ error?: string }>;
 
   // Learning state — the learner's last active language, level, lesson, and
