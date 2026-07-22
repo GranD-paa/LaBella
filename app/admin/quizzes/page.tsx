@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { AdminQuizzesPageView } from "@/components/admin/quizzes/admin-quizzes-page-view";
+import { getLanguagesWithAvailability } from "@/lib/curriculum/availability";
 import { getDataRepository } from "@/lib/data";
 import { fetchEnrichedQuizzes } from "@/lib/quiz-management/data";
 import { createPageMetadata } from "@/lib/i18n/metadata";
@@ -15,11 +16,12 @@ export default async function AdminQuizzesPage() {
   const { profile, user } = await requireAdmin();
   const repo = getDataRepository();
 
-  const [quizzes, quizQuestions, attempts, lessons] = await Promise.all([
+  const [quizzes, quizQuestions, attempts, lessons, languages] = await Promise.all([
     fetchEnrichedQuizzes(repo),
     repo.getAllQuizQuestions(),
     repo.getAllAttempts(),
     repo.getLessons(),
+    getLanguagesWithAvailability(repo),
   ]);
 
   const { t } = await getServerTranslator();
@@ -33,6 +35,7 @@ export default async function AdminQuizzesPage() {
       quizQuestions={quizQuestions}
       attempts={attempts}
       lessons={lessons}
+      languages={languages}
     />
   );
 }

@@ -136,6 +136,22 @@ comment on table public.user_learning_state is
   'Tracks each learner''s last active language/level/lesson/section so navigation can resume it after login.';
 
 -- =========================================================================
+-- 9. language_settings
+-- =========================================================================
+-- Super-admin controlled overrides for whether a language (beyond the
+-- default Italian course) is "coming soon" or fully active/open to
+-- learners. Missing rows fall back to the static default in
+-- `lib/curriculum/languages.ts` (currently only Italian is active).
+create table if not exists public.language_settings (
+  language_slug text primary key,
+  enabled boolean not null default false,
+  updated_at timestamptz not null default now()
+);
+
+comment on table public.language_settings is
+  'Super-admin toggles for opening additional language courses (e.g. German, Turkish, English) from "coming soon" to active.';
+
+-- =========================================================================
 -- Indexes on foreign keys / common lookup columns
 -- =========================================================================
 create index if not exists vocabulary_lesson_id_idx on public.vocabulary (lesson_id);
@@ -158,6 +174,7 @@ alter table public.quizzes enable row level security;
 alter table public.quiz_questions enable row level security;
 alter table public.user_quiz_attempts enable row level security;
 alter table public.user_learning_state enable row level security;
+alter table public.language_settings enable row level security;
 
 alter table public.profiles force row level security;
 alter table public.lessons force row level security;
@@ -167,6 +184,7 @@ alter table public.quizzes force row level security;
 alter table public.quiz_questions force row level security;
 alter table public.user_quiz_attempts force row level security;
 alter table public.user_learning_state force row level security;
+alter table public.language_settings force row level security;
 
 -- -------------------------------------------------------------------------
 -- Helper: private.is_admin() — security definer so it can read
@@ -360,6 +378,24 @@ create policy "Users can update own learning state"
 drop policy if exists "Admins can manage all learning state" on public.user_learning_state;
 create policy "Admins can manage all learning state"
   on public.user_learning_state for all
+  to authenticated
+  using (private.is_admin())
+  with check (private.is_admin());
+
+-- -------------------------------------------------------------------------
+-- language_settings policies: any signed-in learner can read the current
+-- toggles (needed to render the menu/learn pages), but only admins can
+-- change them.
+-- -------------------------------------------------------------------------
+drop policy if exists "Language settings are viewable by authenticated users" on public.language_settings;
+create policy "Language settings are viewable by authenticated users"
+  on public.language_settings for select
+  to authenticated
+  using (true);
+
+drop policy if exists "Admins can manage language settings" on public.language_settings;
+create policy "Admins can manage language settings"
+  on public.language_settings for all
   to authenticated
   using (private.is_admin())
   with check (private.is_admin());

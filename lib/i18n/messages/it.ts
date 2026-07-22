@@ -1,5 +1,6 @@
 import type { Messages } from "@/lib/i18n/types";
 import { adminContentIt } from "@/lib/i18n/messages/admin-content-it";
+import { adminLanguagesIt } from "@/lib/i18n/messages/admin-languages-it";
 import { adminQuizzesIt } from "@/lib/i18n/messages/admin-quizzes-it";
 import { adminUsersIt } from "@/lib/i18n/messages/admin-users-it";
 
@@ -559,6 +560,7 @@ export const it: Messages = {
     content: adminContentIt,
     quizzes: adminQuizzesIt,
     users: adminUsersIt,
+    languages: adminLanguagesIt,
   },
   pricing: {
     signIn: "Accedi",
@@ -649,6 +651,7 @@ export const it: Messages = {
       quizNoQuestions: "Questo quiz non ha domande.",
       answerAll: "Rispondi a tutte le domande prima di inviare.",
       invalidSubmission: "Invio non valido.",
+      forbidden: "Non hai il permesso di eseguire questa azione.",
       generic: "Qualcosa è andato storto. Riprova.",
     },
   },

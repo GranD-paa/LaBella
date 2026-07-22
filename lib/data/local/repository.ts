@@ -134,6 +134,25 @@ export function createLocalRepository(): DataRepository {
       return {};
     },
 
+    async getLanguageAvailability() {
+      return { ...getLocalStore().languageSettings };
+    },
+
+    async setLanguageAvailability(languageSlug, enabled) {
+      const authUser = await this.getAuthUser();
+      if (!authUser) return { error: "You must be signed in." };
+
+      const currentProfile = await this.getProfileById(authUser.id);
+      if (!currentProfile?.is_admin) {
+        return { error: "Only admins can manage language availability." };
+      }
+
+      const store = getLocalStore();
+      store.languageSettings[languageSlug] = enabled;
+      commitStore();
+      return {};
+    },
+
     async getLearningState(userId) {
       return (
         getLocalStore().learningStates.find(

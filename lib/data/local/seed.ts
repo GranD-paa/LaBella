@@ -23,6 +23,10 @@ export type LocalDatabase = {
   quizQuestions: QuizQuestion[];
   userQuizAttempts: UserQuizAttempt[];
   learningStates: UserLearningState[];
+  // Super-admin overrides for which languages are open vs. "coming soon".
+  // Missing keys fall back to the static default in
+  // lib/curriculum/languages.ts (only Italian is active by default).
+  languageSettings: Record<string, boolean>;
 };
 
 const now = "2026-07-15T08:00:00.000Z";
@@ -318,4 +322,5 @@ export const LOCAL_SEED: LocalDatabase = {
   ],
   userQuizAttempts: [],
   learningStates: [],
+  languageSettings: {},
 };

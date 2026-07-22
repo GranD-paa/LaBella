@@ -2,11 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { LearnCategoryView } from "@/components/learn/learn-category-view";
-import {
-  getLanguage,
-  getLevel,
-  isCategorySlug,
-} from "@/lib/curriculum/languages";
+import { getLanguageWithAvailability } from "@/lib/curriculum/availability";
+import { getLevel, isCategorySlug } from "@/lib/curriculum/languages";
 import { resolveLessonForLevel } from "@/lib/curriculum/resolve-lesson";
 import { getDataRepository } from "@/lib/data";
 import { findPublishedQuizzesForLevel } from "@/lib/quiz-management/helpers";
@@ -18,7 +15,7 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { language, level, category } = await params;
-  const languageDef = getLanguage(language);
+  const languageDef = await getLanguageWithAvailability(getDataRepository(), language);
   const levelDef = languageDef ? getLevel(languageDef, level) : undefined;
 
   const { t } = await getServerTranslator();
@@ -38,7 +35,8 @@ export default async function CategoryPage({ params }: PageProps) {
     notFound();
   }
 
-  const language = getLanguage(languageSlug);
+  const repo = getDataRepository();
+  const language = await getLanguageWithAvailability(repo, languageSlug);
   if (!language || !language.available) {
     notFound();
   }
@@ -48,7 +46,6 @@ export default async function CategoryPage({ params }: PageProps) {
     notFound();
   }
 
-  const repo = getDataRepository();
   const user = await repo.getAuthUser();
   const { lesson } = await resolveLessonForLevel(repo, languageSlug, levelSlug);
 

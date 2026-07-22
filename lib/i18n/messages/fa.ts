@@ -1,5 +1,6 @@
 import type { Messages } from "@/lib/i18n/types";
 import { adminContentFa } from "@/lib/i18n/messages/admin-content-fa";
+import { adminLanguagesFa } from "@/lib/i18n/messages/admin-languages-fa";
 import { adminQuizzesFa } from "@/lib/i18n/messages/admin-quizzes-fa";
 import { adminUsersFa } from "@/lib/i18n/messages/admin-users-fa";
 
@@ -549,6 +550,7 @@ export const fa: Messages = {
     content: adminContentFa,
     quizzes: adminQuizzesFa,
     users: adminUsersFa,
+    languages: adminLanguagesFa,
   },
   pricing: {
     signIn: "ورود",
@@ -639,6 +641,7 @@ export const fa: Messages = {
       quizNoQuestions: "این آزمون سؤالی ندارد.",
       answerAll: "لطفاً قبل از ارسال به همه سؤالات پاسخ دهید.",
       invalidSubmission: "ارسال نامعتبر است.",
+      forbidden: "شما اجازه انجام این کار را ندارید.",
       generic: "مشکلی پیش آمد. لطفاً دوباره تلاش کنید.",
     },
   },

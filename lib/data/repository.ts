@@ -62,6 +62,15 @@ export interface DataRepository {
   ): Promise<{ error?: string }>;
   sendPasswordResetEmail(email: string): Promise<{ error?: string }>;
 
+  // Language availability — super-admin overrides for which languages are
+  // open ("active") vs. "coming soon". Returned as a sparse map; a missing
+  // key means "use the static default" (see lib/curriculum/languages.ts).
+  getLanguageAvailability(): Promise<Record<string, boolean>>;
+  setLanguageAvailability(
+    languageSlug: string,
+    enabled: boolean
+  ): Promise<{ error?: string }>;
+
   // Learning state — the learner's last active language, level, lesson, and
   // section. Used to restore navigation position after login. Works for any
   // current or future language since it is keyed by slug, not a fixed enum.

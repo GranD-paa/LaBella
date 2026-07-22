@@ -22,11 +22,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LANGUAGES } from "@/lib/curriculum/languages";
 import type {
   ContentCategorySlug,
   ContentWizardContext,
 } from "@/lib/content-management/categories";
+import type { CurriculumLanguage } from "@/lib/curriculum/types";
 import type { Lesson } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -73,9 +73,11 @@ const CONTENT_TYPES: Array<{
  */
 export function CreateContentSection({
   lessons,
+  languages,
   onSuccess,
 }: {
   lessons: Lesson[];
+  languages: CurriculumLanguage[];
   onSuccess?: () => void;
 }) {
   const { t } = useTranslations();
@@ -85,8 +87,8 @@ export function CreateContentSection({
   const [contentType, setContentType] = useState<ContentCategorySlug | null>(null);
 
   const selectedLanguage = useMemo(
-    () => LANGUAGES.find((language) => language.slug === languageSlug),
-    [languageSlug]
+    () => languages.find((language) => language.slug === languageSlug),
+    [languages, languageSlug]
   );
 
   const levelOptions = useMemo(
@@ -201,7 +203,7 @@ export function CreateContentSection({
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">{t("admin.content.askLanguage")}</h3>
               <div className="grid gap-3 sm:grid-cols-2">
-                {LANGUAGES.map((language) => (
+                {languages.map((language) => (
                   <button
                     key={language.slug}
                     type="button"

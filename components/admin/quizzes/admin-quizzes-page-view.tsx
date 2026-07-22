@@ -9,6 +9,7 @@ import { QuizManagementTable } from "@/components/admin/quizzes/quiz-management-
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { CurriculumLanguage } from "@/lib/curriculum/types";
 import type { EnrichedQuiz } from "@/lib/quiz-management/data";
 import type { Lesson, QuizQuestion, UserQuizAttempt } from "@/types";
 
@@ -18,12 +19,14 @@ export function AdminQuizzesPageView({
   quizQuestions,
   attempts,
   lessons,
+  languages,
 }: {
   displayName: string;
   quizzes: EnrichedQuiz[];
   quizQuestions: QuizQuestion[];
   attempts: UserQuizAttempt[];
   lessons: Lesson[];
+  languages: CurriculumLanguage[];
 }) {
   const { t } = useTranslations();
   const router = useRouter();
@@ -56,6 +59,7 @@ export function AdminQuizzesPageView({
 
       <CreateContentSection
         lessons={lessons}
+        languages={languages}
         onSuccess={() => router.refresh()}
       />
 

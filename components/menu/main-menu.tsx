@@ -7,12 +7,14 @@ import { LanguageCard } from "@/components/menu/language-card";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { LANGUAGES } from "@/lib/curriculum/languages";
+import type { CurriculumLanguage } from "@/lib/curriculum/types";
 
 export function MainMenu({
   displayName,
+  languages,
 }: {
   displayName: string;
+  languages: CurriculumLanguage[];
 }) {
   const { t } = useTranslations();
 
@@ -48,7 +50,7 @@ export function MainMenu({
           <p className="text-sm text-muted-foreground">{t("menu.coursesSubtitle")}</p>
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
-          {LANGUAGES.map((language) => (
+          {languages.map((language) => (
             <LanguageCard key={language.slug} language={language} />
           ))}
         </div>

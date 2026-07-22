@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { LearnLanguageView } from "@/components/learn/learn-language-view";
-import { getLanguage } from "@/lib/curriculum/languages";
+import { getLanguageWithAvailability } from "@/lib/curriculum/availability";
+import { getDataRepository } from "@/lib/data";
 import { CURRICULUM_MESSAGE_KEYS } from "@/lib/i18n/content-keys";
 import { getServerTranslator } from "@/lib/i18n/server-locale";
 
@@ -12,7 +13,7 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { language: languageSlug } = await params;
-  const language = getLanguage(languageSlug);
+  const language = await getLanguageWithAvailability(getDataRepository(), languageSlug);
   const { t } = await getServerTranslator();
   const contentKey = language
     ? CURRICULUM_MESSAGE_KEYS[language.slug]
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function LanguageCoursePage({ params }: PageProps) {
   const { language: languageSlug } = await params;
-  const language = getLanguage(languageSlug);
+  const language = await getLanguageWithAvailability(getDataRepository(), languageSlug);
 
   if (!language) {
     notFound();

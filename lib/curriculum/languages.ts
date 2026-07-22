@@ -1,4 +1,7 @@
+import { ENGLISH_LEVELS } from "@/lib/curriculum/english";
+import { GERMAN_LEVELS } from "@/lib/curriculum/german";
 import { ITALIAN_LEVELS } from "@/lib/curriculum/italian";
+import { TURKISH_LEVELS } from "@/lib/curriculum/turkish";
 import type {
   CategoryDefinition,
   CategorySlug,
@@ -7,6 +10,11 @@ import type {
   LevelSlug,
 } from "@/lib/curriculum/types";
 
+// `available` below is only the *static default*. The actual value shown to
+// learners is resolved at request time by merging this list with any
+// super-admin overrides stored via `getLanguageAvailability()` — see
+// `lib/curriculum/availability.ts`. This lets a super admin flip a language
+// from "coming soon" to active without touching code.
 export const LANGUAGES: CurriculumLanguage[] = [
   {
     slug: "italian",
@@ -27,7 +35,7 @@ export const LANGUAGES: CurriculumLanguage[] = [
     flagEmoji: "🇬🇧",
     accentClass: "from-blue-500/20 to-indigo-500/10",
     available: false,
-    levels: [],
+    levels: ENGLISH_LEVELS,
   },
   {
     slug: "german",
@@ -37,7 +45,7 @@ export const LANGUAGES: CurriculumLanguage[] = [
     flagEmoji: "🇩🇪",
     accentClass: "from-amber-500/20 to-orange-500/10",
     available: false,
-    levels: [],
+    levels: GERMAN_LEVELS,
   },
   {
     slug: "turkish",
@@ -47,7 +55,7 @@ export const LANGUAGES: CurriculumLanguage[] = [
     flagEmoji: "🇹🇷",
     accentClass: "from-rose-500/20 to-red-500/10",
     available: false,
-    levels: [],
+    levels: TURKISH_LEVELS,
   },
 ];
 

@@ -147,6 +147,34 @@ export function createSupabaseRepository(): DataRepository {
       return error ? { error: error.message } : {};
     },
 
+    async getLanguageAvailability() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("language_settings")
+        .select("language_slug, enabled");
+
+      const overrides: Record<string, boolean> = {};
+      for (const row of data ?? []) {
+        overrides[row.language_slug] = row.enabled;
+      }
+      return overrides;
+    },
+
+    async setLanguageAvailability(languageSlug, enabled) {
+      const supabase = await createClient();
+      const { error } = await supabase
+        .from("language_settings")
+        .upsert(
+          {
+            language_slug: languageSlug,
+            enabled,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "language_slug" }
+        );
+      return error ? { error: error.message } : {};
+    },
+
     async getLearningState(userId) {
       const supabase = await createClient();
       const { data } = await supabase

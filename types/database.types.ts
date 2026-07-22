@@ -394,6 +394,24 @@ export interface Database {
           },
         ];
       };
+      language_settings: {
+        Row: {
+          language_slug: string;
+          enabled: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          language_slug: string;
+          enabled?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          language_slug?: string;
+          enabled?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

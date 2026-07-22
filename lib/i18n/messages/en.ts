@@ -1,4 +1,5 @@
 import { adminContentEn } from "@/lib/i18n/messages/admin-content-en";
+import { adminLanguagesEn } from "@/lib/i18n/messages/admin-languages-en";
 import { adminQuizzesEn } from "@/lib/i18n/messages/admin-quizzes-en";
 import { adminUsersEn } from "@/lib/i18n/messages/admin-users-en";
 
@@ -553,6 +554,7 @@ export const en = {
     content: adminContentEn,
     quizzes: adminQuizzesEn,
     users: adminUsersEn,
+    languages: adminLanguagesEn,
   },
   pricing: {
     signIn: "Sign in",
@@ -643,6 +645,7 @@ export const en = {
       quizNoQuestions: "This quiz has no questions.",
       answerAll: "Please answer all questions before submitting.",
       invalidSubmission: "Invalid submission.",
+      forbidden: "You don't have permission to perform this action.",
       generic: "Something went wrong. Please try again.",
     },
   },

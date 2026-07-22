@@ -1,4 +1,5 @@
-import { getLanguage, getLevel, isCategorySlug } from "@/lib/curriculum/languages";
+import { getLevel, isCategorySlug, LANGUAGES } from "@/lib/curriculum/languages";
+import type { CurriculumLanguage } from "@/lib/curriculum/types";
 import type { UserLearningState } from "@/types";
 
 const DEFAULT_PATH = "/menu";
@@ -11,15 +12,20 @@ const DEFAULT_PATH = "/menu";
  *
  * This works for any language slug (Italian, English, German, Turkish, ...)
  * since it only depends on the generic `LANGUAGES` curriculum registry.
+ *
+ * `languages` defaults to the static registry, but callers should pass the
+ * super-admin-resolved list (see `getLanguagesWithAvailability`) so a
+ * recently unlocked language is honored immediately.
  */
 export function resolveContinueLearningPath(
-  state: UserLearningState | null
+  state: UserLearningState | null,
+  languages: CurriculumLanguage[] = LANGUAGES
 ): string {
   if (!state) {
     return DEFAULT_PATH;
   }
 
-  const language = getLanguage(state.language_slug);
+  const language = languages.find((entry) => entry.slug === state.language_slug);
   if (!language || !language.available) {
     return DEFAULT_PATH;
   }

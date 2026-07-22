@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { isLocalDataMode } from "@/lib/config/data-source";
+import { getLanguagesWithAvailability } from "@/lib/curriculum/availability";
 import { getDataRepository } from "@/lib/data";
 import { resolveContinueLearningPath } from "@/lib/curriculum/learning-state";
 import { signInSchema, signUpSchema } from "@/lib/validations/auth";
@@ -72,11 +73,12 @@ export async function signInAction(
 
   const user = await repo.getAuthUser();
   const learningState = user ? await repo.getLearningState(user.id) : null;
+  const languages = await getLanguagesWithAvailability(repo);
 
   // No explicit destination requested: send returning learners straight back
   // into their last active language/level/section, and first-time learners
   // to the Main Menu to choose a language.
-  redirect(resolveContinueLearningPath(learningState));
+  redirect(resolveContinueLearningPath(learningState, languages));
 }
 
 export async function signUpAction(
