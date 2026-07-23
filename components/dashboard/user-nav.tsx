@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTransition } from "react";
 import {
+  CreditCard,
   Home,
   LayoutDashboard,
   LogOut,
@@ -98,6 +99,13 @@ export function UserNav({
           <Link href="/dashboard">
             <LayoutDashboard className="me-2 h-4 w-4" />
             {t("nav.dashboard")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/subscription">
+            <CreditCard className="me-2 h-4 w-4" />
+            {t("nav.subscription")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem

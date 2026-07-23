@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { LessonView } from "@/components/lessons/lesson-view";
+import { getLanguagesWithAvailability } from "@/lib/curriculum/availability";
+import { resolveLessonNavigation } from "@/lib/curriculum/resolve-navigation";
 import { getDataRepository } from "@/lib/data";
 import { getServerTranslator } from "@/lib/i18n/server-locale";
 
@@ -31,11 +33,14 @@ export default async function LessonPage({ params }: PageProps) {
     notFound();
   }
 
-  const [vocabularyData, grammarData, quizzes] = await Promise.all([
-    repo.getVocabularyByLessonId(id),
-    repo.getGrammarRulesByLessonId(id),
-    repo.getQuizzes(),
-  ]);
+  const [vocabularyData, grammarData, quizzes, languages, learningState] =
+    await Promise.all([
+      repo.getVocabularyByLessonId(id),
+      repo.getGrammarRulesByLessonId(id),
+      repo.getQuizzes(),
+      getLanguagesWithAvailability(repo),
+      user ? repo.getLearningState(user.id) : Promise.resolve(null),
+    ]);
 
   const vocabulary = vocabularyData.filter((item) => item.status === "published");
   const grammarRules = grammarData.filter((item) => item.status === "published");
@@ -49,6 +54,13 @@ export default async function LessonPage({ params }: PageProps) {
     quizAttempt = await repo.getAttemptByUserAndQuiz(user.id, quiz.id);
   }
 
+  const { backHref, languageSlug } = resolveLessonNavigation({
+    lesson,
+    languages,
+    quizzes,
+    learningState,
+  });
+
   return (
     <LessonView
       lesson={lesson}
@@ -56,6 +68,8 @@ export default async function LessonPage({ params }: PageProps) {
       grammarRules={grammarRules}
       quiz={quiz}
       quizAttempt={quizAttempt}
+      backHref={backHref}
+      languageSlug={languageSlug}
     />
   );
 }

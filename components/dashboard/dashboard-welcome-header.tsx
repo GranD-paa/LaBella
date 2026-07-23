@@ -14,7 +14,7 @@ import {
   getLocalizedLanguageName,
   getLocalizedLevel,
 } from "@/lib/curriculum/localize";
-import { ITALIAN_LEVELS } from "@/lib/curriculum/italian";
+import type { LanguageSlug } from "@/lib/curriculum/types";
 
 type DashboardWelcomeHeaderProps = {
   displayName: string;
@@ -39,13 +39,19 @@ export function DashboardWelcomeHeader({
   engagement,
 }: DashboardWelcomeHeaderProps) {
   const { t } = useTranslations();
-  const languageName = getLocalizedLanguageName(snapshot.languageSlug as "italian", t);
-  const levelDefinition = ITALIAN_LEVELS.find(
-    (entry) => entry.slug === snapshot.levelSlug
-  );
-  const activeCourseTitle = levelDefinition
-    ? getLocalizedLevel(snapshot.languageSlug as "italian", levelDefinition, t).title
-    : snapshot.activeCourseTitle;
+  const languageSlug = snapshot.languageSlug as LanguageSlug;
+  const languageName = getLocalizedLanguageName(languageSlug, t);
+  const activeCourseTitle = getLocalizedLevel(
+    languageSlug,
+    {
+      slug: snapshot.levelSlug,
+      code: snapshot.levelCode,
+      title: snapshot.activeCourseTitle,
+      description: "",
+      orderNumber: 0,
+    },
+    t
+  ).title;
 
   const hasEngagementMetrics =
     engagement.streakDays !== null ||

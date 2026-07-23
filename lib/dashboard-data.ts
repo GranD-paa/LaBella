@@ -1,3 +1,4 @@
+import { getLanguagesWithAvailability } from "@/lib/curriculum/availability";
 import type { DataRepository } from "@/lib/data/repository";
 import { ITALIAN_LEVELS } from "@/lib/curriculum/italian";
 import {
@@ -103,13 +104,14 @@ export async function fetchUserDashboardData(
   userId: string,
   email: string | null
 ): Promise<UserDashboardData> {
-  const [profile, lessons, quizzes, attempts, learningState, quizQuestions] =
+  const [profile, lessons, quizzes, attempts, learningState, languages, quizQuestions] =
     await Promise.all([
       repo.getProfileById(userId),
       repo.getLessons(),
       repo.getQuizzes(),
       repo.getAttemptsByUserId(userId),
       repo.getLearningState(userId),
+      getLanguagesWithAvailability(repo),
       Promise.all(
         (await repo.getQuizzes()).map(async (quiz) => {
           const questions = await repo.getQuizQuestionsByQuizId(quiz.id);
@@ -196,6 +198,7 @@ export async function fetchUserDashboardData(
     availableQuizDetails,
     achievements,
     continueLearning: buildContinueLearningSnapshot({
+      languages,
       quizzes,
       attempts,
       completedQuizDetails,

@@ -6,6 +6,10 @@ import { ArrowLeft, BookOpen } from "lucide-react";
 import { LessonDetailTabs } from "@/components/lessons/lesson-detail-tabs";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Button } from "@/components/ui/button";
+import {
+  getLocalizedLanguageName,
+} from "@/lib/curriculum/localize";
+import type { LanguageSlug } from "@/lib/curriculum/types";
 import type { GrammarRule, Lesson, Quiz, UserQuizAttempt, Vocabulary } from "@/types";
 
 type LessonViewProps = {
@@ -14,6 +18,8 @@ type LessonViewProps = {
   grammarRules: GrammarRule[];
   quiz: Quiz | null;
   quizAttempt: UserQuizAttempt | null;
+  backHref: string;
+  languageSlug: LanguageSlug | null;
 };
 
 export function LessonView({
@@ -22,16 +28,24 @@ export function LessonView({
   grammarRules,
   quiz,
   quizAttempt,
+  backHref,
+  languageSlug,
 }: LessonViewProps) {
   const { t } = useTranslations();
+
+  const backLabel = languageSlug
+    ? t("lesson.backToCourse", {
+        language: getLocalizedLanguageName(languageSlug, t),
+      })
+    : t("menu.backToMenu");
 
   return (
     <div className="space-y-8">
       <div className="space-y-4">
         <Button variant="ghost" size="sm" asChild className="-ms-2 w-fit">
-          <Link href="/learn/italian">
+          <Link href={backHref}>
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
-            {t("lesson.backToItalian")}
+            {backLabel}
           </Link>
         </Button>
 

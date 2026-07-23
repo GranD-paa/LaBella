@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { LOCAL_SESSION_COOKIE } from "@/lib/auth/local-session";
 
-const PUBLIC_ROUTES = ["/", "/login", "/sign-up", "/auth", "/pricing"];
+const PUBLIC_ROUTES = ["/", "/login", "/sign-up", "/auth"];
 
 export function updateLocalSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;

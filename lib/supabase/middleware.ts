@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_ROUTES = ["/", "/login", "/sign-up", "/auth", "/pricing"];
+const PUBLIC_ROUTES = ["/", "/login", "/sign-up", "/auth"];
 
 /**
  * Refreshes the Supabase auth session on every request and redirects
