@@ -43,6 +43,8 @@
     "dashboard": "Dashboard",
     "profile": "Profilo",
     "subscription": "Abbonamento",
+    "aboutUs": "Chi siamo",
+    "contactUs": "Contattaci",
     "signOut": "Esci",
     "adminPanel": "Admin",
     "openUserMenu": "Apri menu utente"
@@ -973,6 +975,111 @@
       }
     }
   },
+  "about": {
+    "badge": "La nostra storia",
+    "title": "Chi è LaBella",
+    "subtitle": "Costruiamo percorsi linguistici calmi e strutturati — una lezione, un quiz e una piccola vittoria alla volta.",
+    "missionTitle": "Perché esiste LaBella",
+    "missionBody": "LaBella è nata da un'idea semplice: imparare una lingua deve essere chiaro, non opprimente. Uniamo percorsi CEFR, lezioni brevi e quiz significativi per mantenere alta la motivazione.",
+    "valuesTitle": "In cosa crediamo",
+    "valuesSubtitle": "Quattro principi che guidano ogni funzione che rilasciamo.",
+    "values": {
+      "items": {
+        "0": {
+          "title": "Progresso strutturato",
+          "description": "Ogni livello ha uno scopo. Grammatica, vocabolario, visual e quiz lavorano insieme."
+        },
+        "1": {
+          "title": "Apprendimento che resta",
+          "description": "Sessioni brevi, ripetizione intelligente e quiz che spiegano gli errori aiutano a usare la lingua davvero."
+        },
+        "2": {
+          "title": "Rispetto per lo studente",
+          "description": "Niente rumore, niente trucchi. Percorsi chiari, prezzi onesti e strumenti che rispettano il tuo tempo."
+        },
+        "3": {
+          "title": "Lingue per tutti",
+          "description": "L'italiano è attivo oggi. Inglese, tedesco e turco sono in crescita — con spazio per altre culture."
+        }
+      }
+    },
+    "timeline": {
+      "title": "Il nostro percorso",
+      "subtitle": "Uno sguardo rapido al viaggio di LaBella finora.",
+      "items": {
+        "idea": {
+          "title": "L'idea",
+          "description": "Un piccolo team si è chiesto: e se le app linguistiche fossero più simili a una classe attenta?"
+        },
+        "italian": {
+          "title": "L'italiano va live",
+          "description": "Abbiamo lanciato un percorso A1 completo con strumenti admin per personalizzare livelli e contenuti."
+        },
+        "multilingual": {
+          "title": "Espansione multilingue",
+          "description": "I super admin possono attivare nuove lingue e costruire roadmap CEFR personalizzate."
+        },
+        "future": {
+          "title": "Prossimi passi",
+          "description": "Abbonamenti, analisi più ricche e personalizzazione più profonda — sempre al servizio dell'apprendimento."
+        }
+      }
+    },
+    "stats": {
+      "learners": { "value": "1:1", "label": "Percorsi personali" },
+      "languages": { "value": "4+", "label": "Lingue in roadmap" },
+      "lessons": { "value": "∞", "label": "Spazio per crescere con te" }
+    },
+    "communityTitle": "Pensato per chi impara",
+    "communityBody": "Che tu sia un admin che modella il curriculum o uno studente che apre la prima lezione, LaBella è pensata per accompagnarti al passo successivo con fiducia."
+  },
+  "contact": {
+    "badge": "Ti ascoltiamo",
+    "title": "Contattaci",
+    "subtitle": "Domande, feedback o idee di partnership? Inviaci un messaggio e ti risponderemo.",
+    "channels": {
+      "email": {
+        "title": "Email",
+        "value": "hello@labella.app",
+        "hint": "Ideale per account, fatturazione e supporto all'apprendimento."
+      },
+      "response": {
+        "title": "Tempo di risposta",
+        "value": "Entro 48 ore",
+        "hint": "Di solito più veloce nei giorni feriali."
+      },
+      "region": {
+        "title": "Basati in",
+        "value": "Europa · Remote-first",
+        "hint": "Supportiamo studenti e team in tutto il mondo."
+      }
+    },
+    "form": {
+      "title": "Invia un messaggio",
+      "subtitle": "Raccontaci di cosa hai bisogno — più dettagli, risposta migliore.",
+      "name": "Nome completo",
+      "namePlaceholder": "Il tuo nome",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "subject": "Oggetto",
+      "subjectPlaceholder": "Come possiamo aiutarti?",
+      "message": "Messaggio",
+      "messagePlaceholder": "Scrivi qui il tuo messaggio...",
+      "submit": "Invia messaggio",
+      "sending": "Invio in corso...",
+      "validationRequired": "Compila tutti i campi prima di inviare.",
+      "successTitle": "Messaggio ricevuto!",
+      "successDescription": "Grazie per averci scritto. Il team risponderà presto alla tua email."
+    },
+    "helpTitle": "Argomenti comuni",
+    "helpItems": {
+      "account": "Accesso account, password o aggiornamento profilo",
+      "subscription": "Domande sui piani Basic, Pro o Ultimate",
+      "learning": "Lezioni, quiz, livelli o disponibilità lingue",
+      "feedback": "Idee, bug o feedback generale"
+    },
+    "privacyNote": "Il tuo messaggio viene usato solo per risponderti. Non condividiamo i dati di contatto con terze parti."
+  },
   "meta": {
     "siteTitle": "LaBella — Impara una lingua, una lezione alla volta",
     "siteDescription": "LaBella ti aiuta a padroneggiare vocabolario, grammatica e ascolto con lezioni brevi e quiz.",
@@ -984,6 +1091,10 @@
     "profile": "Profilo — LaBella",
     "subscription": "Abbonamento — LaBella",
     "subscriptionDescription": "Scegli Basic, Pro o Ultimate — piani mensili per il tuo percorso linguistico completo.",
+    "about": "Chi siamo — LaBella",
+    "aboutDescription": "Scopri la missione, i valori e la storia di LaBella, la piattaforma per imparare le lingue.",
+    "contact": "Contattaci — LaBella",
+    "contactDescription": "Contatta il team LaBella per supporto, feedback o richieste di partnership.",
     "admin": "Admin — LaBella",
     "adminQuizzes": "Gestione quiz — LaBella",
     "quizBrowse": "Sfoglia quiz — LaBella",

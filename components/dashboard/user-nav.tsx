@@ -5,8 +5,10 @@ import { useTransition } from "react";
 import {
   CreditCard,
   Home,
+  Info,
   LayoutDashboard,
   LogOut,
+  Mail,
   ShieldCheck,
   User as UserIcon,
   UserCircle,
@@ -106,6 +108,18 @@ export function UserNav({
           <Link href="/subscription">
             <CreditCard className="me-2 h-4 w-4" />
             {t("nav.subscription")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/about">
+            <Info className="me-2 h-4 w-4" />
+            {t("nav.aboutUs")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/contact">
+            <Mail className="me-2 h-4 w-4" />
+            {t("nav.contactUs")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem

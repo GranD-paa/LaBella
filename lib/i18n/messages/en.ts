@@ -48,6 +48,8 @@ export const en = {
     dashboard: "Dashboard",
     profile: "Profile",
     subscription: "Subscription",
+    aboutUs: "About us",
+    contactUs: "Contact us",
     signOut: "Sign out",
     adminPanel: "Admin",
     openUserMenu: "Open user menu",
@@ -616,6 +618,125 @@ export const en = {
       },
     },
   },
+  about: {
+    badge: "Our story",
+    title: "About LaBella",
+    subtitle:
+      "We build calm, structured language journeys — one lesson, one quiz, and one small win at a time.",
+    missionTitle: "Why LaBella exists",
+    missionBody:
+      "LaBella started with a simple idea: language learning should feel clear, not overwhelming. We combine CEFR-aligned paths, bite-sized lessons, and meaningful quizzes so learners stay motivated without losing the joy of discovery.",
+    valuesTitle: "What we believe in",
+    valuesSubtitle: "Four principles that shape every feature we ship.",
+    values: {
+      items: {
+        "0": {
+          title: "Structured progress",
+          description:
+            "Every level has a purpose. Grammar, vocabulary, visuals, and quizzes work together instead of competing for attention.",
+        },
+        "1": {
+          title: "Learning that sticks",
+          description:
+            "Short sessions, spaced repetition, and quizzes that explain mistakes help knowledge move from memory to real use.",
+        },
+        "2": {
+          title: "Respect for the learner",
+          description:
+            "No noise, no dark patterns. Clear paths, honest pricing, and tools that respect your time and pace.",
+        },
+        "3": {
+          title: "Languages for everyone",
+          description:
+            "Italian is live today. English, German, and Turkish are growing — with room for more voices and cultures ahead.",
+        },
+      },
+    },
+    timeline: {
+      title: "How we got here",
+      subtitle: "A quick look at the LaBella journey so far.",
+      items: {
+        idea: {
+          title: "The idea",
+          description:
+            "A small team asked: what if language apps felt more like a thoughtful classroom than a gamified maze?",
+        },
+        italian: {
+          title: "Italian goes live",
+          description:
+            "We launched a full A1 Italian path with admin tools to customize levels and content without touching code.",
+        },
+        multilingual: {
+          title: "Multilingual expansion",
+          description:
+            "Super admins can enable new languages and build custom CEFR roadmaps as content becomes ready.",
+        },
+        future: {
+          title: "What comes next",
+          description:
+            "Subscriptions, richer analytics, and deeper personalization — always in service of clearer learning.",
+        },
+      },
+    },
+    stats: {
+      learners: { value: "1:1", label: "Personal learning paths" },
+      languages: { value: "4+", label: "Languages on the roadmap" },
+      lessons: { value: "∞", label: "Room to grow with you" },
+    },
+    communityTitle: "Built with learners in mind",
+    communityBody:
+      "Whether you are an admin shaping curriculum or a learner opening your first lesson, LaBella is designed to meet you where you are — and help you take the next step with confidence.",
+  },
+  contact: {
+    badge: "We are listening",
+    title: "Contact us",
+    subtitle:
+      "Questions, feedback, or partnership ideas? Send us a message and we will get back to you.",
+    channels: {
+      email: {
+        title: "Email",
+        value: "hello@labella.app",
+        hint: "Best for account, billing, and learning support.",
+      },
+      response: {
+        title: "Response time",
+        value: "Within 48 hours",
+        hint: "Usually faster on weekdays.",
+      },
+      region: {
+        title: "Based in",
+        value: "Europe · Remote-first",
+        hint: "We support learners and teams worldwide.",
+      },
+    },
+    form: {
+      title: "Send a message",
+      subtitle: "Tell us what you need — the more detail, the better we can help.",
+      name: "Full name",
+      namePlaceholder: "Your name",
+      email: "Email",
+      emailPlaceholder: "you@example.com",
+      subject: "Subject",
+      subjectPlaceholder: "How can we help?",
+      message: "Message",
+      messagePlaceholder: "Write your message here...",
+      submit: "Send message",
+      sending: "Sending...",
+      validationRequired: "Please fill in all fields before sending.",
+      successTitle: "Message received!",
+      successDescription:
+        "Thanks for reaching out. Our team will reply to your email soon.",
+    },
+    helpTitle: "Common topics",
+    helpItems: {
+      account: "Account access, password, or profile updates",
+      subscription: "Basic, Pro, or Ultimate plan questions",
+      learning: "Lessons, quizzes, levels, or language availability",
+      feedback: "Feature ideas, bugs, or general feedback",
+    },
+    privacyNote:
+      "Your message is used only to respond to your request. We do not share contact details with third parties.",
+  },
   meta: {
     siteTitle: "LaBella — Learn a language, one lesson at a time",
     siteDescription:
@@ -629,6 +750,12 @@ export const en = {
     subscription: "Subscription — LaBella",
     subscriptionDescription:
       "Choose Basic, Pro, or Ultimate — monthly plans to unlock your full language learning journey.",
+    about: "About us — LaBella",
+    aboutDescription:
+      "Learn about LaBella's mission, values, and the story behind our language learning platform.",
+    contact: "Contact us — LaBella",
+    contactDescription:
+      "Get in touch with the LaBella team for support, feedback, or partnership inquiries.",
     admin: "Admin — LaBella",
     adminQuizzes: "Quiz Management — LaBella",
     quizBrowse: "Browse Quizzes — LaBella",
