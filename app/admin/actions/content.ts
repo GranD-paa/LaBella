@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdminPermission } from "@/lib/auth/action-guards";
 import { getDataRepository } from "@/lib/data";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
@@ -10,6 +11,9 @@ import {
 } from "@/lib/validations/admin";
 
 export async function createContentGrammar(values: unknown): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
   const parsed = contentGrammarSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
@@ -35,6 +39,9 @@ export async function createContentGrammar(values: unknown): Promise<ActionResul
 export async function createContentVocabulary(
   values: unknown
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
   const parsed = contentVocabularySchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
@@ -60,6 +67,9 @@ export async function createContentVocabulary(
 }
 
 export async function createContentVideo(values: unknown): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
   const parsed = videoLessonSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };

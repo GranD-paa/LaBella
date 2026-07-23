@@ -6,7 +6,7 @@ import { updateSession } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
   if (isLocalDataMode()) {
-    return updateLocalSession(request);
+    return await updateLocalSession(request);
   }
 
   return await updateSession(request);

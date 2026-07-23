@@ -1,5 +1,10 @@
 "use server";
 
+import { z } from "zod";
+
+import {
+  requireAdminPermission,
+} from "@/lib/auth/action-guards";
 import { getDataRepository } from "@/lib/data";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
@@ -9,6 +14,9 @@ export async function updateUserAdminStatus(
   userId: string,
   isAdmin: boolean
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageUsers");
+  if (!guard.ok) return { error: guard.error };
+
   const repo = getDataRepository();
   const result = await repo.updateUserAdminStatus(userId, isAdmin);
 
@@ -24,6 +32,9 @@ export async function updateUserRole(
   userId: string,
   role: RoleSlug
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageRoles");
+  if (!guard.ok) return { error: guard.error };
+
   const repo = getDataRepository();
   const result = await repo.updateUserRole(userId, role);
 
@@ -39,6 +50,9 @@ export async function updateUserStatus(
   userId: string,
   status: UserStatus
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageUsers");
+  if (!guard.ok) return { error: guard.error };
+
   const repo = getDataRepository();
   const result = await repo.updateUserStatus(userId, status);
 
@@ -53,8 +67,16 @@ export async function updateUserStatus(
 export async function sendPasswordResetEmail(
   email: string
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageUsers");
+  if (!guard.ok) return { error: guard.error };
+
+  const parsed = z.string().email().safeParse(email);
+  if (!parsed.success) {
+    return { error: "actions.errors.invalidInput" };
+  }
+
   const repo = getDataRepository();
-  const result = await repo.sendPasswordResetEmail(email);
+  const result = await repo.sendPasswordResetEmail(parsed.data);
 
   if (result.error) {
     return { error: "actions.errors.generic" };

@@ -43,16 +43,20 @@ const quizIds = Array.from({ length: 10 }, (_, index) =>
   `20000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`
 );
 
-export const LOCAL_DEV_CREDENTIALS = {
-  admin: {
-    email: "erfanmalayri@outlook.com",
-    password: "451377e451377E",
-  },
-  user: {
-    email: "erfanmalayriii@gmail.com",
-    password: "451377e451377E",
-  },
-} as const;
+export function getLocalDevCredentials() {
+  return {
+    admin: {
+      email: process.env.LOCAL_DEV_ADMIN_EMAIL ?? "admin@labella.local",
+      password: process.env.LOCAL_DEV_ADMIN_PASSWORD ?? "Admin123!",
+    },
+    user: {
+      email: process.env.LOCAL_DEV_USER_EMAIL ?? "learner@labella.local",
+      password: process.env.LOCAL_DEV_USER_PASSWORD ?? "Learner123!",
+    },
+  } as const;
+}
+
+export const LOCAL_DEV_CREDENTIALS = getLocalDevCredentials();
 
 export const LOCAL_SEED: LocalDatabase = {
   users: [

@@ -1,11 +1,15 @@
 "use server";
 
+import { requireAdminPermission } from "@/lib/auth/action-guards";
 import { getDataRepository } from "@/lib/data";
 import { lessonSchema } from "@/lib/validations/admin";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
 
 export async function createLesson(values: unknown): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
   const parsed = lessonSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
@@ -30,6 +34,9 @@ export async function updateLesson(
   id: string,
   values: unknown
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
   const parsed = lessonSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
@@ -51,6 +58,9 @@ export async function updateLesson(
 }
 
 export async function deleteLesson(id: string): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
   const repo = getDataRepository();
   const result = await repo.deleteLesson(id);
 

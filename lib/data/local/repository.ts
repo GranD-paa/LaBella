@@ -18,7 +18,15 @@ export function createLocalRepository(): DataRepository {
       if (!userId) return null;
       const store = getLocalStore();
       const user = store.users.find((entry) => entry.id === userId);
-      return user ? { id: user.id, email: user.email } : null;
+      if (!user) return null;
+
+      const profile = store.profiles.find((entry) => entry.id === userId);
+      if (profile?.status === "suspended") {
+        await clearLocalSession();
+        return null;
+      }
+
+      return { id: user.id, email: user.email };
     },
 
     async signInWithPassword(email, password) {

@@ -1,11 +1,15 @@
 "use server";
 
+import { requireAdminPermission } from "@/lib/auth/action-guards";
 import { getDataRepository } from "@/lib/data";
 import { vocabularySchema } from "@/lib/validations/admin";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
 
 export async function createVocabulary(values: unknown): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
   const parsed = vocabularySchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
@@ -34,6 +38,9 @@ export async function updateVocabulary(
   id: string,
   values: unknown
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
   const parsed = vocabularySchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
@@ -57,6 +64,9 @@ export async function updateVocabulary(
 }
 
 export async function deleteVocabulary(id: string): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
   const repo = getDataRepository();
   const row = (await repo.getAllVocabulary()).find((item) => item.id === id);
   const result = await repo.deleteVocabulary(id);

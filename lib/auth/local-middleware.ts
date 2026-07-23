@@ -1,15 +1,21 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { LOCAL_SESSION_COOKIE } from "@/lib/auth/local-session";
+import {
+  LOCAL_SESSION_COOKIE,
+  verifyLocalSessionToken,
+} from "@/lib/auth/local-session";
 
 const PUBLIC_ROUTES = ["/", "/login", "/sign-up", "/auth"];
 
-export function updateLocalSession(request: NextRequest) {
+export async function updateLocalSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isPublicRoute = PUBLIC_ROUTES.some((route) =>
     route === "/" ? pathname === "/" : pathname.startsWith(route)
   );
-  const userId = request.cookies.get(LOCAL_SESSION_COOKIE)?.value ?? null;
+  const rawSession = request.cookies.get(LOCAL_SESSION_COOKIE)?.value ?? null;
+  const userId = rawSession
+    ? await verifyLocalSessionToken(rawSession)
+    : null;
 
   if (!userId && !isPublicRoute) {
     const redirectUrl = request.nextUrl.clone();

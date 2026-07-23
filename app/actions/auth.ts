@@ -1,11 +1,17 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
 import { isLocalDataMode } from "@/lib/config/data-source";
 import { getLanguagesWithAvailability } from "@/lib/curriculum/availability";
 import { getDataRepository } from "@/lib/data";
 import { resolveContinueLearningPath } from "@/lib/curriculum/learning-state";
+import {
+  buildAuthRateLimitKey,
+  checkRateLimit,
+} from "@/lib/auth/rate-limit";
+import { getSafeRedirectPath } from "@/lib/auth/safe-redirect";
 import { signInSchema, signUpSchema } from "@/lib/validations/auth";
 import type { SignInValues, SignUpValues } from "@/lib/validations/auth";
 
@@ -33,16 +39,13 @@ function formatAuthErrorKey(message: string) {
   return "actions.errors.generic";
 }
 
-function getSafeRedirectPath(path: string) {
-  if (!path.startsWith("/") || path.startsWith("//")) {
-    return "/menu";
-  }
-
-  if (path === "/login" || path === "/sign-up") {
-    return "/menu";
-  }
-
-  return path;
+async function getClientIpForRateLimit(): Promise<string> {
+  const headerStore = await headers();
+  return (
+    headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    headerStore.get("x-real-ip") ??
+    "unknown"
+  );
 }
 
 export async function signInAction(
@@ -52,6 +55,14 @@ export async function signInAction(
   const parsed = signInSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidCredentials" };
+  }
+
+  const ip = await getClientIpForRateLimit();
+  const rateLimit = checkRateLimit(
+    buildAuthRateLimitKey(`sign-in:${ip}`, parsed.data.email)
+  );
+  if (!rateLimit.allowed) {
+    return { error: "actions.errors.generic" };
   }
 
   const repo = getDataRepository();
@@ -87,6 +98,15 @@ export async function signUpAction(
   const parsed = signUpSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.formCheck" };
+  }
+
+  const ip = await getClientIpForRateLimit();
+  const rateLimit = checkRateLimit(
+    buildAuthRateLimitKey(`sign-up:${ip}`, parsed.data.email),
+    5
+  );
+  if (!rateLimit.allowed) {
+    return { error: "actions.errors.generic" };
   }
 
   if (isLocalDataMode()) {

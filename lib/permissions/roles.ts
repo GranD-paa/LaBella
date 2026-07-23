@@ -1,8 +1,6 @@
-// Role tiers for the admin user-management system. Only `is_admin` is
-// currently enforced by `requireAdmin()` (any non-"learner" role implies
-// `is_admin = true`). The granular per-role permission flags below are
-// forward-looking metadata for a future fine-grained authorization layer —
-// they are surfaced in the UI today but not yet enforced server-side.
+// Role tiers for the admin user-management system. `requireAdmin()` in
+// layouts still gates the admin UI; server actions enforce the granular
+// permission flags below via `requireAdminPermission()`.
 
 export const ROLE_SLUGS = [
   "super_admin",

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { requireAdminPermission } from "@/lib/auth/action-guards";
 import { getDataRepository } from "@/lib/data";
 import {
   quizQuestionSchema,
@@ -30,6 +31,9 @@ async function getQuestionLessonId(questionId: string) {
 export async function createStructuredQuiz(
   values: unknown
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageQuizzes");
+  if (!guard.ok) return { error: guard.error };
+
   const parsed = structuredQuizSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
@@ -59,6 +63,9 @@ export async function updateQuizStatusAction(
   quizId: string,
   status: "draft" | "published"
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageQuizzes");
+  if (!guard.ok) return { error: guard.error };
+
   const repo = getDataRepository();
 
   if (status === "published") {
@@ -89,6 +96,9 @@ function revalidateQuizPaths() {
 export async function createQuizWithQuestions(
   values: unknown
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageQuizzes");
+  if (!guard.ok) return { error: guard.error };
+
   const parsed = quizSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
@@ -115,6 +125,9 @@ export async function updateQuizTitle(
   quizId: string,
   values: unknown
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageQuizzes");
+  if (!guard.ok) return { error: guard.error };
+
   const parsed = quizTitleSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
@@ -136,6 +149,9 @@ export async function addQuizQuestion(
   quizId: string,
   values: unknown
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageQuizzes");
+  if (!guard.ok) return { error: guard.error };
+
   const parsed = quizQuestionSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
@@ -169,6 +185,9 @@ export async function updateQuizQuestion(
   questionId: string,
   values: unknown
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageQuizzes");
+  if (!guard.ok) return { error: guard.error };
+
   const parsed = quizQuestionSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
@@ -201,6 +220,9 @@ export async function updateQuizQuestion(
 export async function deleteQuizQuestion(
   questionId: string
 ): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageQuizzes");
+  if (!guard.ok) return { error: guard.error };
+
   const repo = getDataRepository();
   const lessonId = await getQuestionLessonId(questionId);
   const result = await repo.deleteQuizQuestion(questionId);
@@ -214,6 +236,9 @@ export async function deleteQuizQuestion(
 }
 
 export async function deleteQuiz(id: string): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageQuizzes");
+  if (!guard.ok) return { error: guard.error };
+
   const repo = getDataRepository();
   const quiz = await repo.getQuizById(id);
   const result = await repo.deleteQuiz(id);
