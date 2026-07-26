@@ -62,7 +62,10 @@ create table if not exists public.vocabulary (
   translation text not null,
   image_url text,
   example_sentence text,
-  created_at timestamptz not null default now()
+  pronunciation text,
+  status text not null default 'draft',
+  created_at timestamptz not null default now(),
+  constraint vocabulary_status_check check (status in ('draft', 'published'))
 );
 
 -- =========================================================================
@@ -74,7 +77,9 @@ create table if not exists public.grammar_rules (
   title text not null,
   description text,
   example text,
-  created_at timestamptz not null default now()
+  status text not null default 'draft',
+  created_at timestamptz not null default now(),
+  constraint grammar_rules_status_check check (status in ('draft', 'published'))
 );
 
 -- =========================================================================
@@ -84,7 +89,12 @@ create table if not exists public.quizzes (
   id uuid primary key default gen_random_uuid(),
   lesson_id uuid not null references public.lessons (id) on delete cascade,
   title text not null,
-  created_at timestamptz not null default now()
+  language_slug text not null default 'italian',
+  level_slug text not null default 'a1-1',
+  section_slug text not null default 'quiz',
+  status text not null default 'published',
+  created_at timestamptz not null default now(),
+  constraint quizzes_status_check check (status in ('draft', 'published'))
 );
 
 -- =========================================================================
@@ -99,7 +109,11 @@ create table if not exists public.quiz_questions (
   option_c text not null,
   option_d text not null,
   correct_option text not null check (correct_option in ('a', 'b', 'c', 'd')),
-  created_at timestamptz not null default now()
+  question_type text not null default 'multiple_choice',
+  expected_answer text,
+  explanation text,
+  created_at timestamptz not null default now(),
+  constraint quiz_questions_question_type_check check (question_type in ('multiple_choice', 'written'))
 );
 
 -- =========================================================================
@@ -115,7 +129,24 @@ create table if not exists public.user_quiz_attempts (
 );
 
 -- =========================================================================
--- 8. user_learning_state
+-- 8. video_lessons
+-- =========================================================================
+create table if not exists public.video_lessons (
+  id uuid primary key default gen_random_uuid(),
+  lesson_id uuid not null references public.lessons (id) on delete cascade,
+  language_slug text not null default 'italian',
+  level_slug text not null default 'a1-1',
+  title text not null,
+  description text,
+  video_url text not null,
+  thumbnail_url text,
+  status text not null default 'draft',
+  created_at timestamptz not null default now(),
+  constraint video_lessons_status_check check (status in ('draft', 'published'))
+);
+
+-- =========================================================================
+-- 9. user_learning_state
 -- =========================================================================
 -- One row per learner: their last active language, level, lesson, and
 -- section. Used to resume the course automatically right after login.
@@ -136,7 +167,7 @@ comment on table public.user_learning_state is
   'Tracks each learner''s last active language/level/lesson/section so navigation can resume it after login.';
 
 -- =========================================================================
--- 9. language_settings
+-- 10. language_settings
 -- =========================================================================
 -- Super-admin controlled overrides for whether a language (beyond the
 -- default Italian course) is "coming soon" or fully active/open to
@@ -152,7 +183,7 @@ comment on table public.language_settings is
   'Super-admin toggles for opening additional language courses (e.g. German, Turkish, English) from "coming soon" to active.';
 
 -- =========================================================================
--- 10. curriculum_level_overrides
+-- 11. curriculum_level_overrides
 -- =========================================================================
 -- Super-admin customization of a language's curriculum structure: renaming
 -- a default level's title/description (is_custom = false), or adding a
@@ -184,8 +215,14 @@ create index if not exists quizzes_lesson_id_idx on public.quizzes (lesson_id);
 create index if not exists quiz_questions_quiz_id_idx on public.quiz_questions (quiz_id);
 create index if not exists user_quiz_attempts_user_id_idx on public.user_quiz_attempts (user_id);
 create index if not exists user_quiz_attempts_quiz_id_idx on public.user_quiz_attempts (quiz_id);
+create unique index if not exists user_quiz_attempts_user_quiz_unique on public.user_quiz_attempts (user_id, quiz_id);
 create index if not exists lessons_order_number_idx on public.lessons (order_number);
 create index if not exists user_learning_state_language_idx on public.user_learning_state (language_slug);
+create index if not exists video_lessons_lesson_id_idx on public.video_lessons (lesson_id);
+create index if not exists grammar_rules_status_idx on public.grammar_rules (status);
+create index if not exists vocabulary_status_idx on public.vocabulary (status);
+create index if not exists quizzes_language_level_section_idx on public.quizzes (language_slug, level_slug, section_slug);
+create index if not exists quizzes_status_idx on public.quizzes (status);
 
 -- =========================================================================
 -- Row Level Security
@@ -197,6 +234,7 @@ alter table public.grammar_rules enable row level security;
 alter table public.quizzes enable row level security;
 alter table public.quiz_questions enable row level security;
 alter table public.user_quiz_attempts enable row level security;
+alter table public.video_lessons enable row level security;
 alter table public.user_learning_state enable row level security;
 alter table public.language_settings enable row level security;
 alter table public.curriculum_level_overrides enable row level security;
@@ -208,6 +246,7 @@ alter table public.grammar_rules force row level security;
 alter table public.quizzes force row level security;
 alter table public.quiz_questions force row level security;
 alter table public.user_quiz_attempts force row level security;
+alter table public.video_lessons force row level security;
 alter table public.user_learning_state force row level security;
 alter table public.language_settings force row level security;
 alter table public.curriculum_level_overrides force row level security;
@@ -374,6 +413,23 @@ create policy "Users can insert own quiz attempts"
 drop policy if exists "Admins can manage all quiz attempts" on public.user_quiz_attempts;
 create policy "Admins can manage all quiz attempts"
   on public.user_quiz_attempts for all
+  to authenticated
+  using (private.is_admin())
+  with check (private.is_admin());
+
+-- -------------------------------------------------------------------------
+-- video_lessons policies: learners can only see published videos; admins
+-- can see and manage everything (including drafts).
+-- -------------------------------------------------------------------------
+drop policy if exists "Video lessons viewable by authenticated" on public.video_lessons;
+create policy "Video lessons viewable by authenticated"
+  on public.video_lessons for select
+  to authenticated
+  using (status = 'published' or private.is_admin());
+
+drop policy if exists "Admins can manage video lessons" on public.video_lessons;
+create policy "Admins can manage video lessons"
+  on public.video_lessons for all
   to authenticated
   using (private.is_admin())
   with check (private.is_admin());

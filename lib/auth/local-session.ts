@@ -7,6 +7,10 @@ function getSessionSecret(): string {
   if (process.env.NODE_ENV === "production" && !secret) {
     throw new Error("LOCAL_SESSION_SECRET must be set when using local data mode.");
   }
+  // Safe to fall back in non-production: `lib/config/data-source.ts`
+  // (`getDataSource()`/`isLocalDataMode()`) already throws before any code
+  // in this file can run if NEXT_PUBLIC_DATA_SOURCE=local is set while
+  // NODE_ENV=production, so this fallback is only ever reached in local dev.
   return secret ?? "labella-local-dev-secret-change-me";
 }
 

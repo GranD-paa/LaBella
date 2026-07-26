@@ -40,6 +40,11 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (user) {
+    // One indexed (primary-key) row/column lookup per request. Cheap even
+    // at scale, but it can be removed by baking `status` into the JWT via
+    // a Supabase "Custom Access Token" auth hook — see
+    // supabase/migrations/20260726120000_status_claim_hook.sql for the
+    // ready-to-enable function and upgrade instructions.
     const { data: profile } = await supabase
       .from("profiles")
       .select("status")

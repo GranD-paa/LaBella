@@ -3,7 +3,7 @@
 import { isLanguageSlug } from "@/lib/curriculum/languages";
 import { getDataRepository } from "@/lib/data";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
-import { requireAdmin } from "@/lib/supabase/admin-guard";
+import { requireSuperAdminAction } from "@/lib/auth/action-guards";
 import type { ActionResult } from "@/lib/action-result";
 
 /**
@@ -16,11 +16,8 @@ export async function setLanguageAvailabilityAction(
   languageSlug: string,
   enabled: boolean
 ): Promise<ActionResult> {
-  const { profile } = await requireAdmin();
-
-  if (profile.role !== "super_admin") {
-    return { error: "actions.errors.forbidden" };
-  }
+  const guard = await requireSuperAdminAction();
+  if (!guard.ok) return { error: guard.error };
 
   if (!isLanguageSlug(languageSlug)) {
     return { error: "actions.errors.generic" };
