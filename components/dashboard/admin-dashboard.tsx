@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   ChevronDown,
   Gauge,
+  Languages,
   ListChecks,
   ShieldCheck,
   Users,
@@ -41,6 +42,20 @@ const LANGUAGE_LABEL_KEYS: Record<string, string> = {
   german: "dashboard.admin.languageGerman",
   turkish: "dashboard.admin.languageTurkish",
 };
+
+function scoreBadgeClassName(score: number) {
+  if (score >= 80) {
+    return "border-emerald-400/30 bg-emerald-500/15 text-emerald-300";
+  }
+  if (score >= 50) {
+    return "border-amber-400/30 bg-amber-500/15 text-amber-300";
+  }
+  return "border-red-400/30 bg-red-500/15 text-red-300";
+}
+
+function getInitial(name: string) {
+  return name.trim().charAt(0).toUpperCase() || "?";
+}
 
 function LevelQuizRowDetails({
   entry,
@@ -205,20 +220,23 @@ export function AdminDashboard({
               </Link>
             </Button>
           ) : (
-            <div className="flex flex-wrap gap-2">
-              <Button asChild variant="secondary">
+            <div className="flex w-full flex-col gap-2 sm:w-64">
+              <Button asChild variant="secondary" className="w-full justify-start">
                 <Link href="/admin/quizzes">
+                  <ListChecks className="h-4 w-4" />
                   {t("dashboard.admin.manageQuizzes")}
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="border-white/20">
+              <Button asChild variant="outline" className="w-full justify-start border-white/20">
                 <Link href="/admin">
+                  <Users className="h-4 w-4" />
                   {t("dashboard.admin.manageUsers")}
                 </Link>
               </Button>
               {isSuperAdmin ? (
-                <Button asChild variant="outline" className="border-white/20">
+                <Button asChild variant="outline" className="w-full justify-start border-white/20">
                   <Link href="/admin/languages">
+                    <Languages className="h-4 w-4" />
                     {t("dashboard.admin.manageLanguages")}
                   </Link>
                 </Button>
@@ -277,13 +295,25 @@ export function AdminDashboard({
       ) : null}
 
       {!showFullManagement ? (
-        <section className="grid gap-6 lg:grid-cols-2">
+        <section>
           <Card className="brand-surface">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-brand-accent" />
-                {t("dashboard.admin.recentActivity")}
-              </CardTitle>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-brand-accent" />
+                  {t("dashboard.admin.recentActivity")}
+                </CardTitle>
+                {data.recentActivity.length > 0 ? (
+                  <Badge
+                    variant="outline"
+                    className="border-white/15 bg-white/5 text-muted-foreground"
+                  >
+                    {t("dashboard.admin.activityCount", {
+                      count: data.recentActivity.length,
+                    })}
+                  </Badge>
+                ) : null}
+              </div>
               <CardDescription>{t("dashboard.admin.recentActivityHint")}</CardDescription>
             </CardHeader>
             <CardContent>
@@ -292,13 +322,16 @@ export function AdminDashboard({
                   {t("dashboard.admin.noActivity")}
                 </p>
               ) : (
-                <div className="space-y-3">
-                  {data.recentActivity.slice(0, 6).map((activity) => (
+                <div className="max-h-96 space-y-2 overflow-y-auto pe-1">
+                  {data.recentActivity.map((activity) => (
                     <div
                       key={activity.id}
-                      className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-muted/30 px-3 py-2"
+                      className="flex items-center gap-3 rounded-lg border border-white/10 bg-muted/30 px-3 py-2"
                     >
-                      <div className="min-w-0">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-accent/15 text-sm font-semibold text-brand-accent">
+                        {getInitial(activity.userName)}
+                      </div>
+                      <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">
                           {activity.userName}
                         </p>
@@ -306,11 +339,16 @@ export function AdminDashboard({
                           {activity.quizTitle}
                         </p>
                       </div>
-                      <div className="text-end">
-                        <Badge variant="secondary">{activity.score}%</Badge>
+                      <div className="shrink-0 text-end">
+                        <Badge
+                          variant="outline"
+                          className={scoreBadgeClassName(activity.score)}
+                        >
+                          {activity.score}%
+                        </Badge>
                         <p className="mt-1 text-xs text-muted-foreground">
                           {formatDate(activity.createdAt, {
-                            dateStyle: "medium",
+                            dateStyle: "short",
                             timeStyle: "short",
                           })}
                         </p>

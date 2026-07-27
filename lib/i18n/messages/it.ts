@@ -317,6 +317,7 @@ export const it: Messages = {
       totalAttempts: "{count} tentativi totali",
       recentActivity: "Attività recente",
       recentActivityHint: "Ultimi invii di quiz dagli studenti.",
+      activityCount: "{count} voci",
       noActivity: "Nessuna attività quiz ancora.",
       quizPerformance: "Performance quiz",
       quizPerformanceHint: "Conteggio tentativi e punteggi medi per quiz.",

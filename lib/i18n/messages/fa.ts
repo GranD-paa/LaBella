@@ -311,6 +311,7 @@ export const fa: Messages = {
       totalAttempts: "{count} تلاش کل",
       recentActivity: "فعالیت اخیر",
       recentActivityHint: "آخرین ارسال‌های آزمون از یادگیرندگان.",
+      activityCount: "{count} مورد",
       noActivity: "هنوز فعالیت آزمونی نیست.",
       quizPerformance: "عملکرد آزمون‌ها",
       quizPerformanceHint: "تعداد تلاش و میانگین نمره هر آزمون.",

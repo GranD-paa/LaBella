@@ -315,6 +315,7 @@ export const en = {
       totalAttempts: "{count} total attempts",
       recentActivity: "Recent activity",
       recentActivityHint: "Latest quiz submissions from learners.",
+      activityCount: "{count} entries",
       noActivity: "No quiz activity yet.",
       quizPerformance: "Quiz performance",
       quizPerformanceHint: "Attempt counts and average scores per quiz.",
