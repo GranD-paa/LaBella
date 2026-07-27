@@ -7,10 +7,11 @@ import {
   ArrowLeft,
   BarChart3,
   BookOpen,
+  CheckCircle2,
   ChevronDown,
+  Gauge,
   ListChecks,
   ShieldCheck,
-  TrendingUp,
   Users,
 } from "lucide-react";
 
@@ -228,35 +229,50 @@ export function AdminDashboard({
       </section>
 
       {!showFullManagement ? (
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard
-            title={t("dashboard.admin.totalUsers")}
-            value={data.stats.totalUsers}
-            description={t("dashboard.admin.registeredLearners")}
-            icon={Users}
-          />
-          <StatCard
-            title={t("dashboard.admin.totalQuizzes")}
-            value={data.stats.totalQuizzes}
-            description={t("dashboard.admin.acrossLessons", {
-              count: data.stats.totalLessons,
-            })}
-            icon={ListChecks}
-          />
-          <StatCard
-            title={t("dashboard.admin.completionRate")}
-            value={`${data.stats.completionRate}%`}
-            description={t("dashboard.admin.quizzesWithAttempts")}
-            icon={TrendingUp}
-          />
-          <StatCard
-            title={t("dashboard.admin.avgScore")}
-            value={`${data.stats.averageScore}%`}
-            description={t("dashboard.admin.totalAttempts", {
-              count: data.stats.totalAttempts,
-            })}
-            icon={BarChart3}
-          />
+        <section>
+          <Card className="brand-surface">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Gauge className="h-5 w-5 text-brand-accent" />
+                {t("dashboard.admin.monitoring")}
+              </CardTitle>
+              <CardDescription>{t("dashboard.admin.monitoringHint")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <StatCard
+                  title={t("dashboard.admin.totalUsers")}
+                  value={data.stats.totalUsers}
+                  description={t("dashboard.admin.registeredLearners")}
+                  icon={Users}
+                />
+                <StatCard
+                  title={t("dashboard.admin.totalQuizzes")}
+                  value={data.stats.totalQuizzes}
+                  description={t("dashboard.admin.acrossLessons", {
+                    count: data.stats.totalLessons,
+                  })}
+                  icon={ListChecks}
+                />
+                <StatCard
+                  title={t("dashboard.admin.avgScore")}
+                  value={`${data.stats.averageScore}%`}
+                  description={t("dashboard.admin.totalAttempts", {
+                    count: data.stats.totalAttempts,
+                  })}
+                  icon={BarChart3}
+                />
+                <StatCard
+                  title={t("dashboard.admin.quizzesWithAttempts")}
+                  value={data.stats.quizzesWithAttempts}
+                  description={t("dashboard.admin.outOfTotalQuizzes", {
+                    count: data.stats.totalQuizzes,
+                  })}
+                  icon={CheckCircle2}
+                />
+              </div>
+            </CardContent>
+          </Card>
         </section>
       ) : null}
 

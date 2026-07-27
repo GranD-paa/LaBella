@@ -137,15 +137,26 @@ export function computeNextCodeForBand(
   return { code, slug: code.toLowerCase() };
 }
 
-/** Next order number within one language's curriculum (not global lessons). */
-export function computeNextOrderNumberForLanguage(
-  levels: CurriculumLevel[]
+/**
+ * Next order number that's free across every lesson on the platform.
+ *
+ * `public.lessons` has no `language_slug` column — `order_number` is a
+ * single shared sequence across every language's curriculum. Scoping this
+ * computation to just one language's levels (as an earlier version of this
+ * function did) lets a brand-new level for e.g. English reuse an
+ * `order_number` that Italian's real lessons already occupy, silently
+ * overwriting them in any lookup keyed by order number (such as the admin
+ * dashboard's per-level quiz overview). Always pass every existing lesson's
+ * `order_number`, not just one language's.
+ */
+export function computeNextGlobalOrderNumber(
+  existingLessonOrderNumbers: number[]
 ): number {
   let highest = 0;
 
-  for (const level of levels) {
-    if (level.orderNumber > highest) {
-      highest = level.orderNumber;
+  for (const orderNumber of existingLessonOrderNumbers) {
+    if (orderNumber > highest) {
+      highest = orderNumber;
     }
   }
 

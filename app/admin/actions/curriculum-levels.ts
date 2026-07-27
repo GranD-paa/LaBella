@@ -3,7 +3,7 @@
 import type { ActionResult } from "@/lib/action-result";
 import {
   computeNextCodeForBand,
-  computeNextOrderNumberForLanguage,
+  computeNextGlobalOrderNumber,
   getAdminCurriculumLevelsByLanguage,
 } from "@/lib/curriculum/level-overrides";
 import { isLanguageSlug } from "@/lib/curriculum/languages";
@@ -47,7 +47,10 @@ export async function addCurriculumLevelAction(
   }
 
   const repo = getDataRepository();
-  const levelsByLanguage = await getAdminCurriculumLevelsByLanguage(repo);
+  const [levelsByLanguage, allLessons] = await Promise.all([
+    getAdminCurriculumLevelsByLanguage(repo),
+    repo.getLessons(),
+  ]);
   const currentLevels = levelsByLanguage[languageSlug] ?? [];
 
   const { code, slug } = computeNextCodeForBand(currentLevels, band);
@@ -55,7 +58,9 @@ export async function addCurriculumLevelAction(
     return { error: "actions.errors.generic" };
   }
 
-  const nextOrderNumber = computeNextOrderNumberForLanguage(currentLevels);
+  const nextOrderNumber = computeNextGlobalOrderNumber(
+    allLessons.map((lesson) => lesson.order_number)
+  );
 
   const trimmedDescription = description.trim();
 

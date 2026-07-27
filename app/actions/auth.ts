@@ -83,6 +83,14 @@ export async function signInAction(
   }
 
   const user = await repo.getAuthUser();
+  const profile = user ? await repo.getProfileById(user.id) : null;
+
+  // Admins manage the platform, not take quizzes — send them to the admin
+  // dashboard instead of resuming (or starting) a learner's course path.
+  if (profile?.is_admin) {
+    redirect("/dashboard");
+  }
+
   const learningState = user ? await repo.getLearningState(user.id) : null;
   const languages = await getLanguagesWithAvailability(repo);
 

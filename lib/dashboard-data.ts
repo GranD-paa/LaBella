@@ -68,6 +68,7 @@ export type AdminDashboardData = {
     totalQuizzes: number;
     totalAttempts: number;
     completionRate: number;
+    quizzesWithAttempts: number;
     averageScore: number;
     totalLessons: number;
   };
@@ -227,16 +228,29 @@ export async function fetchAdminDashboardData(
   );
   const quizMap = new Map(quizzes.map((quiz) => [quiz.id, quiz]));
 
+  // Admins occasionally take quizzes while building/testing content — those
+  // attempts aren't real learner performance and would skew the monitoring
+  // stats below, so every attempt-based metric here is scoped to students
+  // (non-admin profiles) only.
+  const adminIds = new Set(
+    profiles.filter((profile) => profile.is_admin).map((profile) => profile.id)
+  );
+  const studentProfiles = profiles.filter((profile) => !profile.is_admin);
+  const studentAttempts = allAttempts.filter(
+    (attempt) => !adminIds.has(attempt.user_id)
+  );
+
   const averageScore =
-    allAttempts.length > 0
+    studentAttempts.length > 0
       ? Math.round(
-          allAttempts.reduce((sum, attempt) => sum + attempt.score, 0) /
-            allAttempts.length
+          studentAttempts.reduce((sum, attempt) => sum + attempt.score, 0) /
+            studentAttempts.length
         )
       : 0;
 
-  const uniqueCompletions = new Set(allAttempts.map((attempt) => attempt.quiz_id))
-    .size;
+  const uniqueCompletions = new Set(
+    studentAttempts.map((attempt) => attempt.quiz_id)
+  ).size;
   const completionRate =
     quizzes.length > 0
       ? Math.round((uniqueCompletions / quizzes.length) * 100)
@@ -281,7 +295,7 @@ export async function fetchAdminDashboardData(
     };
   });
 
-  const recentActivity = [...allAttempts]
+  const recentActivity = [...studentAttempts]
     .sort((a, b) => b.created_at.localeCompare(a.created_at))
     .slice(0, 20)
     .map((attempt) => {
@@ -297,10 +311,11 @@ export async function fetchAdminDashboardData(
 
   return {
     stats: {
-      totalUsers: profiles.length,
+      totalUsers: studentProfiles.length,
       totalQuizzes: quizzes.length,
-      totalAttempts: allAttempts.length,
+      totalAttempts: studentAttempts.length,
       completionRate,
+      quizzesWithAttempts: uniqueCompletions,
       averageScore,
       totalLessons: lessons.length,
     },
