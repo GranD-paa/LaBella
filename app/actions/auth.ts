@@ -91,13 +91,26 @@ export async function signInAction(
     redirect("/dashboard");
   }
 
-  const learningState = user ? await repo.getLearningState(user.id) : null;
-  const languages = await getLanguagesWithAvailability(repo);
+  const [learningState, languages, lessons, quizzes, attempts] =
+    await Promise.all([
+      user ? repo.getLearningState(user.id) : Promise.resolve(null),
+      getLanguagesWithAvailability(repo),
+      repo.getLessons(),
+      repo.getQuizzes(),
+      user ? repo.getAttemptsByUserId(user.id) : Promise.resolve([]),
+    ]);
 
   // No explicit destination requested: send returning learners straight back
-  // into their last active language/level/section, and first-time learners
-  // to the Main Menu to choose a language.
-  redirect(resolveContinueLearningPath(learningState, languages));
+  // into their last active language/level/section (advancing past it if
+  // they've already passed its checkpoint quiz), and first-time learners to
+  // the Main Menu to choose a language.
+  redirect(
+    resolveContinueLearningPath(learningState, languages, {
+      lessons,
+      quizzes,
+      attemptedQuizIds: new Set(attempts.map((attempt) => attempt.quiz_id)),
+    })
+  );
 }
 
 export async function signUpAction(

@@ -200,6 +200,7 @@ export async function fetchUserDashboardData(
     achievements,
     continueLearning: buildContinueLearningSnapshot({
       languages,
+      lessons,
       quizzes,
       attempts,
       completedQuizDetails,

@@ -2,8 +2,13 @@ import {
   getDefaultLanguageContext,
   resolveLevelContext,
 } from "@/lib/curriculum/resolve-navigation";
+import {
+  getLevelCheckpointQuizzes,
+  isLevelCompleted,
+  resolveNextIncompleteLevel,
+} from "@/lib/curriculum/level-progress";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
-import type { Quiz, UserLearningState, UserQuizAttempt } from "@/types";
+import type { Lesson, Quiz, UserLearningState, UserQuizAttempt } from "@/types";
 
 export type ContinueLearningCategory = "grammar" | "vocabulary" | "quiz" | "visual";
 
@@ -28,6 +33,7 @@ export type LearnerEngagementMetrics = {
 
 type BuildContinueLearningInput = {
   languages: CurriculumLanguage[];
+  lessons: Lesson[];
   quizzes: Quiz[];
   attempts: UserQuizAttempt[];
   completedQuizDetails: Array<{
@@ -124,6 +130,43 @@ export function buildContinueLearningSnapshot(
 
     lastActivityCategory = "quiz";
     lastActivityTopic = mostRecent.quizTitle;
+  }
+
+  // If the resolved level's checkpoint quiz(zes) are already all attempted,
+  // the learner has passed it — advance to the next not-yet-completed level
+  // instead of sending them back into a lesson they already finished.
+  const attemptedQuizIds = new Set(
+    input.attempts.map((attempt) => attempt.quiz_id)
+  );
+  const currentLanguage = input.languages.find(
+    (entry) => entry.slug === languageSlug
+  );
+
+  if (currentLanguage) {
+    const levelQuizzes = getLevelCheckpointQuizzes(
+      languageSlug,
+      levelSlug,
+      input.lessons,
+      input.quizzes
+    );
+
+    if (isLevelCompleted(levelQuizzes, attemptedQuizIds)) {
+      const nextLevel = resolveNextIncompleteLevel(
+        languageSlug,
+        currentLanguage.levels,
+        input.lessons,
+        input.quizzes,
+        attemptedQuizIds
+      );
+
+      if (nextLevel && nextLevel.slug !== levelSlug) {
+        levelSlug = nextLevel.slug;
+        levelCode = nextLevel.code;
+        activeCourseTitle = nextLevel.title;
+        lastActivityCategory = "grammar";
+        lastActivityTopic = "";
+      }
+    }
   }
 
   const continueHref = `/learn/${languageSlug}/${levelSlug}`;
