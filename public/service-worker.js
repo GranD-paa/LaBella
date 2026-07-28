@@ -1,4 +1,4 @@
-const CACHE_NAME = "labella-v1";
+const CACHE_NAME = "laparla-v1";
 const PRECACHE_URLS = [
   "/",
   "/dashboard",

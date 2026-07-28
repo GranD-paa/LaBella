@@ -563,7 +563,7 @@ export const fa: Messages = {
   subscription: {
     title: "طرح یادگیری خود را انتخاب کنید",
     subtitle:
-      "{name}، با اشتراک ماهانه‌ای متناسب با اهدافتان، تجربه کامل لا‌بلا را باز کنید.",
+      "{name}، با اشتراک ماهانه‌ای متناسب با اهدافتان، تجربه کامل لاپارلا را باز کنید.",
     monthlyBadge: "دسترسی ۱ ماهه · پرداخت ماهانه",
     billingPeriod: "ماه",
     mostPopular: "محبوب‌ترین",
@@ -620,12 +620,12 @@ export const fa: Messages = {
   },
   about: {
     badge: "داستان ما",
-    title: "درباره لا‌بلا",
+    title: "درباره لاپارلا",
     subtitle:
       "ما مسیرهای زبان آرام و ساختاریافته می‌سازیم — یک درس، یک آزمون و یک پیروزی کوچک در هر قدم.",
-    missionTitle: "چرا لا‌بلا ساخته شد",
+    missionTitle: "چرا لاپارلا ساخته شد",
     missionBody:
-      "لا‌بلا با یک ایده ساده شروع شد: یادگیری زبان باید روشن باشد، نه گیج‌کننده. مسیرهای هم‌تراز با CEFR، درس‌های کوتاه و آزمون‌های معنادار را کنار هم می‌گذاریم تا یادگیرنده انگیزه‌اش را حفظ کند.",
+      "لاپارلا با یک ایده ساده شروع شد: یادگیری زبان باید روشن باشد، نه گیج‌کننده. مسیرهای هم‌تراز با CEFR، درس‌های کوتاه و آزمون‌های معنادار را کنار هم می‌گذاریم تا یادگیرنده انگیزه‌اش را حفظ کند.",
     valuesTitle: "باورهای ما",
     valuesSubtitle: "چهار اصل که شکل هر ویژگی جدید را تعیین می‌کند.",
     values: {
@@ -654,7 +654,7 @@ export const fa: Messages = {
     },
     timeline: {
       title: "مسیر ما تا اینجا",
-      subtitle: "نگاهی کوتاه به سفر لا‌بلا.",
+      subtitle: "نگاهی کوتاه به سفر لاپارلا.",
       items: {
         idea: {
           title: "ایده",
@@ -685,7 +685,7 @@ export const fa: Messages = {
     },
     communityTitle: "ساخته‌شده برای یادگیرندگان",
     communityBody:
-      "چه مدیر محتوا باشید و چه یادگیرنده‌ای که اولین درس را باز می‌کند، لا‌بلا برای همراهی با شما در قدم بعدی طراحی شده است.",
+      "چه مدیر محتوا باشید و چه یادگیرنده‌ای که اولین درس را باز می‌کند، لاپارلا برای همراهی با شما در قدم بعدی طراحی شده است.",
   },
   contact: {
     badge: "گوش‌به‌زنگیم",
@@ -695,7 +695,7 @@ export const fa: Messages = {
     channels: {
       email: {
         title: "ایمیل",
-        value: "hello@labella.app",
+        value: "hello@laparla.app",
         hint: "مناسب برای حساب، پرداخت و پشتیبانی یادگیری.",
       },
       response: {
@@ -738,32 +738,32 @@ export const fa: Messages = {
       "پیام شما فقط برای پاسخ‌گویی استفاده می‌شود. اطلاعات تماس را با اشخاص ثالث به اشتراک نمی‌گذاریم.",
   },
   meta: {
-    siteTitle: "لا‌بلا — هر درس، یک قدم به روانی",
+    siteTitle: "لاپارلا — هر درس، یک قدم به روانی",
     siteDescription:
-      "لا‌بلا به شما کمک می‌کند واژگان، گرامر و مهارت‌های شنیداری را با درس‌های کوتاه و آزمون‌ها یاد بگیرید.",
-    siteName: "LaBella",
-    login: "ورود — LaBella",
-    signUp: "ثبت‌نام — LaBella",
-    menu: "منوی اصلی — LaBella",
-    dashboard: "داشبورد — LaBella",
-    profile: "پروفایل — LaBella",
-    subscription: "خرید اشتراک — LaBella",
+      "لاپارلا به شما کمک می‌کند واژگان، گرامر و مهارت‌های شنیداری را با درس‌های کوتاه و آزمون‌ها یاد بگیرید.",
+    siteName: "LaParla",
+    login: "ورود — LaParla",
+    signUp: "ثبت‌نام — LaParla",
+    menu: "منوی اصلی — LaParla",
+    dashboard: "داشبورد — LaParla",
+    profile: "پروفایل — LaParla",
+    subscription: "خرید اشتراک — LaParla",
     subscriptionDescription:
       "بیسیک، پرو یا اولتیمیت را انتخاب کنید — طرح‌های ماهانه برای باز کردن مسیر کامل یادگیری زبان.",
-    about: "درباره ما — LaBella",
+    about: "درباره ما — LaParla",
     aboutDescription:
-      "با مأموریت، ارزش‌ها و داستان پشت پلتفرم یادگیری زبان لا‌بلا آشنا شوید.",
-    contact: "تماس با ما — LaBella",
+      "با مأموریت، ارزش‌ها و داستان پشت پلتفرم یادگیری زبان لاپارلا آشنا شوید.",
+    contact: "تماس با ما — LaParla",
     contactDescription:
-      "برای پشتیبانی، بازخورد یا همکاری با تیم لا‌بلا در تماس باشید.",
-    admin: "مدیریت — LaBella",
-    adminQuizzes: "مدیریت آزمون — LaBella",
-    quizBrowse: "مرور آزمون‌ها — LaBella",
-    quiz: "آزمون — LaBella",
-    languageCourse: "دوره زبان — LaBella",
-    level: "سطح — LaBella",
-    lessonCategory: "دسته درس — LaBella",
-    lesson: "درس — LaBella",
+      "برای پشتیبانی، بازخورد یا همکاری با تیم لاپارلا در تماس باشید.",
+    admin: "مدیریت — LaParla",
+    adminQuizzes: "مدیریت آزمون — LaParla",
+    quizBrowse: "مرور آزمون‌ها — LaParla",
+    quiz: "آزمون — LaParla",
+    languageCourse: "دوره زبان — LaParla",
+    level: "سطح — LaParla",
+    lessonCategory: "دسته درس — LaParla",
+    lesson: "درس — LaParla",
   },
   actions: {
     errors: {

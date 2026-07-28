@@ -1,7 +1,7 @@
 {
-  "name": "LaBella",
-  "short_name": "LaBella",
-  "description": "Learn a language through vocabulary, grammar, and interactive quizzes with LaBella.",
+  "name": "LaParla",
+  "short_name": "LaParla",
+  "description": "Learn a language through vocabulary, grammar, and interactive quizzes with LaParla.",
   "start_url": "/login",
   "scope": "/",
   "display": "standalone",

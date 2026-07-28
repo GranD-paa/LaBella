@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { GraduationCap } from "lucide-react";
 
+import { BrandMark } from "@/components/layout/brand-mark";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { cn } from "@/lib/utils";
 
@@ -24,11 +24,9 @@ export function BrandLogo({
       )}
       aria-label={t("brand.goToMenu")}
     >
-      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 transition-colors group-hover:bg-white/15">
-        <GraduationCap className="h-5 w-5 text-brand-accent" />
-      </span>
-      <span className="text-base font-semibold tracking-tight sm:text-lg">
-        LaBella
+      <BrandMark className="h-9 w-9 shrink-0 text-white sm:h-10 sm:w-10" />
+      <span className="text-lg font-semibold tracking-tight sm:text-xl">
+        LaParla
       </span>
     </Link>
   );

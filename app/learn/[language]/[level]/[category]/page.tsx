@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title:
       levelDef && languageDef
-        ? `${t(`learn.categories.${category}.title`)} — ${levelDef.code} — LaBella`
+        ? `${t(`learn.categories.${category}.title`)} — ${levelDef.code} — LaParla`
         : t("meta.lessonCategory"),
   };
 }

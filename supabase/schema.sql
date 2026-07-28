@@ -1,5 +1,5 @@
 -- =========================================================================
--- LaBella - Supabase database schema
+-- LaParla - Supabase database schema
 -- =========================================================================
 -- Run this in the Supabase SQL editor (or via `supabase db push` / migrations)
 -- on a fresh project. Safe to re-run thanks to IF NOT EXISTS / OR REPLACE.

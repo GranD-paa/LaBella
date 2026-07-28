@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-export const LOCAL_SESSION_COOKIE = "labella_local_session";
+export const LOCAL_SESSION_COOKIE = "laparla_local_session";
 
 function getSessionSecret(): string {
   const secret = process.env.LOCAL_SESSION_SECRET;
@@ -11,7 +11,7 @@ function getSessionSecret(): string {
   // (`getDataSource()`/`isLocalDataMode()`) already throws before any code
   // in this file can run if NEXT_PUBLIC_DATA_SOURCE=local is set while
   // NODE_ENV=production, so this fallback is only ever reached in local dev.
-  return secret ?? "labella-local-dev-secret-change-me";
+  return secret ?? "laparla-local-dev-secret-change-me";
 }
 
 function toBase64Url(bytes: ArrayBuffer): string {

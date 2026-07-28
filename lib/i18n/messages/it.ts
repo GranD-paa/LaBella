@@ -573,7 +573,7 @@ export const it: Messages = {
   subscription: {
     title: "Scegli il tuo piano di apprendimento",
     subtitle:
-      "{name}, sblocca l'esperienza completa LaBella con un abbonamento mensile su misura.",
+      "{name}, sblocca l'esperienza completa LaParla con un abbonamento mensile su misura.",
     monthlyBadge: "Accesso di 1 mese · fatturazione mensile",
     billingPeriod: "mese",
     mostPopular: "Più popolare",
@@ -630,12 +630,12 @@ export const it: Messages = {
   },
   about: {
     badge: "La nostra storia",
-    title: "Chi è LaBella",
+    title: "Chi è LaParla",
     subtitle:
       "Costruiamo percorsi linguistici calmi e strutturati — una lezione, un quiz e una piccola vittoria alla volta.",
-    missionTitle: "Perché esiste LaBella",
+    missionTitle: "Perché esiste LaParla",
     missionBody:
-      "LaBella è nata da un'idea semplice: imparare una lingua deve essere chiaro, non opprimente. Uniamo percorsi CEFR, lezioni brevi e quiz significativi per mantenere alta la motivazione.",
+      "LaParla è nata da un'idea semplice: imparare una lingua deve essere chiaro, non opprimente. Uniamo percorsi CEFR, lezioni brevi e quiz significativi per mantenere alta la motivazione.",
     valuesTitle: "In cosa crediamo",
     valuesSubtitle: "Quattro principi che guidano ogni funzione che rilasciamo.",
     values: {
@@ -664,7 +664,7 @@ export const it: Messages = {
     },
     timeline: {
       title: "Il nostro percorso",
-      subtitle: "Uno sguardo rapido al viaggio di LaBella finora.",
+      subtitle: "Uno sguardo rapido al viaggio di LaParla finora.",
       items: {
         idea: {
           title: "L'idea",
@@ -695,7 +695,7 @@ export const it: Messages = {
     },
     communityTitle: "Pensato per chi impara",
     communityBody:
-      "Che tu sia un admin che modella il curriculum o uno studente che apre la prima lezione, LaBella è pensata per accompagnarti al passo successivo con fiducia.",
+      "Che tu sia un admin che modella il curriculum o uno studente che apre la prima lezione, LaParla è pensata per accompagnarti al passo successivo con fiducia.",
   },
   contact: {
     badge: "Ti ascoltiamo",
@@ -705,7 +705,7 @@ export const it: Messages = {
     channels: {
       email: {
         title: "Email",
-        value: "hello@labella.app",
+        value: "hello@laparla.app",
         hint: "Ideale per account, fatturazione e supporto all'apprendimento.",
       },
       response: {
@@ -748,32 +748,32 @@ export const it: Messages = {
       "Il tuo messaggio viene usato solo per risponderti. Non condividiamo i dati di contatto con terze parti.",
   },
   meta: {
-    siteTitle: "LaBella — Impara una lingua, una lezione alla volta",
+    siteTitle: "LaParla — Impara una lingua, una lezione alla volta",
     siteDescription:
-      "LaBella ti aiuta a padroneggiare vocabolario, grammatica e ascolto con lezioni brevi e quiz.",
-    siteName: "LaBella",
-    login: "Accedi — LaBella",
-    signUp: "Registrati — LaBella",
-    menu: "Menu principale — LaBella",
-    dashboard: "Dashboard — LaBella",
-    profile: "Profilo — LaBella",
-    subscription: "Abbonamento — LaBella",
+      "LaParla ti aiuta a padroneggiare vocabolario, grammatica e ascolto con lezioni brevi e quiz.",
+    siteName: "LaParla",
+    login: "Accedi — LaParla",
+    signUp: "Registrati — LaParla",
+    menu: "Menu principale — LaParla",
+    dashboard: "Dashboard — LaParla",
+    profile: "Profilo — LaParla",
+    subscription: "Abbonamento — LaParla",
     subscriptionDescription:
       "Scegli Basic, Pro o Ultimate — piani mensili per il tuo percorso linguistico completo.",
-    about: "Chi siamo — LaBella",
+    about: "Chi siamo — LaParla",
     aboutDescription:
-      "Scopri la missione, i valori e la storia di LaBella, la piattaforma per imparare le lingue.",
-    contact: "Contattaci — LaBella",
+      "Scopri la missione, i valori e la storia di LaParla, la piattaforma per imparare le lingue.",
+    contact: "Contattaci — LaParla",
     contactDescription:
-      "Contatta il team LaBella per supporto, feedback o richieste di partnership.",
-    admin: "Admin — LaBella",
-    adminQuizzes: "Gestione quiz — LaBella",
-    quizBrowse: "Sfoglia quiz — LaBella",
-    quiz: "Quiz — LaBella",
-    languageCourse: "Corso di lingua — LaBella",
-    level: "Livello — LaBella",
-    lessonCategory: "Categoria lezione — LaBella",
-    lesson: "Lezione — LaBella",
+      "Contatta il team LaParla per supporto, feedback o richieste di partnership.",
+    admin: "Admin — LaParla",
+    adminQuizzes: "Gestione quiz — LaParla",
+    quizBrowse: "Sfoglia quiz — LaParla",
+    quiz: "Quiz — LaParla",
+    languageCourse: "Corso di lingua — LaParla",
+    level: "Livello — LaParla",
+    lessonCategory: "Categoria lezione — LaParla",
+    lesson: "Lezione — LaParla",
   },
   actions: {
     errors: {

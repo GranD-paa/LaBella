@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-const REMEMBER_EMAIL_KEY = "labella_remember_email";
+const REMEMBER_EMAIL_KEY = "laparla_remember_email";
 
 export function SignInForm({
   redirectTo,
