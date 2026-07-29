@@ -18,6 +18,7 @@ export function BrandLogo({
   return (
     <Link
       href={href}
+      dir="ltr"
       className={cn(
         "brand-header-link group inline-flex items-center gap-2 whitespace-nowrap",
         className
