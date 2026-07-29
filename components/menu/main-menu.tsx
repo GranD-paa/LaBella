@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Compass, LayoutGrid } from "lucide-react";
+import { Compass, Globe2, LayoutGrid } from "lucide-react";
 
 import { LanguageCard } from "@/components/menu/language-card";
 import { useTranslations } from "@/components/providers/locale-provider";
@@ -45,9 +45,14 @@ export function MainMenu({
       </section>
 
       <section className="space-y-4">
-        <div>
-          <h2 className="text-xl font-semibold">{t("menu.coursesTitle")}</h2>
-          <p className="text-sm text-muted-foreground">{t("menu.coursesSubtitle")}</p>
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-accent/10 text-brand-accent">
+            <Globe2 className="h-5 w-5" />
+          </span>
+          <div>
+            <h2 className="text-xl font-semibold">{t("menu.coursesTitle")}</h2>
+            <p className="text-sm text-muted-foreground">{t("menu.coursesSubtitle")}</p>
+          </div>
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
           {languages.map((language) => (

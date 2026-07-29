@@ -21,23 +21,37 @@ export function LanguageCard({ language }: { language: CurriculumLanguage }) {
   const content = (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-2xl border border-white/10 p-6 transition-all duration-300",
+        "group relative overflow-hidden rounded-3xl border border-white/10 p-6 transition-all duration-300 sm:p-7",
         language.available
-          ? "brand-surface hover:-translate-y-1 hover:border-brand-accent/40 hover:shadow-brand"
+          ? "brand-surface hover:-translate-y-1.5 hover:border-brand-accent/40 hover:shadow-brand"
           : "border-dashed bg-muted/20 opacity-80"
       )}
     >
+      {/* Ambient glow, tinted per-language, blooms in on hover */}
       <div
         className={cn(
-          "pointer-events-none absolute inset-0 bg-gradient-to-br opacity-60 transition-opacity group-hover:opacity-100",
+          "pointer-events-none absolute -top-10 h-40 w-40 rounded-full bg-gradient-to-br opacity-40 blur-3xl transition-opacity duration-500 group-hover:opacity-80 ltr:-right-10 rtl:-left-10",
           language.accentClass
         )}
       />
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-0 bg-gradient-to-br opacity-50 transition-opacity duration-500 group-hover:opacity-90",
+          language.accentClass
+        )}
+      />
+
+      {/* Oversized watermark flag, purely decorative */}
+      <FlagIcon
+        slug={language.slug}
+        className="pointer-events-none absolute -bottom-7 h-24 w-36 rotate-6 opacity-[0.08] transition-transform duration-500 group-hover:rotate-2 group-hover:scale-105 ltr:-right-5 rtl:-left-5 rtl:-rotate-6 rtl:group-hover:-rotate-2"
+      />
+
       <div className="relative space-y-5">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <FlagIcon slug={language.slug} className="h-8 w-11 shrink-0" />
-            <span className="text-sm font-semibold tracking-wide text-muted-foreground">
+          <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/25 p-1.5 shadow-inner backdrop-blur-sm">
+            <FlagIcon slug={language.slug} className="h-6 w-9 shrink-0" />
+            <span className="text-xs font-bold tracking-wider text-foreground/80">
               {getLanguageCode(language.slug)}
             </span>
           </div>
