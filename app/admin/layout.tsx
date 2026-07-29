@@ -24,7 +24,6 @@ export default async function AdminLayout({
           <UserNav
             fullName={profile.full_name}
             email={user.email ?? null}
-            avatarUrl={profile.avatar_url}
             isAdmin={profile.is_admin}
           />
         }

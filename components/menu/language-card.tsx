@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, Lock, Sparkles } from "lucide-react";
 
+import { FlagIcon, getLanguageCode } from "@/components/menu/flag-icon";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { CURRICULUM_MESSAGE_KEYS } from "@/lib/i18n/content-keys";
@@ -34,9 +35,12 @@ export function LanguageCard({ language }: { language: CurriculumLanguage }) {
       />
       <div className="relative space-y-5">
         <div className="flex items-start justify-between gap-3">
-          <span className="text-4xl" aria-hidden>
-            {language.flagEmoji}
-          </span>
+          <div className="flex items-center gap-2.5">
+            <FlagIcon slug={language.slug} className="h-8 w-11 shrink-0" />
+            <span className="text-sm font-semibold tracking-wide text-muted-foreground">
+              {getLanguageCode(language.slug)}
+            </span>
+          </div>
           {language.available ? (
             <Badge className="border-brand-accent/30 bg-brand-accent/10 text-brand-accent">
               <Sparkles className="me-1 h-3 w-3" />

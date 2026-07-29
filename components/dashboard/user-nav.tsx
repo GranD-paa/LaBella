@@ -16,7 +16,6 @@ import {
 
 import { signOutAction } from "@/app/actions/auth";
 import { useTranslations } from "@/components/providers/locale-provider";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -27,27 +26,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-function getInitials(name: string | null, email: string | null) {
-  if (name && name.trim().length > 0) {
-    return name
-      .trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
-      .join("");
-  }
-  return email?.[0]?.toUpperCase() ?? "?";
-}
-
 export function UserNav({
   fullName,
   email,
-  avatarUrl,
   isAdmin = false,
 }: {
   fullName: string | null;
   email: string | null;
-  avatarUrl: string | null;
   isAdmin?: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
@@ -60,13 +45,15 @@ export function UserNav({
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="relative h-9 w-9 rounded-full"
+          size="icon"
+          className="group h-11 w-11 rounded-full"
           aria-label={t("nav.openUserMenu")}
         >
-          <Avatar className="h-9 w-9">
-            <AvatarImage src={avatarUrl ?? undefined} alt={fullName ?? roleLabel} />
-            <AvatarFallback>{getInitials(fullName, email)}</AvatarFallback>
-          </Avatar>
+          <span className="flex h-6 w-6 flex-col items-center justify-center gap-1.5 transition-transform duration-300 ease-out group-data-[state=open]:rotate-90">
+            <span className="h-0.5 w-6 rounded-full bg-current" />
+            <span className="h-0.5 w-6 rounded-full bg-current" />
+            <span className="h-0.5 w-6 rounded-full bg-current" />
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">

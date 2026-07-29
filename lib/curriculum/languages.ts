@@ -32,7 +32,7 @@ export const LANGUAGES: CurriculumLanguage[] = [
     name: "English",
     headline: "Learn English Language",
     description: "Global communication skills from beginner to advanced levels.",
-    flagEmoji: "🇬🇧",
+    flagEmoji: "🇺🇸",
     accentClass: "from-blue-500/20 to-indigo-500/10",
     available: false,
     levels: ENGLISH_LEVELS,

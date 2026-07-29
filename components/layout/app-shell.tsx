@@ -8,13 +8,11 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const user = await repo.getAuthUser();
 
   let fullName: string | null = null;
-  let avatarUrl: string | null = null;
   let isAdmin = false;
 
   if (user) {
     const profile = await repo.getProfileById(user.id);
     fullName = profile?.full_name ?? null;
-    avatarUrl = profile?.avatar_url ?? null;
     isAdmin = profile?.is_admin ?? false;
   }
 
@@ -26,7 +24,6 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           <UserNav
             fullName={fullName}
             email={user?.email ?? null}
-            avatarUrl={avatarUrl}
             isAdmin={isAdmin}
           />
         }
