@@ -21,7 +21,7 @@
     --secondary-foreground: 0 0% 98%;
 
     --muted: 266 50% 16%; /* #3C096C family */
-    --muted-foreground: 270 20% 78%; /* light gray-purple */
+    --muted-foreground: 270 25% 84%; /* light gray-purple */
 
     --accent: 266 85% 23%; /* #3C096C — hover surfaces */
     --accent-foreground: 0 0% 98%;
@@ -48,7 +48,7 @@
     --secondary: 277 91% 38%;
     --secondary-foreground: 0 0% 98%;
     --muted: 266 50% 16%;
-    --muted-foreground: 270 20% 78%;
+    --muted-foreground: 270 25% 84%;
     --accent: 266 85% 23%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 72% 51%;
@@ -76,6 +76,13 @@
 
   [dir="rtl"] .rtl-flip {
     transform: scaleX(-1);
+  }
+
+  /* Non-bold headings/subtitles (Vazirmatn's regular weight reads thin,
+     especially in Persian) — nudge to medium so they stay legible next to
+     bold titles without looking heavy. */
+  .text-muted-foreground {
+    font-weight: 500;
   }
 }
 

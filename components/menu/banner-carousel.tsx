@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -10,12 +10,23 @@ import { cn } from "@/lib/utils";
 import type { Banner } from "@/types";
 
 const AUTO_ADVANCE_MS = 6000;
+// Below this drag distance a pointer interaction is treated as a tap/click
+// rather than a swipe, so links inside a banner still open normally.
+const DRAG_CLICK_THRESHOLD_PX = 8;
+// Fraction of the container's width a swipe must cross before it commits to
+// changing slides instead of snapping back to the current one.
+const SWIPE_COMMIT_RATIO = 0.15;
 
 export function BannerCarousel({ banners }: { banners: Banner[] }) {
   const { t } = useTranslations();
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [dragOffsetPx, setDragOffsetPx] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const dragStartXRef = useRef(0);
+  const didDragRef = useRef(false);
 
   const count = banners.length;
 
@@ -30,14 +41,48 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
   useEffect(() => {
     if (count <= 1 || isPaused) return;
 
+    // Defensively clear any previous interval before creating a new one —
+    // React 18 Strict Mode's dev-only double-invoke of this effect can
+    // otherwise leak a stray interval that keeps ticking in the background.
+    if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setIndex((current) => (current + 1) % count);
     }, AUTO_ADVANCE_MS);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      timerRef.current = null;
     };
   }, [count, isPaused]);
+
+  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    if (count <= 1 || event.pointerType === "mouse") return;
+    dragStartXRef.current = event.clientX;
+    didDragRef.current = false;
+    setIsDragging(true);
+    setIsPaused(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
+  function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!isDragging) return;
+    const delta = event.clientX - dragStartXRef.current;
+    if (Math.abs(delta) > DRAG_CLICK_THRESHOLD_PX) {
+      didDragRef.current = true;
+    }
+    setDragOffsetPx(delta);
+  }
+
+  function endDrag() {
+    if (!isDragging) return;
+    const width = trackRef.current?.offsetWidth || 1;
+    if (Math.abs(dragOffsetPx) > width * SWIPE_COMMIT_RATIO) {
+      goTo(dragOffsetPx < 0 ? index + 1 : index - 1);
+    }
+    setIsDragging(false);
+    setDragOffsetPx(0);
+    setIsPaused(false);
+  }
 
   if (count === 0) {
     return null;
@@ -51,8 +96,16 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
       onMouseLeave={() => setIsPaused(false)}
     >
       <div
-        className="flex h-full w-full transition-transform duration-700 ease-out"
-        style={{ transform: `translateX(${index * -100}%)` }}
+        ref={trackRef}
+        className={cn(
+          "flex h-full w-full touch-pan-y select-none ease-out",
+          isDragging ? "transition-none" : "transition-transform duration-700"
+        )}
+        style={{ transform: `translateX(calc(${index * -100}% + ${dragOffsetPx}px))` }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
       >
         {banners.map((banner) => {
           const media = (
@@ -83,6 +136,12 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
                   target="_blank"
                   rel="noreferrer"
                   className="block h-full w-full"
+                  onClick={(event) => {
+                    if (didDragRef.current) {
+                      event.preventDefault();
+                    }
+                  }}
+                  draggable={false}
                 >
                   {media}
                 </Link>
