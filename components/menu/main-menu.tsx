@@ -3,23 +3,29 @@
 import Link from "next/link";
 import { Compass, Globe2, LayoutGrid } from "lucide-react";
 
+import { BannerCarousel } from "@/components/menu/banner-carousel";
 import { LanguageCard } from "@/components/menu/language-card";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
+import type { Banner } from "@/types";
 
 export function MainMenu({
   displayName,
   languages,
+  banners,
 }: {
   displayName: string;
   languages: CurriculumLanguage[];
+  banners: Banner[];
 }) {
   const { t } = useTranslations();
 
   return (
     <div className="space-y-8">
+      <BannerCarousel banners={banners} />
+
       <section className="brand-surface relative overflow-hidden p-6 sm:p-8">
         <div className="absolute inset-0 bg-brand-gradient opacity-25" />
         <div className="relative space-y-4">

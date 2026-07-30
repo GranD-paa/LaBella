@@ -1,4 +1,5 @@
 import type { Messages } from "@/lib/i18n/types";
+import { adminBannersFa } from "@/lib/i18n/messages/admin-banners-fa";
 import { adminContentFa } from "@/lib/i18n/messages/admin-content-fa";
 import { adminLanguagesFa } from "@/lib/i18n/messages/admin-languages-fa";
 import { adminQuizzesFa } from "@/lib/i18n/messages/admin-quizzes-fa";
@@ -103,6 +104,9 @@ export const fa: Messages = {
     coursesSubtitle: "ایتالیایی اکنون فعال است. زبان‌های بیشتر در راه هستند.",
     startLearning: "شروع یادگیری",
     pathPreparing: "مسیر این زبان در حال آماده‌سازی است.",
+    previousSlide: "بنر قبلی",
+    nextSlide: "بنر بعدی",
+    goToSlide: "رفتن به بنر {number}",
   },
   curriculum: {
     italian: {
@@ -345,6 +349,7 @@ export const fa: Messages = {
       manageQuizzes: "مدیریت آزمون‌ها و محتوا",
       manageUsers: "مدیریت کاربران",
       manageLanguages: "مدیریت زبان‌ها",
+      manageBanners: "مدیریت بنرها",
       contentManagement: "مدیریت محتوا",
       contentManagementHint:
         "درس‌ها، واژگان، گرامر و آزمون‌ها را بسازید، ویرایش و منتشر کنید.",
@@ -559,6 +564,7 @@ export const fa: Messages = {
     quizzes: adminQuizzesFa,
     users: adminUsersFa,
     languages: adminLanguagesFa,
+    banners: adminBannersFa,
   },
   subscription: {
     title: "طرح یادگیری خود را انتخاب کنید",

@@ -164,3 +164,11 @@ export const quizSchema = z.object({
 });
 
 export type QuizValues = z.infer<typeof quizSchema>;
+
+export const bannerSchema = z.object({
+  title: optionalText(150),
+  linkHref: z.string().url("Must be a valid URL").max(2000).optional().or(z.literal("")),
+  status: z.enum(["draft", "published"]).default("draft"),
+});
+
+export type BannerValues = z.infer<typeof bannerSchema>;

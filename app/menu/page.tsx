@@ -24,6 +24,7 @@ export default async function MenuPage() {
   const displayName =
     profile?.full_name || user.email?.split("@")[0] || t("common.guestName");
   const languages = await getLanguagesWithAvailability(repo);
+  const banners = await repo.getActiveBanners();
 
-  return <MainMenu displayName={displayName} languages={languages} />;
+  return <MainMenu displayName={displayName} languages={languages} banners={banners} />;
 }

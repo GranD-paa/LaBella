@@ -1,4 +1,5 @@
 import type {
+  Banner,
   GrammarRule,
   Lesson,
   Profile,
@@ -205,4 +206,29 @@ export interface DataRepository {
     input: Partial<Omit<QuizQuestion, "id" | "quiz_id" | "created_at">>
   ): Promise<{ error?: string }>;
   deleteQuizQuestion(id: string): Promise<{ error?: string }>;
+
+  // Banners — super-admin managed promotional slides shown at the top of
+  // the learner Main Menu.
+  getActiveBanners(): Promise<Banner[]>;
+  getAllBanners(): Promise<Banner[]>;
+  uploadBannerImage(
+    file: File
+  ): Promise<{ url?: string; error?: string }>;
+  createBanner(input: {
+    imageUrl: string;
+    title: string | null;
+    linkHref: string | null;
+    status: "draft" | "published";
+  }): Promise<{ error?: string }>;
+  updateBanner(
+    id: string,
+    input: Partial<{
+      imageUrl: string;
+      title: string | null;
+      linkHref: string | null;
+      status: "draft" | "published";
+    }>
+  ): Promise<{ error?: string }>;
+  deleteBanner(id: string): Promise<{ error?: string }>;
+  reorderBanner(id: string, direction: "up" | "down"): Promise<{ error?: string }>;
 }

@@ -54,6 +54,11 @@ function loadPersistedStore(): LocalDatabase | null {
       parsed.curriculumLevelOverrides = [];
     }
 
+    // Backward-compat: older persisted files predate `banners`.
+    if (!Array.isArray(parsed.banners)) {
+      parsed.banners = [];
+    }
+
     return parsed;
   } catch {
     return null;

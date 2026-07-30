@@ -1,3 +1,6 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
+
 import {
   clearLocalSession,
   getLocalSessionUserId,
@@ -6,6 +9,14 @@ import {
 import type { DataRepository } from "@/lib/data/repository";
 import { createLocalId, getLocalStore, persistLocalStore } from "@/lib/data/local/store";
 import { deriveQuizMetadataFromLesson } from "@/lib/quiz-management/helpers";
+
+const BANNER_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "banners");
+const ALLOWED_IMAGE_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+};
 
 export function createLocalRepository(): DataRepository {
   function commitStore() {
@@ -580,6 +591,94 @@ export function createLocalRepository(): DataRepository {
       store.quizQuestions = store.quizQuestions.filter(
         (question) => question.id !== id
       );
+      commitStore();
+      return {};
+    },
+
+    async getActiveBanners() {
+      return getLocalStore()
+        .banners.filter((banner) => banner.status === "published")
+        .sort((a, b) => a.order_number - b.order_number);
+    },
+
+    async getAllBanners() {
+      return [...getLocalStore().banners].sort(
+        (a, b) => a.order_number - b.order_number
+      );
+    },
+
+    async uploadBannerImage(file) {
+      const extension = ALLOWED_IMAGE_EXTENSIONS[file.type];
+      if (!extension) {
+        return { error: "Please upload a JPEG, PNG, WebP, or GIF image." };
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        return { error: "Image must be smaller than 5MB." };
+      }
+
+      const filename = `${crypto.randomUUID()}.${extension}`;
+      await mkdir(BANNER_UPLOAD_DIR, { recursive: true });
+      const bytes = Buffer.from(await file.arrayBuffer());
+      await writeFile(path.join(BANNER_UPLOAD_DIR, filename), bytes);
+
+      return { url: `/uploads/banners/${filename}` };
+    },
+
+    async createBanner({ imageUrl, title, linkHref, status }) {
+      const store = getLocalStore();
+      const maxOrder = store.banners.reduce(
+        (max, banner) => Math.max(max, banner.order_number),
+        0
+      );
+      store.banners.push({
+        id: createLocalId("banner"),
+        image_url: imageUrl,
+        title,
+        link_href: linkHref,
+        order_number: maxOrder + 1,
+        status,
+        created_at: new Date().toISOString(),
+      });
+      commitStore();
+      return {};
+    },
+
+    async updateBanner(id, input) {
+      const banner = getLocalStore().banners.find((entry) => entry.id === id);
+      if (!banner) return { error: "Banner not found." };
+      if (input.imageUrl !== undefined) banner.image_url = input.imageUrl;
+      if (input.title !== undefined) banner.title = input.title;
+      if (input.linkHref !== undefined) banner.link_href = input.linkHref;
+      if (input.status !== undefined) banner.status = input.status;
+      commitStore();
+      return {};
+    },
+
+    async deleteBanner(id) {
+      const store = getLocalStore();
+      store.banners = store.banners.filter((banner) => banner.id !== id);
+      commitStore();
+      return {};
+    },
+
+    async reorderBanner(id, direction) {
+      const store = getLocalStore();
+      const sorted = [...store.banners].sort(
+        (a, b) => a.order_number - b.order_number
+      );
+      const index = sorted.findIndex((banner) => banner.id === id);
+      if (index === -1) return { error: "Banner not found." };
+
+      const swapIndex = direction === "up" ? index - 1 : index + 1;
+      if (swapIndex < 0 || swapIndex >= sorted.length) {
+        return {};
+      }
+
+      const current = sorted[index];
+      const target = sorted[swapIndex];
+      const temp = current.order_number;
+      current.order_number = target.order_number;
+      target.order_number = temp;
       commitStore();
       return {};
     },

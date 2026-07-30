@@ -1,4 +1,5 @@
 import type { Messages } from "@/lib/i18n/types";
+import { adminBannersIt } from "@/lib/i18n/messages/admin-banners-it";
 import { adminContentIt } from "@/lib/i18n/messages/admin-content-it";
 import { adminLanguagesIt } from "@/lib/i18n/messages/admin-languages-it";
 import { adminQuizzesIt } from "@/lib/i18n/messages/admin-quizzes-it";
@@ -103,6 +104,9 @@ export const it: Messages = {
     coursesSubtitle: "L'italiano è attivo. Altre lingue sono in arrivo.",
     startLearning: "Inizia a imparare",
     pathPreparing: "Il percorso per questa lingua è in preparazione.",
+    previousSlide: "Banner precedente",
+    nextSlide: "Banner successivo",
+    goToSlide: "Vai al banner {number}",
   },
   curriculum: {
     italian: {
@@ -351,6 +355,7 @@ export const it: Messages = {
       manageQuizzes: "Gestisci quiz e contenuti",
       manageUsers: "Gestisci utenti",
       manageLanguages: "Gestisci lingue",
+      manageBanners: "Gestisci banner",
       contentManagement: "Gestione contenuti",
       contentManagementHint:
         "Crea, modifica e pubblica lezioni, vocabolario, grammatica e quiz.",
@@ -569,6 +574,7 @@ export const it: Messages = {
     quizzes: adminQuizzesIt,
     users: adminUsersIt,
     languages: adminLanguagesIt,
+    banners: adminBannersIt,
   },
   subscription: {
     title: "Scegli il tuo piano di apprendimento",

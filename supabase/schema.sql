@@ -207,6 +207,27 @@ comment on table public.curriculum_level_overrides is
   'Super-admin renames of default curriculum levels and brand-new levels (e.g. A2/B1/B2) added per language.';
 
 -- =========================================================================
+-- 12. banners
+-- =========================================================================
+-- Super-admin managed promotional slides shown in the carousel at the top
+-- of the learner Main Menu. `image_url` points at a file in the public
+-- `banners` Storage bucket (see policies below). `link_href` is optional —
+-- when set, clicking the slide navigates there.
+create table if not exists public.banners (
+  id uuid primary key default gen_random_uuid(),
+  image_url text not null,
+  title text,
+  link_href text,
+  order_number integer not null default 0,
+  status text not null default 'draft',
+  created_at timestamptz not null default now(),
+  constraint banners_status_check check (status in ('draft', 'published'))
+);
+
+comment on table public.banners is
+  'Super-admin managed promotional banners shown in the Main Menu carousel.';
+
+-- =========================================================================
 -- Indexes on foreign keys / common lookup columns
 -- =========================================================================
 create index if not exists vocabulary_lesson_id_idx on public.vocabulary (lesson_id);
@@ -223,6 +244,7 @@ create index if not exists grammar_rules_status_idx on public.grammar_rules (sta
 create index if not exists vocabulary_status_idx on public.vocabulary (status);
 create index if not exists quizzes_language_level_section_idx on public.quizzes (language_slug, level_slug, section_slug);
 create index if not exists quizzes_status_idx on public.quizzes (status);
+create index if not exists banners_status_order_idx on public.banners (status, order_number);
 
 -- =========================================================================
 -- Row Level Security
@@ -238,6 +260,7 @@ alter table public.video_lessons enable row level security;
 alter table public.user_learning_state enable row level security;
 alter table public.language_settings enable row level security;
 alter table public.curriculum_level_overrides enable row level security;
+alter table public.banners enable row level security;
 
 alter table public.profiles force row level security;
 alter table public.lessons force row level security;
@@ -250,6 +273,7 @@ alter table public.video_lessons force row level security;
 alter table public.user_learning_state force row level security;
 alter table public.language_settings force row level security;
 alter table public.curriculum_level_overrides force row level security;
+alter table public.banners force row level security;
 
 -- -------------------------------------------------------------------------
 -- Helper: private.is_admin() — security definer so it can read
@@ -500,6 +524,54 @@ create policy "Admins can manage curriculum level overrides"
   to authenticated
   using (private.is_admin())
   with check (private.is_admin());
+
+-- -------------------------------------------------------------------------
+-- banners policies: learners only see published slides; admins can see and
+-- manage everything (including drafts). Restricting who may create/delete
+-- to super admins specifically is enforced in the server action layer, the
+-- same pattern used for curriculum_level_overrides above.
+-- -------------------------------------------------------------------------
+drop policy if exists "Banners viewable by authenticated" on public.banners;
+create policy "Banners viewable by authenticated"
+  on public.banners for select
+  to authenticated
+  using (status = 'published' or private.is_admin());
+
+drop policy if exists "Admins can manage banners" on public.banners;
+create policy "Admins can manage banners"
+  on public.banners for all
+  to authenticated
+  using (private.is_admin())
+  with check (private.is_admin());
+
+-- -------------------------------------------------------------------------
+-- Storage: a public bucket for banner images. Public buckets serve files
+-- straight from the CDN URL with no RLS check, so read access needs no
+-- policy here — only the write side (upload/replace/remove) is restricted
+-- to admins.
+-- -------------------------------------------------------------------------
+insert into storage.buckets (id, name, public)
+values ('banners', 'banners', true)
+on conflict (id) do nothing;
+
+drop policy if exists "Admins can upload banner images" on storage.objects;
+create policy "Admins can upload banner images"
+  on storage.objects for insert
+  to authenticated
+  with check (bucket_id = 'banners' and private.is_admin());
+
+drop policy if exists "Admins can update banner images" on storage.objects;
+create policy "Admins can update banner images"
+  on storage.objects for update
+  to authenticated
+  using (bucket_id = 'banners' and private.is_admin())
+  with check (bucket_id = 'banners' and private.is_admin());
+
+drop policy if exists "Admins can delete banner images" on storage.objects;
+create policy "Admins can delete banner images"
+  on storage.objects for delete
+  to authenticated
+  using (bucket_id = 'banners' and private.is_admin());
 
 -- =========================================================================
 -- Trigger: automatically create a profile row when a new auth user signs up

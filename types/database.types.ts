@@ -448,6 +448,36 @@ export interface Database {
         };
         Relationships: [];
       };
+      banners: {
+        Row: {
+          id: string;
+          image_url: string;
+          title: string | null;
+          link_href: string | null;
+          order_number: number;
+          status: "draft" | "published";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          image_url: string;
+          title?: string | null;
+          link_href?: string | null;
+          order_number?: number;
+          status?: "draft" | "published";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          image_url?: string;
+          title?: string | null;
+          link_href?: string | null;
+          order_number?: number;
+          status?: "draft" | "published";
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

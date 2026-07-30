@@ -29,6 +29,10 @@ yarn-error.log*
 .env*.local
 .local-data/
 
+# locally uploaded banner images (local dev mode only; production uses
+# Supabase Storage)
+/public/uploads/
+
 # claude code personal settings
 .claude/settings.local.json
 

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { DataRepository } from "@/lib/data/repository";
 import { deriveQuizMetadataFromLesson } from "@/lib/quiz-management/helpers";
+import type { Database } from "@/types/database.types";
 
 export function createSupabaseRepository(): DataRepository {
   return {
@@ -636,6 +637,128 @@ export function createSupabaseRepository(): DataRepository {
         .delete()
         .eq("id", id);
       return error ? { error: error.message } : {};
+    },
+
+    async getActiveBanners() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("banners")
+        .select("*")
+        .eq("status", "published")
+        .order("order_number");
+      return data ?? [];
+    },
+
+    async getAllBanners() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("banners")
+        .select("*")
+        .order("order_number");
+      return data ?? [];
+    },
+
+    async uploadBannerImage(file) {
+      const allowedTypes: Record<string, string> = {
+        "image/jpeg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp",
+        "image/gif": "gif",
+      };
+      const extension = allowedTypes[file.type];
+      if (!extension) {
+        return { error: "Please upload a JPEG, PNG, WebP, or GIF image." };
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        return { error: "Image must be smaller than 5MB." };
+      }
+
+      const supabase = await createClient();
+      const objectPath = `${crypto.randomUUID()}.${extension}`;
+      const { error } = await supabase.storage
+        .from("banners")
+        .upload(objectPath, file, { contentType: file.type, upsert: false });
+      if (error) return { error: error.message };
+
+      const { data } = supabase.storage.from("banners").getPublicUrl(objectPath);
+      return { url: data.publicUrl };
+    },
+
+    async createBanner({ imageUrl, title, linkHref, status }) {
+      const supabase = await createClient();
+      const { data: existing } = await supabase
+        .from("banners")
+        .select("order_number")
+        .order("order_number", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const { error } = await supabase.from("banners").insert({
+        image_url: imageUrl,
+        title,
+        link_href: linkHref,
+        status,
+        order_number: (existing?.order_number ?? 0) + 1,
+      });
+      return error ? { error: error.message } : {};
+    },
+
+    async updateBanner(id, input) {
+      const supabase = await createClient();
+      const update: Database["public"]["Tables"]["banners"]["Update"] = {};
+      if (input.imageUrl !== undefined) update.image_url = input.imageUrl;
+      if (input.title !== undefined) update.title = input.title;
+      if (input.linkHref !== undefined) update.link_href = input.linkHref;
+      if (input.status !== undefined) update.status = input.status;
+
+      const { error } = await supabase
+        .from("banners")
+        .update(update)
+        .eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
+    async deleteBanner(id) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("banners").delete().eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
+    async reorderBanner(id, direction) {
+      const supabase = await createClient();
+      const { data: banners } = await supabase
+        .from("banners")
+        .select("id, order_number")
+        .order("order_number");
+      if (!banners) return { error: "Banner not found." };
+
+      const index = banners.findIndex((banner) => banner.id === id);
+      if (index === -1) return { error: "Banner not found." };
+
+      const swapIndex = direction === "up" ? index - 1 : index + 1;
+      if (swapIndex < 0 || swapIndex >= banners.length) {
+        return {};
+      }
+
+      const current = banners[index];
+      const target = banners[swapIndex];
+
+      const [{ error: currentError }, { error: targetError }] = await Promise.all([
+        supabase
+          .from("banners")
+          .update({ order_number: target.order_number })
+          .eq("id", current.id),
+        supabase
+          .from("banners")
+          .update({ order_number: current.order_number })
+          .eq("id", target.id),
+      ]);
+
+      return currentError
+        ? { error: currentError.message }
+        : targetError
+          ? { error: targetError.message }
+          : {};
     },
   };
 }

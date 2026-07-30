@@ -1,4 +1,5 @@
 import type {
+  Banner,
   GrammarRule,
   Lesson,
   Profile,
@@ -31,6 +32,8 @@ export type LocalDatabase = {
   // Super-admin renames of default curriculum levels and brand-new levels
   // (e.g. A2/B1/B2) added from the Language Management page.
   curriculumLevelOverrides: CurriculumLevelOverrideRow[];
+  // Super-admin managed promotional slides shown in the Main Menu carousel.
+  banners: Banner[];
 };
 
 const now = "2026-07-15T08:00:00.000Z";
@@ -332,4 +335,5 @@ export const LOCAL_SEED: LocalDatabase = {
   learningStates: [],
   languageSettings: {},
   curriculumLevelOverrides: [],
+  banners: [],
 };

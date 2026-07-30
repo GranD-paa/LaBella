@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 export function revalidateAppContent(lessonId?: string) {
   revalidatePath("/admin");
   revalidatePath("/admin/quizzes");
+  revalidatePath("/admin/banners");
   revalidatePath("/menu");
   revalidatePath("/dashboard");
   revalidatePath("/profile");

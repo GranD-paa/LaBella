@@ -1,3 +1,4 @@
+import { adminBannersEn } from "@/lib/i18n/messages/admin-banners-en";
 import { adminContentEn } from "@/lib/i18n/messages/admin-content-en";
 import { adminLanguagesEn } from "@/lib/i18n/messages/admin-languages-en";
 import { adminQuizzesEn } from "@/lib/i18n/messages/admin-quizzes-en";
@@ -102,6 +103,9 @@ export const en = {
     coursesSubtitle: "Italian is live now. More languages are on the way.",
     startLearning: "Start learning",
     pathPreparing: "This language path is being prepared.",
+    previousSlide: "Previous banner",
+    nextSlide: "Next banner",
+    goToSlide: "Go to banner {number}",
   },
   curriculum: {
     italian: {
@@ -349,6 +353,7 @@ export const en = {
       manageQuizzes: "Manage quizzes & content",
       manageUsers: "Manage users",
       manageLanguages: "Manage languages",
+      manageBanners: "Manage banners",
       contentManagement: "Content management",
       contentManagementHint:
         "Create, edit, and publish lessons, vocabulary, grammar, and quizzes.",
@@ -563,6 +568,7 @@ export const en = {
     quizzes: adminQuizzesEn,
     users: adminUsersEn,
     languages: adminLanguagesEn,
+    banners: adminBannersEn,
   },
   subscription: {
     title: "Choose your learning plan",

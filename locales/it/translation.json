@@ -94,7 +94,10 @@
     "coursesTitle": "Corsi di lingua",
     "coursesSubtitle": "L'italiano è attivo. Altre lingue sono in arrivo.",
     "startLearning": "Inizia a imparare",
-    "pathPreparing": "Il percorso per questa lingua è in preparazione."
+    "pathPreparing": "Il percorso per questa lingua è in preparazione.",
+    "previousSlide": "Banner precedente",
+    "nextSlide": "Banner successivo",
+    "goToSlide": "Vai al banner {number}"
   },
   "curriculum": {
     "italian": {
@@ -328,7 +331,8 @@
       "manageUsers": "Gestisci utenti",
       "manageLanguages": "Gestisci lingue",
       "contentManagement": "Gestione contenuti",
-      "contentManagementHint": "Crea, modifica e pubblica lezioni, vocabolario, grammatica e quiz."
+      "contentManagementHint": "Crea, modifica e pubblica lezioni, vocabolario, grammatica e quiz.",
+      "manageBanners": "Gestisci banner"
     },
     "achievements": {
       "firstSteps": {
@@ -922,6 +926,36 @@
         "levelReset": "{code} è stato ripristinato al suo nome predefinito",
         "cannotDeleteDefault": "I livelli base non possono essere eliminati, solo rinominati o ripristinati."
       }
+    },
+    "banners": {
+      "pageBadge": "Gestione banner",
+      "pageHello": "Centro banner, {name}",
+      "pageSubtitle": "Carica e gestisci i banner promozionali mostrati in cima al carosello del Menu principale.",
+      "backToDashboard": "Torna alla Dashboard",
+      "uploadTitle": "Carica un banner",
+      "uploadDescription": "Aggiungi una nuova immagine banner per il Menu principale. Le immagini larghe e orizzontali funzionano meglio.",
+      "dropHint": "Trascina e rilascia un'immagine, oppure clicca per sfogliare",
+      "dropSubHint": "JPG, PNG, WEBP o GIF — fino a 5MB",
+      "titleLabel": "Titolo (facoltativo)",
+      "titlePlaceholder": "es. Nuovo anno, nuova lingua",
+      "linkLabel": "URL del link (facoltativo)",
+      "uploadButton": "Carica banner",
+      "uploading": "Caricamento...",
+      "uploadSuccess": "Banner caricato come bozza",
+      "listTitle": "Tutti i banner",
+      "listDescription": "Riordina, pubblica o rimuovi i banner. I banner pubblicati appaiono nel Menu principale in questo ordine.",
+      "empty": "Ancora nessun banner. Caricane uno dalla sezione qui sopra.",
+      "untitled": "Banner senza titolo",
+      "moveUp": "Sposta su",
+      "moveDown": "Sposta giù",
+      "deleteTitle": "Eliminare questo banner?",
+      "deleteDescription": "Questo rimuove definitivamente l'immagine del banner e lo nasconde dal Menu principale.",
+      "deleteSuccess": "Banner eliminato",
+      "errors": {
+        "imageRequired": "Scegli un'immagine da caricare.",
+        "invalidType": "Scegli un'immagine JPG, PNG, WEBP o GIF.",
+        "tooLarge": "L'immagine deve essere massimo 5MB."
+      }
     }
   },
   "subscription": {
@@ -1030,9 +1064,18 @@
       }
     },
     "stats": {
-      "learners": { "value": "1:1", "label": "Percorsi personali" },
-      "languages": { "value": "4+", "label": "Lingue in roadmap" },
-      "lessons": { "value": "∞", "label": "Spazio per crescere con te" }
+      "learners": {
+        "value": "1:1",
+        "label": "Percorsi personali"
+      },
+      "languages": {
+        "value": "4+",
+        "label": "Lingue in roadmap"
+      },
+      "lessons": {
+        "value": "∞",
+        "label": "Spazio per crescere con te"
+      }
     },
     "communityTitle": "Pensato per chi impara",
     "communityBody": "Che tu sia un admin che modella il curriculum o uno studente che apre la prima lezione, LaParla è pensata per accompagnarti al passo successivo con fiducia."

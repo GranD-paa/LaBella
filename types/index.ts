@@ -14,3 +14,4 @@ export type UserQuizAttempt =
   Database["public"]["Tables"]["user_quiz_attempts"]["Row"];
 export type UserLearningState =
   Database["public"]["Tables"]["user_learning_state"]["Row"];
+export type Banner = Database["public"]["Tables"]["banners"]["Row"];
