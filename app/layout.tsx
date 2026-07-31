@@ -35,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     icons: {
       icon: "/icons/icon-192.svg",
-      apple: "/icons/icon-192.svg",
+      apple: "/apple-icon.png",
     },
     openGraph: {
       ...localized.openGraph,

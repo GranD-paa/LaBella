@@ -8,6 +8,7 @@ import {
 } from "@/lib/auth/local-session";
 import type { DataRepository } from "@/lib/data/repository";
 import { createLocalId, getLocalStore, persistLocalStore } from "@/lib/data/local/store";
+import { matchesImageSignature } from "@/lib/data/image-signature";
 import { deriveQuizMetadataFromLesson } from "@/lib/quiz-management/helpers";
 
 const BANNER_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "banners");
@@ -616,9 +617,13 @@ export function createLocalRepository(): DataRepository {
         return { error: "Image must be smaller than 5MB." };
       }
 
+      const bytes = Buffer.from(await file.arrayBuffer());
+      if (!matchesImageSignature(file.type, bytes)) {
+        return { error: "This file's contents don't match a valid image." };
+      }
+
       const filename = `${crypto.randomUUID()}.${extension}`;
       await mkdir(BANNER_UPLOAD_DIR, { recursive: true });
-      const bytes = Buffer.from(await file.arrayBuffer());
       await writeFile(path.join(BANNER_UPLOAD_DIR, filename), bytes);
 
       return { url: `/uploads/banners/${filename}` };

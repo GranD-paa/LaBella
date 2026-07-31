@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { DataRepository } from "@/lib/data/repository";
+import { matchesImageSignature } from "@/lib/data/image-signature";
 import { deriveQuizMetadataFromLesson } from "@/lib/quiz-management/helpers";
 import type { Database } from "@/types/database.types";
 
@@ -673,11 +674,16 @@ export function createSupabaseRepository(): DataRepository {
         return { error: "Image must be smaller than 5MB." };
       }
 
+      const bytes = Buffer.from(await file.arrayBuffer());
+      if (!matchesImageSignature(file.type, bytes)) {
+        return { error: "This file's contents don't match a valid image." };
+      }
+
       const supabase = await createClient();
       const objectPath = `${crypto.randomUUID()}.${extension}`;
       const { error } = await supabase.storage
         .from("banners")
-        .upload(objectPath, file, { contentType: file.type, upsert: false });
+        .upload(objectPath, bytes, { contentType: file.type, upsert: false });
       if (error) return { error: error.message };
 
       const { data } = supabase.storage.from("banners").getPublicUrl(objectPath);
@@ -763,22 +769,15 @@ export function createSupabaseRepository(): DataRepository {
       const current = banners[index];
       const target = banners[swapIndex];
 
-      const [{ error: currentError }, { error: targetError }] = await Promise.all([
-        supabase
-          .from("banners")
-          .update({ order_number: target.order_number })
-          .eq("id", current.id),
-        supabase
-          .from("banners")
-          .update({ order_number: current.order_number })
-          .eq("id", target.id),
-      ]);
+      // A single RPC call swaps both order_number values in one Postgres
+      // transaction, so a mid-swap failure can't leave the two banners with
+      // inconsistent ordering the way two separate client-side updates could.
+      const { error } = await supabase.rpc("swap_banner_order", {
+        banner_id_a: current.id,
+        banner_id_b: target.id,
+      });
 
-      return currentError
-        ? { error: currentError.message }
-        : targetError
-          ? { error: targetError.message }
-          : {};
+      return error ? { error: error.message } : {};
     },
   };
 }
