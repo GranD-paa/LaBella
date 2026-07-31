@@ -44,8 +44,8 @@ function buildLevel(overrides: Partial<CurriculumLevel> = {}): CurriculumLevel {
 }
 
 describe("isLevelCompleted", () => {
-  it("is false when the level has no checkpoint quiz at all", () => {
-    expect(isLevelCompleted([], new Set())).toBe(false);
+  it("is true (vacuously) when the level has no checkpoint quiz at all", () => {
+    expect(isLevelCompleted([], new Set())).toBe(true);
   });
 
   it("is false when some quizzes are unattempted", () => {
@@ -125,6 +125,31 @@ describe("resolveNextIncompleteLevel", () => {
       quizzes,
       attempted
     );
+    expect(next?.slug).toBe("a1-3");
+  });
+
+  it("does not get permanently stuck on a level that has no quiz yet", () => {
+    // a1-2 has no checkpoint quiz configured (e.g. just added by an admin
+    // via "Add level" before its content exists). The learner has already
+    // attempted both quizzes that do exist, including a1-3's.
+    const levelsWithGap = [
+      buildLevel({ slug: "a1-1", code: "A1-1", orderNumber: 1 }),
+      buildLevel({ slug: "a1-2", code: "A1-2", orderNumber: 2 }),
+      buildLevel({ slug: "a1-3", code: "A1-3", orderNumber: 3 }),
+    ];
+    const quizzesWithGap = [
+      buildQuiz({ id: "q1", lesson_id: "lesson-1", level_slug: "a1-1" }),
+      buildQuiz({ id: "q3", lesson_id: "lesson-3", level_slug: "a1-3" }),
+    ];
+    const next = resolveNextIncompleteLevel(
+      "italian",
+      levelsWithGap,
+      lessons,
+      quizzesWithGap,
+      new Set(["q1", "q3"])
+    );
+    // Everything with a quiz is done, so it should fall through to the last
+    // level rather than getting permanently stuck on quiz-less a1-2.
     expect(next?.slug).toBe("a1-3");
   });
 });

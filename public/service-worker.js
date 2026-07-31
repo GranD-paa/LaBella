@@ -1,7 +1,6 @@
-const CACHE_NAME = "laparla-v1";
+const CACHE_NAME = "laparla-v2";
+const STATIC_ASSET_PATTERN = /^\/_next\/static\//;
 const PRECACHE_URLS = [
-  "/",
-  "/dashboard",
   "/manifest.json",
   "/icons/icon-192.svg",
   "/icons/icon-512.svg",
@@ -28,41 +27,49 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+function cachePut(request, response) {
+  if (response && response.status === 200 && response.type === "basic") {
+    const clone = response.clone();
+    caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+  }
+  return response;
+}
+
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") {
     return;
   }
 
   const url = new URL(event.request.url);
-
   if (url.origin !== self.location.origin) {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) {
-        return cached;
-      }
+  // Hashed build assets never change contents for a given URL, so they're
+  // safe (and fast) to serve cache-first forever.
+  if (STATIC_ASSET_PATTERN.test(url.pathname)) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request).then((response) => cachePut(event.request, response));
+      })
+    );
+    return;
+  }
 
-      return fetch(event.request)
-        .then((response) => {
-          if (
-            !response ||
-            response.status !== 200 ||
-            response.type !== "basic"
-          ) {
-            return response;
-          }
+  // Real page loads (not the RSC/data fetches Next.js's client router makes
+  // under the same URL): go to the network first so deploys are picked up
+  // immediately, falling back to the last cached copy only when offline.
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => cachePut(event.request, response))
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
 
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
-
-          return response;
-        })
-        .catch(() => cached);
-    })
-  );
+  // Everything else (RSC payloads, server actions, API-style calls) is left
+  // to the network untouched — caching these by URL would risk serving a
+  // stale or mismatched payload back for a different request shape.
 });

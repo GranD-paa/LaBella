@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import {
@@ -656,8 +656,15 @@ export function createLocalRepository(): DataRepository {
 
     async deleteBanner(id) {
       const store = getLocalStore();
-      store.banners = store.banners.filter((banner) => banner.id !== id);
+      const banner = store.banners.find((entry) => entry.id === id);
+      store.banners = store.banners.filter((entry) => entry.id !== id);
       commitStore();
+
+      if (banner?.image_url.startsWith("/uploads/banners/")) {
+        const filename = banner.image_url.slice("/uploads/banners/".length);
+        await unlink(path.join(BANNER_UPLOAD_DIR, filename)).catch(() => {});
+      }
+
       return {};
     },
 

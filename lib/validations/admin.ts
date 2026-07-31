@@ -167,7 +167,15 @@ export type QuizValues = z.infer<typeof quizSchema>;
 
 export const bannerSchema = z.object({
   title: optionalText(150),
-  linkHref: z.string().url("Must be a valid URL").max(2000).optional().or(z.literal("")),
+  linkHref: z
+    .string()
+    .url("Must be a valid URL")
+    .max(2000)
+    .refine((value) => /^https?:\/\//i.test(value), {
+      message: "Link must start with http:// or https://",
+    })
+    .optional()
+    .or(z.literal("")),
   status: z.enum(["draft", "published"]).default("draft"),
 });
 

@@ -5,14 +5,17 @@ import type { Lesson, Quiz } from "@/types";
 /**
  * A level counts as passed once the learner has attempted every published
  * checkpoint quiz ("quiz" section) tied to it. A level with no checkpoint
- * quiz configured yet can't be judged complete, so it's treated as
- * not-yet-passed rather than silently skipped.
+ * quiz configured yet has nothing to block on, so it's treated as passed
+ * (vacuously complete) rather than as a permanent wall — otherwise adding a
+ * new level to the curriculum before its quiz exists would strand every
+ * learner's "Continue learning" on that level forever, even past levels
+ * they've since finished.
  */
 export function isLevelCompleted(
   levelQuizzes: Quiz[],
   attemptedQuizIds: ReadonlySet<string>
 ): boolean {
-  if (levelQuizzes.length === 0) return false;
+  if (levelQuizzes.length === 0) return true;
   return levelQuizzes.every((quiz) => attemptedQuizIds.has(quiz.id));
 }
 

@@ -720,8 +720,23 @@ export function createSupabaseRepository(): DataRepository {
 
     async deleteBanner(id) {
       const supabase = await createClient();
+      const { data: banner } = await supabase
+        .from("banners")
+        .select("image_url")
+        .eq("id", id)
+        .maybeSingle();
+
       const { error } = await supabase.from("banners").delete().eq("id", id);
-      return error ? { error: error.message } : {};
+      if (error) return { error: error.message };
+
+      const marker = "/object/public/banners/";
+      const markerIndex = banner?.image_url.indexOf(marker) ?? -1;
+      if (banner && markerIndex !== -1) {
+        const objectPath = banner.image_url.slice(markerIndex + marker.length);
+        await supabase.storage.from("banners").remove([objectPath]);
+      }
+
+      return {};
     },
 
     async reorderBanner(id, direction) {
