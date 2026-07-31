@@ -733,7 +733,12 @@ export function createSupabaseRepository(): DataRepository {
       const markerIndex = banner?.image_url.indexOf(marker) ?? -1;
       if (banner && markerIndex !== -1) {
         const objectPath = banner.image_url.slice(markerIndex + marker.length);
-        await supabase.storage.from("banners").remove([objectPath]);
+        const { error: removeError } = await supabase.storage
+          .from("banners")
+          .remove([objectPath]);
+        if (removeError) {
+          console.error("Failed to remove banner storage object:", objectPath, removeError);
+        }
       }
 
       return {};

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { ContentFormPanel } from "@/components/admin/content/content-form-panels";
+import { LessonForm } from "@/components/admin/lessons/lesson-form";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -267,11 +268,19 @@ export function CreateContentSection({
                     </p>
                   ) : null}
                 </div>
-              ) : (
-                <p className="text-sm text-destructive">
-                  {t("admin.content.noLessonMapped")}
-                </p>
-              )}
+              ) : selectedLevel ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-destructive">
+                    {t("admin.content.noLessonMapped")}
+                  </p>
+                  <LessonForm
+                    key={selectedLevel.slug}
+                    defaultTitle={selectedLevel.title}
+                    defaultOrderNumber={selectedLevel.orderNumber}
+                    onSuccess={onSuccess}
+                  />
+                </div>
+              ) : null}
             </div>
           ) : null}
 

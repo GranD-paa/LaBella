@@ -32,7 +32,15 @@ import {
 } from "@/components/ui/form";
 import { useTranslations } from "@/components/providers/locale-provider";
 
-export function LessonForm() {
+export function LessonForm({
+  defaultTitle = "",
+  defaultOrderNumber = 0,
+  onSuccess,
+}: {
+  defaultTitle?: string;
+  defaultOrderNumber?: number;
+  onSuccess?: () => void;
+}) {
   const { t } = useTranslations();
   const [isPending, startTransition] = useTransition();
 
@@ -40,7 +48,11 @@ export function LessonForm() {
 
   const form = useForm<LessonValues>({
     resolver: zodResolver(lessonSchema),
-    defaultValues: { title: "", description: "", orderNumber: 0 },
+    defaultValues: {
+      title: defaultTitle,
+      description: "",
+      orderNumber: defaultOrderNumber,
+    },
   });
 
   function onSubmit(values: LessonValues) {
@@ -51,7 +63,8 @@ export function LessonForm() {
         return;
       }
       toast.success(t("admin.lessons.created"));
-      form.reset({ title: "", description: "", orderNumber: 0 });
+      form.reset({ title: defaultTitle, description: "", orderNumber: defaultOrderNumber });
+      onSuccess?.();
     });
   }
 

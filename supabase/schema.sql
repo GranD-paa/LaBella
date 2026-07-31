@@ -554,6 +554,17 @@ insert into storage.buckets (id, name, public)
 values ('banners', 'banners', true)
 on conflict (id) do nothing;
 
+-- The public-read comment above covers fetching files by their CDN URL.
+-- Admin-side operations (list, replace, remove) go through the Storage API
+-- instead, which needs to SELECT a row before it can update/delete it —
+-- without this policy, RLS silently hides every row from that lookup and
+-- update/remove calls succeed while affecting zero rows.
+drop policy if exists "Admins can view banner image objects" on storage.objects;
+create policy "Admins can view banner image objects"
+  on storage.objects for select
+  to authenticated
+  using (bucket_id = 'banners' and private.is_admin());
+
 drop policy if exists "Admins can upload banner images" on storage.objects;
 create policy "Admins can upload banner images"
   on storage.objects for insert

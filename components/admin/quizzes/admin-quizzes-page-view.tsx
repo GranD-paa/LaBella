@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import { LessonsTable } from "@/components/admin/lessons/lessons-table";
 import { CreateContentSection } from "@/components/admin/quizzes/create-content-section";
 import { QuizManagementTable } from "@/components/admin/quizzes/quiz-management-table";
 import { useTranslations } from "@/components/providers/locale-provider";
@@ -62,6 +63,8 @@ export function AdminQuizzesPageView({
         languages={languages}
         onSuccess={() => router.refresh()}
       />
+
+      <LessonsTable lessons={lessons} />
 
       <QuizManagementTable
         quizzes={quizzes}
