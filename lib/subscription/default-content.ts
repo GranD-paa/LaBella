@@ -150,9 +150,9 @@ export const DEFAULT_SUBSCRIPTION_PAGE_CONTENT: SubscriptionPageContentRow = {
     it: "Scegli il tuo piano di apprendimento",
   },
   hero_subtitle: {
-    fa: "{name}، با اشتراک ماهانه‌ای متناسب با اهدافتان، تجربه کامل لاپارلا را باز کنید.",
-    en: "{name}, unlock the full LaParla experience with a monthly subscription tailored to your goals.",
-    it: "{name}, sblocca l'esperienza completa di LaParla con un abbonamento su misura per i tuoi obiettivi.",
+    fa: "{name}، با اشتراک ماهانه‌ای متناسب با اهدافتان، تجربه کامل لاپارلی را باز کنید.",
+    en: "{name}, unlock the full Laparli experience with a monthly subscription tailored to your goals.",
+    it: "{name}, sblocca l'esperienza completa di Laparli con un abbonamento su misura per i tuoi obiettivi.",
   },
   footer_note: {
     fa: "اشتراک هر ۳۰ روز تمدید می‌شود. پس از فعال شدن پرداخت، هر زمان می‌توانید طرح را تغییر دهید یا لغو کنید. قیمت‌ها به یورو نمایش داده می‌شوند.",

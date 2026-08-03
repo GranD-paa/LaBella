@@ -593,12 +593,12 @@ export const fa: Messages = {
   },
   about: {
     badge: "داستان ما",
-    title: "درباره لاپارلا",
+    title: "درباره لاپارلی",
     subtitle:
       "ما مسیرهای زبان آرام و ساختاریافته می‌سازیم — یک درس، یک آزمون و یک پیروزی کوچک در هر قدم.",
-    missionTitle: "چرا لاپارلا ساخته شد",
+    missionTitle: "چرا لاپارلی ساخته شد",
     missionBody:
-      "لاپارلا با یک ایده ساده شروع شد: یادگیری زبان باید روشن باشد، نه گیج‌کننده. مسیرهای هم‌تراز با CEFR، درس‌های کوتاه و آزمون‌های معنادار را کنار هم می‌گذاریم تا یادگیرنده انگیزه‌اش را حفظ کند.",
+      "لاپارلی با یک ایده ساده شروع شد: یادگیری زبان باید روشن باشد، نه گیج‌کننده. مسیرهای هم‌تراز با CEFR، درس‌های کوتاه و آزمون‌های معنادار را کنار هم می‌گذاریم تا یادگیرنده انگیزه‌اش را حفظ کند.",
     valuesTitle: "باورهای ما",
     valuesSubtitle: "چهار اصل که شکل هر ویژگی جدید را تعیین می‌کند.",
     values: {
@@ -627,7 +627,7 @@ export const fa: Messages = {
     },
     timeline: {
       title: "مسیر ما تا اینجا",
-      subtitle: "نگاهی کوتاه به سفر لاپارلا.",
+      subtitle: "نگاهی کوتاه به سفر لاپارلی.",
       items: {
         idea: {
           title: "ایده",
@@ -658,7 +658,7 @@ export const fa: Messages = {
     },
     communityTitle: "ساخته‌شده برای یادگیرندگان",
     communityBody:
-      "چه مدیر محتوا باشید و چه یادگیرنده‌ای که اولین درس را باز می‌کند، لاپارلا برای همراهی با شما در قدم بعدی طراحی شده است.",
+      "چه مدیر محتوا باشید و چه یادگیرنده‌ای که اولین درس را باز می‌کند، لاپارلی برای همراهی با شما در قدم بعدی طراحی شده است.",
   },
   contact: {
     badge: "گوش‌به‌زنگیم",
@@ -668,7 +668,7 @@ export const fa: Messages = {
     channels: {
       email: {
         title: "ایمیل",
-        value: "hello@laparla.app",
+        value: "hello@laparli.app",
         hint: "مناسب برای حساب، پرداخت و پشتیبانی یادگیری.",
       },
       response: {
@@ -711,32 +711,32 @@ export const fa: Messages = {
       "پیام شما فقط برای پاسخ‌گویی استفاده می‌شود. اطلاعات تماس را با اشخاص ثالث به اشتراک نمی‌گذاریم.",
   },
   meta: {
-    siteTitle: "لاپارلا — هر درس، یک قدم به روانی",
+    siteTitle: "لاپارلی — هر درس، یک قدم به روانی",
     siteDescription:
-      "لاپارلا به شما کمک می‌کند واژگان، گرامر و مهارت‌های شنیداری را با درس‌های کوتاه و آزمون‌ها یاد بگیرید.",
-    siteName: "LaParla",
-    login: "ورود — LaParla",
-    signUp: "ثبت‌نام — LaParla",
-    menu: "منوی اصلی — LaParla",
-    dashboard: "داشبورد — LaParla",
-    profile: "پروفایل — LaParla",
-    subscription: "خرید اشتراک — LaParla",
+      "لاپارلی به شما کمک می‌کند واژگان، گرامر و مهارت‌های شنیداری را با درس‌های کوتاه و آزمون‌ها یاد بگیرید.",
+    siteName: "Laparli",
+    login: "ورود — Laparli",
+    signUp: "ثبت‌نام — Laparli",
+    menu: "منوی اصلی — Laparli",
+    dashboard: "داشبورد — Laparli",
+    profile: "پروفایل — Laparli",
+    subscription: "خرید اشتراک — Laparli",
     subscriptionDescription:
       "بیسیک، پرو یا اولتیمیت را انتخاب کنید — طرح‌های ماهانه برای باز کردن مسیر کامل یادگیری زبان.",
-    about: "درباره ما — LaParla",
+    about: "درباره ما — Laparli",
     aboutDescription:
-      "با مأموریت، ارزش‌ها و داستان پشت پلتفرم یادگیری زبان لاپارلا آشنا شوید.",
-    contact: "تماس با ما — LaParla",
+      "با مأموریت، ارزش‌ها و داستان پشت پلتفرم یادگیری زبان لاپارلی آشنا شوید.",
+    contact: "تماس با ما — Laparli",
     contactDescription:
-      "برای پشتیبانی، بازخورد یا همکاری با تیم لاپارلا در تماس باشید.",
-    admin: "مدیریت — LaParla",
-    adminQuizzes: "مدیریت آزمون — LaParla",
-    quizBrowse: "مرور آزمون‌ها — LaParla",
-    quiz: "آزمون — LaParla",
-    languageCourse: "دوره زبان — LaParla",
-    level: "سطح — LaParla",
-    lessonCategory: "دسته درس — LaParla",
-    lesson: "درس — LaParla",
+      "برای پشتیبانی، بازخورد یا همکاری با تیم لاپارلی در تماس باشید.",
+    admin: "مدیریت — Laparli",
+    adminQuizzes: "مدیریت آزمون — Laparli",
+    quizBrowse: "مرور آزمون‌ها — Laparli",
+    quiz: "آزمون — Laparli",
+    languageCourse: "دوره زبان — Laparli",
+    level: "سطح — Laparli",
+    lessonCategory: "دسته درس — Laparli",
+    lesson: "درس — Laparli",
   },
   actions: {
     errors: {

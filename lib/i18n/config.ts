@@ -1,7 +1,7 @@
 import type { AppLocale } from "@/lib/i18n/types";
 
-export const LOCALE_STORAGE_KEY = "laparla_ui_locale";
-export const LOCALE_COOKIE_KEY = "laparla_ui_locale";
+export const LOCALE_STORAGE_KEY = "laparli_ui_locale";
+export const LOCALE_COOKIE_KEY = "laparli_ui_locale";
 export const DEFAULT_LOCALE: AppLocale = "fa";
 
 export type LocaleDefinition = {

@@ -58,11 +58,11 @@ const quizIds = Array.from({ length: 10 }, (_, index) =>
 export function getLocalDevCredentials() {
   return {
     admin: {
-      email: process.env.LOCAL_DEV_ADMIN_EMAIL ?? "admin@laparla.local",
+      email: process.env.LOCAL_DEV_ADMIN_EMAIL ?? "admin@laparli.local",
       password: process.env.LOCAL_DEV_ADMIN_PASSWORD ?? "Admin123!",
     },
     user: {
-      email: process.env.LOCAL_DEV_USER_EMAIL ?? "learner@laparla.local",
+      email: process.env.LOCAL_DEV_USER_EMAIL ?? "learner@laparli.local",
       password: process.env.LOCAL_DEV_USER_PASSWORD ?? "Learner123!",
     },
   } as const;
@@ -108,7 +108,7 @@ export const LOCAL_SEED: LocalDatabase = {
       id: "80000000-0000-4000-8000-000000000001",
       full_name: "Giulia Rossi",
       avatar_url: null,
-      email: "giulia.rossi@laparla.app",
+      email: "giulia.rossi@laparli.app",
       is_admin: true,
       role: "content_manager",
       status: "active",
@@ -118,7 +118,7 @@ export const LOCAL_SEED: LocalDatabase = {
       id: "80000000-0000-4000-8000-000000000002",
       full_name: "Marco Bianchi",
       avatar_url: null,
-      email: "marco.bianchi@laparla.app",
+      email: "marco.bianchi@laparli.app",
       is_admin: true,
       role: "quiz_manager",
       status: "suspended",
@@ -128,7 +128,7 @@ export const LOCAL_SEED: LocalDatabase = {
       id: "80000000-0000-4000-8000-000000000003",
       full_name: "Sara Verdi",
       avatar_url: null,
-      email: "sara.verdi@laparla.app",
+      email: "sara.verdi@laparli.app",
       is_admin: true,
       role: "limited_admin",
       status: "active",

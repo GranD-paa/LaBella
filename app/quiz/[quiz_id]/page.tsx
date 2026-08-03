@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { t } = await getServerTranslator();
 
   return {
-    title: quiz ? `${quiz.title} — LaParla` : t("meta.quiz"),
+    title: quiz ? `${quiz.title} — Laparli` : t("meta.quiz"),
   };
 }
 

@@ -84,7 +84,7 @@ insert into public.subscription_page_content (id, hero_title, hero_subtitle, foo
 values (
   'default',
   '{"fa":"طرح یادگیری خود را انتخاب کنید","en":"Choose your learning plan","it":"Scegli il tuo piano di apprendimento"}'::jsonb,
-  '{"fa":"{name}، با اشتراک ماهانه‌ای متناسب با اهدافتان، تجربه کامل لاپارلا را باز کنید.","en":"{name}, unlock the full LaParla experience with a monthly subscription tailored to your goals.","it":"{name}, sblocca l''esperienza completa di LaParla con un abbonamento su misura per i tuoi obiettivi."}'::jsonb,
+  '{"fa":"{name}، با اشتراک ماهانه‌ای متناسب با اهدافتان، تجربه کامل لاپارلی را باز کنید.","en":"{name}, unlock the full Laparli experience with a monthly subscription tailored to your goals.","it":"{name}, sblocca l''esperienza completa di Laparli con un abbonamento su misura per i tuoi obiettivi."}'::jsonb,
   '{"fa":"اشتراک هر ۳۰ روز تمدید می‌شود. پس از فعال شدن پرداخت، هر زمان می‌توانید طرح را تغییر دهید یا لغو کنید. قیمت‌ها به یورو نمایش داده می‌شوند.","en":"Subscriptions renew every 30 days. You can change or cancel your plan anytime once payments go live. Prices are shown in EUR.","it":"Gli abbonamenti si rinnovano ogni 30 giorni. Puoi cambiare o annullare il piano in qualsiasi momento una volta attivati i pagamenti. I prezzi sono in EUR."}'::jsonb
 )
 on conflict (id) do nothing;

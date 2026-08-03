@@ -27,7 +27,7 @@ export function BrandLogo({
     >
       <BrandMark className="h-9 w-9 shrink-0 text-white sm:h-10 sm:w-10" />
       <span className="text-lg font-semibold tracking-tight sm:text-xl">
-        LaParla
+        Laparli
       </span>
     </Link>
   );

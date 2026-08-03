@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
     appleWebApp: {
       capable: true,
       statusBarStyle: "default",
-      title: "LaParla",
+      title: "Laparli",
     },
     icons: {
       icon: "/icons/icon-192.svg",
@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     openGraph: {
       ...localized.openGraph,
-      siteName: "LaParla",
+      siteName: "Laparli",
       type: "website",
     },
     twitter: {

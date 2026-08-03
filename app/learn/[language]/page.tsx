@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: contentKey
-      ? `${t(`${contentKey}.headline`)} — LaParla`
+      ? `${t(`${contentKey}.headline`)} — Laparli`
       : t("meta.languageCourse"),
   };
 }

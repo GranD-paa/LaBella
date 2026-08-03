@@ -1,4 +1,4 @@
-# LaParla
+# Laparli
 
 A full-stack language-learning Progressive Web App built with **Next.js 14** (App Router), **Tailwind CSS**, **shadcn/ui**, and **Supabase** (Postgres + Auth + Row Level Security).
 
@@ -140,14 +140,14 @@ types/
 
 ## PWA (Progressive Web App)
 
-LaParla can be installed on Android devices:
+Laparli can be installed on Android devices:
 
 1. Open the app in Chrome
 2. Tap the menu (⋮) → **Add to Home screen**
 
 PWA configuration:
 
-- **Name:** LaParla
+- **Name:** Laparli
 - **Theme color:** `#18181b`
 - **Background color:** `#ffffff`
 - **Manifest:** `public/manifest.json`

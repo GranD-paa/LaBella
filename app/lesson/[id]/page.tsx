@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { t } = await getServerTranslator();
 
   return {
-    title: lesson ? `${lesson.title} — LaParla` : t("meta.lesson"),
+    title: lesson ? `${lesson.title} — Laparli` : t("meta.lesson"),
   };
 }
 

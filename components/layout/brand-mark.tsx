@@ -1,5 +1,5 @@
 /**
- * LaParla's mark: a speech bubble with three conversation dots — "parla"
+ * Laparli's mark: a speech bubble with three conversation dots — "parla"
  * means "speak" in Italian, so the logo leads with dialogue rather than a
  * generic education glyph. Shares its path geometry with the PWA icons in
  * public/icons/ so the brand reads the same at every size.

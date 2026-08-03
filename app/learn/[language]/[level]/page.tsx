@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: level
-      ? `${level.code} — ${language?.name ?? t("locale.label")} — LaParla`
+      ? `${level.code} — ${language?.name ?? t("locale.label")} — Laparli`
       : t("meta.level"),
   };
 }

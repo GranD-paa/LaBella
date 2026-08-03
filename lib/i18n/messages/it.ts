@@ -604,12 +604,12 @@ export const it: Messages = {
   },
   about: {
     badge: "La nostra storia",
-    title: "Chi è LaParla",
+    title: "Chi è Laparli",
     subtitle:
       "Costruiamo percorsi linguistici calmi e strutturati — una lezione, un quiz e una piccola vittoria alla volta.",
-    missionTitle: "Perché esiste LaParla",
+    missionTitle: "Perché esiste Laparli",
     missionBody:
-      "LaParla è nata da un'idea semplice: imparare una lingua deve essere chiaro, non opprimente. Uniamo percorsi CEFR, lezioni brevi e quiz significativi per mantenere alta la motivazione.",
+      "Laparli è nata da un'idea semplice: imparare una lingua deve essere chiaro, non opprimente. Uniamo percorsi CEFR, lezioni brevi e quiz significativi per mantenere alta la motivazione.",
     valuesTitle: "In cosa crediamo",
     valuesSubtitle: "Quattro principi che guidano ogni funzione che rilasciamo.",
     values: {
@@ -638,7 +638,7 @@ export const it: Messages = {
     },
     timeline: {
       title: "Il nostro percorso",
-      subtitle: "Uno sguardo rapido al viaggio di LaParla finora.",
+      subtitle: "Uno sguardo rapido al viaggio di Laparli finora.",
       items: {
         idea: {
           title: "L'idea",
@@ -669,7 +669,7 @@ export const it: Messages = {
     },
     communityTitle: "Pensato per chi impara",
     communityBody:
-      "Che tu sia un admin che modella il curriculum o uno studente che apre la prima lezione, LaParla è pensata per accompagnarti al passo successivo con fiducia.",
+      "Che tu sia un admin che modella il curriculum o uno studente che apre la prima lezione, Laparli è pensata per accompagnarti al passo successivo con fiducia.",
   },
   contact: {
     badge: "Ti ascoltiamo",
@@ -679,7 +679,7 @@ export const it: Messages = {
     channels: {
       email: {
         title: "Email",
-        value: "hello@laparla.app",
+        value: "hello@laparli.app",
         hint: "Ideale per account, fatturazione e supporto all'apprendimento.",
       },
       response: {
@@ -722,32 +722,32 @@ export const it: Messages = {
       "Il tuo messaggio viene usato solo per risponderti. Non condividiamo i dati di contatto con terze parti.",
   },
   meta: {
-    siteTitle: "LaParla — Impara una lingua, una lezione alla volta",
+    siteTitle: "Laparli — Impara una lingua, una lezione alla volta",
     siteDescription:
-      "LaParla ti aiuta a padroneggiare vocabolario, grammatica e ascolto con lezioni brevi e quiz.",
-    siteName: "LaParla",
-    login: "Accedi — LaParla",
-    signUp: "Registrati — LaParla",
-    menu: "Menu principale — LaParla",
-    dashboard: "Dashboard — LaParla",
-    profile: "Profilo — LaParla",
-    subscription: "Abbonamento — LaParla",
+      "Laparli ti aiuta a padroneggiare vocabolario, grammatica e ascolto con lezioni brevi e quiz.",
+    siteName: "Laparli",
+    login: "Accedi — Laparli",
+    signUp: "Registrati — Laparli",
+    menu: "Menu principale — Laparli",
+    dashboard: "Dashboard — Laparli",
+    profile: "Profilo — Laparli",
+    subscription: "Abbonamento — Laparli",
     subscriptionDescription:
       "Scegli Basic, Pro o Ultimate — piani mensili per il tuo percorso linguistico completo.",
-    about: "Chi siamo — LaParla",
+    about: "Chi siamo — Laparli",
     aboutDescription:
-      "Scopri la missione, i valori e la storia di LaParla, la piattaforma per imparare le lingue.",
-    contact: "Contattaci — LaParla",
+      "Scopri la missione, i valori e la storia di Laparli, la piattaforma per imparare le lingue.",
+    contact: "Contattaci — Laparli",
     contactDescription:
-      "Contatta il team LaParla per supporto, feedback o richieste di partnership.",
-    admin: "Admin — LaParla",
-    adminQuizzes: "Gestione quiz — LaParla",
-    quizBrowse: "Sfoglia quiz — LaParla",
-    quiz: "Quiz — LaParla",
-    languageCourse: "Corso di lingua — LaParla",
-    level: "Livello — LaParla",
-    lessonCategory: "Categoria lezione — LaParla",
-    lesson: "Lezione — LaParla",
+      "Contatta il team Laparli per supporto, feedback o richieste di partnership.",
+    admin: "Admin — Laparli",
+    adminQuizzes: "Gestione quiz — Laparli",
+    quizBrowse: "Sfoglia quiz — Laparli",
+    quiz: "Quiz — Laparli",
+    languageCourse: "Corso di lingua — Laparli",
+    level: "Livello — Laparli",
+    lessonCategory: "Categoria lezione — Laparli",
+    lesson: "Lezione — Laparli",
   },
   actions: {
     errors: {

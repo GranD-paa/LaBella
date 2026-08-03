@@ -1,12 +1,12 @@
-# LaParla — Deployment Guide
+# Laparli — Deployment Guide
 
-This folder contains reference files and instructions for deploying LaParla to production (Vercel recommended).
+This folder contains reference files and instructions for deploying Laparli to production (Vercel recommended).
 
 ## App identity (PWA)
 
 | Property | Value |
 |----------|-------|
-| **Name** | LaParla |
+| **Name** | Laparli |
 | **Theme color** | `#18181b` |
 | **Background color** | `#ffffff` |
 | **Start URL** | `/dashboard` |

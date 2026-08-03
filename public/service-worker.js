@@ -1,4 +1,4 @@
-const CACHE_NAME = "laparla-v2";
+const CACHE_NAME = "laparli-v2";
 const STATIC_ASSET_PATTERN = /^\/_next\/static\//;
 const PRECACHE_URLS = [
   "/manifest.json",

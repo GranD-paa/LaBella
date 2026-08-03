@@ -598,12 +598,12 @@ export const en = {
   },
   about: {
     badge: "Our story",
-    title: "About LaParla",
+    title: "About Laparli",
     subtitle:
       "We build calm, structured language journeys — one lesson, one quiz, and one small win at a time.",
-    missionTitle: "Why LaParla exists",
+    missionTitle: "Why Laparli exists",
     missionBody:
-      "LaParla started with a simple idea: language learning should feel clear, not overwhelming. We combine CEFR-aligned paths, bite-sized lessons, and meaningful quizzes so learners stay motivated without losing the joy of discovery.",
+      "Laparli started with a simple idea: language learning should feel clear, not overwhelming. We combine CEFR-aligned paths, bite-sized lessons, and meaningful quizzes so learners stay motivated without losing the joy of discovery.",
     valuesTitle: "What we believe in",
     valuesSubtitle: "Four principles that shape every feature we ship.",
     values: {
@@ -632,7 +632,7 @@ export const en = {
     },
     timeline: {
       title: "How we got here",
-      subtitle: "A quick look at the LaParla journey so far.",
+      subtitle: "A quick look at the Laparli journey so far.",
       items: {
         idea: {
           title: "The idea",
@@ -663,7 +663,7 @@ export const en = {
     },
     communityTitle: "Built with learners in mind",
     communityBody:
-      "Whether you are an admin shaping curriculum or a learner opening your first lesson, LaParla is designed to meet you where you are — and help you take the next step with confidence.",
+      "Whether you are an admin shaping curriculum or a learner opening your first lesson, Laparli is designed to meet you where you are — and help you take the next step with confidence.",
   },
   contact: {
     badge: "We are listening",
@@ -673,7 +673,7 @@ export const en = {
     channels: {
       email: {
         title: "Email",
-        value: "hello@laparla.app",
+        value: "hello@laparli.app",
         hint: "Best for account, billing, and learning support.",
       },
       response: {
@@ -716,32 +716,32 @@ export const en = {
       "Your message is used only to respond to your request. We do not share contact details with third parties.",
   },
   meta: {
-    siteTitle: "LaParla — Learn a language, one lesson at a time",
+    siteTitle: "Laparli — Learn a language, one lesson at a time",
     siteDescription:
-      "LaParla helps you master vocabulary, grammar, and listening skills through bite-sized lessons and quizzes.",
-    siteName: "LaParla",
-    login: "Sign in — LaParla",
-    signUp: "Sign up — LaParla",
-    menu: "Main Menu — LaParla",
-    dashboard: "Dashboard — LaParla",
-    profile: "Profile — LaParla",
-    subscription: "Subscription — LaParla",
+      "Laparli helps you master vocabulary, grammar, and listening skills through bite-sized lessons and quizzes.",
+    siteName: "Laparli",
+    login: "Sign in — Laparli",
+    signUp: "Sign up — Laparli",
+    menu: "Main Menu — Laparli",
+    dashboard: "Dashboard — Laparli",
+    profile: "Profile — Laparli",
+    subscription: "Subscription — Laparli",
     subscriptionDescription:
       "Choose Basic, Pro, or Ultimate — monthly plans to unlock your full language learning journey.",
-    about: "About us — LaParla",
+    about: "About us — Laparli",
     aboutDescription:
-      "Learn about LaParla's mission, values, and the story behind our language learning platform.",
-    contact: "Contact us — LaParla",
+      "Learn about Laparli's mission, values, and the story behind our language learning platform.",
+    contact: "Contact us — Laparli",
     contactDescription:
-      "Get in touch with the LaParla team for support, feedback, or partnership inquiries.",
-    admin: "Admin — LaParla",
-    adminQuizzes: "Quiz Management — LaParla",
-    quizBrowse: "Browse Quizzes — LaParla",
-    quiz: "Quiz — LaParla",
-    languageCourse: "Language Course — LaParla",
-    level: "Level — LaParla",
-    lessonCategory: "Lesson Category — LaParla",
-    lesson: "Lesson — LaParla",
+      "Get in touch with the Laparli team for support, feedback, or partnership inquiries.",
+    admin: "Admin — Laparli",
+    adminQuizzes: "Quiz Management — Laparli",
+    quizBrowse: "Browse Quizzes — Laparli",
+    quiz: "Quiz — Laparli",
+    languageCourse: "Language Course — Laparli",
+    level: "Level — Laparli",
+    lessonCategory: "Lesson Category — Laparli",
+    lesson: "Lesson — Laparli",
   },
   actions: {
     errors: {
