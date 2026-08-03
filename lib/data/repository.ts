@@ -2,9 +2,12 @@ import type {
   Banner,
   GrammarRule,
   Lesson,
+  LocalizedText,
   Profile,
   Quiz,
   QuizQuestion,
+  SubscriptionPageContentRow,
+  SubscriptionPlanRow,
   UserLearningState,
   UserQuizAttempt,
   VideoLesson,
@@ -231,4 +234,28 @@ export interface DataRepository {
   ): Promise<{ error?: string }>;
   deleteBanner(id: string): Promise<{ error?: string }>;
   reorderBanner(id: string, direction: "up" | "down"): Promise<{ error?: string }>;
+
+  // Subscription management — super-admin editable pricing, discounts, and
+  // localized copy for each (plan, learning-language) pair, plus the
+  // subscription page's hero/footer text.
+  getSubscriptionPlans(): Promise<SubscriptionPlanRow[]>;
+  updateSubscriptionPlan(
+    planSlug: string,
+    languageSlug: string,
+    input: Partial<{
+      priceEur: number;
+      discountPercent: number;
+      title: LocalizedText;
+      description: LocalizedText;
+      features: LocalizedText[];
+    }>
+  ): Promise<{ error?: string }>;
+  getSubscriptionPageContent(): Promise<SubscriptionPageContentRow>;
+  updateSubscriptionPageContent(
+    input: Partial<{
+      heroTitle: LocalizedText;
+      heroSubtitle: LocalizedText;
+      footerNote: LocalizedText;
+    }>
+  ): Promise<{ error?: string }>;
 }

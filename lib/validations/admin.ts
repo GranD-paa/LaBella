@@ -179,4 +179,36 @@ export const bannerSchema = z.object({
   status: z.enum(["draft", "published"]).default("draft"),
 });
 
+const localizedTextSchema = z.object({
+  fa: z.string().min(1, "Persian text is required").max(500),
+  en: z.string().min(1, "English text is required").max(500),
+  it: z.string().min(1, "Italian text is required").max(500),
+});
+
+const localizedLongTextSchema = z.object({
+  fa: z.string().min(1, "Persian text is required").max(2000),
+  en: z.string().min(1, "English text is required").max(2000),
+  it: z.string().min(1, "Italian text is required").max(2000),
+});
+
+export const subscriptionPlanSchema = z.object({
+  priceEur: z
+    .number({ error: "Price must be a number" })
+    .min(0, "Price can't be negative")
+    .max(999.99, "Price is too high"),
+  discountPercent: z
+    .number({ error: "Discount must be a number" })
+    .int("Discount must be a whole number")
+    .min(0, "Discount can't be negative")
+    .max(95, "Discount can't exceed 95%"),
+  title: localizedTextSchema,
+  description: localizedLongTextSchema,
+  features: z
+    .array(localizedTextSchema)
+    .min(1, "Add at least one feature")
+    .max(12, "Too many features"),
+});
+
+export type SubscriptionPlanValues = z.infer<typeof subscriptionPlanSchema>;
+
 export type BannerValues = z.infer<typeof bannerSchema>;

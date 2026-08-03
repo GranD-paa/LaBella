@@ -478,6 +478,66 @@ export interface Database {
         };
         Relationships: [];
       };
+      subscription_plans: {
+        Row: {
+          plan_slug: string;
+          language_slug: string;
+          price_eur: number;
+          discount_percent: number;
+          title: Json;
+          description: Json;
+          features: Json;
+          order_number: number;
+          updated_at: string;
+        };
+        Insert: {
+          plan_slug: string;
+          language_slug: string;
+          price_eur: number;
+          discount_percent?: number;
+          title?: Json;
+          description?: Json;
+          features?: Json;
+          order_number?: number;
+          updated_at?: string;
+        };
+        Update: {
+          plan_slug?: string;
+          language_slug?: string;
+          price_eur?: number;
+          discount_percent?: number;
+          title?: Json;
+          description?: Json;
+          features?: Json;
+          order_number?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      subscription_page_content: {
+        Row: {
+          id: string;
+          hero_title: Json;
+          hero_subtitle: Json;
+          footer_note: Json;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          hero_title?: Json;
+          hero_subtitle?: Json;
+          footer_note?: Json;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          hero_title?: Json;
+          hero_subtitle?: Json;
+          footer_note?: Json;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {

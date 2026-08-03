@@ -2,6 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { LOCAL_SEED, type LocalDatabase } from "@/lib/data/local/seed";
+import {
+  DEFAULT_SUBSCRIPTION_PAGE_CONTENT,
+  DEFAULT_SUBSCRIPTION_PLANS,
+} from "@/lib/subscription/default-content";
 
 const DATA_DIR = path.join(process.cwd(), ".local-data");
 const DATA_FILE = path.join(DATA_DIR, "database.json");
@@ -57,6 +61,14 @@ function loadPersistedStore(): LocalDatabase | null {
     // Backward-compat: older persisted files predate `banners`.
     if (!Array.isArray(parsed.banners)) {
       parsed.banners = [];
+    }
+
+    // Backward-compat: older persisted files predate subscription management.
+    if (!Array.isArray(parsed.subscriptionPlans) || parsed.subscriptionPlans.length === 0) {
+      parsed.subscriptionPlans = DEFAULT_SUBSCRIPTION_PLANS.map((plan) => ({ ...plan }));
+    }
+    if (!parsed.subscriptionPageContent || typeof parsed.subscriptionPageContent !== "object") {
+      parsed.subscriptionPageContent = { ...DEFAULT_SUBSCRIPTION_PAGE_CONTENT };
     }
 
     return parsed;

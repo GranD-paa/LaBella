@@ -694,5 +694,46 @@ export function createLocalRepository(): DataRepository {
       commitStore();
       return {};
     },
+
+    async getSubscriptionPlans() {
+      return [...getLocalStore().subscriptionPlans].sort(
+        (a, b) => a.order_number - b.order_number
+      );
+    },
+
+    async updateSubscriptionPlan(planSlug, languageSlug, input) {
+      const store = getLocalStore();
+      const plan = store.subscriptionPlans.find(
+        (entry) => entry.plan_slug === planSlug && entry.language_slug === languageSlug
+      );
+      if (!plan) return { error: "Subscription plan not found." };
+
+      if (input.priceEur !== undefined) plan.price_eur = input.priceEur;
+      if (input.discountPercent !== undefined) plan.discount_percent = input.discountPercent;
+      if (input.title !== undefined) plan.title = input.title;
+      if (input.description !== undefined) plan.description = input.description;
+      if (input.features !== undefined) plan.features = input.features;
+      plan.updated_at = new Date().toISOString();
+
+      commitStore();
+      return {};
+    },
+
+    async getSubscriptionPageContent() {
+      return getLocalStore().subscriptionPageContent;
+    },
+
+    async updateSubscriptionPageContent(input) {
+      const store = getLocalStore();
+      const content = store.subscriptionPageContent;
+
+      if (input.heroTitle !== undefined) content.hero_title = input.heroTitle;
+      if (input.heroSubtitle !== undefined) content.hero_subtitle = input.heroSubtitle;
+      if (input.footerNote !== undefined) content.footer_note = input.footerNote;
+      content.updated_at = new Date().toISOString();
+
+      commitStore();
+      return {};
+    },
   };
 }

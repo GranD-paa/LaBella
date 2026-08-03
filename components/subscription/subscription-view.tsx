@@ -1,18 +1,41 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { CalendarDays, Lock, ShieldCheck, Sparkles } from "lucide-react";
 
+import { SubscriptionLanguageTabs } from "@/components/subscription/subscription-language-tabs";
 import { SubscriptionPlanCards } from "@/components/subscription/subscription-plan-cards";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
+import type { CurriculumLanguage } from "@/lib/curriculum/types";
+import { interpolateText } from "@/lib/subscription/interpolate";
+import type { SubscriptionPageContentRow, SubscriptionPlanRow } from "@/types";
 
 type SubscriptionViewProps = {
   isAdmin: boolean;
   displayName: string;
+  languages: CurriculumLanguage[];
+  plans: SubscriptionPlanRow[];
+  pageContent: SubscriptionPageContentRow;
 };
 
-export function SubscriptionView({ isAdmin, displayName }: SubscriptionViewProps) {
-  const { t } = useTranslations();
+export function SubscriptionView({
+  isAdmin,
+  displayName,
+  languages,
+  plans,
+  pageContent,
+}: SubscriptionViewProps) {
+  const { t, locale } = useTranslations();
+  const defaultSlug =
+    languages.find((language) => language.available)?.slug ??
+    languages[0]?.slug ??
+    "italian";
+  const [selectedSlug, setSelectedSlug] = useState<string>(defaultSlug);
+  const selectedLanguage = useMemo(
+    () => languages.find((language) => language.slug === selectedSlug) ?? languages[0],
+    [languages, selectedSlug]
+  );
 
   return (
     <div className="space-y-10 pb-4">
@@ -27,10 +50,10 @@ export function SubscriptionView({ isAdmin, displayName }: SubscriptionViewProps
             {t("subscription.monthlyBadge")}
           </Badge>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            {t("subscription.title")}
+            {pageContent.hero_title[locale]}
           </h1>
           <p className="text-base text-muted-foreground sm:text-lg">
-            {t("subscription.subtitle", { name: displayName })}
+            {interpolateText(pageContent.hero_subtitle[locale], { name: displayName })}
           </p>
         </div>
       </section>
@@ -51,7 +74,23 @@ export function SubscriptionView({ isAdmin, displayName }: SubscriptionViewProps
         </section>
       ) : null}
 
-      <SubscriptionPlanCards isAdmin={isAdmin} />
+      <section className="space-y-4">
+        <div className="space-y-1 text-center">
+          <h2 className="text-lg font-semibold">
+            {t("subscription.languageStepTitle")}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {t("subscription.languageStepHint")}
+          </p>
+        </div>
+        <SubscriptionLanguageTabs
+          languages={languages}
+          selectedSlug={selectedSlug}
+          onSelect={setSelectedSlug}
+        />
+      </section>
+
+      <SubscriptionPlanCards isAdmin={isAdmin} language={selectedLanguage} plans={plans} />
 
       <section className="grid gap-4 sm:grid-cols-3">
         {(
@@ -75,7 +114,7 @@ export function SubscriptionView({ isAdmin, displayName }: SubscriptionViewProps
         <div className="flex items-start gap-3">
           <Lock className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
           <p className="text-sm leading-relaxed text-muted-foreground">
-            {t("subscription.footerNote")}
+            {pageContent.footer_note[locale]}
           </p>
         </div>
       </section>

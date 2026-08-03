@@ -3,6 +3,7 @@ import { adminBannersIt } from "@/lib/i18n/messages/admin-banners-it";
 import { adminContentIt } from "@/lib/i18n/messages/admin-content-it";
 import { adminLanguagesIt } from "@/lib/i18n/messages/admin-languages-it";
 import { adminQuizzesIt } from "@/lib/i18n/messages/admin-quizzes-it";
+import { adminSubscriptionIt } from "@/lib/i18n/messages/admin-subscription-it";
 import { adminUsersIt } from "@/lib/i18n/messages/admin-users-it";
 
 export const it: Messages = {
@@ -356,6 +357,7 @@ export const it: Messages = {
       manageUsers: "Gestisci utenti",
       manageLanguages: "Gestisci lingue",
       manageBanners: "Gestisci banner",
+      manageSubscription: "Gestisci abbonamento",
       contentManagement: "Gestione contenuti",
       contentManagementHint:
         "Crea, modifica e pubblica lezioni, vocabolario, grammatica e quiz.",
@@ -575,63 +577,29 @@ export const it: Messages = {
     users: adminUsersIt,
     languages: adminLanguagesIt,
     banners: adminBannersIt,
+    subscription: adminSubscriptionIt,
   },
   subscription: {
-    title: "Scegli il tuo piano di apprendimento",
-    subtitle:
-      "{name}, sblocca l'esperienza completa LaParla con un abbonamento mensile su misura.",
     monthlyBadge: "Accesso di 1 mese · fatturazione mensile",
     billingPeriod: "mese",
     mostPopular: "Più popolare",
     paymentSoon: "L'integrazione del gateway di pagamento è in arrivo!",
     checkoutSoon: "Il checkout {plan} sarà disponibile in un aggiornamento futuro.",
+    checkoutSoonForLanguage:
+      "Il checkout {plan} per {language} sarà disponibile in un aggiornamento futuro.",
+    languageStepTitle: "Quale lingua vuoi imparare?",
+    languageStepHint: "Scegli una lingua, poi il piano più adatto a te.",
+    plansForLanguage: "Piani mostrati per {language}",
+    discountRibbon: "{percent}% di sconto",
+    getPlanCta: "Scegli {plan}",
     adminBannerTitle: "Modalità anteprima admin",
     adminBannerDescription:
       "Hai già accesso completo alla piattaforma come admin. Usa questa pagina per visualizzare i piani prima che gli studenti si abbonino.",
     adminPreviewCta: "Anteprima {plan}",
-    footerNote:
-      "Gli abbonamenti si rinnovano ogni 30 giorni. Potrai cambiare o annullare il piano in qualsiasi momento quando i pagamenti saranno attivi. Prezzi in EUR.",
     trust: {
       secure: "Checkout sicuro (in arrivo)",
       flexible: "Cambia piano in qualsiasi momento",
       instant: "Accesso immediato dopo il pagamento",
-    },
-    plans: {
-      basic: {
-        name: "Basic",
-        description: "Ideale per chi inizia concentrandosi su una lingua.",
-        cta: "Scegli Basic",
-        features: {
-          oneLanguage: "1 lingua attiva alla volta",
-          coreLessons: "Lezioni, vocabolario e grammatica base",
-          quizRetakes: "Fino a 3 ripetizioni quiz per lezione",
-          progress: "Monitoraggio progressi nella dashboard",
-        },
-      },
-      pro: {
-        name: "Pro",
-        description: "Il piano più scelto per una pratica quotidiana seria.",
-        cta: "Scegli Pro",
-        features: {
-          allBasic: "Tutto nel piano Basic",
-          allLanguages: "Tutte le lingue attualmente attive",
-          unlimitedQuizzes: "Ripetizioni quiz illimitate",
-          grammarDeepDives: "Approfondimenti grammaticali estesi",
-          prioritySupport: "Supporto email prioritario",
-        },
-      },
-      ultimate: {
-        name: "Ultimate",
-        description: "Accesso massimo per studenti avanzati.",
-        cta: "Scegli Ultimate",
-        features: {
-          allPro: "Tutto nel piano Pro",
-          futureLanguages: "Tutte le lingue future al lancio",
-          offlinePwa: "Accesso offline alle lezioni (PWA)",
-          earlyAccess: "Accesso anticipato a nuovi livelli e funzioni",
-          personalizedPath: "Suggerimenti personalizzati sul percorso",
-        },
-      },
     },
   },
   about: {

@@ -1,0 +1,83 @@
+"use client";
+
+import { Percent, Tag } from "lucide-react";
+
+import { SubscriptionPlanEditDialog } from "@/components/admin/subscription/subscription-plan-edit-dialog";
+import { useTranslations } from "@/components/providers/locale-provider";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import type { SubscriptionPlanRow } from "@/types";
+
+function discountedPrice(priceEur: number, discountPercent: number) {
+  return priceEur * (1 - discountPercent / 100);
+}
+
+export function SubscriptionPlanList({ plans }: { plans: SubscriptionPlanRow[] }) {
+  const { t } = useTranslations();
+  const sorted = [...plans].sort((a, b) => a.order_number - b.order_number);
+
+  return (
+    <Card className="brand-surface">
+      <CardHeader className="space-y-1">
+        <CardTitle className="flex items-center gap-2">
+          <Tag className="h-5 w-5 text-brand-accent" />
+          {t("admin.subscription.plansTitle")}
+        </CardTitle>
+        <CardDescription>{t("admin.subscription.plansDescription")}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {sorted.map((plan) => {
+          const hasDiscount = plan.discount_percent > 0;
+          const finalPrice = discountedPrice(plan.price_eur, plan.discount_percent);
+
+          return (
+            <div
+              key={`${plan.plan_slug}-${plan.language_slug}`}
+              className="flex flex-col gap-3 rounded-xl border border-white/10 bg-muted/10 p-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="min-w-0 space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-semibold">{plan.title.fa}</p>
+                  <span className="text-xs text-muted-foreground">
+                    ({plan.title.en} / {plan.title.it})
+                  </span>
+                  {hasDiscount ? (
+                    <Badge className="gap-1 border-brand-accent/30 bg-brand-accent/10 text-brand-accent">
+                      <Percent className="h-3 w-3" />
+                      {t("admin.subscription.discountBadge", {
+                        percent: plan.discount_percent,
+                      })}
+                    </Badge>
+                  ) : null}
+                </div>
+                <p className="truncate text-sm text-muted-foreground">
+                  {plan.description.fa}
+                </p>
+                <div className="flex items-baseline gap-2">
+                  {hasDiscount ? (
+                    <span className="text-sm text-muted-foreground line-through">
+                      €{plan.price_eur.toFixed(2)}
+                    </span>
+                  ) : null}
+                  <span className="text-lg font-bold text-brand-accent">
+                    €{finalPrice.toFixed(2)}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    / {t("subscription.billingPeriod")}
+                  </span>
+                </div>
+              </div>
+              <SubscriptionPlanEditDialog plan={plan} />
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
+  );
+}

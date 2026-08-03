@@ -2,7 +2,12 @@ import { createClient } from "@/lib/supabase/server";
 import type { DataRepository } from "@/lib/data/repository";
 import { matchesImageSignature } from "@/lib/data/image-signature";
 import { deriveQuizMetadataFromLesson } from "@/lib/quiz-management/helpers";
+import {
+  DEFAULT_SUBSCRIPTION_PAGE_CONTENT,
+  DEFAULT_SUBSCRIPTION_PLANS,
+} from "@/lib/subscription/default-content";
 import type { Database } from "@/types/database.types";
+import type { LocalizedText, SubscriptionPageContentRow, SubscriptionPlanRow } from "@/types";
 
 export function createSupabaseRepository(): DataRepository {
   return {
@@ -777,6 +782,74 @@ export function createSupabaseRepository(): DataRepository {
         banner_id_b: target.id,
       });
 
+      return error ? { error: error.message } : {};
+    },
+
+    async getSubscriptionPlans() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("subscription_plans")
+        .select("*")
+        .order("order_number");
+
+      if (!data || data.length === 0) return DEFAULT_SUBSCRIPTION_PLANS;
+
+      return data.map((row) => ({
+        ...row,
+        title: row.title as unknown as LocalizedText,
+        description: row.description as unknown as LocalizedText,
+        features: row.features as unknown as LocalizedText[],
+      })) satisfies SubscriptionPlanRow[];
+    },
+
+    async updateSubscriptionPlan(planSlug, languageSlug, input) {
+      const supabase = await createClient();
+      const update: Database["public"]["Tables"]["subscription_plans"]["Update"] = {};
+      if (input.priceEur !== undefined) update.price_eur = input.priceEur;
+      if (input.discountPercent !== undefined) update.discount_percent = input.discountPercent;
+      if (input.title !== undefined) update.title = input.title;
+      if (input.description !== undefined) update.description = input.description;
+      if (input.features !== undefined) update.features = input.features;
+      update.updated_at = new Date().toISOString();
+
+      const { error } = await supabase
+        .from("subscription_plans")
+        .update(update)
+        .eq("plan_slug", planSlug)
+        .eq("language_slug", languageSlug);
+      return error ? { error: error.message } : {};
+    },
+
+    async getSubscriptionPageContent() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("subscription_page_content")
+        .select("*")
+        .eq("id", "default")
+        .maybeSingle();
+
+      if (!data) return DEFAULT_SUBSCRIPTION_PAGE_CONTENT;
+
+      return {
+        ...data,
+        hero_title: data.hero_title as unknown as LocalizedText,
+        hero_subtitle: data.hero_subtitle as unknown as LocalizedText,
+        footer_note: data.footer_note as unknown as LocalizedText,
+      } satisfies SubscriptionPageContentRow;
+    },
+
+    async updateSubscriptionPageContent(input) {
+      const supabase = await createClient();
+      const update: Database["public"]["Tables"]["subscription_page_content"]["Update"] = {};
+      if (input.heroTitle !== undefined) update.hero_title = input.heroTitle;
+      if (input.heroSubtitle !== undefined) update.hero_subtitle = input.heroSubtitle;
+      if (input.footerNote !== undefined) update.footer_note = input.footerNote;
+      update.updated_at = new Date().toISOString();
+
+      const { error } = await supabase
+        .from("subscription_page_content")
+        .update(update)
+        .eq("id", "default");
       return error ? { error: error.message } : {};
     },
   };

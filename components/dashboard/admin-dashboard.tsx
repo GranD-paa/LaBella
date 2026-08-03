@@ -9,6 +9,7 @@ import {
   BookOpen,
   CheckCircle2,
   ChevronDown,
+  CreditCard,
   Gauge,
   ImageIcon,
   Languages,
@@ -222,7 +223,7 @@ export function AdminDashboard({
             </Button>
           ) : (
             <div className="flex w-full flex-col gap-2 sm:w-64">
-              <Button asChild variant="secondary" className="w-full justify-start">
+              <Button asChild variant="outline" className="w-full justify-start border-white/20">
                 <Link href="/admin/quizzes">
                   <ListChecks className="h-4 w-4" />
                   {t("dashboard.admin.manageQuizzes")}
@@ -247,6 +248,14 @@ export function AdminDashboard({
                   <Link href="/admin/banners">
                     <ImageIcon className="h-4 w-4" />
                     {t("dashboard.admin.manageBanners")}
+                  </Link>
+                </Button>
+              ) : null}
+              {isSuperAdmin ? (
+                <Button asChild variant="outline" className="w-full justify-start border-white/20">
+                  <Link href="/admin/subscription">
+                    <CreditCard className="h-4 w-4" />
+                    {t("dashboard.admin.manageSubscription")}
                   </Link>
                 </Button>
               ) : null}

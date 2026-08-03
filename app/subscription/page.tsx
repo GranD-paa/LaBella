@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { SubscriptionView } from "@/components/subscription/subscription-view";
+import { getLanguagesWithAvailability } from "@/lib/curriculum/availability";
 import { getDataRepository } from "@/lib/data";
 import { createPageMetadata } from "@/lib/i18n/metadata";
 import { getServerTranslator } from "@/lib/i18n/server-locale";
@@ -25,11 +26,19 @@ export default async function SubscriptionPage() {
   const profile = await repo.getProfileById(user.id);
   const displayName =
     profile?.full_name || user.email?.split("@")[0] || t("common.guestName");
+  const [languages, plans, pageContent] = await Promise.all([
+    getLanguagesWithAvailability(repo),
+    repo.getSubscriptionPlans(),
+    repo.getSubscriptionPageContent(),
+  ]);
 
   return (
     <SubscriptionView
       isAdmin={profile?.is_admin ?? false}
       displayName={displayName}
+      languages={languages}
+      plans={plans}
+      pageContent={pageContent}
     />
   );
 }

@@ -1,0 +1,17 @@
+export const adminSubscriptionFa = {
+  pageBadge: "مدیریت اشتراک",
+  pageHello: "مرکز مدیریت اشتراک، {name}",
+  pageSubtitle: "قیمت‌ها و تخفیف‌های هر پلن اشتراک رو تنظیم کن.",
+  backToDashboard: "بازگشت به داشبورد",
+  languageSelectorLabel: "ویرایش پلن‌ها برای زبان:",
+  plansTitle: "پلن‌ها",
+  plansDescription: "قیمت، تخفیف و متن هر پلن اشتراک رو ویرایش کن.",
+  discountBadge: "٪{percent} تخفیف",
+  editPlanTitle: "ویرایش {plan}",
+  editPlanDescription: "قیمت و متن‌هایی که کاربران به هر زبان می‌بینن رو به‌روزرسانی کن.",
+  priceLabel: "قیمت (یورو)",
+  discountLabel: "درصد تخفیف",
+  featuresLabel: "ویژگی‌ها",
+  addFeature: "افزودن ویژگی",
+  planUpdated: "پلن به‌روزرسانی شد",
+};

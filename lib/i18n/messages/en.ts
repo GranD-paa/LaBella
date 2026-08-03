@@ -2,6 +2,7 @@ import { adminBannersEn } from "@/lib/i18n/messages/admin-banners-en";
 import { adminContentEn } from "@/lib/i18n/messages/admin-content-en";
 import { adminLanguagesEn } from "@/lib/i18n/messages/admin-languages-en";
 import { adminQuizzesEn } from "@/lib/i18n/messages/admin-quizzes-en";
+import { adminSubscriptionEn } from "@/lib/i18n/messages/admin-subscription-en";
 import { adminUsersEn } from "@/lib/i18n/messages/admin-users-en";
 
 export const en = {
@@ -354,6 +355,7 @@ export const en = {
       manageUsers: "Manage users",
       manageLanguages: "Manage languages",
       manageBanners: "Manage banners",
+      manageSubscription: "Manage subscription",
       contentManagement: "Content management",
       contentManagementHint:
         "Create, edit, and publish lessons, vocabulary, grammar, and quizzes.",
@@ -569,63 +571,29 @@ export const en = {
     users: adminUsersEn,
     languages: adminLanguagesEn,
     banners: adminBannersEn,
+    subscription: adminSubscriptionEn,
   },
   subscription: {
-    title: "Choose your learning plan",
-    subtitle:
-      "{name}, unlock the full LaParla experience with a monthly subscription tailored to your goals.",
     monthlyBadge: "1-month access · billed monthly",
     billingPeriod: "month",
     mostPopular: "Most Popular",
     paymentSoon: "Payment gateway integration is coming soon!",
     checkoutSoon: "{plan} checkout will be available in a future update.",
+    checkoutSoonForLanguage:
+      "{plan} checkout for {language} will be available in a future update.",
+    languageStepTitle: "Which language do you want to learn?",
+    languageStepHint: "Pick a language, then choose the plan that fits you.",
+    plansForLanguage: "Plans shown for {language}",
+    discountRibbon: "{percent}% OFF",
+    getPlanCta: "Get {plan}",
     adminBannerTitle: "Admin preview mode",
     adminBannerDescription:
       "You already have full platform access as an admin. Use this page to preview plans before learners subscribe.",
     adminPreviewCta: "Preview {plan}",
-    footerNote:
-      "Subscriptions renew every 30 days. You can change or cancel your plan anytime once payments go live. Prices are shown in EUR.",
     trust: {
       secure: "Secure checkout (coming soon)",
       flexible: "Change plan anytime",
       instant: "Instant access after payment",
-    },
-    plans: {
-      basic: {
-        name: "Basic",
-        description: "Perfect for focused learners starting one language.",
-        cta: "Get Basic",
-        features: {
-          oneLanguage: "1 active language at a time",
-          coreLessons: "Core lessons, vocabulary & grammar",
-          quizRetakes: "Up to 3 quiz retakes per lesson",
-          progress: "Progress tracking on your dashboard",
-        },
-      },
-      pro: {
-        name: "Pro",
-        description: "Our most popular plan for serious daily practice.",
-        cta: "Get Pro",
-        features: {
-          allBasic: "Everything in Basic",
-          allLanguages: "All currently active languages",
-          unlimitedQuizzes: "Unlimited quiz retakes",
-          grammarDeepDives: "Extended grammar deep-dives",
-          prioritySupport: "Priority email support",
-        },
-      },
-      ultimate: {
-        name: "Ultimate",
-        description: "Maximum access for power learners and early adopters.",
-        cta: "Get Ultimate",
-        features: {
-          allPro: "Everything in Pro",
-          futureLanguages: "All future languages as they launch",
-          offlinePwa: "Offline lesson access (PWA)",
-          earlyAccess: "Early access to new levels & features",
-          personalizedPath: "Personalized learning path suggestions",
-        },
-      },
     },
   },
   about: {

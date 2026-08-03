@@ -3,6 +3,7 @@ import { adminBannersFa } from "@/lib/i18n/messages/admin-banners-fa";
 import { adminContentFa } from "@/lib/i18n/messages/admin-content-fa";
 import { adminLanguagesFa } from "@/lib/i18n/messages/admin-languages-fa";
 import { adminQuizzesFa } from "@/lib/i18n/messages/admin-quizzes-fa";
+import { adminSubscriptionFa } from "@/lib/i18n/messages/admin-subscription-fa";
 import { adminUsersFa } from "@/lib/i18n/messages/admin-users-fa";
 
 export const fa: Messages = {
@@ -350,6 +351,7 @@ export const fa: Messages = {
       manageUsers: "مدیریت کاربران",
       manageLanguages: "مدیریت زبان‌ها",
       manageBanners: "مدیریت بنرها",
+      manageSubscription: "مدیریت اشتراک",
       contentManagement: "مدیریت محتوا",
       contentManagementHint:
         "درس‌ها، واژگان، گرامر و آزمون‌ها را بسازید، ویرایش و منتشر کنید.",
@@ -565,63 +567,28 @@ export const fa: Messages = {
     users: adminUsersFa,
     languages: adminLanguagesFa,
     banners: adminBannersFa,
+    subscription: adminSubscriptionFa,
   },
   subscription: {
-    title: "طرح یادگیری خود را انتخاب کنید",
-    subtitle:
-      "{name}، با اشتراک ماهانه‌ای متناسب با اهدافتان، تجربه کامل لاپارلا را باز کنید.",
     monthlyBadge: "دسترسی ۱ ماهه · پرداخت ماهانه",
     billingPeriod: "ماه",
     mostPopular: "محبوب‌ترین",
     paymentSoon: "اتصال درگاه پرداخت به‌زودی!",
     checkoutSoon: "پرداخت {plan} در به‌روزرسانی آینده در دسترس خواهد بود.",
+    checkoutSoonForLanguage: "پرداخت {plan} برای زبان {language} در به‌روزرسانی آینده در دسترس خواهد بود.",
+    languageStepTitle: "می‌خوای کدوم زبان رو یاد بگیری؟",
+    languageStepHint: "اول یه زبان انتخاب کن، بعد پلن مناسبت رو انتخاب کن.",
+    plansForLanguage: "پلن‌های نمایش‌داده‌شده برای {language}",
+    discountRibbon: "{percent}٪ تخفیف",
+    getPlanCta: "دریافت {plan}",
     adminBannerTitle: "حالت پیش‌نمایش مدیر",
     adminBannerDescription:
       "به‌عنوان مدیر از قبل به کل پلتفرم دسترسی دارید. از این صفحه برای پیش‌نمایش طرح‌ها قبل از اشتراک یادگیرندگان استفاده کنید.",
     adminPreviewCta: "پیش‌نمایش {plan}",
-    footerNote:
-      "اشتراک هر ۳۰ روز تمدید می‌شود. پس از فعال شدن پرداخت، هر زمان می‌توانید طرح را تغییر دهید یا لغو کنید. قیمت‌ها به یورو نمایش داده می‌شوند.",
     trust: {
       secure: "پرداخت امن (به‌زودی)",
       flexible: "تغییر طرح در هر زمان",
       instant: "دسترسی فوری پس از پرداخت",
-    },
-    plans: {
-      basic: {
-        name: "بیسیک",
-        description: "مناسب یادگیرندگانی که روی یک زبان تمرکز دارند.",
-        cta: "دریافت بیسیک",
-        features: {
-          oneLanguage: "۱ زبان فعال در هر زمان",
-          coreLessons: "درس‌ها، واژگان و گرامر اصلی",
-          quizRetakes: "تا ۳ بار تلاش مجدد برای هر آزمون",
-          progress: "پیگیری پیشرفت در داشبورد",
-        },
-      },
-      pro: {
-        name: "پرو",
-        description: "محبوب‌ترین طرح برای تمرین روزانه جدی.",
-        cta: "دریافت پرو",
-        features: {
-          allBasic: "همه امکانات بیسیک",
-          allLanguages: "همه زبان‌های فعال فعلی",
-          unlimitedQuizzes: "تلاش مجدد نامحدود آزمون",
-          grammarDeepDives: "گرامر پیشرفته و عمیق",
-          prioritySupport: "پشتیبانی ایمیلی اولویت‌دار",
-        },
-      },
-      ultimate: {
-        name: "اولتیمیت",
-        description: "حداکثر دسترسی برای یادگیرندگان حرفه‌ای.",
-        cta: "دریافت اولتیمیت",
-        features: {
-          allPro: "همه امکانات پرو",
-          futureLanguages: "همه زبان‌های آینده پس از انتشار",
-          offlinePwa: "دسترسی آفلاین به درس‌ها (PWA)",
-          earlyAccess: "دسترسی زودهنگام به سطوح و ویژگی‌های جدید",
-          personalizedPath: "پیشنهاد مسیر یادگیری شخصی‌سازی‌شده",
-        },
-      },
     },
   },
   about: {

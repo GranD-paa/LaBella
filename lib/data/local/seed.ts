@@ -5,6 +5,8 @@ import type {
   Profile,
   Quiz,
   QuizQuestion,
+  SubscriptionPageContentRow,
+  SubscriptionPlanRow,
   UserLearningState,
   UserQuizAttempt,
   VideoLesson,
@@ -13,6 +15,10 @@ import type {
 
 import type { LocalAuthUser } from "@/lib/data/repository";
 import type { CurriculumLevelOverrideRow } from "@/lib/curriculum/level-overrides";
+import {
+  DEFAULT_SUBSCRIPTION_PAGE_CONTENT,
+  DEFAULT_SUBSCRIPTION_PLANS,
+} from "@/lib/subscription/default-content";
 
 export type LocalDatabase = {
   users: LocalAuthUser[];
@@ -34,6 +40,9 @@ export type LocalDatabase = {
   curriculumLevelOverrides: CurriculumLevelOverrideRow[];
   // Super-admin managed promotional slides shown in the Main Menu carousel.
   banners: Banner[];
+  // Super-admin editable pricing/discount/copy for each subscription tier.
+  subscriptionPlans: SubscriptionPlanRow[];
+  subscriptionPageContent: SubscriptionPageContentRow;
 };
 
 const now = "2026-07-15T08:00:00.000Z";
@@ -336,4 +345,6 @@ export const LOCAL_SEED: LocalDatabase = {
   languageSettings: {},
   curriculumLevelOverrides: [],
   banners: [],
+  subscriptionPlans: DEFAULT_SUBSCRIPTION_PLANS.map((plan) => ({ ...plan })),
+  subscriptionPageContent: { ...DEFAULT_SUBSCRIPTION_PAGE_CONTENT },
 };

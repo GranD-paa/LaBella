@@ -15,3 +15,23 @@ export type UserQuizAttempt =
 export type UserLearningState =
   Database["public"]["Tables"]["user_learning_state"]["Row"];
 export type Banner = Database["public"]["Tables"]["banners"]["Row"];
+
+export type LocalizedText = { fa: string; en: string; it: string };
+
+export type SubscriptionPlanRow = Omit<
+  Database["public"]["Tables"]["subscription_plans"]["Row"],
+  "title" | "description" | "features"
+> & {
+  title: LocalizedText;
+  description: LocalizedText;
+  features: LocalizedText[];
+};
+
+export type SubscriptionPageContentRow = Omit<
+  Database["public"]["Tables"]["subscription_page_content"]["Row"],
+  "hero_title" | "hero_subtitle" | "footer_note"
+> & {
+  hero_title: LocalizedText;
+  hero_subtitle: LocalizedText;
+  footer_note: LocalizedText;
+};
