@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 
 import { requireAuthenticatedAction } from "@/lib/auth/action-guards";
-import { getAvailableProviders, getPaymentProvider } from "@/lib/billing/providers";
+import { getAvailableProviders } from "@/lib/billing/providers";
 import { getDataRepository } from "@/lib/data";
 import type { BillingCurrency, PaymentProviderSlug } from "@/types";
 
