@@ -14,6 +14,7 @@ import {
   ImageIcon,
   Languages,
   ListChecks,
+  Receipt,
   ShieldCheck,
   Users,
 } from "lucide-react";
@@ -256,6 +257,14 @@ export function AdminDashboard({
                   <Link href="/admin/subscription">
                     <CreditCard className="h-4 w-4" />
                     {t("dashboard.admin.manageSubscription")}
+                  </Link>
+                </Button>
+              ) : null}
+              {isSuperAdmin ? (
+                <Button asChild variant="outline" className="w-full justify-start border-white/20">
+                  <Link href="/admin/accounting">
+                    <Receipt className="h-4 w-4" />
+                    {t("dashboard.admin.manageAccounting")}
                   </Link>
                 </Button>
               ) : null}

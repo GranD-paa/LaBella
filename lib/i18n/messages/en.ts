@@ -2,6 +2,7 @@ import { adminBannersEn } from "@/lib/i18n/messages/admin-banners-en";
 import { adminContentEn } from "@/lib/i18n/messages/admin-content-en";
 import { adminLanguagesEn } from "@/lib/i18n/messages/admin-languages-en";
 import { adminQuizzesEn } from "@/lib/i18n/messages/admin-quizzes-en";
+import { adminAccountingEn } from "@/lib/i18n/messages/admin-accounting-en";
 import { adminSubscriptionEn } from "@/lib/i18n/messages/admin-subscription-en";
 import { adminUsersEn } from "@/lib/i18n/messages/admin-users-en";
 
@@ -356,6 +357,7 @@ export const en = {
       manageLanguages: "Manage languages",
       manageBanners: "Manage banners",
       manageSubscription: "Manage subscription",
+      manageAccounting: "Manage accounting",
       contentManagement: "Content management",
       contentManagementHint:
         "Create, edit, and publish lessons, vocabulary, grammar, and quizzes.",
@@ -571,11 +573,23 @@ export const en = {
     users: adminUsersEn,
     languages: adminLanguagesEn,
     banners: adminBannersEn,
+    accounting: adminAccountingEn,
     subscription: adminSubscriptionEn,
   },
   subscription: {
     monthlyBadge: "1-month access · billed monthly",
     billingPeriod: "month",
+    currencyEur: "Pay in EUR",
+    currencyIrr: "Pay in Toman",
+    choosePayment: "Choose how to pay",
+    payWith: "Pay with {method}",
+    noPaymentMethods: "No payment method is available for this currency yet.",
+    checkoutStarting: "Redirecting to payment…",
+    checkoutSuccess: "Payment received — your subscription is active.",
+    checkoutFailed: "Payment did not go through.",
+    checkoutCancelled: "Payment was cancelled.",
+    checkoutError: "Something went wrong confirming your payment.",
+    approxRial: "≈ {amount}",
     mostPopular: "Most Popular",
     paymentSoon: "Payment gateway integration is coming soon!",
     checkoutSoon: "{plan} checkout will be available in a future update.",

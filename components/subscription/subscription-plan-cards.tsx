@@ -1,9 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import { Check, Crown, Sparkles, Sprout, Zap } from "lucide-react";
 import { toast } from "sonner";
 
+import { CheckoutDialog } from "@/components/subscription/checkout-dialog";
 import { useTranslations } from "@/components/providers/locale-provider";
+import {
+  computePrice,
+  convertEurCentsToRial,
+  eurToCents,
+} from "@/lib/billing/money";
+import { formatRialAsToman } from "@/lib/billing/format";
+import type {
+  BillingCurrency,
+  FxRate,
+  PaymentProviderSlug,
+  PaymentSettings,
+} from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,23 +47,52 @@ export function SubscriptionPlanCards({
   isAdmin,
   language,
   plans,
+  currency = "EUR",
+  settings,
+  fxRate,
+  availableProviders = [],
 }: {
   isAdmin: boolean;
   language?: CurriculumLanguage;
   plans: SubscriptionPlanRow[];
+  currency?: BillingCurrency;
+  settings?: PaymentSettings;
+  fxRate?: FxRate | null;
+  availableProviders?: PaymentProviderSlug[];
 }) {
   const { t, locale } = useTranslations();
+  const [checkoutPlan, setCheckoutPlan] = useState<SubscriptionPlanRow | null>(
+    null
+  );
+
+  /**
+   * Rial preview only. The amount actually charged is recomputed server-side
+   * from the same rate and margin, so a stale page cannot lock in an old
+   * price — this is here to show the customer a figure, not to set one.
+   */
+  function rialFor(netCents: number): number | null {
+    if (!settings || !fxRate) return null;
+    const rate =
+      settings.fx_source === "manual" ? settings.fx_manual_rate : fxRate.rate;
+    if (!rate || rate <= 0) return null;
+
+    return convertEurCentsToRial({
+      eurCents: netCents,
+      rialPerEur: rate,
+      marginPercent: settings.fx_margin_percent,
+      roundToRial: settings.irr_rounding,
+    });
+  }
 
   function handleSubscribe(plan: SubscriptionPlanRow) {
-    const planName = plan.title[locale];
-    toast.info(t("subscription.paymentSoon"), {
-      description: language
-        ? t("subscription.checkoutSoonForLanguage", {
-            plan: planName,
-            language: language.name,
-          })
-        : t("subscription.checkoutSoon", { plan: planName }),
-    });
+    // Admins previewing the storefront should not be able to buy from it.
+    if (isAdmin) {
+      toast.info(t("subscription.paymentSoon"), {
+        description: t("subscription.checkoutSoon", { plan: plan.title[locale] }),
+      });
+      return;
+    }
+    setCheckoutPlan(plan);
   }
 
   const sortedPlans = plans
@@ -70,6 +113,13 @@ export function SubscriptionPlanCards({
           const planName = plan.title[locale];
           const hasDiscount = plan.discount_percent > 0;
           const finalPrice = discountedPrice(plan.price_eur, plan.discount_percent);
+          // Mirrors the server's rounding exactly, so the Rial figure shown
+          // here is the one the gateway will ask for.
+          const netCents = computePrice(
+            eurToCents(plan.price_eur),
+            plan.discount_percent
+          ).netCents;
+          const rialPreview = rialFor(netCents);
 
           return (
             <Card
@@ -120,6 +170,13 @@ export function SubscriptionPlanCards({
                         / {t("subscription.billingPeriod")}
                       </span>
                     </div>
+                    {currency === "IRR" && rialPreview !== null ? (
+                      <p className="text-sm font-medium text-brand-accent">
+                        {t("subscription.approxRial", {
+                          amount: formatRialAsToman(rialPreview, locale),
+                        })}
+                      </p>
+                    ) : null}
                   </div>
                   <CardDescription>{plan.description[locale]}</CardDescription>
                 </div>
@@ -149,6 +206,32 @@ export function SubscriptionPlanCards({
           );
         })}
       </div>
+
+      {checkoutPlan ? (
+        <CheckoutDialog
+          open
+          onOpenChange={(next) => {
+            if (!next) setCheckoutPlan(null);
+          }}
+          planSlug={checkoutPlan.plan_slug}
+          planName={checkoutPlan.title[locale]}
+          languageSlug={checkoutPlan.language_slug}
+          currency={currency}
+          amountEurCents={
+            computePrice(
+              eurToCents(checkoutPlan.price_eur),
+              checkoutPlan.discount_percent
+            ).netCents
+          }
+          amountRial={rialFor(
+            computePrice(
+              eurToCents(checkoutPlan.price_eur),
+              checkoutPlan.discount_percent
+            ).netCents
+          )}
+          providers={availableProviders}
+        />
+      ) : null}
     </div>
   );
 }

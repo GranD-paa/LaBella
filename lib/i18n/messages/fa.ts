@@ -3,6 +3,7 @@ import { adminBannersFa } from "@/lib/i18n/messages/admin-banners-fa";
 import { adminContentFa } from "@/lib/i18n/messages/admin-content-fa";
 import { adminLanguagesFa } from "@/lib/i18n/messages/admin-languages-fa";
 import { adminQuizzesFa } from "@/lib/i18n/messages/admin-quizzes-fa";
+import { adminAccountingFa } from "@/lib/i18n/messages/admin-accounting-fa";
 import { adminSubscriptionFa } from "@/lib/i18n/messages/admin-subscription-fa";
 import { adminUsersFa } from "@/lib/i18n/messages/admin-users-fa";
 
@@ -352,6 +353,7 @@ export const fa: Messages = {
       manageLanguages: "مدیریت زبان‌ها",
       manageBanners: "مدیریت بنرها",
       manageSubscription: "مدیریت اشتراک",
+      manageAccounting: "مدیریت حسابداری",
       contentManagement: "مدیریت محتوا",
       contentManagementHint:
         "درس‌ها، واژگان، گرامر و آزمون‌ها را بسازید، ویرایش و منتشر کنید.",
@@ -567,11 +569,23 @@ export const fa: Messages = {
     users: adminUsersFa,
     languages: adminLanguagesFa,
     banners: adminBannersFa,
+    accounting: adminAccountingFa,
     subscription: adminSubscriptionFa,
   },
   subscription: {
     monthlyBadge: "دسترسی ۱ ماهه · پرداخت ماهانه",
     billingPeriod: "ماه",
+    currencyEur: "پرداخت به یورو",
+    currencyIrr: "پرداخت به تومان",
+    choosePayment: "روش پرداخت را انتخاب کنید",
+    payWith: "پرداخت با {method}",
+    noPaymentMethods: "هنوز روش پرداختی برای این ارز فعال نیست.",
+    checkoutStarting: "در حال انتقال به درگاه پرداخت…",
+    checkoutSuccess: "پرداخت انجام شد — اشتراک شما فعال است.",
+    checkoutFailed: "پرداخت انجام نشد.",
+    checkoutCancelled: "پرداخت لغو شد.",
+    checkoutError: "در تأیید پرداخت مشکلی پیش آمد.",
+    approxRial: "≈ {amount}",
     mostPopular: "محبوب‌ترین",
     paymentSoon: "اتصال درگاه پرداخت به‌زودی!",
     checkoutSoon: "پرداخت {plan} در به‌روزرسانی آینده در دسترس خواهد بود.",

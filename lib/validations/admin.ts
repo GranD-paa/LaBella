@@ -212,3 +212,66 @@ export const subscriptionPlanSchema = z.object({
 export type SubscriptionPlanValues = z.infer<typeof subscriptionPlanSchema>;
 
 export type BannerValues = z.infer<typeof bannerSchema>;
+
+// -------------------------------------------------------------------------
+// Billing & accounting
+// -------------------------------------------------------------------------
+
+export const billingSettingsSchema = z.object({
+  irrEnabled: z.boolean(),
+  fxSource: z.enum(["tgju", "navasan", "manual"]),
+  fxMarginPercent: z
+    .number({ error: "Margin must be a number" })
+    .min(0, "Margin can't be negative")
+    .max(100, "Margin can't exceed 100%"),
+  // Rial prices are rounded up to a multiple of this. 1 means "don't round".
+  irrRounding: z
+    .number({ error: "Rounding must be a number" })
+    .int("Rounding must be a whole number")
+    .min(1, "Rounding must be at least 1")
+    .max(1_000_000, "Rounding step is too large"),
+  fxManualRate: z
+    .number({ error: "Rate must be a number" })
+    .positive("Rate must be positive")
+    .max(1_000_000_000, "Rate is implausibly high")
+    .nullable(),
+  // Below ~5% normal daily movement would be rejected constantly; above ~90%
+  // the guard would no longer catch a Rial/Toman unit switch.
+  fxMaxDeviationPercent: z
+    .number({ error: "Deviation must be a number" })
+    .min(1, "Deviation limit is too tight")
+    .max(90, "Deviation limit is too loose to catch a unit change"),
+  stripeEnabled: z.boolean(),
+  zarinpalEnabled: z.boolean(),
+  manualEnabled: z.boolean(),
+  gracePeriodDays: z
+    .number({ error: "Grace period must be a number" })
+    .int("Grace period must be a whole number")
+    .min(0, "Grace period can't be negative")
+    .max(60, "Grace period is too long"),
+});
+
+export type BillingSettingsValues = z.infer<typeof billingSettingsSchema>;
+
+export const manualPaymentSchema = z.object({
+  userId: z.string().min(1, "Select a learner"),
+  planSlug: z.string().min(1, "Select a plan"),
+  languageSlug: z.enum(["italian", "english", "german", "turkish"]),
+  currency: z.enum(["EUR", "IRR"]),
+  reference: z.string().max(120).optional(),
+});
+
+export type ManualPaymentValues = z.infer<typeof manualPaymentSchema>;
+
+export const refundSchema = z.object({
+  paymentId: z.string().min(1),
+  // In cents, and strictly positive: a zero refund is a no-op that would
+  // still put a misleading line in the ledger.
+  amountEurCents: z
+    .number({ error: "Amount must be a number" })
+    .int("Amount must be a whole number of cents")
+    .positive("Amount must be greater than zero"),
+  reason: z.string().max(500).optional(),
+});
+
+export type RefundValues = z.infer<typeof refundSchema>;

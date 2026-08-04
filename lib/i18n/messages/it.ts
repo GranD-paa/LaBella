@@ -3,6 +3,7 @@ import { adminBannersIt } from "@/lib/i18n/messages/admin-banners-it";
 import { adminContentIt } from "@/lib/i18n/messages/admin-content-it";
 import { adminLanguagesIt } from "@/lib/i18n/messages/admin-languages-it";
 import { adminQuizzesIt } from "@/lib/i18n/messages/admin-quizzes-it";
+import { adminAccountingIt } from "@/lib/i18n/messages/admin-accounting-it";
 import { adminSubscriptionIt } from "@/lib/i18n/messages/admin-subscription-it";
 import { adminUsersIt } from "@/lib/i18n/messages/admin-users-it";
 
@@ -358,6 +359,7 @@ export const it: Messages = {
       manageLanguages: "Gestisci lingue",
       manageBanners: "Gestisci banner",
       manageSubscription: "Gestisci abbonamento",
+      manageAccounting: "Gestisci contabilità",
       contentManagement: "Gestione contenuti",
       contentManagementHint:
         "Crea, modifica e pubblica lezioni, vocabolario, grammatica e quiz.",
@@ -577,11 +579,23 @@ export const it: Messages = {
     users: adminUsersIt,
     languages: adminLanguagesIt,
     banners: adminBannersIt,
+    accounting: adminAccountingIt,
     subscription: adminSubscriptionIt,
   },
   subscription: {
     monthlyBadge: "Accesso di 1 mese · fatturazione mensile",
     billingPeriod: "mese",
+    currencyEur: "Paga in EUR",
+    currencyIrr: "Paga in Toman",
+    choosePayment: "Scegli come pagare",
+    payWith: "Paga con {method}",
+    noPaymentMethods: "Nessun metodo di pagamento disponibile per questa valuta.",
+    checkoutStarting: "Reindirizzamento al pagamento…",
+    checkoutSuccess: "Pagamento ricevuto — il tuo abbonamento è attivo.",
+    checkoutFailed: "Il pagamento non è andato a buon fine.",
+    checkoutCancelled: "Pagamento annullato.",
+    checkoutError: "Si è verificato un problema nella conferma del pagamento.",
+    approxRial: "≈ {amount}",
     mostPopular: "Più popolare",
     paymentSoon: "L'integrazione del gateway di pagamento è in arrivo!",
     checkoutSoon: "Il checkout {plan} sarà disponibile in un aggiornamento futuro.",

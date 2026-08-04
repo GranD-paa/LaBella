@@ -1,11 +1,19 @@
 import type {
+  AccountingSnapshot,
   Banner,
+  BillingCurrency,
+  FxRate,
   GrammarRule,
   Lesson,
   LocalizedText,
+  Payment,
+  PaymentProviderSlug,
+  PaymentSettings,
   Profile,
   Quiz,
   QuizQuestion,
+  Subscription,
+  SubscriptionEvent,
   SubscriptionPageContentRow,
   SubscriptionPlanRow,
   UserLearningState,
@@ -258,4 +266,86 @@ export interface DataRepository {
       footerNote: LocalizedText;
     }>
   ): Promise<{ error?: string }>;
+
+  // -----------------------------------------------------------------------
+  // Billing & accounting
+  // -----------------------------------------------------------------------
+
+  /** Non-secret billing configuration (FX source, margin, gateway toggles). */
+  getPaymentSettings(): Promise<PaymentSettings>;
+  updatePaymentSettings(
+    input: Partial<{
+      irrEnabled: boolean;
+      fxSource: PaymentSettings["fx_source"];
+      fxMarginPercent: number;
+      irrRounding: number;
+      fxManualRate: number | null;
+      fxMaxDeviationPercent: number;
+      stripeEnabled: boolean;
+      zarinpalEnabled: boolean;
+      manualEnabled: boolean;
+      gracePeriodDays: number;
+    }>
+  ): Promise<{ error?: string }>;
+
+  /** Most recent accepted EUR->IRR rate, or null before the first fetch. */
+  getLatestFxRate(): Promise<FxRate | null>;
+  /** Recent rate history, newest first — including rejected samples. */
+  getFxRateHistory(limit?: number): Promise<FxRate[]>;
+  recordFxRate(input: {
+    rate: number;
+    source: string;
+    accepted: boolean;
+    rejectionReason?: string;
+  }): Promise<{ error?: string }>;
+
+  /** Every live or historical subscription belonging to one learner. */
+  getSubscriptionsForUser(userId: string): Promise<Subscription[]>;
+  /**
+   * The subscription that currently entitles a learner to a language, or null.
+   * Used on the learn/lesson routes to gate paid content.
+   */
+  getEntitlingSubscription(
+    userId: string,
+    languageSlug: string
+  ): Promise<Subscription | null>;
+  cancelSubscription(subscriptionId: string): Promise<{ error?: string }>;
+
+  /**
+   * Opens a checkout. Returns the id of a `pending` payment row whose amount
+   * was computed server-side from the plan — the caller never supplies a
+   * price.
+   */
+  createPendingPayment(input: {
+    planSlug: string;
+    languageSlug: string;
+    provider: PaymentProviderSlug;
+    currency: BillingCurrency;
+  }): Promise<{ paymentId?: string; error?: string }>;
+  getPaymentById(paymentId: string): Promise<Payment | null>;
+  getPaymentsForUser(userId: string): Promise<Payment[]>;
+
+  /** Audit timeline for one subscription. */
+  getSubscriptionEvents(subscriptionId: string): Promise<SubscriptionEvent[]>;
+
+  /** Everything the admin accounting dashboard needs, in one pass. */
+  getAccountingSnapshot(): Promise<AccountingSnapshot>;
+
+  /**
+   * Records a payment received outside any gateway (bank transfer, card to
+   * card) and activates the subscription. Admin-only.
+   */
+  recordManualPayment(input: {
+    userId: string;
+    planSlug: string;
+    languageSlug: string;
+    currency: BillingCurrency;
+    reference?: string;
+  }): Promise<{ error?: string }>;
+
+  refundPayment(input: {
+    paymentId: string;
+    amountEurCents: number;
+    reason?: string;
+  }): Promise<{ error?: string }>;
 }

@@ -1,10 +1,16 @@
 import type {
   Banner,
+  FxRate,
   GrammarRule,
   Lesson,
+  Payment,
+  PaymentSettings,
   Profile,
   Quiz,
   QuizQuestion,
+  Refund,
+  Subscription,
+  SubscriptionEvent,
   SubscriptionPageContentRow,
   SubscriptionPlanRow,
   UserLearningState,
@@ -15,6 +21,7 @@ import type {
 
 import type { LocalAuthUser } from "@/lib/data/repository";
 import type { CurriculumLevelOverrideRow } from "@/lib/curriculum/level-overrides";
+import { DEFAULT_PAYMENT_SETTINGS } from "@/lib/billing/defaults";
 import {
   DEFAULT_SUBSCRIPTION_PAGE_CONTENT,
   DEFAULT_SUBSCRIPTION_PLANS,
@@ -43,6 +50,14 @@ export type LocalDatabase = {
   // Super-admin editable pricing/discount/copy for each subscription tier.
   subscriptionPlans: SubscriptionPlanRow[];
   subscriptionPageContent: SubscriptionPageContentRow;
+  // Billing & accounting. Mirrors the Supabase tables so the admin dashboard
+  // and checkout flow are fully exercisable without a live gateway.
+  paymentSettings: PaymentSettings;
+  fxRates: FxRate[];
+  subscriptions: Subscription[];
+  payments: Payment[];
+  refunds: Refund[];
+  subscriptionEvents: SubscriptionEvent[];
 };
 
 const now = "2026-07-15T08:00:00.000Z";
@@ -347,4 +362,28 @@ export const LOCAL_SEED: LocalDatabase = {
   banners: [],
   subscriptionPlans: DEFAULT_SUBSCRIPTION_PLANS.map((plan) => ({ ...plan })),
   subscriptionPageContent: { ...DEFAULT_SUBSCRIPTION_PAGE_CONTENT },
+  paymentSettings: {
+    ...DEFAULT_PAYMENT_SETTINGS,
+    // Local mode has no real gateway, so the manual/simulated path is the one
+    // that works — the others are switched on from the admin settings panel.
+    manual_enabled: true,
+  },
+  // A plausible free-market rate so Rial pricing renders before the first
+  // cron run. Refreshed hourly in production.
+  fxRates: [
+    {
+      id: "fx-seed-0001",
+      base_currency: "EUR",
+      quote_currency: "IRR",
+      rate: 2_221_600,
+      source: "tgju",
+      accepted: true,
+      rejection_reason: null,
+      fetched_at: now,
+    },
+  ],
+  subscriptions: [],
+  payments: [],
+  refunds: [],
+  subscriptionEvents: [],
 };

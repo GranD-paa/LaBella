@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { DataRepository } from "@/lib/data/repository";
+import { buildAccountingSnapshot } from "@/lib/billing/accounting";
+import { DEFAULT_PAYMENT_SETTINGS } from "@/lib/billing/defaults";
 import { matchesImageSignature } from "@/lib/data/image-signature";
 import { deriveQuizMetadataFromLesson } from "@/lib/quiz-management/helpers";
 import {
@@ -851,6 +853,264 @@ export function createSupabaseRepository(): DataRepository {
         .update(update)
         .eq("id", "default");
       return error ? { error: error.message } : {};
+    },
+
+    // ---------------------------------------------------------------------
+    // Billing & accounting
+    // ---------------------------------------------------------------------
+
+    async getPaymentSettings() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("payment_settings")
+        .select("*")
+        .eq("id", "default")
+        .maybeSingle();
+
+      // Falling back keeps the storefront rendering if the billing migration
+      // has not been applied yet, rather than 500-ing the subscription page.
+      return data ?? DEFAULT_PAYMENT_SETTINGS;
+    },
+
+    async updatePaymentSettings(input) {
+      const supabase = await createClient();
+      const update: Database["public"]["Tables"]["payment_settings"]["Update"] = {};
+      if (input.irrEnabled !== undefined) update.irr_enabled = input.irrEnabled;
+      if (input.fxSource !== undefined) update.fx_source = input.fxSource;
+      if (input.fxMarginPercent !== undefined)
+        update.fx_margin_percent = input.fxMarginPercent;
+      if (input.irrRounding !== undefined) update.irr_rounding = input.irrRounding;
+      if (input.fxManualRate !== undefined) update.fx_manual_rate = input.fxManualRate;
+      if (input.fxMaxDeviationPercent !== undefined)
+        update.fx_max_deviation_percent = input.fxMaxDeviationPercent;
+      if (input.stripeEnabled !== undefined) update.stripe_enabled = input.stripeEnabled;
+      if (input.zarinpalEnabled !== undefined)
+        update.zarinpal_enabled = input.zarinpalEnabled;
+      if (input.manualEnabled !== undefined) update.manual_enabled = input.manualEnabled;
+      if (input.gracePeriodDays !== undefined)
+        update.grace_period_days = input.gracePeriodDays;
+      update.updated_at = new Date().toISOString();
+
+      const { error } = await supabase
+        .from("payment_settings")
+        .update(update)
+        .eq("id", "default");
+      return error ? { error: error.message } : {};
+    },
+
+    async getLatestFxRate() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("fx_rates")
+        .select("*")
+        .eq("base_currency", "EUR")
+        .eq("quote_currency", "IRR")
+        .eq("accepted", true)
+        .order("fetched_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data ?? null;
+    },
+
+    async getFxRateHistory(limit = 50) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("fx_rates")
+        .select("*")
+        .order("fetched_at", { ascending: false })
+        .limit(limit);
+      return data ?? [];
+    },
+
+    async recordFxRate(input) {
+      const supabase = await createClient();
+      const { error } = await supabase.from("fx_rates").insert({
+        rate: input.rate,
+        source: input.source,
+        accepted: input.accepted,
+        rejection_reason: input.rejectionReason ?? null,
+      });
+      return error ? { error: error.message } : {};
+    },
+
+    async getSubscriptionsForUser(userId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+
+    async getEntitlingSubscription(userId, languageSlug) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("language_slug", languageSlug)
+        .in("status", ["active", "past_due"])
+        .maybeSingle();
+      return data ?? null;
+    },
+
+    async cancelSubscription(subscriptionId) {
+      const supabase = await createClient();
+      const { error } = await supabase.rpc("cancel_my_subscription", {
+        p_subscription_id: subscriptionId,
+      });
+      return error ? { error: error.message } : {};
+    },
+
+    async createPendingPayment(input) {
+      const supabase = await createClient();
+      // The amount is computed inside the function from the plan table — the
+      // client only ever names a plan.
+      const { data, error } = await supabase.rpc("create_pending_payment", {
+        p_plan_slug: input.planSlug,
+        p_language_slug: input.languageSlug,
+        p_provider: input.provider,
+        p_currency: input.currency,
+      });
+      if (error) return { error: error.message };
+      return { paymentId: data as string };
+    },
+
+    async getPaymentById(paymentId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("payments")
+        .select("*")
+        .eq("id", paymentId)
+        .maybeSingle();
+      return data ?? null;
+    },
+
+    async getPaymentsForUser(userId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("payments")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+
+    async getSubscriptionEvents(subscriptionId) {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("subscription_events")
+        .select("*")
+        .eq("subscription_id", subscriptionId)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+
+    async getAccountingSnapshot() {
+      const supabase = await createClient();
+
+      // `payments.user_id` points at auth.users rather than profiles, so
+      // PostgREST cannot embed the learner automatically — the two sides are
+      // fetched in parallel and stitched together below.
+      //
+      // Rows are capped rather than streamed: once the ledger outgrows this,
+      // the aggregation belongs in a materialised view, not in the app.
+      const LEDGER_ROW_CAP = 10_000;
+
+      const [
+        paymentsRes,
+        refundsRes,
+        subscriptionsRes,
+        profilesRes,
+        settings,
+        fxRate,
+      ] = await Promise.all([
+        supabase
+          .from("payments")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(LEDGER_ROW_CAP),
+        supabase
+          .from("refunds")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(LEDGER_ROW_CAP),
+        supabase
+          .from("subscriptions")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(LEDGER_ROW_CAP),
+        supabase.from("profiles").select("id, email, full_name"),
+        this.getPaymentSettings(),
+        this.getLatestFxRate(),
+      ]);
+
+      const profileById = new Map(
+        (profilesRes.data ?? []).map((profile) => [profile.id, profile])
+      );
+      const withUser = <T extends { user_id: string }>(row: T) => {
+        const profile = profileById.get(row.user_id);
+        return {
+          ...row,
+          user_email: profile?.email ?? null,
+          user_name: profile?.full_name ?? null,
+        };
+      };
+
+      return buildAccountingSnapshot({
+        payments: (paymentsRes.data ?? []).map(withUser),
+        refunds: refundsRes.data ?? [],
+        subscriptions: (subscriptionsRes.data ?? []).map(withUser),
+        settings,
+        fxRate,
+        now: new Date(),
+      });
+    },
+
+    async recordManualPayment(input) {
+      const supabase = await createClient();
+
+      // Reuses the same server-side pricing path as a gateway checkout, so a
+      // hand-entered payment is priced identically to an online one.
+      const { data: paymentId, error: createError } = await supabase.rpc(
+        "create_pending_payment",
+        {
+          p_plan_slug: input.planSlug,
+          p_language_slug: input.languageSlug,
+          p_provider: "manual",
+          p_currency: input.currency,
+        }
+      );
+      if (createError) return { error: createError.message };
+
+      const { error: settleError } = await supabase.rpc("settle_payment", {
+        p_payment_id: paymentId as string,
+        p_provider_payment_id: `manual-${paymentId}`,
+        p_provider_ref: input.reference ?? null,
+      });
+      return settleError ? { error: settleError.message } : {};
+    },
+
+    async refundPayment(input) {
+      const supabase = await createClient();
+      const { data: user } = await supabase.auth.getUser();
+
+      const { error: refundError } = await supabase.from("refunds").insert({
+        payment_id: input.paymentId,
+        amount_eur_cents: input.amountEurCents,
+        reason: input.reason ?? null,
+        created_by: user.user?.id ?? null,
+      });
+      if (refundError) return { error: refundError.message };
+
+      // The payment row is flagged, but never edited to remove the money —
+      // the refund is its own ledger entry.
+      const { error: statusError } = await supabase
+        .from("payments")
+        .update({ status: "refunded", updated_at: new Date().toISOString() })
+        .eq("id", input.paymentId);
+      return statusError ? { error: statusError.message } : {};
     },
   };
 }

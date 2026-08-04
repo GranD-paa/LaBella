@@ -538,12 +538,335 @@ export interface Database {
         };
         Relationships: [];
       };
+      payment_settings: {
+        Row: {
+          id: string;
+          base_currency: string;
+          irr_enabled: boolean;
+          fx_source: "tgju" | "navasan" | "manual";
+          fx_margin_percent: number;
+          irr_rounding: number;
+          fx_manual_rate: number | null;
+          fx_max_deviation_percent: number;
+          stripe_enabled: boolean;
+          zarinpal_enabled: boolean;
+          manual_enabled: boolean;
+          grace_period_days: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          base_currency?: string;
+          irr_enabled?: boolean;
+          fx_source?: "tgju" | "navasan" | "manual";
+          fx_margin_percent?: number;
+          irr_rounding?: number;
+          fx_manual_rate?: number | null;
+          fx_max_deviation_percent?: number;
+          stripe_enabled?: boolean;
+          zarinpal_enabled?: boolean;
+          manual_enabled?: boolean;
+          grace_period_days?: number;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          base_currency?: string;
+          irr_enabled?: boolean;
+          fx_source?: "tgju" | "navasan" | "manual";
+          fx_margin_percent?: number;
+          irr_rounding?: number;
+          fx_manual_rate?: number | null;
+          fx_max_deviation_percent?: number;
+          stripe_enabled?: boolean;
+          zarinpal_enabled?: boolean;
+          manual_enabled?: boolean;
+          grace_period_days?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      fx_rates: {
+        Row: {
+          id: string;
+          base_currency: string;
+          quote_currency: string;
+          rate: number;
+          source: string;
+          accepted: boolean;
+          rejection_reason: string | null;
+          fetched_at: string;
+        };
+        Insert: {
+          id?: string;
+          base_currency?: string;
+          quote_currency?: string;
+          rate: number;
+          source: string;
+          accepted?: boolean;
+          rejection_reason?: string | null;
+          fetched_at?: string;
+        };
+        Update: {
+          id?: string;
+          base_currency?: string;
+          quote_currency?: string;
+          rate?: number;
+          source?: string;
+          accepted?: boolean;
+          rejection_reason?: string | null;
+          fetched_at?: string;
+        };
+        Relationships: [];
+      };
+      subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          plan_slug: string;
+          language_slug: string;
+          status: "active" | "past_due" | "canceled" | "expired";
+          current_period_start: string;
+          current_period_end: string;
+          anchor_day: number;
+          period_months: number;
+          cancel_at_period_end: boolean;
+          started_at: string;
+          canceled_at: string | null;
+          ended_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          plan_slug: string;
+          language_slug: string;
+          status?: "active" | "past_due" | "canceled" | "expired";
+          current_period_start?: string;
+          current_period_end: string;
+          anchor_day: number;
+          period_months?: number;
+          cancel_at_period_end?: boolean;
+          started_at?: string;
+          canceled_at?: string | null;
+          ended_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          plan_slug?: string;
+          language_slug?: string;
+          status?: "active" | "past_due" | "canceled" | "expired";
+          current_period_start?: string;
+          current_period_end?: string;
+          anchor_day?: number;
+          period_months?: number;
+          cancel_at_period_end?: boolean;
+          started_at?: string;
+          canceled_at?: string | null;
+          ended_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      payments: {
+        Row: {
+          id: string;
+          user_id: string;
+          subscription_id: string | null;
+          plan_slug: string;
+          language_slug: string;
+          period_months: number;
+          plan_title: string | null;
+          list_price_eur_cents: number;
+          discount_percent: number;
+          discount_eur_cents: number;
+          amount_eur_cents: number;
+          paid_currency: "EUR" | "IRR";
+          paid_amount: number;
+          fx_rate: number | null;
+          fx_source: string | null;
+          provider: "stripe" | "zarinpal" | "manual";
+          provider_payment_id: string | null;
+          provider_ref: string | null;
+          status: "pending" | "succeeded" | "failed" | "refunded" | "canceled";
+          failure_reason: string | null;
+          paid_at: string | null;
+          created_at: string;
+          updated_at: string;
+          metadata: Json;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          subscription_id?: string | null;
+          plan_slug: string;
+          language_slug: string;
+          period_months?: number;
+          plan_title?: string | null;
+          list_price_eur_cents: number;
+          discount_percent?: number;
+          discount_eur_cents?: number;
+          amount_eur_cents: number;
+          paid_currency?: "EUR" | "IRR";
+          paid_amount: number;
+          fx_rate?: number | null;
+          fx_source?: string | null;
+          provider: "stripe" | "zarinpal" | "manual";
+          provider_payment_id?: string | null;
+          provider_ref?: string | null;
+          status?: "pending" | "succeeded" | "failed" | "refunded" | "canceled";
+          failure_reason?: string | null;
+          paid_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+          metadata?: Json;
+        };
+        Update: {
+          subscription_id?: string | null;
+          provider_payment_id?: string | null;
+          provider_ref?: string | null;
+          status?: "pending" | "succeeded" | "failed" | "refunded" | "canceled";
+          failure_reason?: string | null;
+          paid_at?: string | null;
+          updated_at?: string;
+          metadata?: Json;
+        };
+        Relationships: [];
+      };
+      refunds: {
+        Row: {
+          id: string;
+          payment_id: string;
+          amount_eur_cents: number;
+          reason: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          payment_id: string;
+          amount_eur_cents: number;
+          reason?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          reason?: string | null;
+        };
+        Relationships: [];
+      };
+      subscription_events: {
+        Row: {
+          id: string;
+          subscription_id: string | null;
+          user_id: string;
+          type:
+            | "created"
+            | "renewed"
+            | "payment_failed"
+            | "past_due"
+            | "canceled"
+            | "expired"
+            | "reactivated"
+            | "refunded"
+            | "plan_changed";
+          payload: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          subscription_id?: string | null;
+          user_id: string;
+          type:
+            | "created"
+            | "renewed"
+            | "payment_failed"
+            | "past_due"
+            | "canceled"
+            | "expired"
+            | "reactivated"
+            | "refunded"
+            | "plan_changed";
+          payload?: Json;
+          created_at?: string;
+        };
+        Update: {
+          payload?: Json;
+        };
+        Relationships: [];
+      };
+      webhook_events: {
+        Row: {
+          id: string;
+          provider: string;
+          provider_event_id: string;
+          event_type: string | null;
+          payload: Json;
+          status: "received" | "processed" | "failed" | "ignored";
+          error: string | null;
+          created_at: string;
+          processed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          provider: string;
+          provider_event_id: string;
+          event_type?: string | null;
+          payload?: Json;
+          status?: "received" | "processed" | "failed" | "ignored";
+          error?: string | null;
+          created_at?: string;
+          processed_at?: string | null;
+        };
+        Update: {
+          status?: "received" | "processed" | "failed" | "ignored";
+          error?: string | null;
+          processed_at?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
       swap_banner_order: {
         Args: { banner_id_a: string; banner_id_b: string };
         Returns: void;
+      };
+      create_pending_payment: {
+        Args: {
+          p_plan_slug: string;
+          p_language_slug: string;
+          p_provider: string;
+          p_currency?: string;
+        };
+        /** The id of the freshly created pending payment row. */
+        Returns: string;
+      };
+      settle_payment: {
+        Args: {
+          p_payment_id: string;
+          p_provider_payment_id?: string | null;
+          p_provider_ref?: string | null;
+        };
+        /** The id of the subscription that was created or extended. */
+        Returns: string;
+      };
+      fail_payment: {
+        Args: { p_payment_id: string; p_reason?: string | null };
+        Returns: void;
+      };
+      cancel_my_subscription: {
+        Args: { p_subscription_id: string };
+        Returns: void;
+      };
+      sweep_subscriptions: {
+        Args: Record<string, never>;
+        Returns: { moved_to_past_due: number; moved_to_expired: number }[];
       };
     };
     Enums: Record<string, never>;

@@ -9,7 +9,16 @@ import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
 import { interpolateText } from "@/lib/subscription/interpolate";
-import type { SubscriptionPageContentRow, SubscriptionPlanRow } from "@/types";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import type {
+  BillingCurrency,
+  FxRate,
+  PaymentProviderSlug,
+  PaymentSettings,
+  SubscriptionPageContentRow,
+  SubscriptionPlanRow,
+} from "@/types";
 
 type SubscriptionViewProps = {
   isAdmin: boolean;
@@ -17,6 +26,10 @@ type SubscriptionViewProps = {
   languages: CurriculumLanguage[];
   plans: SubscriptionPlanRow[];
   pageContent: SubscriptionPageContentRow;
+  settings: PaymentSettings;
+  fxRate: FxRate | null;
+  /** Gateways live for each currency, resolved on the server. */
+  providersByCurrency: Record<BillingCurrency, PaymentProviderSlug[]>;
 };
 
 export function SubscriptionView({
@@ -25,6 +38,9 @@ export function SubscriptionView({
   languages,
   plans,
   pageContent,
+  settings,
+  fxRate,
+  providersByCurrency,
 }: SubscriptionViewProps) {
   const { t, locale } = useTranslations();
   const defaultSlug =
@@ -32,6 +48,14 @@ export function SubscriptionView({
     languages[0]?.slug ??
     "italian";
   const [selectedSlug, setSelectedSlug] = useState<string>(defaultSlug);
+  const [currency, setCurrency] = useState<BillingCurrency>("EUR");
+
+  // Rial is offered only when it is switched on *and* there is a rate to
+  // price with. Showing the toggle without a usable rate would walk the
+  // customer into a checkout that cannot quote them a price.
+  const usableRate =
+    settings.fx_source === "manual" ? settings.fx_manual_rate : (fxRate?.rate ?? null);
+  const canPayInRial = settings.irr_enabled && Boolean(usableRate);
   const selectedLanguage = useMemo(
     () => languages.find((language) => language.slug === selectedSlug) ?? languages[0],
     [languages, selectedSlug]
@@ -90,7 +114,45 @@ export function SubscriptionView({
         />
       </section>
 
-      <SubscriptionPlanCards isAdmin={isAdmin} language={selectedLanguage} plans={plans} />
+      {canPayInRial ? (
+        <div className="flex justify-center">
+          <div
+            className="inline-flex rounded-xl border border-white/10 bg-white/5 p-1"
+            role="group"
+          >
+            {(["EUR", "IRR"] as const).map((option) => (
+              <Button
+                key={option}
+                type="button"
+                size="sm"
+                variant="ghost"
+                aria-pressed={currency === option}
+                onClick={() => setCurrency(option)}
+                className={cn(
+                  "rounded-lg px-4",
+                  currency === option
+                    ? "bg-brand-accent/15 text-brand-accent hover:bg-brand-accent/20"
+                    : "text-muted-foreground"
+                )}
+              >
+                {option === "EUR"
+                  ? t("subscription.currencyEur")
+                  : t("subscription.currencyIrr")}
+              </Button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <SubscriptionPlanCards
+        isAdmin={isAdmin}
+        language={selectedLanguage}
+        plans={plans}
+        currency={currency}
+        settings={settings}
+        fxRate={fxRate}
+        availableProviders={providersByCurrency[currency]}
+      />
 
       <section className="grid gap-4 sm:grid-cols-3">
         {(

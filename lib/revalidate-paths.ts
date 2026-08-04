@@ -6,6 +6,7 @@ export function revalidateAppContent(lessonId?: string) {
   revalidatePath("/admin/quizzes");
   revalidatePath("/admin/banners");
   revalidatePath("/admin/subscription");
+  revalidatePath("/admin/accounting");
   revalidatePath("/menu");
   revalidatePath("/dashboard");
   revalidatePath("/profile");
