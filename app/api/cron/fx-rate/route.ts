@@ -13,10 +13,17 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Hourly EUR -> IRR refresh.
+ * Daily EUR -> IRR refresh.
  *
- * Scheduled from vercel.json. Runs with the service role because there is no
- * user session on a cron invocation and `fx_rates` is admin-writable only.
+ * Scheduled from vercel.json at `30 8 * * *`. Vercel crons run on UTC and Iran
+ * is UTC+3:30 year-round (no DST since 2022), so that is 12:00 noon Tehran
+ * time — deliberately after the ~11:00 local point at which the free-market
+ * rate is set for the day. On Vercel's Hobby plan the job may fire anywhere
+ * inside its hour, which still lands between 11:30 and 12:29 local, i.e.
+ * always after the rate is published.
+ *
+ * Runs with the service role because a cron invocation carries no user session
+ * and `fx_rates` is admin-writable only.
  */
 export async function GET(request: Request) {
   if (!isAuthorizedCronRequest(request)) {
