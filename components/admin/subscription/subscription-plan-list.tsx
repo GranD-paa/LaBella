@@ -19,8 +19,9 @@ function discountedPrice(priceEur: number, discountPercent: number) {
 }
 
 export function SubscriptionPlanList({ plans }: { plans: SubscriptionPlanRow[] }) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const sorted = [...plans].sort((a, b) => a.order_number - b.order_number);
+  const otherLocales = (["fa", "en", "it"] as const).filter((code) => code !== locale);
 
   return (
     <Card className="brand-surface">
@@ -43,9 +44,9 @@ export function SubscriptionPlanList({ plans }: { plans: SubscriptionPlanRow[] }
             >
               <div className="min-w-0 space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-semibold">{plan.title.fa}</p>
+                  <p className="font-semibold">{plan.title[locale]}</p>
                   <span className="text-xs text-muted-foreground">
-                    ({plan.title.en} / {plan.title.it})
+                    ({otherLocales.map((code) => plan.title[code]).join(" / ")})
                   </span>
                   {hasDiscount ? (
                     <Badge className="gap-1 border-brand-accent/30 bg-brand-accent/10 text-brand-accent">
@@ -57,7 +58,7 @@ export function SubscriptionPlanList({ plans }: { plans: SubscriptionPlanRow[] }
                   ) : null}
                 </div>
                 <p className="truncate text-sm text-muted-foreground">
-                  {plan.description.fa}
+                  {plan.description[locale]}
                 </p>
                 <div className="flex items-baseline gap-2">
                   {hasDiscount ? (

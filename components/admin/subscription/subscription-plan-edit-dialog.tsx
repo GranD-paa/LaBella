@@ -44,7 +44,7 @@ const LOCALES = [
 ] as const;
 
 export function SubscriptionPlanEditDialog({ plan }: { plan: SubscriptionPlanRow }) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -105,7 +105,7 @@ export function SubscriptionPlanEditDialog({ plan }: { plan: SubscriptionPlanRow
       <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {t("admin.subscription.editPlanTitle", { plan: plan.title.fa })}
+            {t("admin.subscription.editPlanTitle", { plan: plan.title[locale] })}
           </DialogTitle>
           <DialogDescription>
             {t("admin.subscription.editPlanDescription")}
