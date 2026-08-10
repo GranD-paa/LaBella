@@ -75,7 +75,7 @@ export const fa: Messages = {
     signUpTitle: "حساب کاربری بسازید",
     signUpSubtitle: "امروز یادگیری یک زبان جدید را شروع کنید",
     fullName: "نام کامل",
-    fullNamePlaceholder: "علی رضایی",
+    fullNamePlaceholder: "مثال: علی محمدی",
     confirmPassword: "تأیید رمز عبور",
     creatingAccount: "در حال ایجاد حساب...",
     createAccount: "ایجاد حساب",

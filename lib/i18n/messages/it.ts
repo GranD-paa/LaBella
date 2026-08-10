@@ -75,7 +75,7 @@ export const it: Messages = {
     signUpTitle: "Crea il tuo account",
     signUpSubtitle: "Inizia oggi a imparare una nuova lingua",
     fullName: "Nome completo",
-    fullNamePlaceholder: "Mario Rossi",
+    fullNamePlaceholder: "Esempio: Mario Rossi",
     confirmPassword: "Conferma password",
     creatingAccount: "Creazione account...",
     createAccount: "Crea account",

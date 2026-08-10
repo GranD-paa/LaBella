@@ -74,7 +74,7 @@ export const en = {
     signUpTitle: "Create your account",
     signUpSubtitle: "Start learning a new language today",
     fullName: "Full name",
-    fullNamePlaceholder: "Alex Johnson",
+    fullNamePlaceholder: "Example: Alex Johnson",
     confirmPassword: "Confirm password",
     creatingAccount: "Creating account...",
     createAccount: "Create account",
