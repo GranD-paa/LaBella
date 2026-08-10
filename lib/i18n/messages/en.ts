@@ -182,6 +182,9 @@ export const en = {
     chooseCategoryTitle: "What would you like to study today?",
     moduleCount: "{count} modules",
     quizCount: "{count} quizzes",
+    grammarCount: "{count} rules",
+    vocabularyCount: "{count} words",
+    videoCount: "{count} videos",
     backToCategories: "Back to {code} categories",
     contentPreparing:
       "Content for {code} is being prepared. Check back soon or ask an admin to add lesson {order} in the admin panel.",
@@ -196,8 +199,8 @@ export const en = {
         description: "Essential words and phrases organized by topic.",
       },
       visual: {
-        title: "Visual Learning",
-        description: "Image-based lessons to improve memorization through visuals.",
+        title: "Video Lessons",
+        description: "Watch and repeat with short video lessons for this level.",
       },
       quiz: {
         title: "Quiz",
@@ -211,8 +214,10 @@ export const en = {
     fourCategories: "4 learning categories",
     openLevel: "Open {code}",
     backToLevels: "Back to {name} levels",
-    visualEmpty:
-      "Visual materials for this level will appear here once images are added to vocabulary entries.",
+    videoPlay: "Play {title}",
+    videoOpenExternal: "Watch on the original site",
+    videoEmpty:
+      "No videos have been added for this level yet. They will appear here soon.",
   },
   profile: {
     badge: "Profile",

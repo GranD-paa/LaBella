@@ -180,6 +180,9 @@ export const fa: Messages = {
     chooseCategoryTitle: "امروز چه چیزی یاد می‌گیرید؟",
     moduleCount: "{count} بخش",
     quizCount: "{count} آزمون",
+    grammarCount: "{count} قاعده",
+    vocabularyCount: "{count} واژه",
+    videoCount: "{count} ویدیو",
     backToCategories: "بازگشت به دسته‌های {code}",
     contentPreparing:
       "محتوای {code} در حال آماده‌سازی است. بعداً سر بزنید یا از مدیر بخواهید درس {order} را اضافه کند.",
@@ -193,8 +196,8 @@ export const fa: Messages = {
         description: "کلمات و عبارات ضروری بر اساس موضوع.",
       },
       visual: {
-        title: "یادگیری تصویری",
-        description: "درس‌های تصویری برای تقویت حافظه با تصاویر.",
+        title: "آموزش ویدیویی",
+        description: "ویدیوهای آموزشی برای یادگیری با تماشا و تکرار.",
       },
       quiz: {
         title: "آزمون",
@@ -208,8 +211,10 @@ export const fa: Messages = {
     fourCategories: "۴ دسته یادگیری",
     openLevel: "باز کردن {code}",
     backToLevels: "بازگشت به سطوح {name}",
-    visualEmpty:
-      "مواد تصویری این سطح پس از افزودن تصاویر به واژگان اینجا نمایش داده می‌شود.",
+    videoPlay: "پخش {title}",
+    videoOpenExternal: "تماشا در سایت اصلی",
+    videoEmpty:
+      "هنوز ویدیویی برای این سطح اضافه نشده. به‌زودی اینجا قرار می‌گیرد.",
   },
   profile: {
     badge: "پروفایل",

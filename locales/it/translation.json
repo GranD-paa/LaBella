@@ -179,8 +179,8 @@
         "description": "Parole ed espressioni essenziali organizzate per argomento."
       },
       "visual": {
-        "title": "Apprendimento visivo",
-        "description": "Lezioni basate su immagini per migliorare la memorizzazione."
+        "title": "Lezioni video",
+        "description": "Guarda e ripeti con brevi lezioni video per questo livello."
       },
       "quiz": {
         "title": "Quiz",
@@ -193,7 +193,12 @@
     "fourCategories": "4 categorie di apprendimento",
     "openLevel": "Apri {code}",
     "backToLevels": "Torna ai livelli {name}",
-    "visualEmpty": "I materiali visivi per questo livello appariranno qui quando le immagini saranno aggiunte alle voci del vocabolario."
+    "videoEmpty": "Nessun video ancora aggiunto per questo livello. Appariranno presto qui.",
+    "videoPlay": "Riproduci {title}",
+    "videoOpenExternal": "Guarda sul sito originale",
+    "grammarCount": "{count} regole",
+    "vocabularyCount": "{count} parole",
+    "videoCount": "{count} video"
   },
   "profile": {
     "badge": "Profilo",

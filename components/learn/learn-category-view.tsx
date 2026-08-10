@@ -4,7 +4,7 @@ import {
   LearnCategoryBackLink,
   LearnCategoryHero,
 } from "@/components/learn/learn-category-hero";
-import { VisualLearningGrid } from "@/components/learn/visual-learning-grid";
+import { VideoLessonsGrid } from "@/components/learn/video-lessons-grid";
 import { GrammarRulesList } from "@/components/lessons/grammar-rules-list";
 import { QuizTabContent } from "@/components/lessons/quiz-tab-content";
 import { VocabularyFlashcards } from "@/components/lessons/vocabulary-flashcards";
@@ -19,6 +19,7 @@ import type {
   Lesson,
   Quiz,
   UserQuizAttempt,
+  VideoLesson,
   Vocabulary,
 } from "@/types";
 
@@ -29,6 +30,7 @@ export function LearnCategoryView({
   lesson,
   vocabulary,
   grammarRules,
+  videoLessons = [],
   quizzes = [],
   quizAttempts = [],
 }: {
@@ -38,6 +40,7 @@ export function LearnCategoryView({
   lesson: Lesson | null;
   vocabulary: Vocabulary[];
   grammarRules: GrammarRule[];
+  videoLessons?: VideoLesson[];
   quizzes?: Quiz[];
   quizAttempts?: UserQuizAttempt[];
 }) {
@@ -48,9 +51,11 @@ export function LearnCategoryView({
       ? quizzes.length
       : category === "grammar"
         ? grammarRules.length
-        : category === "vocabulary" || category === "visual"
+        : category === "vocabulary"
           ? vocabulary.length
-          : undefined;
+          : category === "visual"
+            ? videoLessons.length
+            : undefined;
 
   return (
     <div className="space-y-6">
@@ -89,7 +94,7 @@ export function LearnCategoryView({
             <VocabularyFlashcards vocabulary={vocabulary} />
           ) : null}
           {category === "visual" ? (
-            <VisualLearningGrid vocabulary={vocabulary} />
+            <VideoLessonsGrid videos={videoLessons} />
           ) : null}
           {category === "quiz" ? (
             <QuizTabContent quizzes={quizzes} attempts={quizAttempts} />

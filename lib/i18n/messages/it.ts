@@ -183,6 +183,9 @@ export const it: Messages = {
     chooseCategoryTitle: "Cosa vuoi studiare oggi?",
     moduleCount: "{count} moduli",
     quizCount: "{count} quiz",
+    grammarCount: "{count} regole",
+    vocabularyCount: "{count} parole",
+    videoCount: "{count} video",
     backToCategories: "Torna alle categorie {code}",
     contentPreparing:
       "I contenuti per {code} sono in preparazione. Torna presto o chiedi a un admin di aggiungere la lezione {order}.",
@@ -197,8 +200,8 @@ export const it: Messages = {
         description: "Parole ed espressioni essenziali organizzate per argomento.",
       },
       visual: {
-        title: "Apprendimento visivo",
-        description: "Lezioni basate su immagini per migliorare la memorizzazione.",
+        title: "Lezioni video",
+        description: "Guarda e ripeti con brevi lezioni video per questo livello.",
       },
       quiz: {
         title: "Quiz",
@@ -212,8 +215,10 @@ export const it: Messages = {
     fourCategories: "4 categorie di apprendimento",
     openLevel: "Apri {code}",
     backToLevels: "Torna ai livelli {name}",
-    visualEmpty:
-      "I materiali visivi per questo livello appariranno qui quando le immagini saranno aggiunte alle voci del vocabolario.",
+    videoPlay: "Riproduci {title}",
+    videoOpenExternal: "Guarda sul sito originale",
+    videoEmpty:
+      "Nessun video ancora aggiunto per questo livello. Appariranno presto qui.",
   },
   profile: {
     badge: "Profilo",

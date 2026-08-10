@@ -65,6 +65,7 @@ export default async function CategoryPage({ params }: PageProps) {
 
   let vocabulary: import("@/types").Vocabulary[] = [];
   let grammarRules: import("@/types").GrammarRule[] = [];
+  let videoLessons: import("@/types").VideoLesson[] = [];
   let levelQuizzes: import("@/types").Quiz[] = [];
   let quizAttempts: import("@/types").UserQuizAttempt[] = [];
 
@@ -96,13 +97,15 @@ export default async function CategoryPage({ params }: PageProps) {
   }
 
   if (lesson) {
-    const [vocabularyData, grammarData] = await Promise.all([
+    const [vocabularyData, grammarData, videoData] = await Promise.all([
       repo.getVocabularyByLessonId(lesson.id),
       repo.getGrammarRulesByLessonId(lesson.id),
+      repo.getVideoLessonsByLessonId(lesson.id),
     ]);
 
     vocabulary = vocabularyData.filter((item) => item.status === "published");
     grammarRules = grammarData.filter((item) => item.status === "published");
+    videoLessons = videoData.filter((item) => item.status === "published");
   }
 
   return (
@@ -113,6 +116,7 @@ export default async function CategoryPage({ params }: PageProps) {
       lesson={lesson}
       vocabulary={vocabulary}
       grammarRules={grammarRules}
+      videoLessons={videoLessons}
       quizzes={levelQuizzes}
       quizAttempts={quizAttempts}
     />

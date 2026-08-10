@@ -179,8 +179,8 @@
         "description": "کلمات و عبارات ضروری بر اساس موضوع."
       },
       "visual": {
-        "title": "یادگیری تصویری",
-        "description": "درس‌های تصویری برای تقویت حافظه با تصاویر."
+        "title": "آموزش ویدیویی",
+        "description": "ویدیوهای آموزشی برای یادگیری با تماشا و تکرار."
       },
       "quiz": {
         "title": "آزمون",
@@ -193,7 +193,12 @@
     "fourCategories": "۴ دسته یادگیری",
     "openLevel": "باز کردن {code}",
     "backToLevels": "بازگشت به سطوح {name}",
-    "visualEmpty": "مواد تصویری این سطح پس از افزودن تصاویر به واژگان اینجا نمایش داده می‌شود."
+    "videoEmpty": "هنوز ویدیویی برای این سطح اضافه نشده. به‌زودی اینجا قرار می‌گیرد.",
+    "videoPlay": "پخش {title}",
+    "videoOpenExternal": "تماشا در سایت اصلی",
+    "grammarCount": "{count} قاعده",
+    "vocabularyCount": "{count} واژه",
+    "videoCount": "{count} ویدیو"
   },
   "profile": {
     "badge": "پروفایل",

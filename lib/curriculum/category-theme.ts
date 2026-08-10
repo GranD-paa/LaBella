@@ -1,16 +1,18 @@
 import {
   BookMarked,
-  Eye,
   Languages,
   ListChecks,
+  PlayCircle,
 } from "lucide-react";
 
 import type { CategorySlug } from "@/lib/curriculum/types";
 
+// The `visual` slug is kept for the URL and stored progress records, but the
+// section now holds video lessons rather than image cards — hence the play icon.
 export const CATEGORY_ICONS = {
   grammar: BookMarked,
   vocabulary: Languages,
-  visual: Eye,
+  visual: PlayCircle,
   quiz: ListChecks,
 } as const;
 

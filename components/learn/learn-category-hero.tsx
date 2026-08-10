@@ -21,6 +21,18 @@ import type {
   CurriculumLevel,
 } from "@/lib/curriculum/types";
 
+/**
+ * Each category counts a different kind of thing, so each needs its own noun.
+ * A single shared "{count} modules" label read as "0 modules" on the video
+ * page — counting the section the learner was already looking at.
+ */
+const COUNT_MESSAGE_KEYS: Record<CategorySlug, string> = {
+  grammar: "learn.grammarCount",
+  vocabulary: "learn.vocabularyCount",
+  visual: "learn.videoCount",
+  quiz: "learn.quizCount",
+};
+
 export function LearnCategoryHero({
   language,
   level,
@@ -88,14 +100,17 @@ export function LearnCategoryHero({
               {localizedLevel.description}
             </p>
           ) : null}
-          {typeof itemCount === "number" ? (
+          {/*
+            The count is only worth showing when there is something to count:
+            at zero the empty state below already says so, and a "0 videos"
+            chip next to "no videos yet" is just noise.
+          */}
+          {typeof itemCount === "number" && itemCount > 0 ? (
             <Badge
               variant="secondary"
               className="mt-3 border-white/10 bg-white/5 text-xs font-medium uppercase tracking-wide"
             >
-              {category === "quiz"
-                ? t("learn.quizCount", { count: itemCount })
-                : t("learn.moduleCount", { count: itemCount })}
+              {t(COUNT_MESSAGE_KEYS[category], { count: itemCount })}
             </Badge>
           ) : null}
         </div>
