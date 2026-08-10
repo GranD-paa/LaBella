@@ -3,13 +3,10 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+import { CategoryWatermark } from "@/components/learn/category-watermark";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  CATEGORY_ICON_BG,
-  CATEGORY_ICONS,
-} from "@/lib/curriculum/category-theme";
 import {
   getLocalizedLanguageName,
   getLocalizedLevel,
@@ -46,7 +43,6 @@ export function LearnCategoryHero({
 }) {
   const { t } = useTranslations();
   const messageKey = CATEGORY_MESSAGE_KEYS[category];
-  const Icon = CATEGORY_ICONS[category];
   const languageLabel = getLocalizedLanguageName(language.slug, t);
   const localizedLevel = getLocalizedLevel(language.slug, level, t);
 
@@ -75,13 +71,9 @@ export function LearnCategoryHero({
           </Badge>
         </div>
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-          <div
-            className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${CATEGORY_ICON_BG[category]}`}
-          >
-            <Icon className="h-7 w-7" />
-          </div>
-          <div className="min-w-0 space-y-2">
+        <div className="group relative">
+          <CategoryWatermark category={category} size="hero" />
+          <div className="relative min-w-0 space-y-2">
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
               {t(`${messageKey}.title`)}
             </h1>

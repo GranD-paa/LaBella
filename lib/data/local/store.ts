@@ -30,6 +30,39 @@ function getFileMtimeMs(): number | null {
   }
 }
 
+/**
+ * Fills in any collection the persisted file predates.
+ *
+ * The local store is a plain JSON file that survives across upgrades, so a
+ * file written before a feature existed is missing that feature's keys — and
+ * the code reading them crashes on `undefined.filter(...)`. Adding a
+ * hand-written check per collection worked until someone forgot one, which is
+ * exactly what happened when billing landed.
+ *
+ * Deriving the check from the seed instead means any collection added in
+ * future is backfilled automatically. Existing data is never overwritten:
+ * only keys that are absent, or whose shape no longer matches the seed's
+ * (array vs object), are replaced.
+ */
+function backfillMissingCollections(parsed: LocalDatabase): void {
+  const seed = LOCAL_SEED as unknown as Record<string, unknown>;
+  const target = parsed as unknown as Record<string, unknown>;
+
+  for (const key of Object.keys(seed)) {
+    const seedValue = seed[key];
+    const current = target[key];
+
+    const shapeChanged =
+      current === undefined ||
+      current === null ||
+      Array.isArray(seedValue) !== Array.isArray(current);
+
+    if (shapeChanged) {
+      target[key] = structuredClone(seedValue);
+    }
+  }
+}
+
 function loadPersistedStore(): LocalDatabase | null {
   try {
     if (!fs.existsSync(DATA_FILE)) {
@@ -48,23 +81,12 @@ function loadPersistedStore(): LocalDatabase | null {
       return null;
     }
 
-    // Backward-compat: older persisted files predate `languageSettings`.
-    if (!parsed.languageSettings || typeof parsed.languageSettings !== "object") {
-      parsed.languageSettings = {};
-    }
+    backfillMissingCollections(parsed);
 
-    // Backward-compat: older persisted files predate `curriculumLevelOverrides`.
-    if (!Array.isArray(parsed.curriculumLevelOverrides)) {
-      parsed.curriculumLevelOverrides = [];
-    }
-
-    // Backward-compat: older persisted files predate `banners`.
-    if (!Array.isArray(parsed.banners)) {
-      parsed.banners = [];
-    }
-
-    // Backward-compat: older persisted files predate subscription management.
-    if (!Array.isArray(parsed.subscriptionPlans) || parsed.subscriptionPlans.length === 0) {
+    // Subscription plans have their own rule: an *empty* list is treated as
+    // missing rather than as "the admin deleted every plan", because a
+    // storefront with no plans is never what anyone wants locally.
+    if (parsed.subscriptionPlans.length === 0) {
       parsed.subscriptionPlans = DEFAULT_SUBSCRIPTION_PLANS.map((plan) => ({ ...plan }));
     }
     if (!parsed.subscriptionPageContent || typeof parsed.subscriptionPageContent !== "object") {

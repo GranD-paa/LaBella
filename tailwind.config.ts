@@ -7,6 +7,11 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    // `lib/` holds shared class-name maps — category tints, role badge
+    // colours — that no component spells out literally. Without this glob
+    // Tailwind never sees those strings and silently emits no rule for them,
+    // so the class lands on the element and does nothing.
+    "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   prefix: "",
   theme: {

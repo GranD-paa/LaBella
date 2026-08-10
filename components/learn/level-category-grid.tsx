@@ -12,12 +12,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CategoryWatermark } from "@/components/learn/category-watermark";
 import { CATEGORY_DEFINITIONS } from "@/lib/curriculum/languages";
-import {
-  CATEGORY_ACCENTS,
-  CATEGORY_ICON_BG,
-  CATEGORY_ICONS,
-} from "@/lib/curriculum/category-theme";
+import { CATEGORY_ACCENTS } from "@/lib/curriculum/category-theme";
 import {
   getLocalizedLanguageName,
   getLocalizedLevel,
@@ -100,7 +97,6 @@ export function LevelCategoryGrid({ language, level }: LevelCategoryGridProps) {
 
       <div className="grid gap-4 sm:grid-cols-2">
         {CATEGORY_DEFINITIONS.map((category) => {
-          const Icon = CATEGORY_ICONS[category.slug];
           const messageKey = CATEGORY_MESSAGE_KEYS[category.slug];
 
           return (
@@ -109,28 +105,19 @@ export function LevelCategoryGrid({ language, level }: LevelCategoryGridProps) {
               href={category.href(language.slug, level.slug)}
               className="group block"
             >
-              <Card className="brand-surface h-full overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-brand-accent/35 hover:shadow-brand">
+              <Card className="brand-surface relative h-full overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-brand-accent/35 hover:shadow-brand">
                 <div
                   className={cn(
                     "h-1 bg-gradient-to-r",
                     CATEGORY_ACCENTS[category.slug]
                   )}
                 />
-                <CardHeader className="space-y-4">
-                  <div
-                    className={cn(
-                      "flex h-12 w-12 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-105",
-                      CATEGORY_ICON_BG[category.slug]
-                    )}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div className="space-y-2">
-                    <CardTitle className="text-xl">{t(`${messageKey}.title`)}</CardTitle>
-                    <CardDescription className="text-sm leading-relaxed">
-                      {t(`${messageKey}.description`)}
-                    </CardDescription>
-                  </div>
+                <CategoryWatermark category={category.slug} size="card" />
+                <CardHeader className="relative space-y-2">
+                  <CardTitle className="text-xl">{t(`${messageKey}.title`)}</CardTitle>
+                  <CardDescription className="text-sm leading-relaxed">
+                    {t(`${messageKey}.description`)}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <span className="inline-flex items-center gap-1 text-sm font-semibold text-brand-accent transition-transform group-hover:gap-2">
