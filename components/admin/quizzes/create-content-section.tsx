@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { FlagIcon } from "@/components/menu/flag-icon";
 import {
   BookOpen,
   ChevronLeft,
@@ -217,7 +218,7 @@ export function CreateContentSection({
                       !language.available && "cursor-not-allowed opacity-50"
                     )}
                   >
-                    <p className="text-2xl">{language.flagEmoji}</p>
+                    <FlagIcon slug={language.slug} className="mx-auto h-6 w-9" />
                     <p className="mt-2 font-semibold">{language.name}</p>
                     <p className="text-xs text-muted-foreground">
                       {language.available

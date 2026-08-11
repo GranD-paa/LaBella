@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FlagIcon } from "@/components/menu/flag-icon";
 import { useRouter } from "next/navigation";
 import { Globe2, Lock, Sparkles } from "lucide-react";
 
@@ -53,7 +54,7 @@ export function LanguageManagementPanel({
                 className="grid grid-cols-[1fr_auto_auto] items-center gap-3 px-4 py-3 sm:grid-cols-[2fr_1fr_auto]"
               >
                 <div className="flex items-center gap-2 font-medium">
-                  <span className="text-xl">{language.flagEmoji}</span>
+                  <FlagIcon slug={language.slug} className="h-4 w-6 shrink-0" />
                   {language.name}
                 </div>
                 <div>

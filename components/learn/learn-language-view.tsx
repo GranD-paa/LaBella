@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FlagIcon } from "@/components/menu/flag-icon";
 import { ArrowLeft } from "lucide-react";
 
 import {
@@ -34,7 +35,7 @@ export function LearnLanguageView({ language }: { language: CurriculumLanguage }
           <section className="brand-surface relative overflow-hidden p-6 sm:p-8">
             <div className="absolute inset-0 bg-brand-gradient opacity-20" />
             <div className="relative space-y-3">
-              <span className="text-4xl">{language.flagEmoji}</span>
+              <FlagIcon slug={language.slug} className="h-8 w-12" />
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 {headline}
               </h1>

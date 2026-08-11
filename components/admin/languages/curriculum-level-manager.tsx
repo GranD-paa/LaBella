@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { FlagIcon } from "@/components/menu/flag-icon";
 import { useRouter } from "next/navigation";
 import { GraduationCap, Layers, Lock, Sparkles } from "lucide-react";
 
@@ -89,7 +90,7 @@ export function CurriculumLevelManager({
           <TabsList className="flex-wrap">
             {languages.map((language) => (
               <TabsTrigger key={language.slug} value={language.slug} className="gap-1.5">
-                <span>{language.flagEmoji}</span>
+                <FlagIcon slug={language.slug} className="h-3.5 w-5 shrink-0" />
                 {language.name}
               </TabsTrigger>
             ))}

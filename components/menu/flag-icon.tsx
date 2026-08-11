@@ -1,4 +1,5 @@
 import type { LanguageSlug } from "@/lib/curriculum/types";
+import { getLanguageCode } from "@/lib/curriculum/language-codes";
 import { cn } from "@/lib/utils";
 
 /**
@@ -27,9 +28,8 @@ const US_STARS = [
  * 🇮🇹/🇺🇸/etc. silently fall back to rendering as plain two-letter text
  * there — these SVGs look right on every platform, at any size.
  */
-const FLAGS: Record<LanguageSlug, { code: string; render: () => React.ReactNode }> = {
+const FLAGS: Record<LanguageSlug, { render: () => React.ReactNode }> = {
   italian: {
-    code: "IT",
     render: () => (
       <>
         <rect width="8" height="16" fill="#009246" />
@@ -39,7 +39,6 @@ const FLAGS: Record<LanguageSlug, { code: string; render: () => React.ReactNode 
     ),
   },
   english: {
-    code: "EN",
     render: () => (
       <>
         <defs>
@@ -66,7 +65,6 @@ const FLAGS: Record<LanguageSlug, { code: string; render: () => React.ReactNode 
     ),
   },
   german: {
-    code: "DE",
     render: () => (
       <>
         <rect width="24" height={16 / 3} fill="#000000" />
@@ -76,7 +74,6 @@ const FLAGS: Record<LanguageSlug, { code: string; render: () => React.ReactNode 
     ),
   },
   turkish: {
-    code: "TR",
     render: () => (
       <>
         <rect width="24" height="16" fill="#e30a17" />
@@ -103,20 +100,45 @@ export function FlagIcon({
   className?: string;
 }) {
   const flag = FLAGS[slug];
-  if (!flag) return null;
+
+  // A language added to the curriculum before its flag is drawn here falls
+  // back to its two-letter code in the same flag-shaped frame. Returning null
+  // instead would leave a silent gap that nobody notices until a learner does.
+  if (!flag) {
+    return (
+      <svg
+        viewBox="0 0 24 16"
+        className={cn(
+          "overflow-hidden rounded-[3px] shadow-sm ring-1 ring-white/20",
+          className
+        )}
+        role="img"
+        aria-label={getLanguageCode(slug)}
+      >
+        <rect width="24" height="16" className="fill-white/10" />
+        <text
+          x="12"
+          y="11.5"
+          textAnchor="middle"
+          className="fill-white/70"
+          fontSize="9"
+          fontWeight="600"
+        >
+          {getLanguageCode(slug)}
+        </text>
+      </svg>
+    );
+  }
 
   return (
     <svg
       viewBox="0 0 24 16"
       className={cn("overflow-hidden rounded-[3px] shadow-sm ring-1 ring-white/20", className)}
       role="img"
-      aria-label={flag.code}
+      aria-label={getLanguageCode(slug)}
     >
       {flag.render()}
     </svg>
   );
 }
 
-export function getLanguageCode(slug: LanguageSlug): string {
-  return FLAGS[slug]?.code ?? slug.slice(0, 2).toUpperCase();
-}

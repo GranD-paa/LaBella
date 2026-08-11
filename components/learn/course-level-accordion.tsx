@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FlagIcon } from "@/components/menu/flag-icon";
 import { useState } from "react";
 import {
   BookOpen,
@@ -113,7 +114,7 @@ export function ComingSoonLanguage({
 
   return (
     <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed py-20 text-center">
-      <span className="text-5xl">{language.flagEmoji}</span>
+      <FlagIcon slug={language.slug} className="h-12 w-[4.5rem]" />
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold">{headline}</h1>
         <p className="max-w-md text-muted-foreground">{description}</p>

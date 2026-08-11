@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "@/components/providers/locale-provider";
+import { FlagIcon } from "@/components/menu/flag-icon";
 import type { ContinueLearningSnapshot } from "@/lib/dashboard/continue-learning";
 import { getLocalizedLanguageName } from "@/lib/curriculum/localize";
 import type { LanguageSlug } from "@/lib/curriculum/types";
@@ -50,9 +51,10 @@ export function ContinueLearningCard({
             <span className="text-2xl font-bold tracking-tight sm:text-3xl">
               {languageName}
             </span>
-            <span className="text-2xl sm:text-3xl" aria-hidden>
-              {snapshot.flagEmoji}
-            </span>
+            <FlagIcon
+              slug={snapshot.languageSlug as LanguageSlug}
+              className="h-7 w-10 shrink-0 sm:h-8 sm:w-12"
+            />
           </div>
 
           <dl className="grid gap-4 sm:grid-cols-3">

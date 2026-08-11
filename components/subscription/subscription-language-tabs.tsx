@@ -2,7 +2,8 @@
 
 import { Lock } from "lucide-react";
 
-import { FlagIcon, getLanguageCode } from "@/components/menu/flag-icon";
+import { FlagIcon } from "@/components/menu/flag-icon";
+import { getLanguageCode } from "@/lib/curriculum/language-codes";
 import { useTranslations } from "@/components/providers/locale-provider";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
 import { cn } from "@/lib/utils";

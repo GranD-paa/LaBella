@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FlagIcon } from "@/components/menu/flag-icon";
 import { ArrowLeft } from "lucide-react";
 
 import { CategoryWatermark } from "@/components/learn/category-watermark";
@@ -54,9 +55,7 @@ export function LearnCategoryHero({
 
       <div className="relative space-y-6">
         <div className="flex flex-wrap items-center gap-2.5">
-          <span className="text-3xl sm:text-4xl" aria-hidden>
-            {language.flagEmoji}
-          </span>
+          <FlagIcon slug={language.slug} className="h-7 w-10 shrink-0 sm:h-8 sm:w-12" />
           <Badge
             variant="outline"
             className="border-white/15 bg-white/5 text-foreground"

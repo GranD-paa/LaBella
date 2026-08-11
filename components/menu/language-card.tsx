@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { ArrowRight, Lock, Sparkles } from "lucide-react";
 
-import { FlagIcon, getLanguageCode } from "@/components/menu/flag-icon";
+import { FlagIcon } from "@/components/menu/flag-icon";
+import { getLanguageCode } from "@/lib/curriculum/language-codes";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { CURRICULUM_MESSAGE_KEYS } from "@/lib/i18n/content-keys";

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FlagIcon } from "@/components/menu/flag-icon";
 import { Flame, Menu, PlayCircle, Target, User, Zap } from "lucide-react";
 
 import { useTranslations } from "@/components/providers/locale-provider";
@@ -90,7 +91,7 @@ export function DashboardWelcomeHeader({
               </dt>
               <dd className="flex items-center gap-2 text-base font-semibold sm:text-lg">
                 <span>{languageName}</span>
-                <span aria-hidden>{snapshot.flagEmoji}</span>
+                <FlagIcon slug={snapshot.languageSlug as LanguageSlug} className="h-4 w-6" />
               </dd>
             </div>
             <div className="space-y-1">
