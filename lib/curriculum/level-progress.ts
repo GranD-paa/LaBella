@@ -3,19 +3,25 @@ import type { CurriculumLevel } from "@/lib/curriculum/types";
 import type { Lesson, Quiz } from "@/types";
 
 /**
- * A level counts as passed once the learner has attempted every published
- * checkpoint quiz ("quiz" section) tied to it. A level with no checkpoint
- * quiz configured yet has nothing to block on, so it's treated as passed
- * (vacuously complete) rather than as a permanent wall — otherwise adding a
- * new level to the curriculum before its quiz exists would strand every
- * learner's "Continue learning" on that level forever, even past levels
- * they've since finished.
+ * Whether the learner has demonstrably passed a level: it has at least one
+ * published checkpoint quiz and they have attempted every one.
+ *
+ * A level with **no** checkpoint quiz is deliberately not passed. Absence of a
+ * quiz is absence of evidence, not evidence of completion — treating the two
+ * as the same is what previously sent a brand-new learner, who had done
+ * nothing at all, straight to the final level: every earlier level happened to
+ * have no quiz configured yet, so all of them counted as "already passed".
+ *
+ * Not being passed does not make a level a wall, either. `resolveNextIncompleteLevel`
+ * navigates from the last level actually passed rather than stopping at the
+ * first unpassed one, so a quiz-less level in the middle of the course never
+ * strands anyone.
  */
-export function isLevelCompleted(
+export function isLevelPassed(
   levelQuizzes: Quiz[],
   attemptedQuizIds: ReadonlySet<string>
 ): boolean {
-  if (levelQuizzes.length === 0) return true;
+  if (levelQuizzes.length === 0) return false;
   return levelQuizzes.every((quiz) => attemptedQuizIds.has(quiz.id));
 }
 
@@ -34,10 +40,16 @@ export function getLevelCheckpointQuizzes(
 }
 
 /**
- * First level (in curriculum order) the learner hasn't passed yet — the
- * level their "Continue learning" action should land them on. Falls back to
- * the last level once every level is complete, so finishing the course
- * doesn't leave them with a broken destination.
+ * Where "Continue learning" should send the learner: the level immediately
+ * after the furthest one they have actually passed.
+ *
+ * Driving this from the last *passed* level rather than the first *unpassed*
+ * one is what keeps both failure modes away at once — a learner who has done
+ * nothing lands on the first level, and a quiz-less level partway through the
+ * course is stepped over rather than becoming a permanent stopping point.
+ *
+ * Falls back to the final level once everything has been passed, so finishing
+ * the course does not produce a broken destination.
  */
 export function resolveNextIncompleteLevel(
   languageSlug: string,
@@ -46,16 +58,19 @@ export function resolveNextIncompleteLevel(
   quizzes: Quiz[],
   attemptedQuizIds: ReadonlySet<string>
 ): CurriculumLevel | null {
-  for (const level of levels) {
+  let lastPassedIndex = -1;
+
+  levels.forEach((level, index) => {
     const levelQuizzes = getLevelCheckpointQuizzes(
       languageSlug,
       level.slug,
       lessons,
       quizzes
     );
-    if (!isLevelCompleted(levelQuizzes, attemptedQuizIds)) {
-      return level;
+    if (isLevelPassed(levelQuizzes, attemptedQuizIds)) {
+      lastPassedIndex = index;
     }
-  }
-  return levels[levels.length - 1] ?? null;
+  });
+
+  return levels[lastPassedIndex + 1] ?? levels[levels.length - 1] ?? null;
 }

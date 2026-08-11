@@ -4,7 +4,7 @@ import {
 } from "@/lib/curriculum/resolve-navigation";
 import {
   getLevelCheckpointQuizzes,
-  isLevelCompleted,
+  isLevelPassed,
   resolveNextIncompleteLevel,
 } from "@/lib/curriculum/level-progress";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
@@ -150,7 +150,7 @@ export function buildContinueLearningSnapshot(
       input.quizzes
     );
 
-    if (isLevelCompleted(levelQuizzes, attemptedQuizIds)) {
+    if (isLevelPassed(levelQuizzes, attemptedQuizIds)) {
       const nextLevel = resolveNextIncompleteLevel(
         languageSlug,
         currentLanguage.levels,

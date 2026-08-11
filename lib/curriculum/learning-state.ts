@@ -1,7 +1,7 @@
 import { getLevel, isCategorySlug, LANGUAGES } from "@/lib/curriculum/languages";
 import {
   getLevelCheckpointQuizzes,
-  isLevelCompleted,
+  isLevelPassed,
   resolveNextIncompleteLevel,
 } from "@/lib/curriculum/level-progress";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
@@ -68,7 +68,7 @@ export function resolveContinueLearningPath(
       progress.quizzes
     );
 
-    if (isLevelCompleted(levelQuizzes, progress.attemptedQuizIds)) {
+    if (isLevelPassed(levelQuizzes, progress.attemptedQuizIds)) {
       const nextLevel = resolveNextIncompleteLevel(
         language.slug,
         language.levels,

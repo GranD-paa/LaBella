@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getLevelCheckpointQuizzes,
-  isLevelCompleted,
+  isLevelPassed,
   resolveNextIncompleteLevel,
 } from "./level-progress";
 import type { CurriculumLevel } from "@/lib/curriculum/types";
@@ -43,19 +43,21 @@ function buildLevel(overrides: Partial<CurriculumLevel> = {}): CurriculumLevel {
   };
 }
 
-describe("isLevelCompleted", () => {
-  it("is true (vacuously) when the level has no checkpoint quiz at all", () => {
-    expect(isLevelCompleted([], new Set())).toBe(true);
+describe("isLevelPassed", () => {
+  it("is false when the level has no checkpoint quiz at all", () => {
+    // Absence of a quiz is absence of evidence, not proof the learner passed.
+    // Treating it as passed is what sent brand-new learners to the last level.
+    expect(isLevelPassed([], new Set())).toBe(false);
   });
 
   it("is false when some quizzes are unattempted", () => {
     const quizzes = [buildQuiz({ id: "q1" }), buildQuiz({ id: "q2" })];
-    expect(isLevelCompleted(quizzes, new Set(["q1"]))).toBe(false);
+    expect(isLevelPassed(quizzes, new Set(["q1"]))).toBe(false);
   });
 
   it("is true once every quiz has an attempt", () => {
     const quizzes = [buildQuiz({ id: "q1" }), buildQuiz({ id: "q2" })];
-    expect(isLevelCompleted(quizzes, new Set(["q1", "q2"]))).toBe(true);
+    expect(isLevelPassed(quizzes, new Set(["q1", "q2"]))).toBe(true);
   });
 });
 
@@ -126,6 +128,30 @@ describe("resolveNextIncompleteLevel", () => {
       attempted
     );
     expect(next?.slug).toBe("a1-3");
+  });
+
+  it("sends a brand-new learner to the first level, not past every quiz-less one", () => {
+    // The reported bug: with checkpoint quizzes configured only on the last
+    // level, every earlier level counted as vacuously "complete" and a
+    // learner who had done nothing was pointed at A1-10.
+    const quizOnlyOnLastLevel = [
+      buildQuiz({ id: "q3", lesson_id: "lesson-3", level_slug: "a1-3" }),
+    ];
+
+    const next = resolveNextIncompleteLevel(
+      "italian",
+      levels,
+      lessons,
+      quizOnlyOnLastLevel,
+      new Set()
+    );
+
+    expect(next?.slug).toBe("a1-1");
+  });
+
+  it("keeps a learner on the first level when no level has a quiz yet", () => {
+    const next = resolveNextIncompleteLevel("italian", levels, lessons, [], new Set());
+    expect(next?.slug).toBe("a1-1");
   });
 
   it("does not get permanently stuck on a level that has no quiz yet", () => {
