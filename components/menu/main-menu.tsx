@@ -37,9 +37,17 @@ export function MainMenu({
             {t("menu.greeting", { name: displayName })}
           </h1>
           <p className="max-w-2xl text-muted-foreground">{t("menu.subtitle")}</p>
+          {/*
+            Accent outline rather than a solid fill. The subtitle directs the
+            learner to pick a language, so the language cards below are the
+            primary action — a filled button here would be the loudest thing
+            on the page and pull attention away from them. The outline reads
+            as clearly interactive while staying a step below the cards, and
+            matches the accent badge directly above it.
+          */}
           <Button
             variant="outline"
-            className="border-white/20 bg-white/5"
+            className="border-brand-accent/40 bg-brand-accent/10 text-brand-accent hover:bg-brand-accent/20 hover:text-brand-accent"
             asChild
           >
             <Link href="/dashboard">
