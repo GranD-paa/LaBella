@@ -75,19 +75,28 @@ export async function signInAction(
     return { error: formatAuthErrorKey(result.error) };
   }
 
+  const user = await repo.getAuthUser();
+  const profile = user ? await repo.getProfileById(user.id) : null;
+  const isAdmin = Boolean(profile?.is_admin);
+
   // An explicit redirectTo means the user was bounced here from a specific
   // protected page (e.g. a deep link) — honor that instead of resuming their
   // last learning position.
-  if (redirectTo) {
-    redirect(getSafeRedirectPath(redirectTo));
-  }
+  //
+  // `/menu` is the exception. It is where the middleware parks anyone with a
+  // session and where every signed-in user lands by default, so being sent
+  // back from it says nothing about where this person meant to go — an admin
+  // whose session expired on the menu still belongs on the dashboard. Every
+  // other path was genuinely asked for and outranks the default landing.
+  const requestedPath = redirectTo ? getSafeRedirectPath(redirectTo) : null;
 
-  const user = await repo.getAuthUser();
-  const profile = user ? await repo.getProfileById(user.id) : null;
+  if (requestedPath && !(isAdmin && requestedPath === "/menu")) {
+    redirect(requestedPath);
+  }
 
   // Admins manage the platform, not take quizzes — send them to the admin
   // dashboard instead of resuming (or starting) a learner's course path.
-  if (profile?.is_admin) {
+  if (isAdmin) {
     redirect("/dashboard");
   }
 
