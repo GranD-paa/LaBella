@@ -24,24 +24,35 @@ export const CATEGORY_ICONS = {
   quiz: ClipboardCheck,
 } as const;
 
-/** Thin accent bar along the top edge of a section card. */
+/**
+ * Thin accent bar along the top edge of a section card.
+ *
+ * Every section wears the amber bar the video section started with. Warm amber
+ * is the only one of the four hues that carries against the purple surface at
+ * this weight — the cool tints read as washed-out grey — and one shared colour
+ * makes the grid look like a single set instead of four colour-coded modules.
+ */
 export const CATEGORY_ACCENTS = {
-  grammar: "from-violet-500/20 via-purple-500/10 to-transparent",
-  vocabulary: "from-sky-500/20 via-blue-500/10 to-transparent",
+  grammar: "from-amber-500/20 via-yellow-500/10 to-transparent",
+  vocabulary: "from-amber-500/20 via-yellow-500/10 to-transparent",
   visual: "from-amber-500/20 via-yellow-500/10 to-transparent",
-  quiz: "from-emerald-500/20 via-green-500/10 to-transparent",
+  quiz: "from-amber-500/20 via-yellow-500/10 to-transparent",
 } as const;
 
 /**
  * Ink colour for the watermark. Kept separate from the chip background above
  * so the tint can be tuned for a large, very low-opacity mark without
  * disturbing anything that still renders a solid icon.
+ *
+ * Shared across the sections for the same reason as the accent bar above: at
+ * the watermark's ~13% opacity only the amber stays readable, so each section
+ * is told apart by its glyph rather than by colour.
  */
 export const CATEGORY_ICON_TINT: Record<CategorySlug, string> = {
-  grammar: "text-violet-300",
-  vocabulary: "text-sky-300",
+  grammar: "text-amber-300",
+  vocabulary: "text-amber-300",
   visual: "text-amber-300",
-  quiz: "text-emerald-300",
+  quiz: "text-amber-300",
 };
 
 export const CATEGORY_ICON_BG: Record<CategorySlug, string> = {
