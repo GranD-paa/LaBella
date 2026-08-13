@@ -174,6 +174,17 @@ export const en = {
     },
   },
   learn: {
+    bandExams: {
+      title: "Comprehensive level exams",
+      hint: "Each exam covers a whole CEFR level and reports your score at the end.",
+      cardTitle: "{band} comprehensive exam",
+      cardDescription: "Covers everything in {band}, across all of its modules.",
+      start: "Start exam",
+      retake: "Retake exam",
+      lockedBadge: "Subscription",
+      takenBadge: "Completed",
+      scoreBadge: "Best: {score}%",
+    },
     backToMenu: "Back to Main Menu",
     courseLevels: "Course levels",
     courseLevelsHint:
@@ -188,6 +199,14 @@ export const en = {
     backToCategories: "Back to {code} categories",
     contentPreparing:
       "Content for {code} is being prepared. Check back soon or ask an admin to add lesson {order} in the admin panel.",
+    locked: {
+      title: "{content} unlocks with a subscription",
+      description:
+        "This section is part of the {plan} plan. Activate it to get full access right away.",
+      descriptionGeneric:
+        "This section unlocks with an active subscription. Pick a plan to get access.",
+      cta: "See subscription plans",
+    },
     categories: {
       grammar: {
         title: "Grammar",
@@ -582,8 +601,35 @@ export const en = {
     subscription: adminSubscriptionEn,
   },
   subscription: {
+    mine: {
+      title: "Your subscriptions",
+      statusActive: "Active",
+      statusPastDue: "Grace period",
+      renewsOn: "Renews {date}",
+      endsOn: "Ends {date}",
+      daysLeft: "{count} days left",
+      perkVocabulary: "Vocabulary & images",
+      perkGrammar: "Grammar of every lesson",
+      perkVideo: "Video lessons",
+      perkLevelExam: "Level exams",
+      perkRetakes: "{count} quiz retakes",
+      perkRetakesUnlimited: "Unlimited quiz retakes",
+      continueLearning: "Continue learning",
+      managePlan: "Manage plan",
+    },
+    recovered: {
+      title: "Payment confirmed",
+      description: "We checked with the gateway and activated the subscription you had already paid for.",
+    },
     monthlyBadge: "1-month access · billed monthly",
     billingPeriod: "month",
+    billingPeriodQuarterly: "3 months",
+    perMonthEquivalent: "{amount} per month",
+    periodMonthly: "1 month",
+    periodQuarterly: "3 months",
+    periodSaveBadge: "save {percent}%",
+    periodGroupLabel: "Billing period",
+    currencyGroupLabel: "Payment currency",
     currencyEur: "Pay in EUR",
     currencyIrr: "Pay in Toman",
     choosePayment: "Choose how to pay",
@@ -764,6 +810,8 @@ export const en = {
   },
   actions: {
     errors: {
+      retakeLimitReached: "You have used all your retakes for this quiz. Upgrade your plan for more.",
+      levelExamLocked: "The level exam needs an active subscription. Choose a plan to unlock it.",
       invalidInput: "Invalid input. Please check the form and try again.",
       invalidCredentials: "Please check your email and password and try again.",
       formCheck: "Please double-check the form and try again.",

@@ -4,6 +4,7 @@ import {
   LearnCategoryBackLink,
   LearnCategoryHero,
 } from "@/components/learn/learn-category-hero";
+import { LockedContentNotice } from "@/components/learn/locked-content-notice";
 import { VideoLessonsGrid } from "@/components/learn/video-lessons-grid";
 import { GrammarRulesList } from "@/components/lessons/grammar-rules-list";
 import { QuizTabContent } from "@/components/lessons/quiz-tab-content";
@@ -17,6 +18,7 @@ import type {
 import type {
   GrammarRule,
   Lesson,
+  LocalizedText,
   Quiz,
   UserQuizAttempt,
   VideoLesson,
@@ -33,6 +35,8 @@ export function LearnCategoryView({
   videoLessons = [],
   quizzes = [],
   quizAttempts = [],
+  locked = false,
+  requiredPlanTitle = null,
 }: {
   language: CurriculumLanguage;
   level: CurriculumLevel;
@@ -43,11 +47,22 @@ export function LearnCategoryView({
   videoLessons?: VideoLesson[];
   quizzes?: Quiz[];
   quizAttempts?: UserQuizAttempt[];
+  /** True when the learner's plan does not cover this category. */
+  locked?: boolean;
+  /**
+   * Admin-authored title of the cheapest plan that unlocks this category.
+   * Passed as stored copy rather than a translation key so the upsell always
+   * names the plan by the name the admin gave it.
+   */
+  requiredPlanTitle?: LocalizedText | null;
 }) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
 
-  const contentCount =
-    category === "quiz"
+  // A locked category has no items to count, and showing "0 words" there would
+  // read as "this level is empty" rather than "you cannot see this yet".
+  const contentCount = locked
+    ? undefined
+    : category === "quiz"
       ? quizzes.length
       : category === "grammar"
         ? grammarRules.length
@@ -72,7 +87,13 @@ export function LearnCategoryView({
         itemCount={contentCount}
       />
 
-      {!lesson && category !== "quiz" ? (
+      {locked ? (
+        <LockedContentNotice
+          planName={requiredPlanTitle?.[locale] ?? null}
+          contentLabel={t(`learn.categories.${category}.title`)}
+          languageSlug={language.slug}
+        />
+      ) : !lesson && category !== "quiz" ? (
         <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 py-16 text-center text-muted-foreground">
           <p>
             {t("learn.contentPreparing", {
@@ -101,6 +122,7 @@ export function LearnCategoryView({
           ) : null}
         </>
       )}
+
     </div>
   );
 }

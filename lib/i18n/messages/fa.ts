@@ -172,6 +172,17 @@ export const fa: Messages = {
     },
   },
   learn: {
+    bandExams: {
+      title: "آزمون‌های جامع سطح",
+      hint: "هر آزمون کل یک سطح را پوشش می‌دهد و در پایان نمرهٔ شما را نشان می‌دهد.",
+      cardTitle: "آزمون جامع {band}",
+      cardDescription: "تمام مطالب سطح {band} را در همهٔ بخش‌هایش پوشش می‌دهد.",
+      start: "شروع آزمون",
+      retake: "آزمون مجدد",
+      lockedBadge: "نیازمند اشتراک",
+      takenBadge: "انجام شده",
+      scoreBadge: "بهترین: ٪{score}",
+    },
     backToMenu: "بازگشت به منوی اصلی",
     courseLevels: "سطوح دوره",
     courseLevelsHint:
@@ -186,6 +197,14 @@ export const fa: Messages = {
     backToCategories: "بازگشت به دسته‌های {code}",
     contentPreparing:
       "محتوای {code} در حال آماده‌سازی است. بعداً سر بزنید یا از مدیر بخواهید درس {order} را اضافه کند.",
+    locked: {
+      title: "{content} با اشتراک باز می‌شود",
+      description:
+        "این بخش بخشی از طرح {plan} است. با فعال‌کردن آن، همین حالا دسترسی کامل بگیرید.",
+      descriptionGeneric:
+        "این بخش با اشتراک فعال باز می‌شود. یکی از طرح‌ها را انتخاب کنید تا دسترسی بگیرید.",
+      cta: "دیدن طرح‌های اشتراک",
+    },
     categories: {
       grammar: {
         title: "گرامر",
@@ -578,8 +597,35 @@ export const fa: Messages = {
     subscription: adminSubscriptionFa,
   },
   subscription: {
+    mine: {
+      title: "اشتراک‌های شما",
+      statusActive: "فعال",
+      statusPastDue: "مهلت تمدید",
+      renewsOn: "تمدید در {date}",
+      endsOn: "پایان در {date}",
+      daysLeft: "{count} روز باقی‌مانده",
+      perkVocabulary: "واژگان و تصاویر",
+      perkGrammar: "قواعد همه درس‌ها",
+      perkVideo: "آموزش ویدیویی",
+      perkLevelExam: "آزمون جامع سطح",
+      perkRetakes: "{count} بار تلاش مجدد آزمون",
+      perkRetakesUnlimited: "تلاش مجدد نامحدود آزمون",
+      continueLearning: "ادامه یادگیری",
+      managePlan: "مدیریت اشتراک",
+    },
+    recovered: {
+      title: "پرداخت تأیید شد",
+      description: "از درگاه استعلام گرفتیم و اشتراکی را که قبلاً پرداخت کرده بودید فعال کردیم.",
+    },
     monthlyBadge: "دسترسی ۱ ماهه · پرداخت ماهانه",
     billingPeriod: "ماه",
+    billingPeriodQuarterly: "۳ ماه",
+    perMonthEquivalent: "ماهانه {amount}",
+    periodMonthly: "۱ ماهه",
+    periodQuarterly: "۳ ماهه",
+    periodSaveBadge: "{percent}٪ تخفیف",
+    periodGroupLabel: "دوره پرداخت",
+    currencyGroupLabel: "واحد پول پرداخت",
     currencyEur: "پرداخت به یورو",
     currencyIrr: "پرداخت به تومان",
     choosePayment: "روش پرداخت را انتخاب کنید",
@@ -759,6 +805,8 @@ export const fa: Messages = {
   },
   actions: {
     errors: {
+      retakeLimitReached: "تمام تلاش‌های مجدد این آزمون را استفاده کرده‌اید. برای تلاش بیشتر، طرح خود را ارتقا دهید.",
+      levelExamLocked: "آزمون جامع سطح به اشتراک فعال نیاز دارد. یکی از طرح‌ها را انتخاب کنید تا باز شود.",
       invalidInput: "ورودی نامعتبر است. لطفاً فرم را بررسی و دوباره تلاش کنید.",
       invalidCredentials: "لطفاً ایمیل و رمز عبور را بررسی و دوباره تلاش کنید.",
       formCheck: "لطفاً فرم را دوباره بررسی کنید.",

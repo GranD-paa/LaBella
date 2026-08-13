@@ -270,6 +270,7 @@ export interface Database {
           quiz_id: string;
           score: number;
           answers_json: Json;
+          attempt_number: number;
           created_at: string;
         };
         Insert: {
@@ -278,6 +279,7 @@ export interface Database {
           quiz_id: string;
           score?: number;
           answers_json?: Json;
+          attempt_number?: number;
           created_at?: string;
         };
         Update: {
@@ -286,6 +288,7 @@ export interface Database {
           quiz_id?: string;
           score?: number;
           answers_json?: Json;
+          attempt_number?: number;
           created_at?: string;
         };
         Relationships: [
@@ -488,6 +491,9 @@ export interface Database {
           description: Json;
           features: Json;
           order_number: number;
+          is_active: boolean;
+          quarterly_enabled: boolean;
+          quarterly_discount_percent: number;
           updated_at: string;
         };
         Insert: {
@@ -499,6 +505,9 @@ export interface Database {
           description?: Json;
           features?: Json;
           order_number?: number;
+          is_active?: boolean;
+          quarterly_enabled?: boolean;
+          quarterly_discount_percent?: number;
           updated_at?: string;
         };
         Update: {
@@ -510,6 +519,42 @@ export interface Database {
           description?: Json;
           features?: Json;
           order_number?: number;
+          is_active?: boolean;
+          quarterly_enabled?: boolean;
+          quarterly_discount_percent?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      subscription_tiers: {
+        Row: {
+          plan_slug: string;
+          tier_rank: number;
+          unlocks_vocabulary: boolean;
+          unlocks_grammar: boolean;
+          unlocks_video: boolean;
+          unlocks_level_exam: boolean;
+          quiz_retake_limit: number | null;
+          updated_at: string;
+        };
+        Insert: {
+          plan_slug: string;
+          tier_rank: number;
+          unlocks_vocabulary?: boolean;
+          unlocks_grammar?: boolean;
+          unlocks_video?: boolean;
+          unlocks_level_exam?: boolean;
+          quiz_retake_limit?: number | null;
+          updated_at?: string;
+        };
+        Update: {
+          plan_slug?: string;
+          tier_rank?: number;
+          unlocks_vocabulary?: boolean;
+          unlocks_grammar?: boolean;
+          unlocks_video?: boolean;
+          unlocks_level_exam?: boolean;
+          quiz_retake_limit?: number | null;
           updated_at?: string;
         };
         Relationships: [];
@@ -552,6 +597,10 @@ export interface Database {
           zarinpal_enabled: boolean;
           manual_enabled: boolean;
           grace_period_days: number;
+          enforce_entitlements: boolean;
+          free_cefr_bands: string[];
+          free_quiz_retake_limit: number;
+          pending_payment_timeout_minutes: number;
           updated_at: string;
         };
         Insert: {
@@ -567,6 +616,10 @@ export interface Database {
           zarinpal_enabled?: boolean;
           manual_enabled?: boolean;
           grace_period_days?: number;
+          enforce_entitlements?: boolean;
+          free_cefr_bands?: string[];
+          free_quiz_retake_limit?: number;
+          pending_payment_timeout_minutes?: number;
           updated_at?: string;
         };
         Update: {
@@ -582,6 +635,10 @@ export interface Database {
           zarinpal_enabled?: boolean;
           manual_enabled?: boolean;
           grace_period_days?: number;
+          enforce_entitlements?: boolean;
+          free_cefr_bands?: string[];
+          free_quiz_retake_limit?: number;
+          pending_payment_timeout_minutes?: number;
           updated_at?: string;
         };
         Relationships: [];
@@ -693,6 +750,7 @@ export interface Database {
           provider: "stripe" | "zarinpal" | "manual";
           provider_payment_id: string | null;
           provider_ref: string | null;
+          checkout_reference: string | null;
           status: "pending" | "succeeded" | "failed" | "refunded" | "canceled";
           failure_reason: string | null;
           paid_at: string | null;
@@ -719,6 +777,7 @@ export interface Database {
           provider: "stripe" | "zarinpal" | "manual";
           provider_payment_id?: string | null;
           provider_ref?: string | null;
+          checkout_reference?: string | null;
           status?: "pending" | "succeeded" | "failed" | "refunded" | "canceled";
           failure_reason?: string | null;
           paid_at?: string | null;
@@ -730,6 +789,7 @@ export interface Database {
           subscription_id?: string | null;
           provider_payment_id?: string | null;
           provider_ref?: string | null;
+          checkout_reference?: string | null;
           status?: "pending" | "succeeded" | "failed" | "refunded" | "canceled";
           failure_reason?: string | null;
           paid_at?: string | null;
@@ -843,9 +903,41 @@ export interface Database {
           p_language_slug: string;
           p_provider: string;
           p_currency?: string;
+          /** 1 or 3; anything else is rejected. */
+          p_period_months?: number;
         };
         /** The id of the freshly created pending payment row. */
         Returns: string;
+      };
+      record_quiz_attempt: {
+        Args: {
+          p_quiz_id: string;
+          p_score: number;
+          p_answers?: Json;
+        };
+        /**
+         * `{ ok: false, reason: 'retake_limit_reached' }` when the learner has
+         * spent their allowance, otherwise `{ ok: true, attempt_number }`.
+         */
+        Returns: {
+          ok: boolean;
+          reason?: string;
+          attempt_number?: number;
+          retake_limit?: number | null;
+          attempts_used?: number;
+        };
+      };
+      list_my_pending_payments: {
+        Args: Record<string, never>;
+        Returns: Database["public"]["Tables"]["payments"]["Row"][];
+      };
+      attach_checkout_reference: {
+        Args: { p_payment_id: string; p_reference: string };
+        Returns: void;
+      };
+      list_stale_pending_payments: {
+        Args: { p_limit?: number };
+        Returns: Database["public"]["Tables"]["payments"]["Row"][];
       };
       settle_payment: {
         Args: {

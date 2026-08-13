@@ -6,7 +6,17 @@ export type QuizSectionSlug =
   | "vocabulary"
   | "visual"
   | "quiz"
+  | "level-exam"
   | "custom";
+
+/**
+ * The level-wide comprehensive exam.
+ *
+ * Distinct from the `quiz` section, which holds the per-lesson quizzes: those
+ * stay free for everyone, while this one is a paid entitlement gated on
+ * `subscription_tiers.unlocks_level_exam`.
+ */
+export const LEVEL_EXAM_SECTION = "level-exam" satisfies QuizSectionSlug;
 
 export type QuizStatus = "draft" | "published";
 
@@ -78,7 +88,12 @@ export const QUIZ_SECTIONS: Array<{
   {
     slug: "quiz",
     title: "General Quiz",
-    description: "Mixed section checkpoint",
+    description: "Mixed section checkpoint — free for every learner",
+  },
+  {
+    slug: "level-exam",
+    title: "Level Exam",
+    description: "Comprehensive exam covering a whole CEFR level (paid)",
   },
   {
     slug: "custom",

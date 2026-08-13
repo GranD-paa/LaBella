@@ -27,6 +27,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import type { ContentWizardContext } from "@/lib/content-management/categories";
+import { LEVEL_EXAM_SECTION } from "@/lib/quiz-management/types";
 import { resolveMessage } from "@/lib/i18n/resolve-message";
 import {
   createContentGrammarRuleSchema,
@@ -484,13 +485,18 @@ export function QuizContentPanel({
   const [questionCount, setQuestionCount] = useState(1);
   const schema = useMemo(() => createStructuredQuizSchema(t), [t]);
 
+  // A level exam is filed under its own section, which is what makes it a paid
+  // entitlement rather than one of the free per-lesson quizzes.
+  const sectionSlug =
+    context.category === "level-exam" ? LEVEL_EXAM_SECTION : "quiz";
+
   const form = useForm<StructuredQuizValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       lessonId: context.lessonId,
       languageSlug: context.languageSlug,
       levelSlug: context.levelSlug,
-      sectionSlug: "quiz",
+      sectionSlug,
       title: "",
       status: "draft",
       questions: [{ ...emptyQuestion }],
@@ -534,7 +540,7 @@ export function QuizContentPanel({
         lessonId: context.lessonId,
         languageSlug: context.languageSlug,
         levelSlug: context.levelSlug,
-        sectionSlug: "quiz",
+        sectionSlug,
         title: "",
         status: "draft",
         questions: [{ ...emptyQuestion }],
@@ -679,6 +685,10 @@ export function ContentFormPanel({
     case "video":
       return <VideoContentPanel context={context} onSuccess={onSuccess} />;
     case "quiz":
+    // The level exam is authored with the same question builder; only the
+    // section it is filed under differs, and QuizContentPanel derives that
+    // from the category.
+    case "level-exam":
       return <QuizContentPanel context={context} onSuccess={onSuccess} />;
     default:
       return null;

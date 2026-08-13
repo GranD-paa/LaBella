@@ -1,19 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Crown, Sparkles, Sprout, Zap } from "lucide-react";
+import { Check, Crown, Gem, Sparkles, Sprout, Zap } from "lucide-react";
 import { toast } from "sonner";
 
 import { CheckoutDialog } from "@/components/subscription/checkout-dialog";
 import { useTranslations } from "@/components/providers/locale-provider";
 import {
-  computePrice,
+  centsToEur,
   convertEurCentsToRial,
-  eurToCents,
+  divRoundHalfUp,
+  resolvePlanPeriodPrice,
 } from "@/lib/billing/money";
 import { formatRialAsToman } from "@/lib/billing/format";
 import type {
   BillingCurrency,
+  BillingPeriodMonths,
   FxRate,
   PaymentProviderSlug,
   PaymentSettings,
@@ -37,17 +39,15 @@ const PLAN_ICONS = {
   seedling: Sprout,
   zap: Zap,
   crown: Crown,
+  gem: Gem,
 } as const;
-
-function discountedPrice(priceEur: number, discountPercent: number) {
-  return priceEur * (1 - discountPercent / 100);
-}
 
 export function SubscriptionPlanCards({
   isAdmin,
   language,
   plans,
   currency = "EUR",
+  periodMonths = 1,
   settings,
   fxRate,
   availableProviders = [],
@@ -56,6 +56,7 @@ export function SubscriptionPlanCards({
   language?: CurriculumLanguage;
   plans: SubscriptionPlanRow[];
   currency?: BillingCurrency;
+  periodMonths?: BillingPeriodMonths;
   settings?: PaymentSettings;
   fxRate?: FxRate | null;
   availableProviders?: PaymentProviderSlug[];
@@ -96,8 +97,25 @@ export function SubscriptionPlanCards({
   }
 
   const sortedPlans = plans
-    .filter((plan) => !language || plan.language_slug === language.slug)
+    .filter(
+      (plan) =>
+        // A plan switched off for this language must not appear at all — not
+        // greyed out, not "coming soon". The reserved fourth slot ships this
+        // way, so it is invisible until an admin turns it on.
+        plan.is_active && (!language || plan.language_slug === language.slug)
+    )
     .sort((a, b) => a.order_number - b.order_number);
+
+  /**
+   * Price for one plan over the selected period. A plan with the quarterly
+   * option switched off stays on monthly pricing even while the toggle says
+   * three months, which matches what checkout will accept for it.
+   */
+  function pricingFor(plan: SubscriptionPlanRow) {
+    const months: BillingPeriodMonths =
+      periodMonths === 3 && plan.quarterly_enabled ? 3 : 1;
+    return { months, price: resolvePlanPeriodPrice(plan, months) };
+  }
 
   return (
     <div className="space-y-4">
@@ -106,20 +124,26 @@ export function SubscriptionPlanCards({
           {t("subscription.plansForLanguage", { language: language.name })}
         </p>
       ) : null}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div
+        className={cn(
+          "grid gap-6 sm:grid-cols-2",
+          // Four cards side by side would be too narrow to read at lg, so the
+          // fourth slot being switched on widens the grid a breakpoint later
+          // instead of squeezing the existing three.
+          sortedPlans.length >= 4
+            ? "lg:grid-cols-2 xl:grid-cols-4"
+            : "sm:grid-cols-1 lg:grid-cols-3"
+        )}
+      >
         {sortedPlans.map((plan) => {
           const meta = getSubscriptionPlanMeta(plan.plan_slug);
           const PlanIcon = PLAN_ICONS[meta.icon];
           const planName = plan.title[locale];
-          const hasDiscount = plan.discount_percent > 0;
-          const finalPrice = discountedPrice(plan.price_eur, plan.discount_percent);
-          // Mirrors the server's rounding exactly, so the Rial figure shown
-          // here is the one the gateway will ask for.
-          const netCents = computePrice(
-            eurToCents(plan.price_eur),
-            plan.discount_percent
-          ).netCents;
-          const rialPreview = rialFor(netCents);
+          // Mirrors the server's rounding exactly, so the figures shown here
+          // are the ones the gateway will ask for.
+          const { months, price } = pricingFor(plan);
+          const hasDiscount = price.discountPercent > 0;
+          const rialPreview = rialFor(price.netCents);
 
           return (
             <Card
@@ -159,17 +183,29 @@ export function SubscriptionPlanCards({
                   <div className="flex flex-col items-center gap-1">
                     {hasDiscount ? (
                       <span className="text-sm text-muted-foreground line-through">
-                        €{plan.price_eur.toFixed(2)}
+                        €{centsToEur(price.listCents).toFixed(2)}
                       </span>
                     ) : null}
                     <div className="flex items-end justify-center gap-1">
                       <span className="text-4xl font-bold tracking-tight">
-                        €{finalPrice.toFixed(2)}
+                        €{centsToEur(price.netCents).toFixed(2)}
                       </span>
                       <span className="pb-1 text-sm text-muted-foreground">
-                        / {t("subscription.billingPeriod")}
+                        /{" "}
+                        {months === 3
+                          ? t("subscription.billingPeriodQuarterly")
+                          : t("subscription.billingPeriod")}
                       </span>
                     </div>
+                    {months === 3 ? (
+                      <p className="text-xs text-muted-foreground">
+                        {t("subscription.perMonthEquivalent", {
+                          amount: `€${centsToEur(
+                            divRoundHalfUp(price.netCents, 3)
+                          ).toFixed(2)}`,
+                        })}
+                      </p>
+                    ) : null}
                     {currency === "IRR" && rialPreview !== null ? (
                       <p className="text-sm font-medium text-brand-accent">
                         {t("subscription.approxRial", {
@@ -217,18 +253,9 @@ export function SubscriptionPlanCards({
           planName={checkoutPlan.title[locale]}
           languageSlug={checkoutPlan.language_slug}
           currency={currency}
-          amountEurCents={
-            computePrice(
-              eurToCents(checkoutPlan.price_eur),
-              checkoutPlan.discount_percent
-            ).netCents
-          }
-          amountRial={rialFor(
-            computePrice(
-              eurToCents(checkoutPlan.price_eur),
-              checkoutPlan.discount_percent
-            ).netCents
-          )}
+          periodMonths={pricingFor(checkoutPlan).months}
+          amountEurCents={pricingFor(checkoutPlan).price.netCents}
+          amountRial={rialFor(pricingFor(checkoutPlan).price.netCents)}
           providers={availableProviders}
         />
       ) : null}

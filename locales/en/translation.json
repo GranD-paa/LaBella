@@ -169,6 +169,12 @@
     "quizCount": "{count} quizzes",
     "backToCategories": "Back to {code} categories",
     "contentPreparing": "Content for {code} is being prepared. Check back soon or ask an admin to add lesson {order} in the admin panel.",
+    "locked": {
+      "title": "{content} unlocks with a subscription",
+      "description": "This section is part of the {plan} plan. Activate it to get full access right away.",
+      "descriptionGeneric": "This section unlocks with an active subscription. Pick a plan to get access.",
+      "cta": "See subscription plans"
+    },
     "categories": {
       "grammar": {
         "title": "Grammar",
@@ -198,7 +204,18 @@
     "videoOpenExternal": "Watch on the original site",
     "grammarCount": "{count} rules",
     "vocabularyCount": "{count} words",
-    "videoCount": "{count} videos"
+    "videoCount": "{count} videos",
+    "bandExams": {
+      "title": "Comprehensive level exams",
+      "hint": "Each exam covers a whole CEFR level and reports your score at the end.",
+      "cardTitle": "{band} comprehensive exam",
+      "cardDescription": "Covers everything in {band}, across all of its modules.",
+      "start": "Start exam",
+      "retake": "Retake exam",
+      "lockedBadge": "Subscription",
+      "takenBadge": "Completed",
+      "scoreBadge": "Best: {score}%"
+    }
   },
   "profile": {
     "badge": "Profile",
@@ -592,6 +609,11 @@
           "title": "Quizzes",
           "description": "Multiple-choice and written assessment questions",
           "features": "Multiple choice · Written questions · Answers & explanations"
+        },
+        "levelExam": {
+          "title": "Level exam",
+          "description": "The comprehensive exam for a whole CEFR level. Paid: it is gated on the subscription plan, unlike the per-lesson quizzes.",
+          "features": "Covers the whole level · Subscription required · Shown on the language page"
         }
       },
       "grammar": {
@@ -979,7 +1001,46 @@
       "featuresLabel": "Features",
       "addFeature": "Add feature",
       "planUpdated": "Plan updated",
-      "languageSelectorLabel": "Editing plans for:"
+      "languageSelectorLabel": "Editing plans for:",
+      "notOnSaleBadge": "Not on sale",
+      "quarterlyBadge": "3-month available",
+      "quarterlyBadgeWithDiscount": "3-month −{percent}%",
+      "onSaleLabel": "Sell this plan for this language",
+      "onSaleHint": "Switch off to hide the plan from the storefront entirely. Checkout refuses it too, so it cannot be bought by a crafted request.",
+      "quarterlyEnabledLabel": "Offer the 3-month option",
+      "quarterlyEnabledHint": "Adds a 1-month / 3-month switch on the subscription page for this plan.",
+      "quarterlyDiscountLabel": "Extra discount on 3 months (%)",
+      "quarterlyDiscountHint": "A 3-month purchase would cost €{price} in total.",
+      "access": {
+        "title": "Content access",
+        "description": "Decides what learners without a subscription can open. These settings apply to every language.",
+        "enforceLabel": "Enforce content gating",
+        "enforceHint": "While off, every lesson stays open to everyone regardless of plan. Turn it on once your payment gateway is live.",
+        "offNotice": "Gating is off: all content is currently free for everyone. The plan capabilities below are saved but not enforced yet.",
+        "freeBandsLabel": "Free CEFR levels",
+        "freeBandsHint": "All lesson content in these levels is free for everyone — your trial experience. The level-wide exam and quiz retakes stay paid even here.",
+        "noFreeBandsWarning": "No level is free. Once gating is on, a new visitor will not be able to open any lesson.",
+        "freeRetakesLabel": "Retakes without a subscription",
+        "freeRetakesHint": "Everyone gets one free attempt at each lesson quiz. This is how many times an unsubscribed learner may retake it.",
+        "saved": "Access settings saved"
+      },
+      "capabilities": {
+        "title": "What each plan unlocks",
+        "description": "Applies to every language at once, so a plan cannot include grammar for one language but not for another.",
+        "rank": "Rank {rank}",
+        "vocabulary": "Vocabulary & images",
+        "vocabularyHint": "Words with their pictures.",
+        "grammar": "Grammar",
+        "grammarHint": "The grammar rules of each lesson.",
+        "video": "Video lessons",
+        "videoHint": "The video section of each lesson.",
+        "levelExam": "Level exam",
+        "levelExamHint": "The comprehensive exam covering a whole level.",
+        "retakes": "Quiz retakes",
+        "retakesHint": "Retakes past the first free attempt at each lesson quiz.",
+        "unlimitedRetakes": "Unlimited",
+        "saved": "Plan capabilities saved"
+      }
     },
     "accounting": {
       "pageBadge": "Accounting",
@@ -1139,6 +1200,13 @@
   "subscription": {
     "monthlyBadge": "1-month access · billed monthly",
     "billingPeriod": "month",
+    "billingPeriodQuarterly": "3 months",
+    "perMonthEquivalent": "{amount} per month",
+    "periodMonthly": "1 month",
+    "periodQuarterly": "3 months",
+    "periodSaveBadge": "save {percent}%",
+    "periodGroupLabel": "Billing period",
+    "currencyGroupLabel": "Payment currency",
     "mostPopular": "Most Popular",
     "paymentSoon": "Payment gateway integration is coming soon!",
     "checkoutSoon": "{plan} checkout will be available in a future update.",
@@ -1166,7 +1234,27 @@
     "checkoutFailed": "Payment did not go through.",
     "checkoutCancelled": "Payment was cancelled.",
     "checkoutError": "Something went wrong confirming your payment.",
-    "approxRial": "≈ {amount}"
+    "approxRial": "≈ {amount}",
+    "mine": {
+      "title": "Your subscriptions",
+      "statusActive": "Active",
+      "statusPastDue": "Grace period",
+      "renewsOn": "Renews {date}",
+      "endsOn": "Ends {date}",
+      "daysLeft": "{count} days left",
+      "perkVocabulary": "Vocabulary & images",
+      "perkGrammar": "Grammar of every lesson",
+      "perkVideo": "Video lessons",
+      "perkLevelExam": "Level exams",
+      "perkRetakes": "{count} quiz retakes",
+      "perkRetakesUnlimited": "Unlimited quiz retakes",
+      "continueLearning": "Continue learning",
+      "managePlan": "Manage plan"
+    },
+    "recovered": {
+      "title": "Payment confirmed",
+      "description": "We checked with the gateway and activated the subscription you had already paid for."
+    }
   },
   "about": {
     "badge": "Our story",
@@ -1322,7 +1410,9 @@
       "answerAll": "Please answer all questions before submitting.",
       "invalidSubmission": "Invalid submission.",
       "forbidden": "You don't have permission to perform this action.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "retakeLimitReached": "You have used all your retakes for this quiz. Upgrade your plan for more.",
+      "levelExamLocked": "The level exam needs an active subscription. Choose a plan to unlock it."
     }
   },
   "validation": {

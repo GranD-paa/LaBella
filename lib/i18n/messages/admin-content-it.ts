@@ -46,6 +46,12 @@ export const adminContentIt = {
       description: "Domande a scelta multipla e a risposta aperta",
       features: "Scelta multipla · Domande scritte · Risposte e spiegazioni",
     },
+    levelExam: {
+      title: "Esame di livello",
+      description:
+        "L’esame completo per un intero livello CEFR. È a pagamento e dipende dal piano di abbonamento, a differenza dei quiz delle singole lezioni.",
+      features: "Copre tutto il livello · Richiede abbonamento · Mostrato nella pagina della lingua",
+    },
   },
   grammar: {
     formTitle: "Aggiungi contenuto grammaticale",

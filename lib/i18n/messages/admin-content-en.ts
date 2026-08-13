@@ -45,6 +45,12 @@ export const adminContentEn = {
       description: "Multiple-choice and written assessment questions",
       features: "Multiple choice · Written questions · Answers & explanations",
     },
+    levelExam: {
+      title: "Level exam",
+      description:
+        "The comprehensive exam for a whole CEFR level. Paid: it is gated on the subscription plan, unlike the per-lesson quizzes.",
+      features: "Covers the whole level · Subscription required · Shown on the language page",
+    },
   },
   grammar: {
     formTitle: "Add grammar content",

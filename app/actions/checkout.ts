@@ -4,8 +4,17 @@ import { headers } from "next/headers";
 
 import { requireAuthenticatedAction } from "@/lib/auth/action-guards";
 import { getAvailableProviders } from "@/lib/billing/providers";
+import { reconcilePayments, type ReconcileDeps } from "@/lib/billing/reconcile";
+import { isLocalDataMode } from "@/lib/config/data-source";
 import { getDataRepository } from "@/lib/data";
-import type { BillingCurrency, PaymentProviderSlug } from "@/types";
+import { failLocalPayment, settleLocalPayment } from "@/lib/data/local/repository";
+import { createServiceClient } from "@/lib/supabase/service-client";
+import { BILLING_PERIOD_MONTHS } from "@/types";
+import type {
+  BillingCurrency,
+  BillingPeriodMonths,
+  PaymentProviderSlug,
+} from "@/types";
 
 export type CheckoutResult =
   | { error: string }
@@ -24,9 +33,18 @@ export async function startCheckoutAction(input: {
   languageSlug: string;
   currency: BillingCurrency;
   provider: PaymentProviderSlug;
+  periodMonths?: BillingPeriodMonths;
 }): Promise<CheckoutResult> {
   const guard = await requireAuthenticatedAction();
   if (!guard.ok) return { error: guard.error };
+
+  // Narrowed here as well as in SQL: the period reaches the price calculation,
+  // so a value outside the sold set must not get that far.
+  const periodMonths = BILLING_PERIOD_MONTHS.includes(
+    input.periodMonths as BillingPeriodMonths
+  )
+    ? (input.periodMonths as BillingPeriodMonths)
+    : 1;
 
   const repo = getDataRepository();
   const settings = await repo.getPaymentSettings();
@@ -44,6 +62,7 @@ export async function startCheckoutAction(input: {
     languageSlug: input.languageSlug,
     provider: input.provider,
     currency: input.currency,
+    periodMonths,
   });
   if (created.error || !created.paymentId) {
     return { error: "actions.errors.checkoutFailed" };
@@ -72,7 +91,96 @@ export async function startCheckoutAction(input: {
     return { error: "actions.errors.checkoutFailed" };
   }
 
+  // Keep the gateway's handle on this attempt before the customer leaves. It is
+  // what lets us ask the gateway "did this actually get paid?" if they never
+  // make it back through the callback — for ZarinPal, which has no webhooks,
+  // that is the only recovery path there is.
+  if (checkout.providerPaymentId) {
+    await repo.attachCheckoutReference(payment.id, checkout.providerPaymentId);
+  }
+
   return { success: true, redirectUrl: checkout.redirectUrl };
+}
+
+/**
+ * Recovers the caller's own paid-but-not-activated payments, immediately.
+ *
+ * The nightly reconciliation job is the safety net, but "you paid, come back
+ * tomorrow" is not an acceptable experience — and on Vercel Hobby the cron
+ * cannot run more often than daily anyway. So opening the subscription page
+ * also triggers a check of just this learner's stuck payments, which turns the
+ * worst case from a day of waiting into a page load.
+ *
+ * Safe to call on every visit: it only ever looks at the caller's own pending
+ * rows, only those with a gateway reference to verify against, and settlement
+ * itself is idempotent.
+ */
+export async function recoverMyPendingPaymentsAction(): Promise<{
+  activated: number;
+}> {
+  const guard = await requireAuthenticatedAction();
+  if (!guard.ok) return { activated: 0 };
+
+  const repo = getDataRepository();
+  const pending = await repo.getMyPendingPayments();
+
+  // Skip very recent attempts: the customer may still be on the gateway's
+  // page, or the callback may be in flight. Verifying now would report a
+  // perfectly healthy payment as abandoned.
+  const cutoff = Date.now() - MIN_RECONCILE_AGE_MS;
+  const stale = pending.filter(
+    (payment) => new Date(payment.created_at).getTime() < cutoff
+  );
+  if (stale.length === 0) return { activated: 0 };
+
+  const outcomes = await reconcilePayments(stale, buildRecoveryDeps());
+  return {
+    activated: outcomes.filter((outcome) => outcome.status === "settled").length,
+  };
+}
+
+/** A payment younger than this is still plausibly mid-flight. */
+const MIN_RECONCILE_AGE_MS = 60_000;
+
+/**
+ * Settle/fail wired to the service role.
+ *
+ * `settle_payment` is not granted to `authenticated` on purpose — a learner
+ * must never be able to mark their own payment paid. The elevated client is
+ * confined to this helper, and only ever reached after the gateway has
+ * independently confirmed the money moved.
+ */
+function buildRecoveryDeps(): ReconcileDeps {
+  if (isLocalDataMode()) {
+    return {
+      async settle({ paymentId }) {
+        return settleLocalPayment(paymentId);
+      },
+      async fail(paymentId, reason) {
+        failLocalPayment(paymentId, reason);
+      },
+    };
+  }
+
+  const supabase = createServiceClient();
+  return {
+    async settle({ paymentId, providerPaymentId, providerRef }) {
+      const { data, error } = await supabase.rpc("settle_payment", {
+        p_payment_id: paymentId,
+        p_provider_payment_id: providerPaymentId,
+        p_provider_ref: providerRef ?? null,
+      });
+      return error
+        ? { error: error.message }
+        : { subscriptionId: data as string };
+    },
+    async fail(paymentId, reason) {
+      await supabase.rpc("fail_payment", {
+        p_payment_id: paymentId,
+        p_reason: reason,
+      });
+    },
+  };
 }
 
 /** Cancels a subscription at the end of the period the learner already paid for. */

@@ -1,4 +1,4 @@
-export type SubscriptionPlanId = "basic" | "pro" | "ultimate";
+export type SubscriptionPlanId = "basic" | "pro" | "ultimate" | "elite";
 
 /**
  * Static visual/structural metadata per plan — icon, highlight state, and
@@ -9,7 +9,7 @@ export type SubscriptionPlanMeta = {
   id: SubscriptionPlanId;
   highlighted: boolean;
   accentClass: string;
-  icon: "seedling" | "zap" | "crown";
+  icon: "seedling" | "zap" | "crown" | "gem";
 };
 
 export const SUBSCRIPTION_PLAN_META: Record<SubscriptionPlanId, SubscriptionPlanMeta> = {
@@ -30,6 +30,14 @@ export const SUBSCRIPTION_PLAN_META: Record<SubscriptionPlanId, SubscriptionPlan
     highlighted: false,
     accentClass: "from-amber-500/25 to-orange-500/10",
     icon: "crown",
+  },
+  // Reserved fourth slot. It is off in every language until an admin switches
+  // `subscription_plans.is_active` on, so it renders nowhere by default.
+  elite: {
+    id: "elite",
+    highlighted: false,
+    accentClass: "from-sky-500/25 to-indigo-500/10",
+    icon: "gem",
   },
 };
 

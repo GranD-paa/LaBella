@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { updateSubscriptionPlanAction } from "@/app/admin/actions/subscription";
+import { ToggleRow } from "@/components/admin/toggle-row";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,6 +57,9 @@ export function SubscriptionPlanEditDialog({ plan }: { plan: SubscriptionPlanRow
       title: plan.title,
       description: plan.description,
       features: plan.features,
+      isActive: plan.is_active,
+      quarterlyEnabled: plan.quarterly_enabled,
+      quarterlyDiscountPercent: plan.quarterly_discount_percent,
     },
   });
 
@@ -92,6 +96,9 @@ export function SubscriptionPlanEditDialog({ plan }: { plan: SubscriptionPlanRow
             title: plan.title,
             description: plan.description,
             features: plan.features,
+            isActive: plan.is_active,
+            quarterlyEnabled: plan.quarterly_enabled,
+            quarterlyDiscountPercent: plan.quarterly_discount_percent,
           });
         }
       }}
@@ -152,6 +159,71 @@ export function SubscriptionPlanEditDialog({ plan }: { plan: SubscriptionPlanRow
                         onChange={(event) => field.onChange(event.target.valueAsNumber)}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="space-y-3 rounded-xl border border-white/10 bg-muted/10 p-4">
+              <ToggleRow
+                emphasis
+                label={t("admin.subscription.onSaleLabel")}
+                hint={t("admin.subscription.onSaleHint")}
+                checked={form.watch("isActive")}
+                disabled={isPending}
+                onChange={(next) =>
+                  form.setValue("isActive", next, { shouldDirty: true })
+                }
+              />
+
+              <ToggleRow
+                label={t("admin.subscription.quarterlyEnabledLabel")}
+                hint={t("admin.subscription.quarterlyEnabledHint")}
+                checked={form.watch("quarterlyEnabled")}
+                disabled={isPending}
+                onChange={(next) =>
+                  form.setValue("quarterlyEnabled", next, { shouldDirty: true })
+                }
+              />
+
+              <FormField
+                control={form.control}
+                name="quarterlyDiscountPercent"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {t("admin.subscription.quarterlyDiscountLabel")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="1"
+                        min={0}
+                        max={95}
+                        className="max-w-32"
+                        disabled={isPending || !form.watch("quarterlyEnabled")}
+                        {...field}
+                        onChange={(event) =>
+                          field.onChange(event.target.valueAsNumber)
+                        }
+                      />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      {t("admin.subscription.quarterlyDiscountHint", {
+                        price: (
+                          plan.price_eur *
+                          3 *
+                          (1 -
+                            Math.min(
+                              95,
+                              (form.watch("discountPercent") || 0) +
+                                (form.watch("quarterlyDiscountPercent") || 0)
+                            ) /
+                              100)
+                        ).toFixed(2),
+                      })}
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}

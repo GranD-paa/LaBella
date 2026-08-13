@@ -1,6 +1,6 @@
 "use client";
 
-import { Percent, Tag } from "lucide-react";
+import { CalendarRange, EyeOff, Percent, Tag } from "lucide-react";
 
 import { SubscriptionPlanEditDialog } from "@/components/admin/subscription/subscription-plan-edit-dialog";
 import { useTranslations } from "@/components/providers/locale-provider";
@@ -54,6 +54,27 @@ export function SubscriptionPlanList({ plans }: { plans: SubscriptionPlanRow[] }
                       {t("admin.subscription.discountBadge", {
                         percent: plan.discount_percent,
                       })}
+                    </Badge>
+                  ) : null}
+                  {/*
+                    Called out prominently: a plan being off sale is the single
+                    most consequential thing about this row, and it is the only
+                    reason the reserved fourth slot is invisible to learners.
+                  */}
+                  {plan.is_active ? null : (
+                    <Badge className="gap-1 border-white/20 bg-white/10 text-muted-foreground">
+                      <EyeOff className="h-3 w-3" />
+                      {t("admin.subscription.notOnSaleBadge")}
+                    </Badge>
+                  )}
+                  {plan.is_active && plan.quarterly_enabled ? (
+                    <Badge className="gap-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
+                      <CalendarRange className="h-3 w-3" />
+                      {plan.quarterly_discount_percent > 0
+                        ? t("admin.subscription.quarterlyBadgeWithDiscount", {
+                            percent: plan.quarterly_discount_percent,
+                          })
+                        : t("admin.subscription.quarterlyBadge")}
                     </Badge>
                   ) : null}
                 </div>

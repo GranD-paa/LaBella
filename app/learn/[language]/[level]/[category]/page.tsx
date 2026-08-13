@@ -6,6 +6,11 @@ import { getLanguageWithAvailability } from "@/lib/curriculum/availability";
 import { getLevel, isCategorySlug } from "@/lib/curriculum/languages";
 import { resolveLessonForLevel } from "@/lib/curriculum/resolve-lesson";
 import { getDataRepository } from "@/lib/data";
+import {
+  cheapestTierUnlocking,
+  gateForCategory,
+  resolveEntitlement,
+} from "@/lib/entitlements";
 import { findPublishedQuizzesForLevel } from "@/lib/quiz-management/helpers";
 import { getServerTranslator } from "@/lib/i18n/server-locale";
 
@@ -69,11 +74,37 @@ export default async function CategoryPage({ params }: PageProps) {
   let levelQuizzes: import("@/types").Quiz[] = [];
   let quizAttempts: import("@/types").UserQuizAttempt[] = [];
 
-  const [lessons, allQuizzes, allQuestions] = await Promise.all([
-    repo.getLessons(),
-    repo.getQuizzes(),
-    repo.getAllQuizQuestions(),
-  ]);
+  const [lessons, allQuizzes, allQuestions, settings, tiers, subscription, plans] =
+    await Promise.all([
+      repo.getLessons(),
+      repo.getQuizzes(),
+      repo.getAllQuizQuestions(),
+      repo.getPaymentSettings(),
+      repo.getSubscriptionTiers(),
+      user ? repo.getEntitlingSubscription(user.id, language.slug) : null,
+      repo.getSubscriptionPlans(),
+    ]);
+
+  /** The admin-authored name of a plan, in this learning language's row. */
+  const planTitleFor = (planSlug: string | null | undefined) =>
+    plans.find(
+      (plan) =>
+        plan.plan_slug === planSlug && plan.language_slug === language.slug
+    )?.title ?? null;
+
+  // What this learner may see here. With `enforce_entitlements` off — its
+  // default — every gate resolves open and the page behaves exactly as it did
+  // before entitlements existed.
+  const entitlement = resolveEntitlement({
+    settings,
+    tiers,
+    subscription,
+    levelSlug: level.slug,
+  });
+
+  const gate = gateForCategory(category);
+  const categoryLocked = gate ? !entitlement.unlocks[gate] : false;
+  const requiredTier = gate ? cheapestTierUnlocking(tiers, gate) : null;
 
   const questionCountByQuiz = allQuestions.reduce<Record<string, number>>(
     (counts, question) => {
@@ -96,11 +127,18 @@ export default async function CategoryPage({ params }: PageProps) {
     quizAttempts = attempts.filter((attempt) => quizIds.has(attempt.quiz_id));
   }
 
+  // Locked content is not fetched at all rather than fetched and hidden: a
+  // paid grammar rule must not travel to the browser inside the RSC payload
+  // where anyone can read it out of the network tab.
   if (lesson) {
     const [vocabularyData, grammarData, videoData] = await Promise.all([
-      repo.getVocabularyByLessonId(lesson.id),
-      repo.getGrammarRulesByLessonId(lesson.id),
-      repo.getVideoLessonsByLessonId(lesson.id),
+      entitlement.unlocks.vocabulary
+        ? repo.getVocabularyByLessonId(lesson.id)
+        : [],
+      entitlement.unlocks.grammar
+        ? repo.getGrammarRulesByLessonId(lesson.id)
+        : [],
+      entitlement.unlocks.video ? repo.getVideoLessonsByLessonId(lesson.id) : [],
     ]);
 
     vocabulary = vocabularyData.filter((item) => item.status === "published");
@@ -119,6 +157,8 @@ export default async function CategoryPage({ params }: PageProps) {
       videoLessons={videoLessons}
       quizzes={levelQuizzes}
       quizAttempts={quizAttempts}
+      locked={categoryLocked}
+      requiredPlanTitle={planTitleFor(requiredTier?.plan_slug)}
     />
   );
 }

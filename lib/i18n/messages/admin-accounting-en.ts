@@ -127,7 +127,8 @@ export const adminAccountingEn = {
     fxMargin: "Margin (%)",
     fxMarginHint: "Added on top of the market rate to cover spread and gateway fees.",
     irrRounding: "Round Rial prices to",
-    irrRoundingHint: "Prices are rounded up to a multiple of this, so they end in zeros.",
+    irrRoundingHint:
+      "Prices are rounded up to a multiple of this. Set it to 1 for no rounding — the price is then exactly what the exchange rate works out to.",
     fxManualRate: "Manual rate (Rial per €1)",
     fxMaxDeviation: "Reject rate moves over (%)",
     fxMaxDeviationHint:

@@ -164,4 +164,18 @@ export const zarinpalProvider: PaymentProvider = {
       };
     }
   },
+
+  /**
+   * ZarinPal has no webhooks at all, so reconciling from the stored authority
+   * is the *only* way a customer who closed the tab mid-payment ever gets
+   * their subscription.
+   *
+   * `Status: "OK"` here is not an assumption that the payment succeeded — it
+   * only satisfies the local guard in `verify`. The verify call itself is what
+   * decides: ZarinPal answers 100/101 only when money actually moved, and an
+   * error code otherwise.
+   */
+  verifyParamsFromReference(reference) {
+    return reference ? { Authority: reference, Status: "OK" } : null;
+  },
 };

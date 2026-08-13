@@ -10,6 +10,10 @@
     {
       "path": "/api/cron/subscription-sweep",
       "schedule": "15 2 * * *"
+    },
+    {
+      "path": "/api/cron/reconcile-payments",
+      "schedule": "45 3 * * *"
     }
   ],
   "headers": [

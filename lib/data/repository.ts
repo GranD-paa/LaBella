@@ -2,6 +2,7 @@ import type {
   AccountingSnapshot,
   Banner,
   BillingCurrency,
+  BillingPeriodMonths,
   FxRate,
   GrammarRule,
   Lesson,
@@ -16,6 +17,7 @@ import type {
   SubscriptionEvent,
   SubscriptionPageContentRow,
   SubscriptionPlanRow,
+  SubscriptionTier,
   UserLearningState,
   UserQuizAttempt,
   VideoLesson,
@@ -140,12 +142,25 @@ export interface DataRepository {
     quizId: string
   ): Promise<UserQuizAttempt | null>;
   getAllAttempts(): Promise<UserQuizAttempt[]>;
+  /**
+   * Records one attempt at a quiz.
+   *
+   * The retake allowance is a paid entitlement, so it is enforced by the
+   * database rather than here — see `record_quiz_attempt`. A learner who has
+   * run out of retakes gets `code: 403` back.
+   */
   createQuizAttempt(input: {
     userId: string;
     quizId: string;
     score: number;
     answersJson: Json;
-  }): Promise<{ error?: string; code?: number }>;
+  }): Promise<{
+    error?: string;
+    code?: number;
+    attemptNumber?: number;
+    /** Retakes allowed past the first attempt; `null` means unlimited. */
+    retakeLimit?: number | null;
+  }>;
 
   // Admin content mutations
   createLesson(input: {
@@ -256,6 +271,25 @@ export interface DataRepository {
       title: LocalizedText;
       description: LocalizedText;
       features: LocalizedText[];
+      /** Whether this tier is sold for this language at all. */
+      isActive: boolean;
+      quarterlyEnabled: boolean;
+      quarterlyDiscountPercent: number;
+    }>
+  ): Promise<{ error?: string }>;
+
+  /** What each tier unlocks. Global per tier, not per language. */
+  getSubscriptionTiers(): Promise<SubscriptionTier[]>;
+  updateSubscriptionTier(
+    planSlug: string,
+    input: Partial<{
+      tierRank: number;
+      unlocksVocabulary: boolean;
+      unlocksGrammar: boolean;
+      unlocksVideo: boolean;
+      unlocksLevelExam: boolean;
+      /** `null` means unlimited retakes. */
+      quizRetakeLimit: number | null;
     }>
   ): Promise<{ error?: string }>;
   getSubscriptionPageContent(): Promise<SubscriptionPageContentRow>;
@@ -285,6 +319,12 @@ export interface DataRepository {
       zarinpalEnabled: boolean;
       manualEnabled: boolean;
       gracePeriodDays: number;
+      /** Master switch for content gating. */
+      enforceEntitlements: boolean;
+      /** CEFR bands that are free for everyone, e.g. `["A1"]`. */
+      freeCefrBands: string[];
+      freeQuizRetakeLimit: number;
+      pendingPaymentTimeoutMinutes: number;
     }>
   ): Promise<{ error?: string }>;
 
@@ -321,9 +361,31 @@ export interface DataRepository {
     languageSlug: string;
     provider: PaymentProviderSlug;
     currency: BillingCurrency;
+    /** 1 or 3. Anything else is rejected server-side. */
+    periodMonths?: BillingPeriodMonths;
   }): Promise<{ paymentId?: string; error?: string }>;
   getPaymentById(paymentId: string): Promise<Payment | null>;
   getPaymentsForUser(userId: string): Promise<Payment[]>;
+
+  /**
+   * The caller's own payments still sitting at `pending`.
+   *
+   * Lets the subscription page recover a payment whose browser callback never
+   * landed, without waiting for the nightly reconciliation job.
+   */
+  getMyPendingPayments(): Promise<Payment[]>;
+
+  /**
+   * Records the gateway's handle on a checkout attempt (ZarinPal authority,
+   * Stripe session id) so an abandoned payment can be verified later.
+   *
+   * Best-effort: a failure here must not break the handoff the customer is in
+   * the middle of.
+   */
+  attachCheckoutReference(
+    paymentId: string,
+    reference: string
+  ): Promise<{ error?: string }>;
 
   /** Audit timeline for one subscription. */
   getSubscriptionEvents(subscriptionId: string): Promise<SubscriptionEvent[]>;

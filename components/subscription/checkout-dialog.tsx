@@ -16,7 +16,11 @@ import {
 } from "@/components/ui/dialog";
 import { formatEurCents, formatRialAsToman } from "@/lib/billing/format";
 import { resolveMessage } from "@/lib/i18n/resolve-message";
-import type { BillingCurrency, PaymentProviderSlug } from "@/types";
+import type {
+  BillingCurrency,
+  BillingPeriodMonths,
+  PaymentProviderSlug,
+} from "@/types";
 
 const PROVIDER_ICONS: Record<PaymentProviderSlug, typeof CreditCard> = {
   stripe: CreditCard,
@@ -37,6 +41,7 @@ export function CheckoutDialog({
   planName,
   languageSlug,
   currency,
+  periodMonths = 1,
   amountEurCents,
   amountRial,
   providers,
@@ -47,6 +52,7 @@ export function CheckoutDialog({
   planName: string;
   languageSlug: string;
   currency: BillingCurrency;
+  periodMonths?: BillingPeriodMonths;
   amountEurCents: number;
   amountRial: number | null;
   providers: PaymentProviderSlug[];
@@ -64,6 +70,7 @@ export function CheckoutDialog({
         languageSlug,
         currency,
         provider,
+        periodMonths,
       });
 
       if ("error" in result) {

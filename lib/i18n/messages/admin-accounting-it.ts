@@ -131,7 +131,7 @@ export const adminAccountingIt = {
       "Aggiunto al tasso di mercato per coprire lo spread e le commissioni del gateway.",
     irrRounding: "Arrotonda i prezzi in Rial a",
     irrRoundingHint:
-      "I prezzi vengono arrotondati per eccesso a un multiplo di questo, così finiscono con degli zeri.",
+      "I prezzi vengono arrotondati per eccesso a un multiplo di questo. Imposta 1 per non arrotondare: il prezzo è esattamente quello che risulta dal tasso di cambio.",
     fxManualRate: "Tasso manuale (Rial per €1)",
     fxMaxDeviation: "Rifiuta variazioni oltre (%)",
     fxMaxDeviationHint:

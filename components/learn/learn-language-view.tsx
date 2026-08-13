@@ -5,6 +5,10 @@ import { FlagIcon } from "@/components/menu/flag-icon";
 import { ArrowLeft } from "lucide-react";
 
 import {
+  BandExamsSection,
+  type BandExamCard,
+} from "@/components/learn/band-exams-section";
+import {
   ComingSoonLanguage,
   CourseLevelAccordion,
 } from "@/components/learn/course-level-accordion";
@@ -12,8 +16,19 @@ import { useTranslations } from "@/components/providers/locale-provider";
 import { Button } from "@/components/ui/button";
 import { CURRICULUM_MESSAGE_KEYS } from "@/lib/i18n/content-keys";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
+import type { LocalizedText, UserQuizAttempt } from "@/types";
 
-export function LearnLanguageView({ language }: { language: CurriculumLanguage }) {
+export function LearnLanguageView({
+  language,
+  bandExams = [],
+  examAttempts = [],
+  requiredPlanTitle = null,
+}: {
+  language: CurriculumLanguage;
+  bandExams?: BandExamCard[];
+  examAttempts?: UserQuizAttempt[];
+  requiredPlanTitle?: LocalizedText | null;
+}) {
   const { t } = useTranslations();
   const contentKey = CURRICULUM_MESSAGE_KEYS[language.slug];
   const headline = contentKey ? t(`${contentKey}.headline`) : language.headline;
@@ -52,6 +67,17 @@ export function LearnLanguageView({ language }: { language: CurriculumLanguage }
             </div>
             <CourseLevelAccordion language={language} />
           </section>
+
+          {/*
+            After the levels, not before: a learner works through the band and
+            then sits its exam, and the page should read in that order.
+          */}
+          <BandExamsSection
+            exams={bandExams}
+            attempts={examAttempts}
+            requiredPlanTitle={requiredPlanTitle}
+            languageSlug={language.slug}
+          />
         </>
       ) : (
         <ComingSoonLanguage language={language} />

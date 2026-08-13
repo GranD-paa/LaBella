@@ -1,7 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import type { DataRepository } from "@/lib/data/repository";
 import { buildAccountingSnapshot } from "@/lib/billing/accounting";
-import { DEFAULT_PAYMENT_SETTINGS } from "@/lib/billing/defaults";
+import {
+  DEFAULT_PAYMENT_SETTINGS,
+  DEFAULT_SUBSCRIPTION_TIERS,
+} from "@/lib/billing/defaults";
 import { matchesImageSignature } from "@/lib/data/image-signature";
 import { deriveQuizMetadataFromLesson } from "@/lib/quiz-management/helpers";
 import {
@@ -9,7 +12,12 @@ import {
   DEFAULT_SUBSCRIPTION_PLANS,
 } from "@/lib/subscription/default-content";
 import type { Database } from "@/types/database.types";
-import type { LocalizedText, SubscriptionPageContentRow, SubscriptionPlanRow } from "@/types";
+import type {
+  LocalizedText,
+  Payment,
+  SubscriptionPageContentRow,
+  SubscriptionPlanRow,
+} from "@/types";
 
 export function createSupabaseRepository(): DataRepository {
   return {
@@ -432,26 +440,40 @@ export function createSupabaseRepository(): DataRepository {
       return data ?? [];
     },
 
-    async createQuizAttempt({ userId, quizId, score, answersJson }) {
+    async createQuizAttempt({ quizId, score, answersJson }) {
       const supabase = await createClient();
-      const { error } = await supabase.from("user_quiz_attempts").insert({
-        user_id: userId,
-        quiz_id: quizId,
-        score,
-        answers_json: answersJson,
+
+      // Routed through the RPC rather than a direct insert because the retake
+      // allowance is a paid entitlement: counting attempts client-side and
+      // trusting the count would hand out retakes for free. The function reads
+      // the caller from auth.uid(), so userId is not passed.
+      const { data, error } = await supabase.rpc("record_quiz_attempt", {
+        p_quiz_id: quizId,
+        p_score: score,
+        p_answers: answersJson,
       });
 
-      if (error) {
-        if (error.code === "23505") {
-          return {
-            error: "You have already attempted this quiz.",
-            code: 409,
-          };
-        }
-        return { error: error.message };
+      if (error) return { error: error.message };
+
+      const result = data as {
+        ok: boolean;
+        reason?: string;
+        attempt_number?: number;
+        retake_limit?: number | null;
+      } | null;
+
+      if (!result?.ok) {
+        return {
+          error: "You have no retakes left for this quiz.",
+          code: 403,
+          retakeLimit: result?.retake_limit ?? 0,
+        };
       }
 
-      return {};
+      return {
+        attemptNumber: result.attempt_number,
+        retakeLimit: result.retake_limit ?? null,
+      };
     },
 
     async createLesson({ title, description, orderNumber }) {
@@ -812,6 +834,11 @@ export function createSupabaseRepository(): DataRepository {
       if (input.title !== undefined) update.title = input.title;
       if (input.description !== undefined) update.description = input.description;
       if (input.features !== undefined) update.features = input.features;
+      if (input.isActive !== undefined) update.is_active = input.isActive;
+      if (input.quarterlyEnabled !== undefined)
+        update.quarterly_enabled = input.quarterlyEnabled;
+      if (input.quarterlyDiscountPercent !== undefined)
+        update.quarterly_discount_percent = input.quarterlyDiscountPercent;
       update.updated_at = new Date().toISOString();
 
       const { error } = await supabase
@@ -819,6 +846,40 @@ export function createSupabaseRepository(): DataRepository {
         .update(update)
         .eq("plan_slug", planSlug)
         .eq("language_slug", languageSlug);
+      return error ? { error: error.message } : {};
+    },
+
+    async getSubscriptionTiers() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("subscription_tiers")
+        .select("*")
+        .order("tier_rank");
+
+      // Falling back keeps the storefront and the learn routes working if the
+      // entitlement migration has not been applied yet.
+      return data && data.length > 0 ? data : DEFAULT_SUBSCRIPTION_TIERS;
+    },
+
+    async updateSubscriptionTier(planSlug, input) {
+      const supabase = await createClient();
+      const update: Database["public"]["Tables"]["subscription_tiers"]["Update"] = {};
+      if (input.tierRank !== undefined) update.tier_rank = input.tierRank;
+      if (input.unlocksVocabulary !== undefined)
+        update.unlocks_vocabulary = input.unlocksVocabulary;
+      if (input.unlocksGrammar !== undefined)
+        update.unlocks_grammar = input.unlocksGrammar;
+      if (input.unlocksVideo !== undefined) update.unlocks_video = input.unlocksVideo;
+      if (input.unlocksLevelExam !== undefined)
+        update.unlocks_level_exam = input.unlocksLevelExam;
+      if (input.quizRetakeLimit !== undefined)
+        update.quiz_retake_limit = input.quizRetakeLimit;
+      update.updated_at = new Date().toISOString();
+
+      const { error } = await supabase
+        .from("subscription_tiers")
+        .update(update)
+        .eq("plan_slug", planSlug);
       return error ? { error: error.message } : {};
     },
 
@@ -889,6 +950,18 @@ export function createSupabaseRepository(): DataRepository {
       if (input.manualEnabled !== undefined) update.manual_enabled = input.manualEnabled;
       if (input.gracePeriodDays !== undefined)
         update.grace_period_days = input.gracePeriodDays;
+      if (input.enforceEntitlements !== undefined)
+        update.enforce_entitlements = input.enforceEntitlements;
+      if (input.freeCefrBands !== undefined)
+        // Normalised on the way in so the band comparison never has to worry
+        // about "a1" versus "A1".
+        update.free_cefr_bands = input.freeCefrBands.map((band) =>
+          band.trim().toUpperCase()
+        );
+      if (input.freeQuizRetakeLimit !== undefined)
+        update.free_quiz_retake_limit = input.freeQuizRetakeLimit;
+      if (input.pendingPaymentTimeoutMinutes !== undefined)
+        update.pending_payment_timeout_minutes = input.pendingPaymentTimeoutMinutes;
       update.updated_at = new Date().toISOString();
 
       const { error } = await supabase
@@ -972,9 +1045,25 @@ export function createSupabaseRepository(): DataRepository {
         p_language_slug: input.languageSlug,
         p_provider: input.provider,
         p_currency: input.currency,
+        p_period_months: input.periodMonths ?? 1,
       });
       if (error) return { error: error.message };
       return { paymentId: data as string };
+    },
+
+    async getMyPendingPayments() {
+      const supabase = await createClient();
+      const { data } = await supabase.rpc("list_my_pending_payments");
+      return (data as Payment[] | null) ?? [];
+    },
+
+    async attachCheckoutReference(paymentId, reference) {
+      const supabase = await createClient();
+      const { error } = await supabase.rpc("attach_checkout_reference", {
+        p_payment_id: paymentId,
+        p_reference: reference,
+      });
+      return error ? { error: error.message } : {};
     },
 
     async getPaymentById(paymentId) {

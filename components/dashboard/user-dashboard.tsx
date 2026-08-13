@@ -14,14 +14,20 @@ import { DashboardWelcomeHeader } from "@/components/dashboard/dashboard-welcome
 import { QuizSubmittedBanner } from "@/components/dashboard/quiz-submitted-banner";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { useTranslations } from "@/components/providers/locale-provider";
+import {
+  MySubscriptionsCard,
+  type MySubscriptionEntry,
+} from "@/components/subscription/my-subscriptions-card";
 import type { UserDashboardData } from "@/lib/dashboard-data";
 
 export function UserDashboard({
   data,
   displayName,
+  subscriptions = [],
 }: {
   data: UserDashboardData;
   displayName: string;
+  subscriptions?: MySubscriptionEntry[];
 }) {
   const { t } = useTranslations();
   const earnedCount = data.achievements.filter((a) => a.earned).length;
@@ -38,6 +44,12 @@ export function UserDashboard({
         snapshot={data.continueLearning}
         engagement={data.engagement}
       />
+
+      {/*
+        Above the stats: what the learner paid for should be one of the first
+        things they see, not something they have to hunt for.
+      */}
+      <MySubscriptionsCard entries={subscriptions} />
 
       <ContinueLearningCard snapshot={data.continueLearning} />
 

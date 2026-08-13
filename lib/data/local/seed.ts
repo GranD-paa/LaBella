@@ -13,6 +13,7 @@ import type {
   SubscriptionEvent,
   SubscriptionPageContentRow,
   SubscriptionPlanRow,
+  SubscriptionTier,
   UserLearningState,
   UserQuizAttempt,
   VideoLesson,
@@ -21,7 +22,10 @@ import type {
 
 import type { LocalAuthUser } from "@/lib/data/repository";
 import type { CurriculumLevelOverrideRow } from "@/lib/curriculum/level-overrides";
-import { DEFAULT_PAYMENT_SETTINGS } from "@/lib/billing/defaults";
+import {
+  DEFAULT_PAYMENT_SETTINGS,
+  DEFAULT_SUBSCRIPTION_TIERS,
+} from "@/lib/billing/defaults";
 import {
   DEFAULT_SUBSCRIPTION_PAGE_CONTENT,
   DEFAULT_SUBSCRIPTION_PLANS,
@@ -49,6 +53,9 @@ export type LocalDatabase = {
   banners: Banner[];
   // Super-admin editable pricing/discount/copy for each subscription tier.
   subscriptionPlans: SubscriptionPlanRow[];
+  // What each tier unlocks. Keyed by tier alone, so capabilities cannot
+  // diverge between languages.
+  subscriptionTiers: SubscriptionTier[];
   subscriptionPageContent: SubscriptionPageContentRow;
   // Billing & accounting. Mirrors the Supabase tables so the admin dashboard
   // and checkout flow are fully exercisable without a live gateway.
@@ -361,6 +368,7 @@ export const LOCAL_SEED: LocalDatabase = {
   curriculumLevelOverrides: [],
   banners: [],
   subscriptionPlans: DEFAULT_SUBSCRIPTION_PLANS.map((plan) => ({ ...plan })),
+  subscriptionTiers: DEFAULT_SUBSCRIPTION_TIERS.map((tier) => ({ ...tier })),
   subscriptionPageContent: { ...DEFAULT_SUBSCRIPTION_PAGE_CONTENT },
   paymentSettings: {
     ...DEFAULT_PAYMENT_SETTINGS,

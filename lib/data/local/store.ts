@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { LOCAL_SEED, type LocalDatabase } from "@/lib/data/local/seed";
+import { DEFAULT_PAYMENT_SETTINGS } from "@/lib/billing/defaults";
 import {
   DEFAULT_SUBSCRIPTION_PAGE_CONTENT,
   DEFAULT_SUBSCRIPTION_PLANS,
@@ -63,6 +64,36 @@ function backfillMissingCollections(parsed: LocalDatabase): void {
   }
 }
 
+/**
+ * Fills in columns added to existing row shapes by later migrations.
+ *
+ * `backfillMissingCollections` only notices whole collections that are absent;
+ * it cannot see that the plan rows inside an already-present array predate a
+ * new column. Left unhandled, a dev store written before the entitlement
+ * migration would read `is_active` as `undefined` and every plan would quietly
+ * become unbuyable.
+ */
+function backfillNewRowFields(parsed: LocalDatabase): void {
+  for (const plan of parsed.subscriptionPlans) {
+    plan.is_active ??= true;
+    plan.quarterly_enabled ??= true;
+    plan.quarterly_discount_percent ??= 0;
+  }
+
+  for (const attempt of parsed.userQuizAttempts) {
+    // Every pre-existing attempt is somebody's first.
+    attempt.attempt_number ??= 1;
+  }
+
+  const settings = parsed.paymentSettings;
+  settings.enforce_entitlements ??= DEFAULT_PAYMENT_SETTINGS.enforce_entitlements;
+  settings.free_cefr_bands ??= [...DEFAULT_PAYMENT_SETTINGS.free_cefr_bands];
+  settings.free_quiz_retake_limit ??=
+    DEFAULT_PAYMENT_SETTINGS.free_quiz_retake_limit;
+  settings.pending_payment_timeout_minutes ??=
+    DEFAULT_PAYMENT_SETTINGS.pending_payment_timeout_minutes;
+}
+
 function loadPersistedStore(): LocalDatabase | null {
   try {
     if (!fs.existsSync(DATA_FILE)) {
@@ -92,6 +123,8 @@ function loadPersistedStore(): LocalDatabase | null {
     if (!parsed.subscriptionPageContent || typeof parsed.subscriptionPageContent !== "object") {
       parsed.subscriptionPageContent = { ...DEFAULT_SUBSCRIPTION_PAGE_CONTENT };
     }
+
+    backfillNewRowFields(parsed);
 
     return parsed;
   } catch {

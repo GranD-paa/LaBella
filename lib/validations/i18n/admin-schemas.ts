@@ -198,7 +198,14 @@ export function createStructuredQuizSchema(t: Translator) {
       .max(150, t("validation.admin.titleMax")),
     languageSlug: z.enum(["italian", "english", "german", "turkish"]),
     levelSlug: z.string().min(1, t("validation.admin.selectLevel")),
-    sectionSlug: z.enum(["grammar", "vocabulary", "visual", "quiz", "custom"]),
+    sectionSlug: z.enum([
+      "grammar",
+      "vocabulary",
+      "visual",
+      "quiz",
+      "level-exam",
+      "custom",
+    ]),
     status: z.enum(["draft", "published"]),
     questions: z
       .array(quizQuestionSchema)

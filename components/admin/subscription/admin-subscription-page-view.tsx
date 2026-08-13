@@ -5,20 +5,30 @@ import Link from "next/link";
 import { ArrowLeft, CreditCard } from "lucide-react";
 
 import { FlagIcon } from "@/components/menu/flag-icon";
+import { EntitlementSettingsPanel } from "@/components/admin/subscription/entitlement-settings-panel";
 import { SubscriptionPlanList } from "@/components/admin/subscription/subscription-plan-list";
+import { TierCapabilitiesPanel } from "@/components/admin/subscription/tier-capabilities-panel";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LANGUAGES } from "@/lib/curriculum/languages";
 import { cn } from "@/lib/utils";
-import type { SubscriptionPlanRow } from "@/types";
+import type {
+  PaymentSettings,
+  SubscriptionPlanRow,
+  SubscriptionTier,
+} from "@/types";
 
 export function AdminSubscriptionPageView({
   displayName,
   plans,
+  tiers,
+  settings,
 }: {
   displayName: string;
   plans: SubscriptionPlanRow[];
+  tiers: SubscriptionTier[];
+  settings: PaymentSettings;
 }) {
   const { t } = useTranslations();
   const [selectedSlug, setSelectedSlug] = useState(LANGUAGES[0].slug);
@@ -83,6 +93,15 @@ export function AdminSubscriptionPageView({
       </div>
 
       <SubscriptionPlanList plans={plansForLanguage} />
+
+      {/*
+        Capabilities and the master gate come after the per-language pricing
+        because they are global: an admin arriving to change one language's
+        price should not have to scroll past platform-wide switches to reach it.
+      */}
+      <TierCapabilitiesPanel tiers={tiers} plans={plans} />
+
+      <EntitlementSettingsPanel settings={settings} />
     </div>
   );
 }

@@ -3,7 +3,26 @@ import type { SubscriptionPageContentRow, SubscriptionPlanRow } from "@/types";
 
 const LANGUAGE_SLUGS: LanguageSlug[] = ["italian", "english", "german", "turkish"];
 
-type PlanTemplate = Omit<SubscriptionPlanRow, "plan_slug" | "language_slug" | "updated_at">;
+/**
+ * The sale switch and the quarterly settings are optional here and defaulted
+ * below, so a template only spells them out when it wants something other
+ * than "on sale, quarterly allowed, no extra quarterly discount".
+ */
+type PlanTemplate = Omit<
+  SubscriptionPlanRow,
+  | "plan_slug"
+  | "language_slug"
+  | "updated_at"
+  | "is_active"
+  | "quarterly_enabled"
+  | "quarterly_discount_percent"
+> &
+  Partial<
+    Pick<
+      SubscriptionPlanRow,
+      "is_active" | "quarterly_enabled" | "quarterly_discount_percent"
+    >
+  >;
 
 /**
  * Base plan copy shared across languages as a starting point — mirrors the
@@ -11,7 +30,10 @@ type PlanTemplate = Omit<SubscriptionPlanRow, "plan_slug" | "language_slug" | "u
  * its own row (admins customize price/discount/copy per language from
  * there), so this template is expanded into one row per language below.
  */
-const PLAN_TEMPLATES: Record<"basic" | "pro" | "ultimate", PlanTemplate> = {
+const PLAN_TEMPLATES: Record<
+  "basic" | "pro" | "ultimate" | "elite",
+  PlanTemplate
+> = {
   basic: {
     price_eur: 2.99,
     discount_percent: 0,
@@ -121,6 +143,32 @@ const PLAN_TEMPLATES: Record<"basic" | "pro" | "ultimate", PlanTemplate> = {
     ],
     order_number: 3,
   },
+  /**
+   * Reserved fourth slot, held back for a future release.
+   *
+   * `is_active: false` is what keeps it out of the storefront, and
+   * `create_pending_payment` refuses it too, so the row being present here is
+   * harmless until an admin switches it on per language.
+   */
+  elite: {
+    price_eur: 7.99,
+    discount_percent: 0,
+    title: { fa: "الیت", en: "Elite", it: "Elite" },
+    description: {
+      fa: "طرح ویژه‌ای که به‌زودی معرفی می‌شود.",
+      en: "A premium plan launching soon.",
+      it: "Un piano premium in arrivo.",
+    },
+    features: [
+      {
+        fa: "همه امکانات اولتیمیت",
+        en: "Everything in Ultimate",
+        it: "Tutto quello incluso in Ultimate",
+      },
+    ],
+    order_number: 4,
+    is_active: false,
+  },
 };
 
 /**
@@ -138,6 +186,11 @@ export const DEFAULT_SUBSCRIPTION_PLANS: SubscriptionPlanRow[] = (
     ...template,
     plan_slug: planSlug,
     language_slug: languageSlug,
+    is_active: template.is_active ?? true,
+    quarterly_enabled: template.quarterly_enabled ?? true,
+    // Left at zero deliberately: what a three-month commitment is worth is a
+    // pricing decision for the admin, not something to default silently.
+    quarterly_discount_percent: template.quarterly_discount_percent ?? 0,
     updated_at: new Date(0).toISOString(),
   }))
 );

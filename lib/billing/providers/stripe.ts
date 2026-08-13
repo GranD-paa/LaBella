@@ -149,6 +149,16 @@ export const stripeProvider: PaymentProvider = {
       };
     }
   },
+
+  /**
+   * The stored reference is the Checkout Session id, which is exactly what
+   * `verify` retrieves. Reconciliation is a backstop here rather than the main
+   * path — the webhook already covers the closed-tab case — but it also
+   * catches the window where webhook delivery itself failed.
+   */
+  verifyParamsFromReference(reference) {
+    return reference ? { session_id: reference } : null;
+  },
 };
 
 export type StripeWebhookEvent = {

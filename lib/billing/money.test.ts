@@ -8,6 +8,8 @@ import {
   eurToCents,
   isRateAcceptable,
   parseRateString,
+  resolvePlanDiscountPercent,
+  resolvePlanPeriodPrice,
   rialToToman,
 } from "./money";
 
@@ -140,6 +142,38 @@ describe("convertEurCentsToRial", () => {
     expect(convertEurCentsToRial({ eurCents: 0, rialPerEur })).toBe(0);
   });
 
+  it("charges the exact converted amount when rounding is switched off", () => {
+    // roundToRial: 1 is how an admin asks for an exact price. The result is
+    // still a whole number, because Rial is the smallest unit the gateways
+    // accept — but it is not nudged up to a tidy figure.
+    const charged = convertEurCentsToRial({
+      eurCents: 499,
+      rialPerEur,
+      roundToRial: 1,
+    });
+
+    expect(charged).toBe(Math.ceil((499 / 100) * rialPerEur));
+    // Nothing about it lands on a "clean" boundary.
+    expect(charged % 10_000).not.toBe(0);
+  });
+
+  it("keeps the margin applied when rounding is switched off", () => {
+    // Removing rounding must not quietly remove the business margin with it.
+    const withMargin = convertEurCentsToRial({
+      eurCents: 499,
+      rialPerEur,
+      marginPercent: 2.5,
+      roundToRial: 1,
+    });
+    const withoutMargin = convertEurCentsToRial({
+      eurCents: 499,
+      rialPerEur,
+      roundToRial: 1,
+    });
+
+    expect(withMargin).toBeGreaterThan(withoutMargin);
+  });
+
   it("rejects a non-positive rate instead of producing a free subscription", () => {
     expect(() => convertEurCentsToRial({ eurCents: 599, rialPerEur: 0 })).toThrow();
     expect(() => convertEurCentsToRial({ eurCents: 599, rialPerEur: -5 })).toThrow();
@@ -211,5 +245,70 @@ describe("parseRateString", () => {
     expect(parseRateString("N/A")).toBeNull();
     expect(parseRateString("0")).toBeNull();
     expect(parseRateString("<html>error</html>")).toBeNull();
+  });
+});
+
+describe("resolvePlanDiscountPercent", () => {
+  const plan = { discount_percent: 10, quarterly_discount_percent: 15 };
+
+  it("ignores the quarterly discount on a one-month purchase", () => {
+    expect(resolvePlanDiscountPercent(plan, 1)).toBe(10);
+  });
+
+  it("stacks the quarterly discount on top of the plan's own", () => {
+    expect(resolvePlanDiscountPercent(plan, 3)).toBe(25);
+  });
+
+  it("caps the stack so a plan can never become free", () => {
+    // A 90% promotion plus a 20% quarterly incentive must not reach 110%,
+    // which would make computePrice throw and hand out a negative charge.
+    expect(
+      resolvePlanDiscountPercent(
+        { discount_percent: 90, quarterly_discount_percent: 20 },
+        3
+      )
+    ).toBe(95);
+  });
+});
+
+describe("resolvePlanPeriodPrice", () => {
+  const plan = {
+    price_eur: 4.99,
+    discount_percent: 0,
+    quarterly_discount_percent: 0,
+  };
+
+  it("charges the monthly price for one month", () => {
+    expect(resolvePlanPeriodPrice(plan, 1).netCents).toBe(499);
+  });
+
+  it("lists three months as three times the monthly price", () => {
+    const price = resolvePlanPeriodPrice(plan, 3);
+    expect(price.listCents).toBe(1497);
+    expect(price.netCents).toBe(1497);
+  });
+
+  it("applies the quarterly discount to the whole period", () => {
+    const price = resolvePlanPeriodPrice(
+      { ...plan, quarterly_discount_percent: 10 },
+      3
+    );
+    expect(price.listCents).toBe(1497);
+    // 1497 * 90% = 1347.3, rounded half-up to 1347.
+    expect(price.netCents).toBe(1347);
+    // The ledger invariant list = net + discount has to survive the period
+    // multiplication, not just the single-month case.
+    expect(price.netCents + price.discountCents).toBe(price.listCents);
+  });
+
+  it("keeps list = net + discount for an awkward price and stacked discounts", () => {
+    const price = resolvePlanPeriodPrice(
+      { price_eur: 3.33, discount_percent: 7, quarterly_discount_percent: 13 },
+      3
+    );
+    expect(price.listCents).toBe(999);
+    expect(price.discountPercent).toBe(20);
+    expect(price.netCents).toBe(799);
+    expect(price.netCents + price.discountCents).toBe(price.listCents);
   });
 });

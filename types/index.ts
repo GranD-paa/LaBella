@@ -27,6 +27,14 @@ export type SubscriptionPlanRow = Omit<
   features: LocalizedText[];
 };
 
+/**
+ * What one subscription tier unlocks. Keyed by tier alone — capabilities are
+ * deliberately not per-language, so "Pro includes grammar" cannot end up true
+ * for Italian and false for German.
+ */
+export type SubscriptionTier =
+  Database["public"]["Tables"]["subscription_tiers"]["Row"];
+
 export type SubscriptionPageContentRow = Omit<
   Database["public"]["Tables"]["subscription_page_content"]["Row"],
   "hero_title" | "hero_subtitle" | "footer_note"
@@ -52,6 +60,14 @@ export type SubscriptionStatus = Subscription["status"];
 export type PaymentStatus = Payment["status"];
 export type PaymentProviderSlug = Payment["provider"];
 export type BillingCurrency = Payment["paid_currency"];
+
+/**
+ * Billing periods on sale. Kept as a narrow union rather than a number so a
+ * stray period can never reach `create_pending_payment`, which rejects
+ * anything other than these two.
+ */
+export const BILLING_PERIOD_MONTHS = [1, 3] as const;
+export type BillingPeriodMonths = (typeof BILLING_PERIOD_MONTHS)[number];
 
 /** A payment joined with the learner it belongs to, for admin ledger views. */
 export type PaymentWithUser = Payment & {

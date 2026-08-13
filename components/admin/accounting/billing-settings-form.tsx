@@ -42,40 +42,8 @@ import {
   billingSettingsSchema,
   type BillingSettingsValues,
 } from "@/lib/validations/admin";
+import { ToggleRow } from "@/components/admin/toggle-row";
 import type { FxRate, PaymentSettings } from "@/types";
-
-/** A plain checkbox row — the project has no Switch primitive. */
-function ToggleRow({
-  label,
-  hint,
-  checked,
-  disabled,
-  onChange,
-}: {
-  label: string;
-  hint?: string;
-  checked: boolean;
-  disabled?: boolean;
-  onChange: (next: boolean) => void;
-}) {
-  return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-muted/10 p-3">
-      <input
-        type="checkbox"
-        className="mt-0.5 h-4 w-4 shrink-0 accent-brand-accent"
-        checked={checked}
-        disabled={disabled}
-        onChange={(event) => onChange(event.target.checked)}
-      />
-      <span className="space-y-0.5">
-        <span className="block text-sm font-medium">{label}</span>
-        {hint ? (
-          <span className="block text-xs text-muted-foreground">{hint}</span>
-        ) : null}
-      </span>
-    </label>
-  );
-}
 
 export function BillingSettingsForm({
   settings,
@@ -266,8 +234,11 @@ export function BillingSettingsForm({
                           <FormControl>
                             <Input
                               type="number"
-                              step="1"
-                              min={1}
+                              // "any" so a rate is entered exactly as quoted.
+                              // step="1" rejected every fractional rate, and
+                              // the column stores numeric(20,4).
+                              step="any"
+                              min={0}
                               disabled={isPending}
                               value={field.value ?? ""}
                               onChange={(event) =>
@@ -324,7 +295,13 @@ export function BillingSettingsForm({
                           <FormControl>
                             <Input
                               type="number"
-                              step="1000"
+                              // step="1" so every whole number is valid. With a
+                              // coarser step the browser validates the value
+                              // against `min + n*step` and rejects anything off
+                              // that ladder — which silently blocked saving the
+                              // whole form for any value not of the form
+                              // 1 + 1000n, including the old 10,000 default.
+                              step="1"
                               min={1}
                               disabled={isPending}
                               {...field}

@@ -145,7 +145,15 @@ export const structuredQuizSchema = z.object({
     .max(150, "Title is too long"),
   languageSlug: z.enum(["italian", "english", "german", "turkish"]),
   levelSlug: z.string().min(1, "Select a course level"),
-  sectionSlug: z.enum(["grammar", "vocabulary", "visual", "quiz", "custom"]),
+  sectionSlug: z.enum([
+    "grammar",
+    "vocabulary",
+    "visual",
+    "quiz",
+    // The comprehensive level exam — same question shape, paid entitlement.
+    "level-exam",
+    "custom",
+  ]),
   status: z.enum(["draft", "published"]),
   questions: z.array(quizQuestionSchema).min(1, "Add at least one question"),
 });
@@ -207,9 +215,62 @@ export const subscriptionPlanSchema = z.object({
     .array(localizedTextSchema)
     .min(1, "Add at least one feature")
     .max(12, "Too many features"),
+  /** Whether this tier is sold for this language at all. */
+  isActive: z.boolean(),
+  quarterlyEnabled: z.boolean(),
+  quarterlyDiscountPercent: z
+    .number({ error: "Quarterly discount must be a number" })
+    .int("Quarterly discount must be a whole number")
+    .min(0, "Quarterly discount can't be negative")
+    .max(95, "Quarterly discount can't exceed 95%"),
 });
 
 export type SubscriptionPlanValues = z.infer<typeof subscriptionPlanSchema>;
+
+/**
+ * What one tier unlocks. Global per tier rather than per language, matching
+ * `subscription_tiers`.
+ */
+export const subscriptionTierSchema = z.object({
+  tierRank: z
+    .number({ error: "Rank must be a number" })
+    .int("Rank must be a whole number")
+    .min(0, "Rank can't be negative")
+    .max(99, "Rank is too high"),
+  unlocksVocabulary: z.boolean(),
+  unlocksGrammar: z.boolean(),
+  unlocksVideo: z.boolean(),
+  unlocksLevelExam: z.boolean(),
+  /**
+   * Retakes past the first free attempt. `null` is unlimited, which is why
+   * this is nullable rather than using a sentinel like -1.
+   */
+  quizRetakeLimit: z
+    .number({ error: "Retake limit must be a number" })
+    .int("Retake limit must be a whole number")
+    .min(0, "Retake limit can't be negative")
+    .max(99, "Retake limit is too high")
+    .nullable(),
+});
+
+export type SubscriptionTierValues = z.infer<typeof subscriptionTierSchema>;
+
+/** Platform-wide content-gating settings. */
+export const entitlementSettingsSchema = z.object({
+  enforceEntitlements: z.boolean(),
+  freeCefrBands: z
+    .array(z.enum(["A1", "A2", "B1", "B2", "C1", "C2"]))
+    .max(6, "Too many bands"),
+  freeQuizRetakeLimit: z
+    .number({ error: "Retake limit must be a number" })
+    .int("Retake limit must be a whole number")
+    .min(0, "Retake limit can't be negative")
+    .max(99, "Retake limit is too high"),
+});
+
+export type EntitlementSettingsValues = z.infer<
+  typeof entitlementSettingsSchema
+>;
 
 export type BannerValues = z.infer<typeof bannerSchema>;
 

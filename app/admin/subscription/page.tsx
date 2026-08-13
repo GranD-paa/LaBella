@@ -21,11 +21,22 @@ export default async function AdminSubscriptionPage() {
   }
 
   const repo = getDataRepository();
-  const plans = await repo.getSubscriptionPlans();
+  const [plans, tiers, settings] = await Promise.all([
+    repo.getSubscriptionPlans(),
+    repo.getSubscriptionTiers(),
+    repo.getPaymentSettings(),
+  ]);
 
   const { t } = await getServerTranslator();
   const displayName =
     profile.full_name || user.email || t("common.adminFallback");
 
-  return <AdminSubscriptionPageView displayName={displayName} plans={plans} />;
+  return (
+    <AdminSubscriptionPageView
+      displayName={displayName}
+      plans={plans}
+      tiers={tiers}
+      settings={settings}
+    />
+  );
 }

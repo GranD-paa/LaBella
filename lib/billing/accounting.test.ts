@@ -28,6 +28,10 @@ const SETTINGS: PaymentSettings = {
   zarinpal_enabled: true,
   manual_enabled: true,
   grace_period_days: 3,
+  enforce_entitlements: false,
+  free_cefr_bands: ["A1"],
+  free_quiz_retake_limit: 0,
+  pending_payment_timeout_minutes: 20,
   updated_at: NOW.toISOString(),
 };
 
@@ -64,6 +68,7 @@ function payment(over: Partial<PaymentWithUser> = {}): PaymentWithUser {
     provider: "stripe",
     provider_payment_id: `pi-${seq}`,
     provider_ref: null,
+    checkout_reference: null,
     status: "succeeded",
     failure_reason: null,
     paid_at: NOW.toISOString(),

@@ -52,4 +52,16 @@ export type PaymentProvider = {
   currencies: readonly BillingCurrency[];
   createCheckout(request: CheckoutRequest): Promise<CheckoutResponse>;
   verify(request: VerifyRequest): Promise<VerifyResponse>;
+  /**
+   * Rebuilds verify parameters from a stored `checkout_reference`, for
+   * reconciling a payment whose customer never came back through the callback.
+   *
+   * Each gateway owns this mapping because only it knows which query key its
+   * own `verify` reads — `Authority` for ZarinPal, `session_id` for Stripe.
+   * Returning null means the gateway cannot be asked after the fact, and the
+   * payment is left alone rather than guessed at.
+   */
+  verifyParamsFromReference?(
+    reference: string
+  ): Record<string, string> | null;
 };

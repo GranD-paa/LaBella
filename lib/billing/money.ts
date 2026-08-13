@@ -93,6 +93,43 @@ export function computePrice(
   };
 }
 
+/**
+ * Effective discount for one plan bought over one billing period.
+ *
+ * The quarterly incentive stacks on top of whatever discount the plan already
+ * carries, capped at 95% so a promotion plus a long-period discount can never
+ * combine into a free subscription. Mirrors the same arithmetic in
+ * `create_pending_payment`.
+ */
+export function resolvePlanDiscountPercent(
+  plan: { discount_percent: number; quarterly_discount_percent: number },
+  periodMonths: number
+): number {
+  const quarterly = periodMonths === 3 ? plan.quarterly_discount_percent : 0;
+  return Math.min(95, plan.discount_percent + quarterly);
+}
+
+/**
+ * What a plan costs for a whole billing period, in euro cents.
+ *
+ * The list price is the monthly price times the number of months, so a
+ * three-month subscription shows a real "3 × monthly" figure with the
+ * quarterly saving struck off it rather than an unexplained number.
+ */
+export function resolvePlanPeriodPrice(
+  plan: {
+    price_eur: number;
+    discount_percent: number;
+    quarterly_discount_percent: number;
+  },
+  periodMonths: number
+): PriceBreakdown {
+  return computePrice(
+    eurToCents(plan.price_eur) * periodMonths,
+    resolvePlanDiscountPercent(plan, periodMonths)
+  );
+}
+
 // =========================================================================
 // EUR -> IRR
 // =========================================================================

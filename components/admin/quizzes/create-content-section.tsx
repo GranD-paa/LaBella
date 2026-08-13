@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clapperboard,
+  GraduationCap,
   ImageIcon,
   ListChecks,
   PenLine,
@@ -66,6 +67,13 @@ const CONTENT_TYPES: Array<{
     titleKey: "admin.content.categories.quiz.title",
     descriptionKey: "admin.content.categories.quiz.description",
     featuresKey: "admin.content.categories.quiz.features",
+  },
+  {
+    slug: "level-exam",
+    icon: GraduationCap,
+    titleKey: "admin.content.categories.levelExam.title",
+    descriptionKey: "admin.content.categories.levelExam.description",
+    featuresKey: "admin.content.categories.levelExam.features",
   },
 ];
 

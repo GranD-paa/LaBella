@@ -12,6 +12,7 @@ import {
   computePrice,
   convertEurCentsToRial,
   eurToCents,
+  resolvePlanPeriodPrice,
 } from "@/lib/billing/money";
 import { computeRenewalPeriod, isEntitled } from "@/lib/billing/period";
 import { createLocalId, getLocalStore, persistLocalStore } from "@/lib/data/local/store";
@@ -343,11 +344,15 @@ export function createLocalRepository(): DataRepository {
     },
 
     async getAttemptByUserAndQuiz(userId, quizId) {
+      // Newest first, matching the Supabase side: with retakes a quiz can have
+      // several attempts, and the latest one is the learner's current result.
       return (
-        getLocalStore().userQuizAttempts.find(
-          (attempt) =>
-            attempt.user_id === userId && attempt.quiz_id === quizId
-        ) ?? null
+        getLocalStore()
+          .userQuizAttempts.filter(
+            (attempt) =>
+              attempt.user_id === userId && attempt.quiz_id === quizId
+          )
+          .sort((a, b) => b.attempt_number - a.attempt_number)[0] ?? null
       );
     },
 
@@ -355,27 +360,64 @@ export function createLocalRepository(): DataRepository {
       return [...getLocalStore().userQuizAttempts];
     },
 
+    /**
+     * Mirrors `record_quiz_attempt`: the first attempt is always free, and
+     * retakes beyond it are spent against the learner's tier allowance.
+     */
     async createQuizAttempt({ userId, quizId, score, answersJson }) {
       const store = getLocalStore();
-      const existing = store.userQuizAttempts.find(
+      const used = store.userQuizAttempts.filter(
         (attempt) => attempt.user_id === userId && attempt.quiz_id === quizId
-      );
+      ).length;
 
-      if (existing) {
-        return { error: "You have already attempted this quiz.", code: 409 };
+      let retakeLimit: number | null = null;
+
+      if (used > 0) {
+        const settings = store.paymentSettings;
+
+        if (settings.enforce_entitlements) {
+          const quiz = store.quizzes.find((entry) => entry.id === quizId);
+          const subscription = store.subscriptions.find(
+            (entry) =>
+              entry.user_id === userId &&
+              entry.language_slug === quiz?.language_slug &&
+              (entry.status === "active" || entry.status === "past_due")
+          );
+          const tier = subscription
+            ? store.subscriptionTiers.find(
+                (entry) => entry.plan_slug === subscription.plan_slug
+              )
+            : undefined;
+
+          retakeLimit = tier
+            ? tier.quiz_retake_limit
+            : settings.free_quiz_retake_limit;
+        }
+
+        // `used` counts the free first attempt, so retakes already spent is
+        // one fewer.
+        if (retakeLimit !== null && used - 1 >= retakeLimit) {
+          return {
+            error: "You have no retakes left for this quiz.",
+            code: 403,
+            retakeLimit,
+          };
+        }
       }
 
+      const attemptNumber = used + 1;
       store.userQuizAttempts.push({
         id: createLocalId("attempt"),
         user_id: userId,
         quiz_id: quizId,
         score,
         answers_json: answersJson,
+        attempt_number: attemptNumber,
         created_at: new Date().toISOString(),
       });
 
       commitStore();
-      return {};
+      return { attemptNumber, retakeLimit };
     },
 
     async createLesson({ title, description, orderNumber }) {
@@ -720,7 +762,41 @@ export function createLocalRepository(): DataRepository {
       if (input.title !== undefined) plan.title = input.title;
       if (input.description !== undefined) plan.description = input.description;
       if (input.features !== undefined) plan.features = input.features;
+      if (input.isActive !== undefined) plan.is_active = input.isActive;
+      if (input.quarterlyEnabled !== undefined)
+        plan.quarterly_enabled = input.quarterlyEnabled;
+      if (input.quarterlyDiscountPercent !== undefined)
+        plan.quarterly_discount_percent = input.quarterlyDiscountPercent;
       plan.updated_at = new Date().toISOString();
+
+      commitStore();
+      return {};
+    },
+
+    async getSubscriptionTiers() {
+      return [...getLocalStore().subscriptionTiers].sort(
+        (a, b) => a.tier_rank - b.tier_rank
+      );
+    },
+
+    async updateSubscriptionTier(planSlug, input) {
+      const store = getLocalStore();
+      const tier = store.subscriptionTiers.find(
+        (entry) => entry.plan_slug === planSlug
+      );
+      if (!tier) return { error: "Subscription tier not found." };
+
+      if (input.tierRank !== undefined) tier.tier_rank = input.tierRank;
+      if (input.unlocksVocabulary !== undefined)
+        tier.unlocks_vocabulary = input.unlocksVocabulary;
+      if (input.unlocksGrammar !== undefined)
+        tier.unlocks_grammar = input.unlocksGrammar;
+      if (input.unlocksVideo !== undefined) tier.unlocks_video = input.unlocksVideo;
+      if (input.unlocksLevelExam !== undefined)
+        tier.unlocks_level_exam = input.unlocksLevelExam;
+      if (input.quizRetakeLimit !== undefined)
+        tier.quiz_retake_limit = input.quizRetakeLimit;
+      tier.updated_at = new Date().toISOString();
 
       commitStore();
       return {};
@@ -772,6 +848,16 @@ export function createLocalRepository(): DataRepository {
       if (input.manualEnabled !== undefined) settings.manual_enabled = input.manualEnabled;
       if (input.gracePeriodDays !== undefined)
         settings.grace_period_days = input.gracePeriodDays;
+      if (input.enforceEntitlements !== undefined)
+        settings.enforce_entitlements = input.enforceEntitlements;
+      if (input.freeCefrBands !== undefined)
+        settings.free_cefr_bands = input.freeCefrBands.map((band) =>
+          band.trim().toUpperCase()
+        );
+      if (input.freeQuizRetakeLimit !== undefined)
+        settings.free_quiz_retake_limit = input.freeQuizRetakeLimit;
+      if (input.pendingPaymentTimeoutMinutes !== undefined)
+        settings.pending_payment_timeout_minutes = input.pendingPaymentTimeoutMinutes;
       settings.updated_at = new Date().toISOString();
 
       commitStore();
@@ -874,12 +960,20 @@ export function createLocalRepository(): DataRepository {
           entry.language_slug === input.languageSlug
       );
       if (!plan) return { error: "Subscription plan not found." };
+      // Mirrors the guard in create_pending_payment: a plan hidden from the
+      // storefront must not be buyable by a hand-crafted request either.
+      if (!plan.is_active) return { error: "Subscription plan is not on sale." };
+
+      const periodMonths = input.periodMonths ?? 1;
+      if (periodMonths !== 1 && periodMonths !== 3) {
+        return { error: "Unsupported billing period." };
+      }
+      if (periodMonths === 3 && !plan.quarterly_enabled) {
+        return { error: "Quarterly billing is not available for this plan." };
+      }
 
       const settings = store.paymentSettings;
-      const price = computePrice(
-        eurToCents(plan.price_eur),
-        plan.discount_percent
-      );
+      const price = resolvePlanPeriodPrice(plan, periodMonths);
 
       let paidAmount = price.netCents;
       let fxRate: number | null = null;
@@ -919,7 +1013,7 @@ export function createLocalRepository(): DataRepository {
         subscription_id: null,
         plan_slug: input.planSlug,
         language_slug: input.languageSlug,
-        period_months: 1,
+        period_months: periodMonths,
         plan_title: plan.title.en,
         list_price_eur_cents: price.listCents,
         discount_percent: price.discountPercent,
@@ -932,6 +1026,7 @@ export function createLocalRepository(): DataRepository {
         provider: input.provider,
         provider_payment_id: null,
         provider_ref: null,
+        checkout_reference: null,
         status: "pending",
         failure_reason: null,
         paid_at: null,
@@ -957,6 +1052,35 @@ export function createLocalRepository(): DataRepository {
           (a, b) =>
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
+    },
+
+    async getMyPendingPayments() {
+      const userId = await getLocalSessionUserId();
+      if (!userId) return [];
+
+      return getLocalStore()
+        .payments.filter(
+          (entry) => entry.user_id === userId && entry.status === "pending"
+        )
+        .sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        )
+        .slice(0, 10);
+    },
+
+    async attachCheckoutReference(paymentId, reference) {
+      const store = getLocalStore();
+      const payment = store.payments.find((entry) => entry.id === paymentId);
+      // Same narrow conditions as the RPC: pending, and not already set.
+      if (!payment || payment.status !== "pending" || payment.checkout_reference) {
+        return {};
+      }
+
+      payment.checkout_reference = reference;
+      payment.updated_at = new Date().toISOString();
+      commitStore();
+      return {};
     },
 
     async getSubscriptionEvents(subscriptionId) {
@@ -1030,6 +1154,9 @@ export function createLocalRepository(): DataRepository {
         provider: "manual",
         provider_payment_id: `manual-${paymentId}`,
         provider_ref: input.reference ?? null,
+        // A manual payment never went through a gateway checkout, so there is
+        // nothing to reconcile it against later.
+        checkout_reference: null,
         status: "pending",
         failure_reason: null,
         paid_at: null,

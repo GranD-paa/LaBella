@@ -175,6 +175,17 @@ export const it: Messages = {
     },
   },
   learn: {
+    bandExams: {
+      title: "Esami completi di livello",
+      hint: "Ogni esame copre un intero livello CEFR e mostra il tuo punteggio alla fine.",
+      cardTitle: "Esame completo di {band}",
+      cardDescription: "Copre tutto il livello {band}, in tutti i suoi moduli.",
+      start: "Inizia l’esame",
+      retake: "Ripeti l’esame",
+      lockedBadge: "Abbonamento",
+      takenBadge: "Completato",
+      scoreBadge: "Migliore: {score}%",
+    },
     backToMenu: "Torna al menu principale",
     courseLevels: "Livelli del corso",
     courseLevelsHint:
@@ -189,6 +200,14 @@ export const it: Messages = {
     backToCategories: "Torna alle categorie {code}",
     contentPreparing:
       "I contenuti per {code} sono in preparazione. Torna presto o chiedi a un admin di aggiungere la lezione {order}.",
+    locked: {
+      title: "{content} si sblocca con un abbonamento",
+      description:
+        "Questa sezione fa parte del piano {plan}. Attivalo per avere subito accesso completo.",
+      descriptionGeneric:
+        "Questa sezione si sblocca con un abbonamento attivo. Scegli un piano per accedere.",
+      cta: "Vedi i piani di abbonamento",
+    },
     categories: {
       grammar: {
         title: "Grammatica",
@@ -588,8 +607,35 @@ export const it: Messages = {
     subscription: adminSubscriptionIt,
   },
   subscription: {
+    mine: {
+      title: "I tuoi abbonamenti",
+      statusActive: "Attivo",
+      statusPastDue: "Periodo di tolleranza",
+      renewsOn: "Si rinnova il {date}",
+      endsOn: "Termina il {date}",
+      daysLeft: "{count} giorni rimasti",
+      perkVocabulary: "Vocabolario e immagini",
+      perkGrammar: "Grammatica di ogni lezione",
+      perkVideo: "Videolezioni",
+      perkLevelExam: "Esami del livello",
+      perkRetakes: "{count} ripetizioni dei quiz",
+      perkRetakesUnlimited: "Ripetizioni illimitate dei quiz",
+      continueLearning: "Continua a imparare",
+      managePlan: "Gestisci piano",
+    },
+    recovered: {
+      title: "Pagamento confermato",
+      description: "Abbiamo verificato con il gateway e attivato l’abbonamento che avevi già pagato.",
+    },
     monthlyBadge: "Accesso di 1 mese · fatturazione mensile",
     billingPeriod: "mese",
+    billingPeriodQuarterly: "3 mesi",
+    perMonthEquivalent: "{amount} al mese",
+    periodMonthly: "1 mese",
+    periodQuarterly: "3 mesi",
+    periodSaveBadge: "risparmi {percent}%",
+    periodGroupLabel: "Periodo di fatturazione",
+    currencyGroupLabel: "Valuta di pagamento",
     currencyEur: "Paga in EUR",
     currencyIrr: "Paga in Toman",
     choosePayment: "Scegli come pagare",
@@ -770,6 +816,8 @@ export const it: Messages = {
   },
   actions: {
     errors: {
+      retakeLimitReached: "Hai esaurito le ripetizioni per questo quiz. Passa a un piano superiore per averne altre.",
+      levelExamLocked: "L’esame del livello richiede un abbonamento attivo. Scegli un piano per sbloccarlo.",
       invalidInput: "Input non valido. Controlla il modulo e riprova.",
       invalidCredentials: "Controlla email e password e riprova.",
       formCheck: "Controlla di nuovo il modulo e riprova.",
