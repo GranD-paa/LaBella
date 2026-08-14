@@ -2,6 +2,7 @@
 
 import { CalendarRange, EyeOff, Percent, Tag } from "lucide-react";
 
+import { PlanActiveToggle } from "@/components/admin/subscription/plan-active-toggle";
 import { SubscriptionPlanEditDialog } from "@/components/admin/subscription/subscription-plan-edit-dialog";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
@@ -95,7 +96,10 @@ export function SubscriptionPlanList({ plans }: { plans: SubscriptionPlanRow[] }
                   </span>
                 </div>
               </div>
-              <SubscriptionPlanEditDialog plan={plan} />
+              <div className="flex shrink-0 items-center gap-3">
+                <PlanActiveToggle plan={plan} />
+                <SubscriptionPlanEditDialog plan={plan} />
+              </div>
             </div>
           );
         })}
