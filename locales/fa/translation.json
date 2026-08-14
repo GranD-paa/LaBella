@@ -1198,7 +1198,7 @@
     }
   },
   "subscription": {
-    "monthlyBadge": "دسترسی ۱ ماهه · پرداخت ماهانه",
+    "monthlyBadge": "اشتراک ویژه لاپارلی",
     "billingPeriod": "ماه",
     "billingPeriodQuarterly": "۳ ماه",
     "perMonthEquivalent": "ماهانه {amount}",

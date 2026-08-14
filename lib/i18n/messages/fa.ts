@@ -617,7 +617,7 @@ export const fa: Messages = {
       title: "پرداخت تأیید شد",
       description: "از درگاه استعلام گرفتیم و اشتراکی را که قبلاً پرداخت کرده بودید فعال کردیم.",
     },
-    monthlyBadge: "دسترسی ۱ ماهه · پرداخت ماهانه",
+    monthlyBadge: "اشتراک ویژه لاپارلی",
     billingPeriod: "ماه",
     billingPeriodQuarterly: "۳ ماه",
     perMonthEquivalent: "ماهانه {amount}",

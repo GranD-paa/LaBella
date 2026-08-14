@@ -198,12 +198,12 @@ export const DEFAULT_SUBSCRIPTION_PLANS: SubscriptionPlanRow[] = (
 export const DEFAULT_SUBSCRIPTION_PAGE_CONTENT: SubscriptionPageContentRow = {
   id: "default",
   hero_title: {
-    fa: "طرح یادگیری خود را انتخاب کنید",
+    fa: "ارتقای کیفیت یادگیری با اشتراک لاپارلی",
     en: "Choose your learning plan",
     it: "Scegli il tuo piano di apprendimento",
   },
   hero_subtitle: {
-    fa: "{name}، با اشتراک ماهانه‌ای متناسب با اهدافتان، تجربه کامل لاپارلی را باز کنید.",
+    fa: "{name} گرامی، اشتراک لاپارلی امکان دسترسی کامل به درس‌ها، تمرین‌ها و محتوای پیشرفته را فراهم می‌کند. برای بهره‌مندی از این امکانات، نسبت به تهیه اشتراک مدنظر خود اقدام فرمایید.",
     en: "{name}, unlock the full Laparli experience with a monthly subscription tailored to your goals.",
     it: "{name}, sblocca l'esperienza completa di Laparli con un abbonamento su misura per i tuoi obiettivi.",
   },

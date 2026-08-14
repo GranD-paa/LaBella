@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { CalendarDays, Lock, ShieldCheck, Sparkles } from "lucide-react";
+import { Crown, Lock, ShieldCheck, Sparkles } from "lucide-react";
 
 import { recoverMyPendingPaymentsAction } from "@/app/actions/checkout";
 import { SubscriptionLanguageTabs } from "@/components/subscription/subscription-language-tabs";
@@ -139,7 +139,7 @@ export function SubscriptionView({
             variant="outline"
             className="gap-1.5 border-brand-accent/40 bg-white/5 px-3 py-1 text-brand-accent"
           >
-            <CalendarDays className="h-3.5 w-3.5" />
+            <Crown className="h-3.5 w-3.5" />
             {t("subscription.monthlyBadge")}
           </Badge>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
