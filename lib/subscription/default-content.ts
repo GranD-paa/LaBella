@@ -144,16 +144,20 @@ const PLAN_TEMPLATES: Record<
     order_number: 3,
   },
   /**
-   * Reserved fourth slot, held back for a future release.
+   * Platinum — the fourth slot, held back for a future release.
    *
    * `is_active: false` is what keeps it out of the storefront, and
    * `create_pending_payment` refuses it too, so the row being present here is
    * harmless until an admin switches it on per language.
+   *
+   * The slug stays `elite` because it is an internal key that tiers,
+   * capabilities and payments join on; only the copy an admin and a learner
+   * ever read carries the Platinum name.
    */
   elite: {
     price_eur: 7.99,
     discount_percent: 0,
-    title: { fa: "الیت", en: "Elite", it: "Elite" },
+    title: { fa: "پلاتینیوم", en: "Platinum", it: "Platino" },
     description: {
       fa: "طرح ویژه‌ای که به‌زودی معرفی می‌شود.",
       en: "A premium plan launching soon.",
