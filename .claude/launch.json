@@ -2,13 +2,25 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "signalyar",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "E:/SignalYar/web/server.js",
+        "3005"
+      ],
+      "port": 3005
+    },
+    {
       "name": "laparli",
       "url": "https://laparli.vercel.app"
     },
     {
       "name": "laparli-local",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 3001
     }
   ]
