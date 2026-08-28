@@ -10,6 +10,13 @@ export type SignInValues = z.infer<typeof signInSchema>;
 
 export const signUpSchema = z
   .object({
+    // Asked before anything else on the form: it decides whether the account
+    // is verified by SMS or by an email link. See lib/auth/better-auth.ts.
+    region: z.enum(["ir", "intl"]),
+    phone: z
+      .string()
+      .min(1, "Phone number is required")
+      .max(20, "Phone number is too long"),
     fullName: z
       .string()
       .min(2, "Full name must be at least 2 characters")

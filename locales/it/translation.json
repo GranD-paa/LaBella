@@ -83,8 +83,18 @@
       "passwordUppercase": "La password deve contenere una lettera maiuscola",
       "passwordNumber": "La password deve contenere un numero",
       "confirmPasswordRequired": "Conferma la password",
-      "passwordsMismatch": "Le password non corrispondono"
-    }
+      "passwordsMismatch": "Le password non corrispondono",
+      "phoneRequired": "Il numero di telefono è obbligatorio",
+      "phoneMax": "Il numero di telefono è troppo lungo"
+    },
+    "region": "Da dove ti registri?",
+    "regionIran": "Dall'Iran",
+    "regionAbroad": "Fuori dall'Iran",
+    "regionHint": "Gli account in Iran si confermano via SMS; da ogni altro paese inviamo un link per email.",
+    "phone": "Numero di cellulare",
+    "phonePlaceholder": "09121234567",
+    "phoneIntlPlaceholder": "+39 320 1234567",
+    "phoneHint": "Se sei fuori dall'Iran, includi il prefisso internazionale."
   },
   "menu": {
     "badge": "Menu principale",
@@ -1417,7 +1427,10 @@
       "forbidden": "Non hai il permesso di eseguire questa azione.",
       "generic": "Qualcosa è andato storto. Riprova.",
       "retakeLimitReached": "Hai esaurito le ripetizioni per questo quiz. Passa a un piano superiore per averne altre.",
-      "levelExamLocked": "L’esame del livello richiede un abbonamento attivo. Scegli un piano per sbloccarlo."
+      "levelExamLocked": "L’esame del livello richiede un abbonamento attivo. Scegli un piano per sbloccarlo.",
+      "confirmPhone": "Ti abbiamo inviato un codice via SMS. Inseriscilo per completare la registrazione.",
+      "invalidPhone": "Questo numero di telefono non sembra valido.",
+      "iranPhoneRequired": "Hai scelto l'Iran, quindi il numero deve essere un cellulare iraniano."
     }
   },
   "validation": {

@@ -83,8 +83,18 @@
       "passwordUppercase": "Password must contain an uppercase letter",
       "passwordNumber": "Password must contain a number",
       "confirmPasswordRequired": "Please confirm your password",
-      "passwordsMismatch": "Passwords do not match"
-    }
+      "passwordsMismatch": "Passwords do not match",
+      "phoneRequired": "Phone number is required",
+      "phoneMax": "Phone number is too long"
+    },
+    "region": "Where are you signing up from?",
+    "regionIran": "Inside Iran",
+    "regionAbroad": "Outside Iran",
+    "regionHint": "Accounts inside Iran are confirmed by SMS; from anywhere else we send an email link instead.",
+    "phone": "Mobile number",
+    "phonePlaceholder": "09121234567",
+    "phoneIntlPlaceholder": "+49 151 23456789",
+    "phoneHint": "Include your country code if you are outside Iran."
   },
   "menu": {
     "badge": "Main Menu",
@@ -1417,7 +1427,10 @@
       "forbidden": "You don't have permission to perform this action.",
       "generic": "Something went wrong. Please try again.",
       "retakeLimitReached": "You have used all your retakes for this quiz. Upgrade your plan for more.",
-      "levelExamLocked": "The level exam needs an active subscription. Choose a plan to unlock it."
+      "levelExamLocked": "The level exam needs an active subscription. Choose a plan to unlock it.",
+      "confirmPhone": "We sent a code to your phone. Enter it to finish signing up.",
+      "invalidPhone": "That phone number does not look right.",
+      "iranPhoneRequired": "You chose Iran, so the number must be an Iranian mobile."
     }
   },
   "validation": {

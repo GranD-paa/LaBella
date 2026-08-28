@@ -12,6 +12,7 @@ import { signUpAction } from "@/app/actions/auth";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Form,
   FormControl,
@@ -34,6 +35,8 @@ export function SignUpForm() {
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
+      region: "ir",
+      phone: "",
       fullName: "",
       email: "",
       password: "",
@@ -69,6 +72,69 @@ export function SignUpForm() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="region"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("auth.region")}</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isPending}
+                    className="grid grid-cols-2 gap-3"
+                  >
+                    {(["ir", "intl"] as const).map((option) => (
+                      <FormLabel
+                        key={option}
+                        className="flex cursor-pointer items-center gap-2 rounded-md border p-3 font-normal has-[:checked]:border-primary"
+                      >
+                        <RadioGroupItem value={option} />
+                        {t(option === "ir" ? "auth.regionIran" : "auth.regionAbroad")}
+                      </FormLabel>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  {t("auth.regionHint")}
+                </p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("auth.phone")}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="tel"
+                    inputMode="tel"
+                    dir="ltr"
+                    placeholder={t(
+                      form.watch("region") === "ir"
+                        ? "auth.phonePlaceholder"
+                        : "auth.phoneIntlPlaceholder"
+                    )}
+                    autoComplete="tel"
+                    disabled={isPending}
+                    {...field}
+                  />
+                </FormControl>
+                {form.watch("region") === "intl" ? (
+                  <p className="text-xs text-muted-foreground">
+                    {t("auth.phoneHint")}
+                  </p>
+                ) : null}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="fullName"

@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 
-import { isLocalDataMode } from "@/lib/config/data-source";
+import { isLocalDataMode, isPostgresDataMode } from "@/lib/config/data-source";
 import { getLanguagesWithAvailability } from "@/lib/curriculum/availability";
 import { getDataRepository } from "@/lib/data";
 import { resolveContinueLearningPath } from "@/lib/curriculum/learning-state";
@@ -145,6 +145,10 @@ export async function signUpAction(
     };
   }
 
+  if (isPostgresDataMode()) {
+    return await signUpWithPostgres(parsed.data);
+  }
+
   const { createClient } = await import("@/lib/supabase/server");
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
@@ -173,4 +177,63 @@ export async function signOutAction() {
   const repo = getDataRepository();
   await repo.signOut();
   redirect("/login");
+}
+
+/**
+ * Sign-up against the self-hosted stack.
+ *
+ * The phone number is normalized to E.164 *before* Better Auth stores it —
+ * the OTP endpoints look users up by the exact stored string, so a raw
+ * `09121234567` here would never match the `+989121234567` the verify step
+ * sends. It is also the value SpotPlayer burns into the video watermark, so a
+ * consistent shape matters beyond login.
+ */
+async function signUpWithPostgres(
+  values: SignUpValues
+): Promise<ActionResult | void> {
+  const { assertRegionMatchesPhone, auth } = await import(
+    "@/lib/auth/better-auth"
+  );
+
+  const phoneCheck = assertRegionMatchesPhone(values.region, values.phone);
+  if (!phoneCheck.ok) {
+    return { error: phoneCheck.error };
+  }
+
+  const requestHeaders = await headers();
+
+  try {
+    await auth.api.signUpEmail({
+      body: {
+        email: values.email,
+        password: values.password,
+        name: values.fullName,
+        phoneNumber: phoneCheck.phone,
+        region: values.region,
+      },
+      headers: requestHeaders,
+    });
+  } catch (error) {
+    return {
+      error: formatAuthErrorKey(
+        error instanceof Error ? error.message : "sign up failed"
+      ),
+    };
+  }
+
+  // Iranian accounts prove themselves by SMS; everyone else gets an email
+  // link, because an international SMS costs ~146x a domestic one.
+  if (values.region === "ir") {
+    await auth.api.sendPhoneNumberOTP({
+      body: { phoneNumber: phoneCheck.phone },
+      headers: requestHeaders,
+    });
+    return { success: true, message: "actions.errors.confirmPhone" };
+  }
+
+  await auth.api.sendVerificationEmail({
+    body: { email: values.email, callbackURL: "/login" },
+    headers: requestHeaders,
+  });
+  return { success: true, message: "actions.errors.confirmEmail" };
 }
