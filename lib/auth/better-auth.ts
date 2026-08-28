@@ -3,6 +3,7 @@ import { nextCookies } from "better-auth/next-js";
 import { phoneNumber } from "better-auth/plugins";
 import { Pool } from "pg";
 
+import { resolveConnectionString } from "@/lib/data/postgres/client";
 import { sendEmail } from "@/lib/notify/email";
 import { isIranianPhone, normalizePhone } from "@/lib/notify/phone";
 import { sendSms } from "@/lib/notify/sms";
@@ -25,7 +26,7 @@ export type Region = "ir" | "intl";
  * way; it is what SpotPlayer burns into the video watermark.
  */
 export const auth = betterAuth({
-  database: new Pool({ connectionString: process.env.DATABASE_URL }),
+  database: new Pool({ connectionString: resolveConnectionString() }),
   user: {
     additionalFields: {
       region: { type: "string", required: true, defaultValue: "ir", input: true },
