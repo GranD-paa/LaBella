@@ -45,3 +45,6 @@ next-env.d.ts
 
 # local npm proxy override (machine-specific, not for commit)
 .npmrc
+
+# scratch scripts used while debugging (never meant to be committed)
+__*.mjs

@@ -37,6 +37,25 @@ export function resolveConnectionString(): string | undefined {
  * globalThis to avoid leaking a new pool (and its connections) on every edit —
  * the ArvanCloud Starter cluster allows 250 connections in total.
  */
+/**
+ * Connection settings shared by this pool and Better Auth's.
+ *
+ * `query_timeout` is the important one. The path to the cluster drops packets
+ * often enough that a response occasionally never arrives, and without a
+ * driver-side deadline `pg` waits forever — the request hangs instead of
+ * failing, which is how a missing column default first showed up as a sign-up
+ * that never returned rather than an error. Every knob here bounds a wait that
+ * would otherwise be unbounded.
+ */
+export const POOL_OPTIONS = {
+  connectionTimeoutMillis: 10_000,
+  query_timeout: 20_000,
+  statement_timeout: 20_000,
+  idleTimeoutMillis: 30_000,
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 5_000,
+} as const;
+
 const globalForPool = globalThis as unknown as { laparliPool?: Pool };
 
 export function getPool(): Pool {
@@ -44,6 +63,7 @@ export function getPool(): Pool {
     globalForPool.laparliPool = new Pool({
       connectionString: resolveConnectionString(),
       max: 10,
+      ...POOL_OPTIONS,
     });
   }
   return globalForPool.laparliPool;
