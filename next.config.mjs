@@ -10,6 +10,10 @@ const supabaseHostname = (() => {
 })();
 
 const nextConfig = {
+  // Emits `.next/standalone` with only the files the server actually needs,
+  // so the container image carries a trimmed node_modules instead of the full
+  // dependency tree.
+  output: "standalone",
   poweredByHeader: false,
   compress: true,
   images: {

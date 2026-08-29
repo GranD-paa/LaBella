@@ -113,3 +113,27 @@ export function buildUpdate(
 
   return fragments.length ? { sql: fragments.join(", "), values } : null;
 }
+
+/**
+ * Runs `work` inside a transaction on a single dedicated connection, so a
+ * multi-statement write either lands whole or not at all.
+ */
+export async function withTransaction<T>(
+  work: (run: (text: string, values?: unknown[]) => Promise<unknown[]>) => Promise<T>
+): Promise<T> {
+  const client = await getPool().connect();
+  try {
+    await client.query("begin");
+    const result = await work(async (text, values = []) => {
+      const rows = await client.query(text, values);
+      return rows.rows;
+    });
+    await client.query("commit");
+    return result;
+  } catch (error) {
+    await client.query("rollback");
+    throw error;
+  } finally {
+    client.release();
+  }
+}

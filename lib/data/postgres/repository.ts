@@ -7,6 +7,7 @@ import {
   execute,
   query,
   queryOne,
+  withTransaction,
 } from "@/lib/data/postgres/client";
 import type {
   AuthUser,
@@ -943,14 +944,31 @@ export function createPostgresRepository(): DataRepository {
         }
       }),
 
+    // The payment row is flagged but never edited to remove the money — the
+    // refund is its own ledger entry, so a partial refund stays visible as
+    // both the original sale and the amount handed back. Both writes go in one
+    // transaction: a refund recorded without flagging the payment would keep
+    // counting as revenue.
     refundPayment: (input) =>
-      mutate(() =>
-        execute(
-          `insert into refunds (payment_id, amount_eur_cents, reason)
-           values ($1, $2, $3)`,
-          [input.paymentId, input.amountEurCents, input.reason ?? null]
-        )
-      ),
+      mutate(async () => {
+        const issuedBy = await requireUserId();
+        return withTransaction(async (run) => {
+          await run(
+            `insert into refunds (payment_id, amount_eur_cents, reason, created_by)
+             values ($1, $2, $3, $4)`,
+            [
+              input.paymentId,
+              input.amountEurCents,
+              input.reason ?? null,
+              issuedBy,
+            ]
+          );
+          await run(
+            "update payments set status = 'refunded', updated_at = now() where id = $1",
+            [input.paymentId]
+          );
+        });
+      }),
   };
 
   return repository;

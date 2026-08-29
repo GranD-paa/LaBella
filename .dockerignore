@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.env*
+.claude
+.cursor
+.vscode
+.local-data
+build-output.txt
+final-deployment
+docs
+supabase
+**/*.test.ts
+**/*.test.tsx
