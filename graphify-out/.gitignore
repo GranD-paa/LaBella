@@ -1,0 +1,6 @@
+# سایدکارها و کش graphify — با هر build/update دوباره ساخته می‌شوند.
+# فقط graph.json و GRAPH_REPORT.md و graph.html ارزش کامیت‌شدن دارند.
+.graphify_*
+cache/
+memory/
+reflections/
