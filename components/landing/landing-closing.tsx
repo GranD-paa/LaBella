@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Arrow, Check, SectionHead } from "@/components/landing/landing-bits";
-import { GoldCorners, GoldRosette } from "@/components/landing/gold-motif";
+import { LatticeField } from "@/components/landing/lattice";
 import type { LandingCopy } from "@/lib/landing/content";
 import { cn } from "@/lib/utils";
 
@@ -53,8 +53,6 @@ export function LandingPricing({
                       "border-primary/35 bg-primary/[0.04] shadow-[0_24px_70px_-30px_rgba(251,191,36,0.35)]"
                   )}
                 >
-                  {plan.highlighted && <GoldCorners className="m-3" />}
-
                   <h3 className="text-xl font-bold text-white">{plan.title}</h3>
 
                   {plan.description && (
@@ -213,10 +211,13 @@ export function LandingFinal({
     <section className="relative isolate overflow-hidden py-28 lg:py-36">
       <div aria-hidden className="aurora -z-10 opacity-60" />
 
-      {/* The one place the rosette appears. Centred behind the closing ask,
-          large enough to read as structure and faint enough that you notice it
-          only after the words. */}
-      <GoldRosette className="-z-10 start-1/2 top-1/2 h-[46rem] w-[46rem] -translate-x-1/2 -translate-y-1/2 opacity-[0.16] rtl:translate-x-1/2" />
+{/* One field, not a mirrored pair. The reference is a single asymmetric
+          composition, and doubling it filled the frame — which is the one thing
+          the drawing is not. */}
+      <LatticeField
+        className="-z-10 start-0 top-0 hidden h-full w-[36rem] -translate-x-1/3 lg:block rtl:translate-x-1/3"
+        opacity={0.2}
+      />
 
       <div className="mx-auto max-w-[80rem] px-5 text-center sm:px-8">
         <h2

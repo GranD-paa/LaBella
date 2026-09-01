@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { HeroScene } from "@/components/landing/hero-scene";
 import { Arrow, Check, Cross, Eyebrow } from "@/components/landing/landing-bits";
+import { LatticeField } from "@/components/landing/lattice";
 import type { LandingCopy } from "@/lib/landing/content";
 
 /**
@@ -150,8 +151,16 @@ export function LandingWhy({ copy }: { copy: LandingCopy }) {
   return (
     <section
       id="method"
-      className="relative scroll-mt-24 py-24 sm:py-32 lg:py-40"
+      className="relative isolate scroll-mt-24 overflow-hidden py-24 sm:py-32 lg:py-40"
     >
+      {/* Hung in the gap beside the heading, which is capped at max-w-2xl and
+          leaves the far half of the row empty on wide screens. Off-screen on
+          narrow ones, where there is no gap to fill. */}
+      <LatticeField
+        className="-z-10 end-0 top-0 hidden h-[27rem] w-[26rem] translate-x-1/4 lg:block rtl:-translate-x-1/4"
+        opacity={0.26}
+      />
+
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
         <div className="max-w-2xl">
           <div data-reveal>

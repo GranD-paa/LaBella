@@ -21,7 +21,7 @@ import {
   LandingPricing,
   type LandingPlan,
 } from "@/components/landing/landing-closing";
-import { GoldDivider } from "@/components/landing/gold-motif";
+import { LatticeRule } from "@/components/landing/lattice";
 import { ScrollEffects } from "@/components/landing/scroll-effects";
 import { getServerLocale } from "@/lib/i18n/server-locale";
 import {
@@ -122,15 +122,15 @@ export default async function Home() {
         <LandingHero copy={copy} isSignedIn={isSignedIn} />
         <LandingTicker copy={copy} />
         <LandingWhy copy={copy} />
-        <GoldDivider />
+        <LatticeRule />
         <LandingLesson copy={copy} />
         <LandingFeatures copy={copy} />
-        <GoldDivider />
+        <LatticeRule />
         <LandingSteps copy={copy} />
         <LandingLanguages copy={copy} languages={languages} />
         <LandingPricing copy={copy} plans={plans} isSignedIn={isSignedIn} />
         <LandingDay copy={copy} />
-        <GoldDivider />
+        <LatticeRule />
         <LandingFaq copy={copy} />
         <LandingFinal copy={copy} isSignedIn={isSignedIn} />
       </main>

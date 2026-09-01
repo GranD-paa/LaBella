@@ -5,6 +5,7 @@ import {
   LESSON_ICONS,
   SectionHead,
 } from "@/components/landing/landing-bits";
+import { LatticeField } from "@/components/landing/lattice";
 import type { LandingCopy, LandingLanguageCopy } from "@/lib/landing/content";
 import type { LandingLanguageDefinition } from "@/lib/landing/languages";
 import { cn } from "@/lib/utils";
@@ -157,8 +158,15 @@ export function LandingLanguages({
   return (
     <section
       id="languages"
-      className="relative scroll-mt-24 py-24 sm:py-32 lg:py-40"
+      className="relative isolate scroll-mt-24 overflow-hidden py-24 sm:py-32 lg:py-40"
     >
+      {/* Mirrored against the one in the method section and hung on the
+          opposite edge, so the two do not stack the page's weight on one side. */}
+      <LatticeField
+        className="-z-10 start-0 top-0 hidden h-[25rem] w-[24rem] -translate-x-1/4 -scale-x-100 lg:block rtl:translate-x-1/4"
+        opacity={0.22}
+      />
+
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
         <SectionHead title={copy.languages.title} sub={copy.languages.sub} />
 

@@ -378,9 +378,9 @@
     "semantic_hash": ""
   },
   "app/page.tsx": {
-    "mtime": 1788262259.1959655,
-    "seen": 1788262897.9816287,
-    "ast_hash": "1842b764ed73e599bdc41d7e5f9e8d47",
+    "mtime": 1788272577.8025053,
+    "seen": 1788273026.8137896,
+    "ast_hash": "9501c7a1f230fa0cfe31e6b9e5d1f0fc",
     "semantic_hash": ""
   },
   "app/profile/layout.tsx": {
@@ -1950,9 +1950,9 @@
     "semantic_hash": ""
   },
   "lib/landing/visibility.ts": {
-    "mtime": 1788152711.2945037,
-    "seen": 1788154327.476039,
-    "ast_hash": "7a5d03b74e07c948d492cedd5d5162ec",
+    "mtime": 1788273008.0931861,
+    "seen": 1788273026.8142898,
+    "ast_hash": "360112904bdf8c34b3186bb9c37e1b82",
     "semantic_hash": ""
   },
   "lib/learn/video-embed.test.ts": {
@@ -2532,9 +2532,9 @@
     "semantic_hash": ""
   },
   "components/landing/landing-closing.tsx": {
-    "mtime": 1788262107.5662525,
-    "seen": 1788262897.9816287,
-    "ast_hash": "f4c5e160773db861ed47fcb22895ec7c",
+    "mtime": 1788272577.8035054,
+    "seen": 1788273026.8137896,
+    "ast_hash": "b88873cb14399b3a8fe964eaf186c36d",
     "semantic_hash": ""
   },
   "components/landing/landing-middle.tsx": {
@@ -2547,6 +2547,12 @@
     "mtime": 1788262809.963368,
     "seen": 1788262897.9816287,
     "ast_hash": "39e71faf9ecd12536678c1a0a60a0e5a",
+    "semantic_hash": ""
+  },
+  "components/landing/gold-motif.tsx": {
+    "mtime": 1788263468.1190052,
+    "seen": 1788273026.8137896,
+    "ast_hash": "5b9ec6a198100b15a63cd2deb614d447",
     "semantic_hash": ""
   }
 }
