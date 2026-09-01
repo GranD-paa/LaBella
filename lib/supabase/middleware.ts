@@ -77,9 +77,11 @@ export async function updateSession(request: NextRequest) {
     route === "/" ? pathname === "/" : pathname.startsWith(route)
   );
 
+  // Sign-up, not login: see the note in `postgres-middleware.ts`. Kept in
+  // step here so the two data modes route a visitor the same way.
   if (!user && !isPublicRoute) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
+    redirectUrl.pathname = "/sign-up";
     redirectUrl.searchParams.set("redirectedFrom", pathname);
     return NextResponse.redirect(redirectUrl);
   }
@@ -94,13 +96,6 @@ export async function updateSession(request: NextRequest) {
   if (user && pathname === "/") {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/menu";
-    redirectUrl.search = "";
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  if (!user && pathname === "/") {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
     redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }

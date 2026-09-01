@@ -66,7 +66,7 @@ export function LandingHero({
           className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
         >
           <Link
-            href={isSignedIn ? "/menu" : "/register"}
+            href={isSignedIn ? "/menu" : "/sign-up"}
             className="group inline-flex min-h-13 items-center justify-center gap-2.5 rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground shadow-[0_16px_44px_-12px_rgba(251,191,36,0.5)] transition-transform duration-200 hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             {copy.hero.ctaPrimary}

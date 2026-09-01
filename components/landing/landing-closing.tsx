@@ -1,129 +1,9 @@
 import Link from "next/link";
 
-import { Arrow, Check, SectionHead } from "@/components/landing/landing-bits";
+import { Arrow, SectionHead } from "@/components/landing/landing-bits";
 import { LatticeField } from "@/components/landing/lattice";
 import type { LandingCopy } from "@/lib/landing/content";
 import { cn } from "@/lib/utils";
-
-/** Just enough of a plan row to render a card — resolved on the server. */
-export type LandingPlan = {
-  id: string;
-  title: string;
-  description: string;
-  features: string[];
-  highlighted: boolean;
-};
-
-export function LandingPricing({
-  copy,
-  plans,
-  isSignedIn,
-}: {
-  copy: LandingCopy;
-  plans: LandingPlan[];
-  isSignedIn: boolean;
-}) {
-  return (
-    <section
-      id="pricing"
-      className="relative scroll-mt-24 py-24 sm:py-32 lg:py-40"
-    >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[30rem] bg-[radial-gradient(ellipse_45%_60%_at_50%_0%,rgba(114,9,183,0.16),transparent)]"
-      />
-
-      <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
-        <SectionHead title={copy.pricing.title} sub={copy.pricing.sub} />
-
-        {plans.length > 0 ? (
-          <ul
-            data-reveal-group
-            className={cn(
-              "mt-14 grid gap-4 lg:mt-20",
-              plans.length >= 3 ? "lg:grid-cols-3" : "sm:grid-cols-2"
-            )}
-          >
-            {plans.map((plan) => (
-              <li key={plan.id} data-reveal-item>
-                <article
-                  className={cn(
-                    "glass edge-light relative flex h-full flex-col overflow-hidden rounded-3xl p-7 sm:p-8",
-                    plan.highlighted &&
-                      "border-primary/35 bg-primary/[0.04] shadow-[0_24px_70px_-30px_rgba(251,191,36,0.35)]"
-                  )}
-                >
-                  <h3 className="text-xl font-bold text-white">{plan.title}</h3>
-
-                  {plan.description && (
-                    <p className="mt-3 text-sm leading-[1.8] text-white/55">
-                      {plan.description}
-                    </p>
-                  )}
-
-                  {plan.features.length > 0 && (
-                    <ul className="mt-6 flex-1 space-y-3">
-                      {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-start gap-2.5">
-                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                          <span className="text-sm leading-relaxed text-white/70">
-                            {feature}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  <Link
-                    href={isSignedIn ? "/subscription" : "/register"}
-                    className={cn(
-                      "group mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-transform duration-200 hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
-                      plan.highlighted
-                        ? "bg-primary text-primary-foreground"
-                        : "border border-white/15 text-white/80"
-                    )}
-                  >
-                    {copy.pricing.cta}
-                    <Arrow />
-                  </Link>
-                </article>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          // The plans table is admin-owned and can legitimately be empty on a
-          // fresh install. Inventing prices here would be worse than saying
-          // what the subscription covers and linking to the real page.
-          <div className="mt-14 grid gap-10 lg:mt-20 lg:grid-cols-12">
-            <ul data-reveal-group className="lg:col-span-7">
-              {copy.pricing.fallback.map((point) => (
-                <li
-                  key={point}
-                  data-reveal-item
-                  className="flex items-center gap-4 border-b border-white/[0.07] py-5 last:border-b-0"
-                >
-                  <Check className="h-5 w-5 shrink-0 text-primary" />
-                  <span className="text-base text-white/75">{point}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div data-reveal className="lg:col-span-4 lg:col-start-9 lg:pt-4">
-              <Link
-                href={isSignedIn ? "/subscription" : "/register"}
-                className="group inline-flex min-h-13 items-center gap-2.5 rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-transform duration-200 hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              >
-                {copy.pricing.cta}
-                <Arrow />
-              </Link>
-              <p className="mt-4 text-xs text-white/35">{copy.pricing.note}</p>
-            </div>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
 
 export function LandingDay({ copy }: { copy: LandingCopy }) {
   return (
@@ -236,7 +116,7 @@ export function LandingFinal({
 
         <div data-reveal className="mt-10">
           <Link
-            href={isSignedIn ? "/menu" : "/register"}
+            href={isSignedIn ? "/menu" : "/sign-up"}
             className="group inline-flex min-h-14 items-center gap-2.5 rounded-full bg-primary px-10 py-4 text-base font-semibold text-primary-foreground shadow-[0_20px_60px_-16px_rgba(251,191,36,0.55)] transition-transform duration-200 hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             {copy.final.cta}

@@ -115,7 +115,7 @@ export function LandingHeader({
             </Link>
 
             <Link
-              href={isSignedIn ? "/menu" : "/register"}
+              href={isSignedIn ? "/menu" : "/sign-up"}
               className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-transform duration-200 hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               {isSignedIn ? copy.nav.dashboard : copy.nav.signUp}

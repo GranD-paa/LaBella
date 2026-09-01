@@ -18,9 +18,11 @@ import {
   LandingFaq,
   LandingFinal,
   LandingFooter,
-  LandingPricing,
-  type LandingPlan,
 } from "@/components/landing/landing-closing";
+import {
+  LandingPricing,
+  LandingPricingFallback,
+} from "@/components/landing/landing-pricing";
 import { LatticeRule } from "@/components/landing/lattice";
 import { ScrollEffects } from "@/components/landing/scroll-effects";
 import { getServerLocale } from "@/lib/i18n/server-locale";
@@ -28,8 +30,8 @@ import {
   getLandingCopy,
   getLandingLanguageCopy,
 } from "@/lib/landing/content";
+import { getLandingPricing } from "@/lib/landing/pricing";
 import { getVisibleLandingLanguages } from "@/lib/landing/visibility";
-import { getSubscriptionPlanMeta } from "@/lib/subscription/plans";
 import { getDataRepository } from "@/lib/data";
 import { getSiteUrl } from "@/lib/seo/site-url";
 
@@ -66,12 +68,13 @@ export default async function Home() {
   const locale = await getServerLocale();
   const copy = getLandingCopy(locale);
 
-  const [user, definitions, planRows, siteUrl] = await Promise.all([
+  const [user, definitions, pricing, siteUrl] = await Promise.all([
     repo.getAuthUser().catch(() => null),
     getVisibleLandingLanguages(repo),
-    // The plans table is admin-owned and may not exist on a fresh install.
-    // The pricing section has a copy-only fallback, so failing here is fine.
-    repo.getSubscriptionPlans().catch(() => []),
+    // Null when there is nothing to price — a fresh install with no plans, or
+    // a database this process cannot reach. Either way the section falls back
+    // to copy rather than an empty grid.
+    getLandingPricing(repo, locale).catch(() => null),
     getSiteUrl(),
   ]);
 
@@ -84,31 +87,6 @@ export default async function Home() {
     const entry = languageCopy[definition.slug];
     return entry ? [{ ...definition, copy: entry }] : [];
   });
-
-  // Plans are stored per language (`plan_slug` + `language_slug`), and the
-  // price differs between them — so the landing shows the tier structure and
-  // leaves every number to the subscription page. Quoting one language's price
-  // as if it were the price would be the dishonest shortcut here.
-  const seen = new Set<string>();
-  const plans: LandingPlan[] = planRows
-    .filter((row) => row.is_active)
-    .sort((a, b) => a.order_number - b.order_number)
-    .flatMap((row) => {
-      if (seen.has(row.plan_slug)) return [];
-      seen.add(row.plan_slug);
-
-      return [
-        {
-          id: row.plan_slug,
-          title: row.title?.[locale] ?? row.title?.fa ?? row.plan_slug,
-          description: row.description?.[locale] ?? row.description?.fa ?? "",
-          features: (row.features ?? [])
-            .map((feature) => feature?.[locale] ?? feature?.fa ?? "")
-            .filter(Boolean),
-          highlighted: getSubscriptionPlanMeta(row.plan_slug).highlighted,
-        },
-      ];
-    });
 
   const dir = locale === "fa" ? "rtl" : "ltr";
 
@@ -128,7 +106,16 @@ export default async function Home() {
         <LatticeRule />
         <LandingSteps copy={copy} />
         <LandingLanguages copy={copy} languages={languages} />
-        <LandingPricing copy={copy} plans={plans} isSignedIn={isSignedIn} />
+        {pricing ? (
+          <LandingPricing
+            copy={copy}
+            data={pricing}
+            isSignedIn={isSignedIn}
+            defaultToToman={locale === "fa"}
+          />
+        ) : (
+          <LandingPricingFallback copy={copy} isSignedIn={isSignedIn} />
+        )}
         <LandingDay copy={copy} />
         <LatticeRule />
         <LandingFaq copy={copy} />

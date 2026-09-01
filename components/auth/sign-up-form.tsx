@@ -25,12 +25,25 @@ import { resolveMessage } from "@/lib/i18n/resolve-message";
 import { createSignUpSchema } from "@/lib/validations/i18n/auth-schemas";
 import type { SignUpValues } from "@/lib/validations/auth";
 
-export function SignUpForm() {
+export function SignUpForm({
+  redirectTo,
+}: {
+  /**
+   * Where the visitor was heading when the middleware sent them here. Handed
+   * on to the login page so signing up and then signing in lands them on the
+   * page they actually asked for.
+   */
+  redirectTo?: string;
+} = {}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
   const { t } = useTranslations();
   const signUpSchema = useMemo(() => createSignUpSchema(t), [t]);
+
+  const loginHref = redirectTo
+    ? `/login?redirectedFrom=${encodeURIComponent(redirectTo)}`
+    : "/login";
 
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
@@ -56,7 +69,7 @@ export function SignUpForm() {
       }
       if (result && "success" in result) {
         toast.success(resolveMessage(t, result.message));
-        router.push("/login");
+        router.push(loginHref);
       }
     });
   }
@@ -234,7 +247,7 @@ export function SignUpForm() {
       <p className="text-center text-sm text-muted-foreground">
         {t("auth.hasAccount")}{" "}
         <Link
-          href="/login"
+          href={loginHref}
           className="font-medium text-foreground underline-offset-4 hover:underline"
         >
           {t("auth.signIn")}

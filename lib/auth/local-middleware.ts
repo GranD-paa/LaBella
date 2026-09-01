@@ -5,8 +5,10 @@ import {
   verifyLocalSessionToken,
 } from "@/lib/auth/local-session";
 
-// `/blog`, the sitemap and robots.txt are public on purpose: the blog is the
-// SEO surface, and a crawler hitting a login redirect would index nothing.
+// The landing page, `/blog`, the sitemap and robots.txt are public on purpose:
+// they are the whole SEO surface, and a crawler hitting an auth redirect would
+// index nothing. `/login` stays public so the header link and the sign-up
+// form both still reach it — it is simply no longer where a visitor is sent.
 const PUBLIC_ROUTES = [
   "/",
   "/login",
@@ -28,9 +30,12 @@ export async function updateLocalSession(request: NextRequest) {
     ? await verifyLocalSessionToken(rawSession)
     : null;
 
+  // Anyone reaching for the product without an account is sent to sign-up,
+  // not to login: they are overwhelmingly first-time visitors, and a password
+  // form is a dead end for someone who has no password yet.
   if (!userId && !isPublicRoute) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
+    redirectUrl.pathname = "/sign-up";
     redirectUrl.searchParams.set("redirectedFrom", pathname);
     return NextResponse.redirect(redirectUrl);
   }
@@ -45,13 +50,6 @@ export async function updateLocalSession(request: NextRequest) {
   if (userId && pathname === "/") {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/menu";
-    redirectUrl.search = "";
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  if (!userId && pathname === "/") {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
     redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }

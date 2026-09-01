@@ -68,6 +68,28 @@ export type LandingCopy = {
     sub: string;
     cta: string;
     note: string;
+    /** Replaces `note` while the grid is quoting Toman. */
+    tomanNote: string;
+    /** Shown when the selected language has not opened yet. */
+    comingSoonNote: string;
+    languageLabel: string;
+    periodLabel: string;
+    currencyLabel: string;
+    monthly: string;
+    quarterly: string;
+    euro: string;
+    toman: string;
+    popular: string;
+    /** `{percent}` — the quarterly incentive, on the period toggle. */
+    save: string;
+    /** `{percent}` — a plan's own discount, under its price. */
+    off: string;
+    /** `{amount}` — the per-month equivalent of a quarterly price. */
+    perMonth: string;
+    /** Unit printed after a monthly price. */
+    perMonthUnit: string;
+    /** Unit printed after a three-month price. */
+    perQuarter: string;
     /** Rendered when the plans table has nothing to show. */
     fallback: string[];
   };
@@ -251,8 +273,23 @@ const fa: LandingCopy = {
   pricing: {
     title: "یک اشتراک، همهٔ مسیرها",
     sub: "لازم نیست برای هر زبان جدا حساب کنی. تا وقتی اشتراکت فعال است، هر مسیری که باز باشد در دسترس توست.",
-    cta: "دیدن پلن‌ها",
-    note: "قیمت‌ها در صفحهٔ اشتراک به‌روز است.",
+    cta: "تهیهٔ اشتراک",
+    note: "همین قیمت است. پرداخت بعد از ساختن حساب انجام می‌شود.",
+    tomanNote: "مبلغ تومانی با نرخ روز حساب می‌شود و تا لحظهٔ پرداخت ممکن است کمی جابه‌جا شود.",
+    comingSoonNote: "این مسیر هنوز باز نشده. قیمت‌ها همان‌هایی است که روز افتتاح اعمال می‌شود.",
+    languageLabel: "زبان",
+    periodLabel: "دورهٔ پرداخت",
+    currencyLabel: "واحد پول",
+    monthly: "۱ ماهه",
+    quarterly: "۳ ماهه",
+    euro: "یورو",
+    toman: "تومان",
+    popular: "محبوب‌ترین",
+    save: "{percent}٪ کمتر",
+    off: "{percent}٪ تخفیف",
+    perMonth: "ماهانه {amount}",
+    perMonthUnit: "/ ماه",
+    perQuarter: "/ ۳ ماه",
     fallback: [
       "دسترسی به همهٔ زبان‌های فعال",
       "درس‌های تازه بدون هزینهٔ اضافه",
@@ -481,8 +518,23 @@ const en: LandingCopy = {
   pricing: {
     title: "One subscription, every path",
     sub: "No separate account per language. While your subscription is active, every open path is yours.",
-    cta: "See the plans",
-    note: "Current prices live on the subscription page.",
+    cta: "Get this plan",
+    note: "This is the price. Payment comes after you create your account.",
+    tomanNote: "The Toman figure follows the day's rate and can move slightly before you pay.",
+    comingSoonNote: "This path has not opened yet. These are the prices that will apply on the day it does.",
+    languageLabel: "Language",
+    periodLabel: "Billing period",
+    currencyLabel: "Currency",
+    monthly: "1 month",
+    quarterly: "3 months",
+    euro: "Euro",
+    toman: "Toman",
+    popular: "Most popular",
+    save: "{percent}% less",
+    off: "{percent}% off",
+    perMonth: "{amount} per month",
+    perMonthUnit: "/ month",
+    perQuarter: "/ 3 months",
     fallback: [
       "Access to every active language",
       "New lessons at no extra cost",

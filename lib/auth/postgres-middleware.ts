@@ -13,8 +13,11 @@ import { NextResponse, type NextRequest } from "next/server";
  * matters; a forged cookie gets someone the login-redirect skip and nothing
  * else.
  */
-// `/blog`, the sitemap and robots.txt are public on purpose: the blog is the
-// SEO surface, and a crawler hitting a login redirect would index nothing.
+// The landing page, `/blog`, the sitemap and robots.txt are public on purpose:
+// they are the whole SEO surface, and a crawler hitting an auth redirect would
+// index nothing. `/login` stays public so the header's "sign in" link and the
+// sign-up form's "already have an account" link both still work — it is simply
+// no longer where an anonymous visitor is *sent*.
 const PUBLIC_ROUTES = [
   "/",
   "/login",
@@ -33,9 +36,13 @@ export async function updatePostgresSession(request: NextRequest) {
   );
   const hasSession = Boolean(getSessionCookie(request));
 
+  // Anyone reaching for the product without an account is sent to sign-up,
+  // not to login. Almost everyone who lands on a protected URL is a visitor
+  // who has never had an account, and asking them for a password they do not
+  // have is a dead end; the returning learner is one link away on that page.
   if (!hasSession && !isPublicRoute) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
+    redirectUrl.pathname = "/sign-up";
     redirectUrl.searchParams.set("redirectedFrom", pathname);
     return NextResponse.redirect(redirectUrl);
   }
