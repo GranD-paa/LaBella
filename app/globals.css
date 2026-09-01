@@ -115,3 +115,301 @@
     animation: none !important;
   }
 }
+
+/* -------------------------------------------------------------------------
+   Blog article body.
+   Written as plain CSS rather than @apply so the rules can target elements
+   that only exist inside `dangerouslySetInnerHTML` output, where Tailwind's
+   class scanner never sees them.
+   ------------------------------------------------------------------------- */
+.blog-prose {
+  color: hsl(var(--muted-foreground));
+  font-size: 1.0625rem;
+  line-height: 1.9;
+}
+
+.blog-prose > * + * {
+  margin-top: 1.35em;
+}
+
+.blog-prose h2,
+.blog-prose h3,
+.blog-prose h4 {
+  color: hsl(var(--foreground));
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 2.2em;
+  margin-bottom: 0.7em;
+  scroll-margin-top: 5rem;
+}
+
+.blog-prose h2 {
+  font-size: 1.6rem;
+}
+.blog-prose h3 {
+  font-size: 1.3rem;
+}
+.blog-prose h4 {
+  font-size: 1.1rem;
+}
+
+.blog-prose a {
+  color: hsl(var(--primary));
+  text-underline-offset: 3px;
+  text-decoration: underline;
+}
+
+.blog-prose a:hover {
+  color: hsl(var(--foreground));
+}
+
+.blog-prose strong {
+  color: hsl(var(--foreground));
+  font-weight: 600;
+}
+
+.blog-prose ul,
+.blog-prose ol {
+  padding-inline-start: 1.5em;
+}
+
+.blog-prose ul {
+  list-style: disc;
+}
+.blog-prose ol {
+  list-style: decimal;
+}
+
+.blog-prose li + li {
+  margin-top: 0.5em;
+}
+
+.blog-prose li::marker {
+  color: hsl(var(--primary));
+}
+
+.blog-prose blockquote {
+  border-inline-start: 2px solid hsl(var(--primary));
+  padding-inline-start: 1.25rem;
+  color: hsl(var(--foreground));
+  font-style: normal;
+}
+
+.blog-prose img {
+  border-radius: 1rem;
+  border: 1px solid hsl(var(--border));
+  width: 100%;
+  height: auto;
+}
+
+.blog-prose code {
+  background: rgb(255 255 255 / 0.07);
+  border-radius: 0.35rem;
+  padding: 0.15em 0.4em;
+  font-size: 0.9em;
+  /* Code is always LTR even inside a right-to-left article. */
+  direction: ltr;
+  display: inline-block;
+}
+
+.blog-prose pre {
+  background: rgb(255 255 255 / 0.05);
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.9rem;
+  padding: 1.1rem 1.3rem;
+  overflow-x: auto;
+  direction: ltr;
+  text-align: left;
+}
+
+.blog-prose pre code {
+  background: none;
+  padding: 0;
+  display: inline;
+}
+
+.blog-prose hr {
+  border-color: hsl(var(--border));
+  margin-block: 2.5em;
+}
+
+.blog-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+}
+
+.blog-prose th,
+.blog-prose td {
+  border: 1px solid hsl(var(--border));
+  padding: 0.6rem 0.9rem;
+  text-align: start;
+}
+
+.blog-prose th {
+  color: hsl(var(--foreground));
+  font-weight: 600;
+  background: rgb(255 255 255 / 0.04);
+}
+
+/* -------------------------------------------------------------------------
+   Landing page.
+
+   The surface treatment the marketing page runs on: an aurora field, a film
+   grain, and the glass panels every card is cut from. Kept here rather than in
+   utility classes because each one is a stack of two or three layers that no
+   amount of `bg-` classes reads well as.
+   ------------------------------------------------------------------------- */
+
+/*
+ * Aurora. Three slow drifting blooms in the brand's own colours, sitting
+ * behind everything. This is what stops a near-black page reading as a flat
+ * sheet — and it is also the fallback the hero falls back *to* when a device
+ * has no WebGL, so it has to look deliberate on its own.
+ */
+.aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurora::before,
+.aurora::after {
+  content: "";
+  position: absolute;
+  width: 60rem;
+  height: 60rem;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.5;
+}
+
+.aurora::before {
+  top: -22rem;
+  inset-inline-start: -14rem;
+  background: radial-gradient(circle, rgba(114, 9, 183, 0.5), transparent 68%);
+  animation: aurora-drift-a 26s ease-in-out infinite alternate;
+}
+
+.aurora::after {
+  bottom: -26rem;
+  inset-inline-end: -16rem;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.16), transparent 66%);
+  animation: aurora-drift-b 32s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-drift-a {
+  to {
+    transform: translate3d(6rem, 4rem, 0) scale(1.12);
+  }
+}
+
+@keyframes aurora-drift-b {
+  to {
+    transform: translate3d(-5rem, -3rem, 0) scale(1.08);
+  }
+}
+
+/*
+ * Film grain over the whole page. An inline SVG turbulence rather than a PNG,
+ * so it costs no request and stays sharp at any DPR. `fixed` keeps it still
+ * while the page scrolls, which is what makes it read as emulsion over the
+ * frame instead of a texture glued to the content.
+ */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* The panel every card on the landing page is cut from. */
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.045),
+    rgb(255 255 255 / 0.015)
+  );
+  border: 1px solid rgb(255 255 255 / 0.09);
+  backdrop-filter: blur(14px);
+}
+
+.glass-hover {
+  transition:
+    border-color 240ms cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 240ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-hover:hover {
+  border-color: rgb(255 255 255 / 0.2);
+  transform: translateY(-3px);
+}
+
+/*
+ * Hairline that traces the top edge of a card, brightest in the middle. The
+ * detail that separates a glass panel from a grey box.
+ */
+.edge-light::before {
+  content: "";
+  position: absolute;
+  inset-inline: 12%;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.35),
+    transparent
+  );
+}
+
+/* The marquee under the hero. Two identical copies, so -50% loops seamlessly. */
+@keyframes ticker-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-track {
+  animation: ticker-drift 46s linear infinite;
+}
+
+[dir="rtl"] .ticker-track {
+  animation-name: ticker-drift-rtl;
+}
+
+@keyframes ticker-drift-rtl {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+
+.ticker-mask {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora::before,
+  .aurora::after,
+  .ticker-track {
+    animation: none;
+  }
+}

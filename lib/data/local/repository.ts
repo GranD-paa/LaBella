@@ -1,3 +1,4 @@
+import type { BlogPost } from "@/lib/blog/types";
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -177,6 +178,147 @@ export function createLocalRepository(): DataRepository {
 
       const store = getLocalStore();
       store.languageSettings[languageSlug] = enabled;
+      commitStore();
+      return {};
+    },
+
+    async getLandingLanguageVisibility() {
+      return { ...getLocalStore().landingLanguageSettings };
+    },
+
+    async setLandingLanguageVisibility(languageSlug, visible) {
+      const authUser = await this.getAuthUser();
+      if (!authUser) return { error: "You must be signed in." };
+
+      const currentProfile = await this.getProfileById(authUser.id);
+      if (!currentProfile?.is_admin) {
+        return { error: "Only admins can manage the landing page." };
+      }
+
+      const store = getLocalStore();
+      store.landingLanguageSettings[languageSlug] = visible;
+      commitStore();
+      return {};
+    },
+
+    // ------------------------------------------------------------------ blog
+    async getBlogCategories() {
+      return [...getLocalStore().blogCategories].sort(
+        (a, b) => a.orderNumber - b.orderNumber || a.name.localeCompare(b.name)
+      );
+    },
+
+    async getPublishedBlogPosts(options) {
+      const { categorySlug, limit = 12, offset = 0 } = options ?? {};
+
+      const matching = getLocalStore()
+        .blogPosts.filter(
+          (post) => post.status === "published" && post.publishedAt !== null
+        )
+        .filter(
+          (post) =>
+            !categorySlug || post.categorySlugs.includes(categorySlug)
+        )
+        .sort((a, b) =>
+          (b.publishedAt ?? "").localeCompare(a.publishedAt ?? "")
+        );
+
+      return {
+        posts: matching.slice(offset, offset + limit),
+        total: matching.length,
+      };
+    },
+
+    async getPublishedBlogPostBySlug(slug) {
+      return (
+        getLocalStore().blogPosts.find(
+          (post) =>
+            post.slug === slug &&
+            post.status === "published" &&
+            post.publishedAt !== null
+        ) ?? null
+      );
+    },
+
+    async getBlogPostsForAdmin() {
+      return [...getLocalStore().blogPosts].sort((a, b) =>
+        (b.publishedAt ?? b.updatedAt).localeCompare(a.publishedAt ?? a.updatedAt)
+      );
+    },
+
+    async getBlogPostById(id) {
+      return getLocalStore().blogPosts.find((post) => post.id === id) ?? null;
+    },
+
+    async upsertBlogPost(input) {
+      const authUser = await this.getAuthUser();
+      if (!authUser) return { error: "You must be signed in." };
+
+      const currentProfile = await this.getProfileById(authUser.id);
+      if (!currentProfile?.is_admin) {
+        return { error: "Only admins can manage the blog." };
+      }
+
+      const store = getLocalStore();
+      const now = new Date().toISOString();
+      const existing = input.id
+        ? store.blogPosts.find((post) => post.id === input.id)
+        : undefined;
+
+      if (store.blogPosts.some((post) => post.slug === input.slug && post.id !== input.id)) {
+        return { error: "That slug is already taken." };
+      }
+
+      // Mirrors the SQL: stamp published_at on first publish, keep it on
+      // re-edit, clear it when the post goes back to draft.
+      const publishedAt =
+        input.status !== "published"
+          ? null
+          : existing?.publishedAt ?? now;
+
+      const post: BlogPost = {
+        id: existing?.id ?? crypto.randomUUID(),
+        slug: input.slug,
+        title: input.title,
+        excerpt: input.excerpt,
+        content: input.content,
+        coverImageUrl: input.coverImageUrl,
+        status: input.status,
+        publishedAt,
+        authorId: input.authorId ?? existing?.authorId ?? authUser.id,
+        authorName: currentProfile.full_name ?? null,
+        metaTitle: input.metaTitle,
+        metaDescription: input.metaDescription,
+        canonicalUrl: input.canonicalUrl,
+        ogImageUrl: input.ogImageUrl,
+        noindex: input.noindex,
+        readingMinutes: input.readingMinutes ?? null,
+        createdAt: existing?.createdAt ?? now,
+        updatedAt: now,
+        categorySlugs: input.categorySlugs,
+      };
+
+      if (existing) {
+        store.blogPosts[store.blogPosts.indexOf(existing)] = post;
+      } else {
+        store.blogPosts.push(post);
+      }
+
+      commitStore();
+      return { id: post.id };
+    },
+
+    async deleteBlogPost(id) {
+      const authUser = await this.getAuthUser();
+      if (!authUser) return { error: "You must be signed in." };
+
+      const currentProfile = await this.getProfileById(authUser.id);
+      if (!currentProfile?.is_admin) {
+        return { error: "Only admins can manage the blog." };
+      }
+
+      const store = getLocalStore();
+      store.blogPosts = store.blogPosts.filter((post) => post.id !== id);
       commitStore();
       return {};
     },

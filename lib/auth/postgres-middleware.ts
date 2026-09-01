@@ -13,7 +13,18 @@ import { NextResponse, type NextRequest } from "next/server";
  * matters; a forged cookie gets someone the login-redirect skip and nothing
  * else.
  */
-const PUBLIC_ROUTES = ["/", "/login", "/sign-up", "/auth", "/api/auth"];
+// `/blog`, the sitemap and robots.txt are public on purpose: the blog is the
+// SEO surface, and a crawler hitting a login redirect would index nothing.
+const PUBLIC_ROUTES = [
+  "/",
+  "/login",
+  "/sign-up",
+  "/auth",
+  "/api/auth",
+  "/blog",
+  "/sitemap.xml",
+  "/robots.txt",
+];
 
 export async function updatePostgresSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;

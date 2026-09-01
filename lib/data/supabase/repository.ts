@@ -177,6 +177,49 @@ export function createSupabaseRepository(): DataRepository {
       return overrides;
     },
 
+    // The landing page shipped after the move to self-hosted Postgres, so the
+    // Supabase tables never got `landing_language_settings`. Returning an
+    // empty map leaves the landing page on its static defaults rather than
+    // erroring, which is the right behaviour for this legacy path.
+    async getLandingLanguageVisibility() {
+      return {};
+    },
+
+    async setLandingLanguageVisibility() {
+      return { error: "Landing page settings require the Postgres data source." };
+    },
+
+    // The blog shipped after the move to self-hosted Postgres and its tables
+    // were never created in Supabase. Reads come back empty and writes refuse,
+    // rather than throwing against tables that do not exist.
+    async getBlogCategories() {
+      return [];
+    },
+
+    async getPublishedBlogPosts() {
+      return { posts: [], total: 0 };
+    },
+
+    async getPublishedBlogPostBySlug() {
+      return null;
+    },
+
+    async getBlogPostsForAdmin() {
+      return [];
+    },
+
+    async getBlogPostById() {
+      return null;
+    },
+
+    async upsertBlogPost() {
+      return { error: "The blog requires the Postgres data source." };
+    },
+
+    async deleteBlogPost() {
+      return { error: "The blog requires the Postgres data source." };
+    },
+
     async setLanguageAvailability(languageSlug, enabled) {
       const supabase = await createClient();
       const { error } = await supabase

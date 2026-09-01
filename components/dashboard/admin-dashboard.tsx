@@ -10,8 +10,10 @@ import {
   CheckCircle2,
   ChevronDown,
   CreditCard,
+  FileText,
   Gauge,
   ImageIcon,
+  Landmark,
   Languages,
   ListChecks,
   Receipt,
@@ -265,6 +267,25 @@ export function AdminDashboard({
                   <Link href="/admin/accounting">
                     <Receipt className="h-4 w-4" />
                     {t("dashboard.admin.manageAccounting")}
+                  </Link>
+                </Button>
+              ) : null}
+              {/* The blog and the landing showcase are Persian-only surfaces
+                  (see components/admin/blog), so their labels are literal
+                  rather than translation keys. */}
+              {isSuperAdmin ? (
+                <Button asChild variant="outline" className="w-full justify-start border-white/20">
+                  <Link href="/admin/blog">
+                    <FileText className="h-4 w-4" />
+                    مدیریت وبلاگ
+                  </Link>
+                </Button>
+              ) : null}
+              {isSuperAdmin ? (
+                <Button asChild variant="outline" className="w-full justify-start border-white/20">
+                  <Link href="/admin/landing">
+                    <Landmark className="h-4 w-4" />
+                    صفحهٔ اصلی
                   </Link>
                 </Button>
               ) : null}

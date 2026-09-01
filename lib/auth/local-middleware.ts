@@ -5,7 +5,18 @@ import {
   verifyLocalSessionToken,
 } from "@/lib/auth/local-session";
 
-const PUBLIC_ROUTES = ["/", "/login", "/sign-up", "/auth"];
+// `/blog`, the sitemap and robots.txt are public on purpose: the blog is the
+// SEO surface, and a crawler hitting a login redirect would index nothing.
+const PUBLIC_ROUTES = [
+  "/",
+  "/login",
+  "/sign-up",
+  "/auth",
+  "/api/auth",
+  "/blog",
+  "/sitemap.xml",
+  "/robots.txt",
+];
 
 export async function updateLocalSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;

@@ -15,6 +15,7 @@ import type {
   ProfileSummary,
 } from "@/lib/data/repository";
 import type { CurriculumLevelOverrideRow } from "@/lib/curriculum/level-overrides";
+import type { BlogCategory, BlogPost } from "@/lib/blog/types";
 import type {
   Banner,
   FxRate,
@@ -38,6 +39,68 @@ import type {
 
 const PROFILE_COLUMNS =
   "id, full_name, avatar_url, email, is_admin, role, status, created_at";
+
+type BlogPostRow = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  content: string;
+  coverImageUrl: string | null;
+  status: string;
+  publishedAt: Date | string | null;
+  authorId: string | null;
+  authorName: string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  canonicalUrl: string | null;
+  ogImageUrl: string | null;
+  noindex: boolean;
+  readingMinutes: number | null;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  categorySlugs: string[] | null;
+};
+
+/**
+ * One select for every blog read, so the public list, the single post and the
+ * admin table can never drift into returning different shapes. Categories come
+ * back aggregated rather than joined, which keeps one post as exactly one row
+ * however many categories it carries.
+ */
+const BLOG_POST_SELECT = `
+  select p.id, p.slug, p.title, p.excerpt, p.content,
+         p.cover_image_url as "coverImageUrl", p.status,
+         p.published_at as "publishedAt", p.author_id as "authorId",
+         pr.full_name as "authorName",
+         p.meta_title as "metaTitle", p.meta_description as "metaDescription",
+         p.canonical_url as "canonicalUrl", p.og_image_url as "ogImageUrl",
+         p.noindex, p.reading_minutes as "readingMinutes",
+         p.created_at as "createdAt", p.updated_at as "updatedAt",
+         coalesce(
+           array(select pc.category_slug from blog_post_categories pc
+                 where pc.post_id = p.id order by pc.category_slug),
+           '{}'
+         ) as "categorySlugs"
+  from blog_posts p
+  left join profiles pr on pr.id = p.author_id`;
+
+function toIso(value: Date | string | null): string | null {
+  if (!value) return null;
+  return value instanceof Date ? value.toISOString() : value;
+}
+
+function mapBlogPost(row: BlogPostRow): BlogPost {
+  return {
+    ...row,
+    status: row.status === "published" ? "published" : "draft",
+    publishedAt: toIso(row.publishedAt),
+    createdAt: toIso(row.createdAt) ?? new Date().toISOString(),
+    updatedAt: toIso(row.updatedAt) ?? new Date().toISOString(),
+    categorySlugs: row.categorySlugs ?? [],
+  };
+}
+
 
 /** Turns a thrown database error into the `{ error }` shape callers expect. */
 function failure(error: unknown): { error: string } {
@@ -180,6 +243,183 @@ export function createPostgresRepository(): DataRepository {
           [languageSlug, enabled]
         )
       ),
+
+    async getLandingLanguageVisibility() {
+      // The landing page must render even on a database that predates
+      // db/004_landing_and_blog.sql, so a missing table falls back to the
+      // static defaults rather than taking down `/`.
+      try {
+        const rows = await query<{ language_slug: string; visible: boolean }>(
+          "select language_slug, visible from landing_language_settings"
+        );
+        return Object.fromEntries(
+          rows.map((row) => [row.language_slug, row.visible])
+        );
+      } catch {
+        return {};
+      }
+    },
+
+    setLandingLanguageVisibility: (languageSlug, visible) =>
+      mutate(() =>
+        execute(
+          `insert into landing_language_settings (language_slug, visible, updated_at)
+           values ($1, $2, now())
+           on conflict (language_slug)
+           do update set visible = excluded.visible, updated_at = now()`,
+          [languageSlug, visible]
+        )
+      ),
+
+    // ------------------------------------------------------------------ blog
+    getBlogCategories: () =>
+      query<BlogCategory>(
+        `select slug, name, description, order_number as "orderNumber"
+         from blog_categories
+         order by order_number, name`
+      ),
+
+    async getPublishedBlogPosts(options) {
+      const { categorySlug, limit = 12, offset = 0 } = options ?? {};
+
+      // The category filter is an EXISTS rather than a join: joining the
+      // category table would return one row per category per post, so a post
+      // in three categories would appear three times in the list.
+      const filters = ["p.status = 'published'", "p.published_at is not null"];
+      const values: unknown[] = [];
+
+      if (categorySlug) {
+        values.push(categorySlug);
+        filters.push(
+          `exists (select 1 from blog_post_categories pc
+                   where pc.post_id = p.id and pc.category_slug = $${values.length})`
+        );
+      }
+
+      const where = filters.join(" and ");
+
+      const totalRow = await queryOne<{ total: string }>(
+        `select count(*)::text as total from blog_posts p where ${where}`,
+        values
+      );
+
+      values.push(limit, offset);
+      const posts = await query<BlogPostRow>(
+        `${BLOG_POST_SELECT}
+         where ${where}
+         order by p.published_at desc
+         limit $${values.length - 1} offset $${values.length}`,
+        values
+      );
+
+      return {
+        posts: posts.map(mapBlogPost),
+        total: Number(totalRow?.total ?? 0),
+      };
+    },
+
+    async getPublishedBlogPostBySlug(slug) {
+      const row = await queryOne<BlogPostRow>(
+        `${BLOG_POST_SELECT}
+         where p.slug = $1 and p.status = 'published' and p.published_at is not null`,
+        [slug]
+      );
+      return row ? mapBlogPost(row) : null;
+    },
+
+    async getBlogPostsForAdmin() {
+      const rows = await query<BlogPostRow>(
+        `${BLOG_POST_SELECT}
+         order by coalesce(p.published_at, p.updated_at) desc`
+      );
+      return rows.map(mapBlogPost);
+    },
+
+    async getBlogPostById(id) {
+      const row = await queryOne<BlogPostRow>(
+        `${BLOG_POST_SELECT} where p.id = $1`,
+        [id]
+      );
+      return row ? mapBlogPost(row) : null;
+    },
+
+    async upsertBlogPost(input) {
+      try {
+        const id = await withTransaction(async (run) => {
+          // `published_at` is stamped the first time a post goes live and then
+          // left alone: re-editing a published post must not reorder the index
+          // or change the date shown in search results. Unpublishing clears it.
+          const rows = (await run(
+            `insert into blog_posts
+               (id, slug, title, excerpt, content, cover_image_url, status,
+                published_at, author_id, meta_title, meta_description,
+                canonical_url, og_image_url, noindex, reading_minutes, updated_at)
+             values
+               (coalesce($1::uuid, gen_random_uuid()), $2, $3, $4, $5, $6, $7,
+                case when $7 = 'published' then now() else null end,
+                $8, $9, $10, $11, $12, $13, $14, now())
+             on conflict (id) do update set
+               slug = excluded.slug,
+               title = excluded.title,
+               excerpt = excluded.excerpt,
+               content = excluded.content,
+               cover_image_url = excluded.cover_image_url,
+               status = excluded.status,
+               published_at = case
+                 when excluded.status <> 'published' then null
+                 else coalesce(blog_posts.published_at, now())
+               end,
+               meta_title = excluded.meta_title,
+               meta_description = excluded.meta_description,
+               canonical_url = excluded.canonical_url,
+               og_image_url = excluded.og_image_url,
+               noindex = excluded.noindex,
+               reading_minutes = excluded.reading_minutes,
+               updated_at = now()
+             returning id`,
+            [
+              input.id ?? null,
+              input.slug,
+              input.title,
+              input.excerpt,
+              input.content,
+              input.coverImageUrl,
+              input.status,
+              input.authorId ?? null,
+              input.metaTitle,
+              input.metaDescription,
+              input.canonicalUrl,
+              input.ogImageUrl,
+              input.noindex,
+              input.readingMinutes ?? null,
+            ]
+          )) as Array<{ id: string }>;
+
+          const postId = rows[0].id;
+
+          await run("delete from blog_post_categories where post_id = $1", [
+            postId,
+          ]);
+
+          for (const categorySlug of input.categorySlugs) {
+            await run(
+              `insert into blog_post_categories (post_id, category_slug)
+               values ($1, $2) on conflict do nothing`,
+              [postId, categorySlug]
+            );
+          }
+
+          return postId;
+        });
+
+        return { id };
+      } catch (error) {
+        return failure(error);
+      }
+    },
+
+    deleteBlogPost: (id) =>
+      mutate(() => execute("delete from blog_posts where id = $1", [id])),
 
     getCurriculumLevelOverrides: () =>
       query<CurriculumLevelOverrideRow>(

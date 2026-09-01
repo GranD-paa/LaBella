@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Vazirmatn } from "next/font/google";
+import { Instrument_Serif, Inter, Vazirmatn } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { LocaleProvider } from "@/components/providers/locale-provider";
@@ -17,6 +17,16 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const vazirmatn = Vazirmatn({
   subsets: ["arabic", "latin"],
   variable: "--font-fa",
+});
+
+// Display face for oversized latin headings and the language endonyms on the
+// landing page. Latin-only by nature, so Persian display text stays on
+// Vazirmatn at heavy weights rather than falling back to something mismatched.
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-display",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -67,7 +77,12 @@ export default function RootLayout({
     <html
       lang={DEFAULT_LOCALE}
       dir="rtl"
-      className={cn("font-sans", inter.variable, vazirmatn.variable)}
+      className={cn(
+        "font-sans",
+        inter.variable,
+        vazirmatn.variable,
+        instrumentSerif.variable
+      )}
       suppressHydrationWarning
     >
       <head>

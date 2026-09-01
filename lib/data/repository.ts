@@ -25,6 +25,11 @@ import type {
 } from "@/types";
 import type { Json } from "@/types/database.types";
 import type { CurriculumLevelOverrideRow } from "@/lib/curriculum/level-overrides";
+import type {
+  BlogCategory,
+  BlogPost,
+  BlogPostInput,
+} from "@/lib/blog/types";
 
 export type AuthUser = {
   id: string;
@@ -85,6 +90,32 @@ export interface DataRepository {
     languageSlug: string,
     enabled: boolean
   ): Promise<{ error?: string }>;
+
+  // Landing page showcase — which languages appear in the 3D stage on `/`.
+  // Deliberately separate from `language_settings` above: a language can be
+  // shown on the landing page as a teaser while its course is still closed,
+  // and a language with no curriculum at all (French, Spanish) has a landmark
+  // built but stays hidden until a super admin reveals it. Sparse map; a
+  // missing key means "use `defaultVisible` from lib/landing/languages.ts".
+  getLandingLanguageVisibility(): Promise<Record<string, boolean>>;
+  setLandingLanguageVisibility(
+    languageSlug: string,
+    visible: boolean
+  ): Promise<{ error?: string }>;
+
+  // Blog. The public reads only published posts; the admin panel reads
+  // everything, including drafts.
+  getBlogCategories(): Promise<BlogCategory[]>;
+  getPublishedBlogPosts(options?: {
+    categorySlug?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ posts: BlogPost[]; total: number }>;
+  getPublishedBlogPostBySlug(slug: string): Promise<BlogPost | null>;
+  getBlogPostsForAdmin(): Promise<BlogPost[]>;
+  getBlogPostById(id: string): Promise<BlogPost | null>;
+  upsertBlogPost(input: BlogPostInput): Promise<{ error?: string; id?: string }>;
+  deleteBlogPost(id: string): Promise<{ error?: string }>;
 
   // Curriculum level customization — super-admin renames of default levels
   // and brand-new levels (e.g. A2/B1/B2) added on top of the static

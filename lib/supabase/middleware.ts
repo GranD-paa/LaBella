@@ -1,7 +1,18 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_ROUTES = ["/", "/login", "/sign-up", "/auth"];
+// `/blog`, the sitemap and robots.txt are public on purpose: the blog is the
+// SEO surface, and a crawler hitting a login redirect would index nothing.
+const PUBLIC_ROUTES = [
+  "/",
+  "/login",
+  "/sign-up",
+  "/auth",
+  "/api/auth",
+  "/blog",
+  "/sitemap.xml",
+  "/robots.txt",
+];
 
 /**
  * Refreshes the Supabase auth session on every request and redirects

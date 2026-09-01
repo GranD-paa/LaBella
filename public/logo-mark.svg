@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 512" role="img" aria-label="Laparli">
+  <defs>
+    <linearGradient id="lp-violet" gradientUnits="userSpaceOnUse" x1="20" y1="20" x2="410" y2="490">
+      <stop offset="0" stop-color="#A87BE8"/>
+      <stop offset="0.55" stop-color="#7E43C4"/>
+      <stop offset="1" stop-color="#4C2080"/>
+    </linearGradient>
+    <linearGradient id="lp-gold" gradientUnits="userSpaceOnUse" x1="140" y1="215" x2="320" y2="412">
+      <stop offset="0" stop-color="#FBC838"/>
+      <stop offset="1" stop-color="#E89D1C"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#lp-violet)">
+    <rect x="0" y="5" width="115" height="500" rx="57.5"/>
+    <path fill-rule="evenodd" d="M60 105h140c130 0 240 90 240 200s-110 200-240 200H60Z
+      M115 220c0-22 18-40 40-40h45c85 0 155 56 155 125s-70 125-155 125h-45c-22 0-40-18-40-40Z"/>
+  </g>
+  <path fill="url(#lp-gold)" d="M232 215c49 0 88 37 88 82s-39 82-88 82h-28c-10 20-32 31-58 33
+    17-13 24-28 20-43-17-16-28-41-28-67 0-45 42-87 94-87Z"/>
+</svg>

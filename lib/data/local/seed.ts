@@ -1,3 +1,4 @@
+import type { BlogCategory, BlogPost } from "@/lib/blog/types";
 import type {
   Banner,
   FxRate,
@@ -46,6 +47,9 @@ export type LocalDatabase = {
   // Missing keys fall back to the static default in
   // lib/curriculum/languages.ts (only Italian is active by default).
   languageSettings: Record<string, boolean>;
+  landingLanguageSettings: Record<string, boolean>;
+  blogCategories: BlogCategory[];
+  blogPosts: BlogPost[];
   // Super-admin renames of default curriculum levels and brand-new levels
   // (e.g. A2/B1/B2) added from the Language Management page.
   curriculumLevelOverrides: CurriculumLevelOverrideRow[];
@@ -365,6 +369,9 @@ export const LOCAL_SEED: LocalDatabase = {
   userQuizAttempts: [],
   learningStates: [],
   languageSettings: {},
+  landingLanguageSettings: {},
+  blogCategories: [],
+  blogPosts: [],
   curriculumLevelOverrides: [],
   banners: [],
   subscriptionPlans: DEFAULT_SUBSCRIPTION_PLANS.map((plan) => ({ ...plan })),
