@@ -34,7 +34,7 @@ export type LandingCourse = {
   available: boolean;
   /** 16:9 backdrop. */
   flag: string;
-  /** 9:16 backdrop, for phone viewports. */
+  /** 9:16 backdrop, for portrait viewports. */
   flagPhone: string;
   /** Circular flag for the side slots. */
   globe: string;
@@ -75,7 +75,7 @@ export function LandingHero({
   // intent. Four full-bleed photographs on first paint is not a hero, it is a
   // download.
   const [warmed, setWarmed] = useState<Set<string>>(() => new Set([featured]));
-  const [phone, setPhone] = useState(false);
+  const [portrait, setPortrait] = useState(false);
 
   const index = courses.findIndex((course) => course.slug === featured);
   const count = courses.length;
@@ -88,11 +88,14 @@ export function LandingHero({
     );
   }, []);
 
-  /* A 16:9 flag centred in a phone viewport shows the Italian flag's white
-     middle band and nothing else, so narrow screens get a 9:16 render. */
+  /* A 16:9 flag centred in a portrait viewport shows the Italian flag's white
+     middle band and nothing else, so those get a 9:16 render instead.
+     The test is the viewport's shape, not its width: a 900x1400 desktop window
+     is as badly cropped as a phone, and a width breakpoint would hand it the
+     landscape file anyway. */
   useEffect(() => {
-    const query = window.matchMedia("(max-width: 579px)");
-    const sync = () => setPhone(query.matches);
+    const query = window.matchMedia("(max-aspect-ratio: 5/4)");
+    const sync = () => setPortrait(query.matches);
     sync();
     query.addEventListener("change", sync);
     return () => query.removeEventListener("change", sync);
@@ -273,7 +276,7 @@ export function LandingHero({
             style={
               warmed.has(course.slug)
                 ? {
-                    backgroundImage: `url(${phone ? course.flagPhone : course.flag})`,
+                    backgroundImage: `url(${portrait ? course.flagPhone : course.flag})`,
                   }
                 : undefined
             }
