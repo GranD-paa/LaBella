@@ -1,0 +1,410 @@
+/*
+ * The liquid-glass panel every card under the hero is cut from, and the gold
+ * ornaments that sit inside it.
+ *
+ * Three layers are what separate glass from a grey box with a border:
+ *
+ *   1. a blurred, saturated backdrop, so whatever bloom the section paints
+ *      behind the grid bends as it passes through the card;
+ *   2. a 1px rim drawn as a masked gradient rather than a flat border —
+ *      bright where the light would strike the top-left corner, gold where it
+ *      leaves the bottom-right, which is the whole trick;
+ *   3. a specular bloom that follows the pointer.
+ *
+ * The bloom is positioned from two custom properties the card carries, so
+ * tracking the cursor is a style write on one node and never a React render.
+ * See trackPointer in glass.tsx.
+ *
+ * The ornaments live here rather than in sections.module.css because most of
+ * them react to the card's own hover, and a CSS module cannot reach into
+ * another one to do that.
+ */
+
+.card {
+  position: relative;
+  isolation: isolate;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(
+      158deg,
+      rgb(255 255 255 / 0.075) 0%,
+      rgb(255 255 255 / 0.022) 46%,
+      rgb(255 255 255 / 0.05) 100%
+    ),
+    rgb(255 255 255 / 0.012);
+  backdrop-filter: blur(22px) saturate(155%);
+  -webkit-backdrop-filter: blur(22px) saturate(155%);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.11),
+    inset 0 -20px 36px -28px rgb(255 255 255 / 0.35),
+    0 24px 48px -34px rgb(0 0 0 / 0.9);
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The rim. A gradient behind a two-layer mask that keeps only the 1px of
+   padding, which is the one way to get a border that changes colour along its
+   own length. */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    152deg,
+    rgb(255 255 255 / 0.34) 0%,
+    rgb(255 255 255 / 0.07) 34%,
+    rgb(255 255 255 / 0.04) 62%,
+    rgb(251 191 36 / 0.26) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: background 420ms ease;
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 520ms ease;
+  background: radial-gradient(
+    15rem 15rem at var(--gx, 50%) var(--gy, 0%),
+    rgb(255 255 255 / 0.085) 0%,
+    rgb(251 191 36 / 0.1) 34%,
+    transparent 68%
+  );
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+}
+
+.card:hover,
+.card:focus-within {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.2),
+    inset 0 -20px 36px -28px rgb(255 255 255 / 0.45),
+    0 34px 62px -36px rgb(0 0 0 / 1),
+    0 0 36px -14px rgb(251 191 36 / 0.2);
+}
+
+.card:hover::before,
+.card:focus-within::before {
+  background: linear-gradient(
+    152deg,
+    rgb(255 255 255 / 0.5) 0%,
+    rgb(255 255 255 / 0.1) 32%,
+    rgb(251 191 36 / 0.2) 62%,
+    rgb(251 191 36 / 0.55) 100%
+  );
+}
+
+.card:hover .glow,
+.card:focus-within .glow {
+  opacity: 1;
+}
+
+/* A card carrying the emphasis — the recommended plan. Gold is already in the
+   rim, so here it moves into the fill and the drop shadow. */
+.gold {
+  background:
+    linear-gradient(
+      158deg,
+      rgb(251 191 36 / 0.12) 0%,
+      rgb(251 191 36 / 0.03) 48%,
+      rgb(255 255 255 / 0.05) 100%
+    ),
+    rgb(255 255 255 / 0.014);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.16),
+    inset 0 -20px 36px -28px rgb(251 191 36 / 0.4),
+    0 28px 60px -34px rgb(251 191 36 / 0.32);
+}
+
+.gold::before {
+  background: linear-gradient(
+    152deg,
+    rgb(251 191 36 / 0.6) 0%,
+    rgb(251 191 36 / 0.18) 40%,
+    rgb(255 255 255 / 0.1) 70%,
+    rgb(251 191 36 / 0.5) 100%
+  );
+}
+
+/* A row in a list of rows lifts less than a card in a grid — three pixels of
+   travel on eight stacked panels reads as the page wobbling. */
+.still:hover,
+.still:focus-within {
+  transform: none;
+}
+
+/* An open question is the one the visitor is reading; the panel says so. */
+.card:has(details[open]) {
+  background:
+    linear-gradient(
+      158deg,
+      rgb(255 255 255 / 0.1) 0%,
+      rgb(255 255 255 / 0.035) 46%,
+      rgb(255 255 255 / 0.06) 100%
+    ),
+    rgb(255 255 255 / 0.02);
+}
+
+/* --------------------------------------------------------------- ornaments */
+
+/*
+ * The index dial. It replaces the bare 01 the cards used to carry: the gold
+ * arc is the item's position in the list, so a glance says "second of three"
+ * without the visitor counting cards.
+ */
+.dial {
+  position: relative;
+  display: inline-flex;
+  height: 3rem;
+  width: 3rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.dial::before {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(251 191 36 / 0.3), transparent 66%);
+  opacity: 0.45;
+  transition: opacity 420ms ease;
+}
+
+.card:hover .dial::before,
+.card:focus-within .dial::before {
+  opacity: 1;
+}
+
+.dialTrack {
+  stroke: rgb(255 255 255 / 0.1);
+}
+
+.dialArc {
+  stroke: #fbbf24;
+  filter: drop-shadow(0 0 5px rgb(251 191 36 / 0.55));
+}
+
+.dialNum {
+  position: relative;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #fbbf24;
+}
+
+/* The module icon sits on a gold chip rather than a flat tinted square: a lit
+   pane of the same glass, one step warmer than the card around it. */
+.tile {
+  position: relative;
+  display: flex;
+  height: 2.875rem;
+  width: 2.875rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.95rem;
+  color: #fbbf24;
+  background: linear-gradient(
+    150deg,
+    rgb(251 191 36 / 0.24),
+    rgb(251 191 36 / 0.05)
+  );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.24),
+    inset 0 0 0 1px rgb(251 191 36 / 0.22),
+    0 12px 26px -16px rgb(251 191 36 / 0.5);
+  transition:
+    box-shadow 420ms ease,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover .tile,
+.card:focus-within .tile {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    inset 0 0 0 1px rgb(251 191 36 / 0.45),
+    0 16px 34px -14px rgb(251 191 36 / 0.55);
+}
+
+/* A small gold disc for a single glyph — the tick on a feature, the plus on a
+   question. */
+.chip {
+  display: inline-flex;
+  height: 1.9rem;
+  width: 1.9rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #fbbf24;
+  background: radial-gradient(
+    circle at 30% 25%,
+    rgb(251 191 36 / 0.28),
+    rgb(251 191 36 / 0.07)
+  );
+  box-shadow: inset 0 0 0 1px rgb(251 191 36 / 0.28);
+  transition:
+    box-shadow 320ms ease,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover .chip,
+.card:focus-within .chip {
+  box-shadow:
+    inset 0 0 0 1px rgb(251 191 36 / 0.55),
+    0 0 18px -6px rgb(251 191 36 / 0.5);
+}
+
+/* The plus on an open question turns into a cross, on the gold disc itself. */
+details[open] .chip {
+  transform: rotate(135deg);
+  box-shadow:
+    inset 0 0 0 1px rgb(251 191 36 / 0.55),
+    0 0 18px -6px rgb(251 191 36 / 0.5);
+}
+
+/*
+ * The step number, and the gold rail that runs out of it. The rail is a flex
+ * sibling rather than an absolute box, so it takes whatever width is left and
+ * reaches past the padding to the card's own edge, where the card clips it —
+ * a run of three cards that share one line, without drawing anything across a
+ * gap the mobile layout does not have.
+ */
+.disc {
+  position: relative;
+  display: inline-flex;
+  height: 2.75rem;
+  width: 2.75rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fbbf24;
+  background: radial-gradient(
+    circle at 32% 26%,
+    rgb(251 191 36 / 0.3),
+    rgb(251 191 36 / 0.06)
+  );
+  box-shadow:
+    inset 0 0 0 1px rgb(251 191 36 / 0.35),
+    0 10px 26px -14px rgb(251 191 36 / 0.55);
+  transition: box-shadow 420ms ease;
+}
+
+.card:hover .disc,
+.card:focus-within .disc {
+  box-shadow:
+    inset 0 0 0 1px rgb(251 191 36 / 0.65),
+    0 0 26px -8px rgb(251 191 36 / 0.6);
+}
+
+.trail {
+  flex: 1;
+  height: 1px;
+  margin-inline-end: -2rem;
+  background-image: linear-gradient(
+    to right,
+    rgb(251 191 36 / 0.55),
+    rgb(251 191 36 / 0)
+  );
+  opacity: 0.7;
+  transition: opacity 420ms ease;
+}
+
+:global([dir="rtl"]) .trail {
+  background-image: linear-gradient(
+    to left,
+    rgb(251 191 36 / 0.55),
+    rgb(251 191 36 / 0)
+  );
+}
+
+.card:hover .trail,
+.card:focus-within .trail {
+  opacity: 1;
+}
+
+/*
+ * Three bars under a time-of-day label, filled up to the slot the card names.
+ * The same gold that used to be spent on the label alone, now doing the work
+ * of saying where in the day this one sits.
+ */
+.meter {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.bar {
+  height: 3px;
+  width: 1.35rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+  transition:
+    background 420ms ease,
+    box-shadow 420ms ease;
+}
+
+.barOn {
+  background: linear-gradient(90deg, rgb(251 191 36 / 0.55), #fbbf24);
+  box-shadow: 0 0 10px -2px rgb(251 191 36 / 0.6);
+}
+
+/* The section bloom. Glass needs something behind it to bend, and a near-black
+   page gives it nothing — so each grid gets one soft light of its own. */
+.bloom {
+  position: absolute;
+  inset-inline: 0;
+  top: 18%;
+  z-index: -1;
+  height: 34rem;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      36rem 20rem at 22% 30%,
+      rgb(114 9 183 / 0.22),
+      transparent 70%
+    ),
+    radial-gradient(
+      30rem 18rem at 82% 70%,
+      rgb(251 191 36 / 0.09),
+      transparent 70%
+    );
+  filter: blur(10px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card:hover,
+  .card:focus-within,
+  .tile,
+  .chip {
+    transform: none;
+    transition-duration: 1ms;
+  }
+}

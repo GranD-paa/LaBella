@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { Arrow, Check, SectionHead } from "@/components/landing/landing-bits";
+import { LiquidCard, SectionBloom } from "@/components/landing/glass";
 import type { CourseDeck } from "@/lib/landing/decks";
 import { fill, type LandingCopy } from "@/lib/landing/content";
 import type {
@@ -84,10 +85,7 @@ export function PricingSection({
       id="pricing"
       className="relative scroll-mt-24 py-24 sm:py-32 lg:py-40"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[30rem] bg-[radial-gradient(ellipse_45%_60%_at_50%_0%,rgba(114,9,183,0.16),transparent)]"
-      />
+      <SectionBloom />
 
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
         <SectionHead
@@ -154,7 +152,7 @@ export function PricingSection({
 
         <ul
           className={cn(
-            "mt-10 grid gap-4",
+            "mt-10 grid gap-5",
             plans.length >= 4
               ? "sm:grid-cols-2 xl:grid-cols-4"
               : plans.length === 3
@@ -168,12 +166,10 @@ export function PricingSection({
 
             return (
               <li key={plan.planSlug}>
-                <article
-                  className={cn(
-                    "glass edge-light relative flex h-full flex-col overflow-hidden rounded-3xl p-7 sm:p-8",
-                    plan.highlighted &&
-                      "border-primary/35 bg-primary/[0.04] shadow-[0_24px_70px_-30px_rgba(251,191,36,0.35)]"
-                  )}
+                <LiquidCard
+                  as="article"
+                  tone={plan.highlighted ? "gold" : undefined}
+                  contentClassName="flex h-full flex-col p-7 sm:p-8"
                 >
                   {plan.highlighted && (
                     <p className="mb-4 inline-flex w-fit rounded-full bg-primary/15 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-primary">
@@ -216,7 +212,7 @@ export function PricingSection({
                     {copy.pricing.cta}
                     <Arrow />
                   </Link>
-                </article>
+                </LiquidCard>
               </li>
             );
           })}
@@ -307,10 +303,7 @@ export function PricingFallback({
       id="pricing"
       className="relative scroll-mt-24 py-24 sm:py-32 lg:py-40"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[30rem] bg-[radial-gradient(ellipse_45%_60%_at_50%_0%,rgba(114,9,183,0.16),transparent)]"
-      />
+      <SectionBloom />
 
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
         <SectionHead

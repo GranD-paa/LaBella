@@ -2502,15 +2502,15 @@
     "semantic_hash": ""
   },
   "lib/landing/content.ts": {
-    "mtime": 1788356554.1632643,
-    "seen": 1788357030.1442397,
-    "ast_hash": "f3a4c34d3307b608fcf620fa6e3f16c7",
+    "mtime": 1788357088.8780513,
+    "seen": 1788375327.5163715,
+    "ast_hash": "4e33fbe78a1c84f86aa42f74aec0f3e5",
     "semantic_hash": ""
   },
   "components/landing/landing-bits.tsx": {
-    "mtime": 1788262021.8872645,
-    "seen": 1788262897.9816287,
-    "ast_hash": "49170fd6e424f93350cfc266bc4920c0",
+    "mtime": 1788374768.6884165,
+    "seen": 1788375327.515874,
+    "ast_hash": "9d0c9cba9866b87e2cb50f466c777b25",
     "semantic_hash": ""
   },
   "lib/landing/pricing.ts": {
@@ -2520,39 +2520,39 @@
     "semantic_hash": ""
   },
   "components/landing/hero.tsx": {
-    "mtime": 1788356493.1519773,
-    "seen": 1788357030.1442397,
-    "ast_hash": "ff9e4de6675292af5c94966759b78ffc",
+    "mtime": 1788359230.245211,
+    "seen": 1788375327.515874,
+    "ast_hash": "cf560aa542f23d0bc9f57ea5c6f3c09e",
     "semantic_hash": ""
   },
   "components/landing/landing.tsx": {
-    "mtime": 1788356493.1529777,
-    "seen": 1788357030.1442397,
-    "ast_hash": "fea8ffa1864187624e50221a8a561968",
+    "mtime": 1788357075.2808135,
+    "seen": 1788375327.515874,
+    "ast_hash": "4e9614a2e3561403a8f2c3548a6e2ea5",
     "semantic_hash": ""
   },
   "components/landing/pricing-section.tsx": {
-    "mtime": 1788356493.1534777,
-    "seen": 1788357030.1442397,
-    "ast_hash": "06791c699f15e11b17affc0e55651e30",
+    "mtime": 1788374932.6458104,
+    "seen": 1788375327.515874,
+    "ast_hash": "9acc5fc5e83b3fd8fb11ba5b6c7d4045",
     "semantic_hash": ""
   },
   "components/landing/sections.tsx": {
-    "mtime": 1788356493.1544776,
-    "seen": 1788357030.1442397,
-    "ast_hash": "fb74a20c9cb8c67541b4e6e78b54efd0",
+    "mtime": 1788376043.6563904,
+    "seen": 1788376092.9593437,
+    "ast_hash": "e936e9631c0a2e52fec95fd09f73c3b9",
     "semantic_hash": ""
   },
   "lib/landing/brand.ts": {
-    "mtime": 1788356493.2320063,
-    "seen": 1788357030.1442397,
-    "ast_hash": "730ff1184755f3eb76021076652298dc",
+    "mtime": 1788357088.8775506,
+    "seen": 1788375327.5163715,
+    "ast_hash": "0c6ebade5dc4f78027e67a2a1c6d8765",
     "semantic_hash": ""
   },
   "lib/landing/decks.ts": {
-    "mtime": 1788354362.6807547,
-    "seen": 1788357030.1442397,
-    "ast_hash": "1f3374d6e24df898641734b70f187a12",
+    "mtime": 1788357088.8785508,
+    "seen": 1788375327.5163715,
+    "ast_hash": "155f64fbe1309133a8c2a50f4f99cefa",
     "semantic_hash": ""
   },
   "public/landing/bg-de.webp": {
@@ -2625,6 +2625,12 @@
     "mtime": 1788349907.972159,
     "seen": 1788357030.1447392,
     "ast_hash": "a1454bbb5b13a30a70af5851b3aaa8a4",
+    "semantic_hash": ""
+  },
+  "components/landing/glass.tsx": {
+    "mtime": 1788374919.6931658,
+    "seen": 1788375327.515874,
+    "ast_hash": "3a426f980c5aa7b344cc673fee3f9a61",
     "semantic_hash": ""
   }
 }

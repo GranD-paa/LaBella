@@ -3,11 +3,26 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-import { Check, LESSON_ICONS, SectionHead } from "@/components/landing/landing-bits";
+import {
+  Check,
+  DAY_ICONS,
+  LESSON_ICONS,
+  SectionHead,
+} from "@/components/landing/landing-bits";
 import type { CourseDeck } from "@/lib/landing/decks";
 import { fill, type LandingCopy } from "@/lib/landing/content";
 import { cn } from "@/lib/utils";
 
+import {
+  DayMeter,
+  GoldChip,
+  GoldTile,
+  IndexDial,
+  LiquidCard,
+  SectionBloom,
+  StepDisc,
+  StepTrail,
+} from "./glass";
 import styles from "./sections.module.css";
 
 /**
@@ -19,23 +34,28 @@ import styles from "./sections.module.css";
  * time. The method sections take the course name by interpolation rather than
  * being written four times; see `lib/landing/content.ts`.
  *
- * The small shared pieces (`SectionHead`, `Check`, the module icons) come from
- * the live landing page on purpose. The dependency only runs that way — this
- * page borrows from `components/landing/`, never the reverse — so nothing here
- * can affect what `/` renders.
+ * Every panel on the page is a `LiquidCard` from `./glass` — one material,
+ * separated by real gaps rather than fused into a single slab, so a grid reads
+ * as a set of things rather than a table. The gold is spent on the ornaments
+ * that carry meaning (a position dial, a time-of-day meter, the thread between
+ * steps) instead of on printing a number in yellow.
  */
 
 /** Fades a block in the first time it comes into view, then stops watching. */
 function Reveal({
+  as: Tag = "div",
   children,
   className,
   delay = 0,
 }: {
+  /** `li` keeps an ordered list's markup honest — the reveal wrapper would
+      otherwise sit between the `ol` and its items. */
+  as?: "div" | "li";
   children: React.ReactNode;
   className?: string;
   delay?: number;
 }) {
-  const ref = useRef<HTMLDivElement | null>(null);
+  const ref = useRef<HTMLElement | null>(null);
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
@@ -56,13 +76,13 @@ function Reveal({
   }, []);
 
   return (
-    <div
-      ref={ref}
+    <Tag
+      ref={ref as never}
       className={cn(styles.reveal, shown && styles.revealed, className)}
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
     >
       {children}
-    </div>
+    </Tag>
   );
 }
 
@@ -179,7 +199,12 @@ export function LandingHurdles({
   copy: LandingCopy;
 }) {
   return (
-    <section id="method" className="scroll-mt-24 py-24 sm:py-32 lg:py-40">
+    <section
+      id="method"
+      className="relative scroll-mt-24 py-24 sm:py-32 lg:py-40"
+    >
+      <SectionBloom />
+
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
         <Reveal>
           <SectionHead
@@ -189,20 +214,21 @@ export function LandingHurdles({
           />
         </Reveal>
 
-        <div className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.06] sm:grid-cols-3">
+        {/* Three separate panels rather than one slab divided by hairlines:
+            these are three unrelated difficulties, not three columns of a
+            table, and the gap is what says so. */}
+        <div className="mt-14 grid gap-5 sm:grid-cols-3">
           {deck.hurdles.map((hurdle, index) => (
             <Reveal key={hurdle.title} delay={index * 90}>
-              <div className="h-full bg-[#0b0320] p-7 sm:p-8">
-                <span className="text-[0.68rem] font-semibold tracking-[0.2em] text-primary">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <h3 className="mt-4 text-lg font-semibold text-white">
+              <LiquidCard contentClassName="p-7 sm:p-8">
+                <IndexDial index={index} total={deck.hurdles.length} />
+                <h3 className="mt-5 text-lg font-semibold text-white">
                   {hurdle.title}
                 </h3>
-                <p className="mt-3 text-sm leading-[1.9] text-white/55">
+                <p className="mt-3 text-sm leading-[1.9] text-white/60">
                   {hurdle.body}
                 </p>
-              </div>
+              </LiquidCard>
             </Reveal>
           ))}
         </div>
@@ -222,6 +248,8 @@ export function LandingLesson({
 }) {
   return (
     <section className="relative border-y border-white/[0.07] bg-white/[0.015] py-24 sm:py-32 lg:py-40">
+      <SectionBloom />
+
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
         <Reveal>
           <SectionHead
@@ -230,20 +258,18 @@ export function LandingLesson({
           />
         </Reveal>
 
-        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {copy.lesson.parts.map((part, index) => (
             <Reveal key={part.title} delay={index * 70}>
-              <div className="h-full rounded-2xl border border-white/[0.08] bg-[#0b0320] p-6">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  {LESSON_ICONS[index]}
-                </span>
+              <LiquidCard contentClassName="p-6 sm:p-7">
+                <GoldTile>{LESSON_ICONS[index]}</GoldTile>
                 <h3 className="mt-5 text-base font-semibold text-white">
                   {part.title}
                 </h3>
-                <p className="mt-2.5 text-sm leading-[1.9] text-white/55">
+                <p className="mt-2.5 text-sm leading-[1.9] text-white/60">
                   {fill(part.body, { course: deck.name })}
                 </p>
-              </div>
+              </LiquidCard>
             </Reveal>
           ))}
         </div>
@@ -262,7 +288,9 @@ export function LandingFeatures({
   copy: LandingCopy;
 }) {
   return (
-    <section className="py-24 sm:py-32 lg:py-40">
+    <section className="relative py-24 sm:py-32 lg:py-40">
+      <SectionBloom />
+
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
         <Reveal>
           <SectionHead
@@ -271,17 +299,24 @@ export function LandingFeatures({
           />
         </Reveal>
 
-        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {copy.features.items.map((item, index) => (
             <Reveal key={item.title} delay={(index % 3) * 80}>
-              <div className="h-full rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6">
-                <h3 className="text-base font-semibold text-white">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-sm leading-[1.9] text-white/55">
+              <LiquidCard contentClassName="p-6 sm:p-7">
+                {/* Each of these is something the visitor gets, so the gold
+                    goes on a tick rather than on the heading. */}
+                <div className="flex items-center gap-3.5">
+                  <GoldChip>
+                    <Check className="h-3.5 w-3.5" />
+                  </GoldChip>
+                  <h3 className="text-base font-semibold text-white">
+                    {item.title}
+                  </h3>
+                </div>
+                <p className="mt-4 text-sm leading-[1.9] text-white/60">
                   {fill(item.body, { course: deck.name })}
                 </p>
-              </div>
+              </LiquidCard>
             </Reveal>
           ))}
         </div>
@@ -302,7 +337,9 @@ export function LandingSteps({
   isSignedIn: boolean;
 }) {
   return (
-    <section className="border-y border-white/[0.07] bg-white/[0.015] py-24 sm:py-32">
+    <section className="relative border-y border-white/[0.07] bg-white/[0.015] py-24 sm:py-32">
+      <SectionBloom />
+
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
         <Reveal>
           <SectionHead
@@ -311,20 +348,26 @@ export function LandingSteps({
           />
         </Reveal>
 
-        <ol className="mt-14 grid gap-8 sm:grid-cols-3">
+        <ol className="mt-14 grid gap-5 sm:grid-cols-3">
           {copy.steps.items.map((step, index) => (
-            <Reveal key={step.title} delay={index * 90}>
-              <li className="list-none">
-                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-primary/30 text-sm font-semibold text-primary">
-                  {index + 1}
-                </span>
+            <Reveal as="li" key={step.title} className="list-none" delay={index * 90}>
+              <LiquidCard contentClassName="p-7">
+                {/* The thread leaving the disc is the gold that used to be
+                    spent on a bare outlined numeral: it says the steps are one
+                    run. Every card carries it, the last one included — the
+                    three read as a set, and a card missing its rail looked
+                    like an omission rather than an ending. */}
+                <div className="flex items-center gap-4">
+                  <StepDisc>{index + 1}</StepDisc>
+                  <StepTrail />
+                </div>
                 <h3 className="mt-5 text-lg font-semibold text-white">
                   {fill(step.title, { course: deck.name })}
                 </h3>
-                <p className="mt-3 text-sm leading-[1.9] text-white/55">
+                <p className="mt-3 text-sm leading-[1.9] text-white/60">
                   {fill(step.body, { course: deck.name })}
                 </p>
-              </li>
+              </LiquidCard>
             </Reveal>
           ))}
         </ol>
@@ -332,7 +375,7 @@ export function LandingSteps({
         <Reveal className="mt-12">
           <Link
             href={isSignedIn ? "/dashboard" : "/sign-up"}
-            className="inline-flex h-12 items-center rounded-full bg-white px-7 text-sm font-semibold text-[#071227]"
+            className="inline-flex h-12 items-center rounded-full bg-white px-7 text-sm font-semibold text-[#071227] transition-transform duration-200 hover:scale-[1.03]"
           >
             {copy.final.cta}
           </Link>
@@ -352,7 +395,9 @@ export function LandingDay({
   copy: LandingCopy;
 }) {
   return (
-    <section className="py-24 sm:py-32">
+    <section className="relative py-24 sm:py-32">
+      <SectionBloom />
+
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
         <Reveal>
           <SectionHead
@@ -361,20 +406,33 @@ export function LandingDay({
           />
         </Reveal>
 
-        <div className="mt-14 grid gap-4 sm:grid-cols-3">
+        <div className="mt-14 grid gap-5 sm:grid-cols-3">
           {copy.day.items.map((item, index) => (
             <Reveal key={item.title} delay={index * 90}>
-              <div className="h-full rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6">
-                <span className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-primary">
-                  {item.when}
-                </span>
+              <LiquidCard contentClassName="p-6 sm:p-7">
+                <div className="flex items-center gap-3">
+                  <GoldChip>{DAY_ICONS[index]}</GoldChip>
+                  <span className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-primary">
+                    {item.when}
+                  </span>
+                </div>
+
+                {/* Three bars, lit up to this slot: the card says where in the
+                    day it sits without the reader holding the other two in
+                    their head. */}
+                <DayMeter
+                  index={index}
+                  total={copy.day.items.length}
+                  className="mt-5"
+                />
+
                 <h3 className="mt-4 text-base font-semibold text-white">
                   {item.title}
                 </h3>
-                <p className="mt-3 text-sm leading-[1.9] text-white/55">
+                <p className="mt-3 text-sm leading-[1.9] text-white/60">
                   {item.body}
                 </p>
-              </div>
+              </LiquidCard>
             </Reveal>
           ))}
         </div>
@@ -399,30 +457,29 @@ export function LandingFaq({
   return (
     <section
       id="faq"
-      className="scroll-mt-24 border-t border-white/[0.07] py-24 sm:py-32 lg:py-40"
+      className="relative scroll-mt-24 border-t border-white/[0.07] py-24 sm:py-32 lg:py-40"
     >
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
         <Reveal>
           <SectionHead title={copy.faq.title} sub={copy.faq.sub} />
         </Reveal>
 
-        <div className="mt-14 grid gap-3 lg:max-w-4xl">
+        <div className="mt-14 grid gap-3.5 lg:max-w-4xl">
           {items.map((item, index) => (
             <Reveal key={item.q} delay={Math.min(index, 4) * 60}>
-              <details className="group rounded-2xl border border-white/[0.08] bg-white/[0.02] px-6 open:bg-white/[0.04]">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-base font-medium text-white marker:content-none">
-                  {item.q}
-                  <span
-                    aria-hidden
-                    className="shrink-0 text-primary transition-transform group-open:rotate-45"
-                  >
-                    +
-                  </span>
-                </summary>
-                <p className="pb-6 text-sm leading-[1.95] text-white/55">
-                  {item.a}
-                </p>
-              </details>
+              <LiquidCard still contentClassName="px-5 sm:px-6">
+                <details>
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-base font-medium text-white marker:content-none">
+                    {item.q}
+                    {/* The plus turns into a cross by turning the whole gold
+                        disc — one moving part instead of two. */}
+                    <GoldChip className="text-lg font-light">+</GoldChip>
+                  </summary>
+                  <p className="border-t border-white/[0.07] pb-6 pt-5 text-sm leading-[1.95] text-white/60">
+                    {item.a}
+                  </p>
+                </details>
+              </LiquidCard>
             </Reveal>
           ))}
         </div>
@@ -458,7 +515,7 @@ export function LandingFinal({
           </p>
           <Link
             href={isSignedIn ? "/dashboard" : "/sign-up"}
-            className="mt-10 inline-flex h-14 items-center rounded-full bg-white px-9 text-sm font-semibold text-[#071227]"
+            className="mt-10 inline-flex h-14 items-center rounded-full bg-white px-9 text-sm font-semibold text-[#071227] transition-transform duration-200 hover:scale-[1.03]"
           >
             {copy.final.cta}
           </Link>
