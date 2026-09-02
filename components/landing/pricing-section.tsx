@@ -1,65 +1,62 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 
 import { Arrow, Check, SectionHead } from "@/components/landing/landing-bits";
-import type { LandingCopy } from "@/lib/landing/content";
+import type { CourseDeck } from "@/lib/landing/decks";
+import { fill, type LandingCopy } from "@/lib/landing/content";
 import type {
   LandingPriceCell,
   LandingPricingData,
 } from "@/lib/landing/pricing";
-import { interpolateText } from "@/lib/subscription/interpolate";
 import { cn } from "@/lib/utils";
 import type { BillingCurrency, BillingPeriodMonths } from "@/types";
 
 /**
- * The landing page's pricing section: the real storefront, minus the till.
+ * The storefront for one course.
  *
- * It carries the same three choices the subscription page does — language,
- * billing period, currency — because the first question a visitor has is what
- * *their* path costs, and a page that answers it with "see the plans" has
- * asked them to sign up before telling them the price.
+ * The live section at `/` carries three choices — language, billing period,
+ * currency — because it has to answer "what does *my* path cost" for a visitor
+ * who has not chosen a language yet. Here the hero has already chosen, so the
+ * language tabs are gone and the section simply prices whatever flag is flying
+ * at the top. Two controls remain, because period and currency are still the
+ * visitor's to pick.
  *
- * The one thing it deliberately does not do is take money. Every button is a
- * link to sign-up; checkout stays behind a session, where the server can
- * recompute the price it is about to charge.
- *
- * Prices arrive as finished strings from `getLandingPricing`, so this file
- * does no arithmetic — there is no second implementation of the pricing rules
- * here to drift out of step with billing.
+ * Prices arrive as finished strings from `getLandingPricing`, computed on the
+ * server from the same rules checkout uses. There is no arithmetic in this
+ * file, and no second implementation of the pricing rules to drift.
  */
-export function LandingPricing({
+export function PricingSection({
+  deck,
   copy,
   data,
+  courseSlug,
+  available,
   isSignedIn,
   defaultToToman,
 }: {
+  deck: CourseDeck;
   copy: LandingCopy;
   data: LandingPricingData;
+  courseSlug: string;
+  /** False for a path that is priced but has not opened yet. */
+  available: boolean;
   isSignedIn: boolean;
-  /** Persian visitors are quoted in Toman first; everyone else in euro. */
   defaultToToman: boolean;
 }) {
-  const [languageSlug, setLanguageSlug] = useState(
-    () => data.languages[0]?.slug ?? ""
-  );
   const [currency, setCurrency] = useState<BillingCurrency>(
     data.canPayInRial && defaultToToman ? "IRR" : "EUR"
   );
   const [months, setMonths] = useState<BillingPeriodMonths>(1);
 
   const plans = useMemo(
-    () => data.plans.filter((plan) => plan.languageSlug === languageSlug),
-    [data.plans, languageSlug]
+    () => data.plans.filter((plan) => plan.languageSlug === courseSlug),
+    [data.plans, courseSlug]
   );
 
-  const selectedLanguage = data.languages.find(
-    (language) => language.slug === languageSlug
-  );
-
-  // A language whose plans all have the three-month option switched off must
-  // not strand the visitor on a period nothing sells.
+  // A course whose plans all have the three-month option switched off must not
+  // strand the visitor on a period nothing sells.
   const canPayQuarterly = plans.some((plan) => plan.quarterly !== null);
   const period: BillingPeriodMonths = canPayQuarterly ? months : 1;
 
@@ -70,6 +67,17 @@ export function LandingPricing({
   );
 
   const href = isSignedIn ? "/subscription" : "/sign-up";
+  const course = { course: deck.name };
+
+  if (plans.length === 0) {
+    return (
+      <PricingFallback
+        deck={deck}
+        copy={copy}
+        isSignedIn={isSignedIn}
+      />
+    );
+  }
 
   return (
     <section
@@ -82,51 +90,14 @@ export function LandingPricing({
       />
 
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
-        <SectionHead title={copy.pricing.title} sub={copy.pricing.sub} />
+        <SectionHead
+          eyebrow={deck.code}
+          title={fill(copy.pricing.title, course)}
+          sub={fill(copy.pricing.sub, course)}
+        />
 
-        {/* ------------------------------------------------------- controls */}
-        <div data-reveal className="mt-12 space-y-6 lg:mt-16">
-          <fieldset>
-            <legend className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-white/35">
-              {copy.pricing.languageLabel}
-            </legend>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {data.languages.map((language) => {
-                const selected = language.slug === languageSlug;
-                return (
-                  <button
-                    key={language.slug}
-                    type="button"
-                    onClick={() => setLanguageSlug(language.slug)}
-                    aria-pressed={selected}
-                    className={cn(
-                      "inline-flex min-h-11 items-center gap-2.5 rounded-full border px-5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
-                      selected
-                        ? "border-primary/45 bg-primary/[0.08] text-white"
-                        : "border-white/10 text-white/55 hover:border-white/20 hover:text-white/80"
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "text-[0.65rem] font-semibold tracking-[0.12em]",
-                        selected ? "text-primary" : "text-white/30"
-                      )}
-                    >
-                      {language.code}
-                    </span>
-                    {language.name}
-                    {!language.available && (
-                      <span className="rounded-full bg-white/[0.07] px-2 py-0.5 text-[0.65rem] font-medium text-white/45">
-                        {copy.languages.comingSoon}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </fieldset>
-
-          <div className="flex flex-wrap items-center gap-3">
+        {(canPayQuarterly || data.canPayInRial) && (
+          <div className="mt-12 flex flex-wrap gap-3 lg:mt-16">
             {canPayQuarterly && (
               <Segmented label={copy.pricing.periodLabel}>
                 {([1, 3] as const).map((option) => (
@@ -147,9 +118,7 @@ export function LandingPricing({
                             : "bg-emerald-400/15 text-emerald-300"
                         )}
                       >
-                        {interpolateText(copy.pricing.save, {
-                          percent: bestSaving,
-                        })}
+                        {fill(copy.pricing.save, { percent: bestSaving })}
                       </span>
                     )}
                   </SegmentButton>
@@ -171,21 +140,19 @@ export function LandingPricing({
               </Segmented>
             )}
           </div>
-        </div>
+        )}
 
-        {selectedLanguage && !selectedLanguage.available && (
+        {!available && (
           <p className="mt-8 flex items-center gap-2.5 text-sm text-white/45">
             <span
               aria-hidden
               className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70"
             />
-            {copy.pricing.comingSoonNote}
+            {fill(copy.pricing.comingSoonNote, course)}
           </p>
         )}
 
-        {/* ---------------------------------------------------------- cards */}
         <ul
-          data-reveal-group
           className={cn(
             "mt-10 grid gap-4",
             plans.length >= 4
@@ -200,7 +167,7 @@ export function LandingPricing({
               period === 3 && plan.quarterly ? plan.quarterly : plan.monthly;
 
             return (
-              <li key={plan.planSlug} data-reveal-item>
+              <li key={plan.planSlug}>
                 <article
                   className={cn(
                     "glass edge-light relative flex h-full flex-col overflow-hidden rounded-3xl p-7 sm:p-8",
@@ -240,7 +207,7 @@ export function LandingPricing({
                   <Link
                     href={href}
                     className={cn(
-                      "group mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-transform duration-200 hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+                      "group mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-transform duration-200 hover:scale-[1.02]",
                       plan.highlighted
                         ? "bg-primary text-primary-foreground"
                         : "border border-white/15 text-white/80"
@@ -255,7 +222,7 @@ export function LandingPricing({
           })}
         </ul>
 
-        <p data-reveal className="mt-8 text-xs leading-relaxed text-white/35">
+        <p className="mt-8 text-xs leading-relaxed text-white/35">
           {currency === "IRR" ? copy.pricing.tomanNote : copy.pricing.note}
         </p>
       </div>
@@ -266,9 +233,9 @@ export function LandingPricing({
 /**
  * The price block.
  *
- * Toman is the headline for a Rial visitor and the euro figure the line
- * beneath it, rather than the other way round: euro is what the ledger is
- * denominated in, but it is not the number the customer is deciding on.
+ * Toman is the headline for a Rial visitor and euro the line beneath it. Euro
+ * is what the ledger is denominated in, but it is not the number the customer
+ * is deciding on.
  */
 function Price({
   cell,
@@ -305,14 +272,10 @@ function Price({
             <bdi dir="ltr">{cell.eur}</bdi>
           </p>
         )}
-        {perMonth && (
-          <p>{interpolateText(copy.pricing.perMonth, { amount: perMonth })}</p>
-        )}
+        {perMonth && <p>{fill(copy.pricing.perMonth, { amount: perMonth })}</p>}
         {cell.discountPercent > 0 && (
           <p className="font-medium text-emerald-300">
-            {interpolateText(copy.pricing.off, {
-              percent: cell.discountPercent,
-            })}
+            {fill(copy.pricing.off, { percent: cell.discountPercent })}
           </p>
         )}
       </div>
@@ -321,21 +284,24 @@ function Price({
 }
 
 /**
- * What the section falls back to when there are no plans to price.
+ * What the section falls back to when this course has nothing to price.
  *
- * The plans table is admin-owned and can legitimately be empty on a fresh
- * install; the database can also simply be unreachable, which is the same
- * thing from here. Either way the section says what the subscription covers
- * and sends the visitor to sign-up. Inventing a price would be worse than
- * showing none.
+ * The plans table is admin-owned and can legitimately be empty; the database
+ * can also simply be unreachable, which is the same thing from here. Either
+ * way the section says what the subscription covers and sends the visitor to
+ * sign-up. Inventing a price would be worse than showing none.
  */
-export function LandingPricingFallback({
+export function PricingFallback({
+  deck,
   copy,
   isSignedIn,
 }: {
+  deck: CourseDeck;
   copy: LandingCopy;
   isSignedIn: boolean;
 }) {
+  const course = { course: deck.name };
+
   return (
     <section
       id="pricing"
@@ -347,14 +313,17 @@ export function LandingPricingFallback({
       />
 
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
-        <SectionHead title={copy.pricing.title} sub={copy.pricing.sub} />
+        <SectionHead
+          eyebrow={deck.code}
+          title={fill(copy.pricing.title, course)}
+          sub={fill(copy.pricing.sub, course)}
+        />
 
         <div className="mt-14 grid gap-10 lg:mt-20 lg:grid-cols-12">
-          <ul data-reveal-group className="lg:col-span-7">
+          <ul className="lg:col-span-7">
             {copy.pricing.fallback.map((point) => (
               <li
                 key={point}
-                data-reveal-item
                 className="flex items-center gap-4 border-b border-white/[0.07] py-5 last:border-b-0"
               >
                 <Check className="h-5 w-5 shrink-0 text-primary" />
@@ -363,10 +332,10 @@ export function LandingPricingFallback({
             ))}
           </ul>
 
-          <div data-reveal className="lg:col-span-4 lg:col-start-9 lg:pt-4">
+          <div className="lg:col-span-4 lg:col-start-9 lg:pt-4">
             <Link
               href={isSignedIn ? "/subscription" : "/sign-up"}
-              className="group inline-flex min-h-13 items-center gap-2.5 rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-transform duration-200 hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="group inline-flex min-h-13 items-center gap-2.5 rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-transform duration-200 hover:scale-[1.03]"
             >
               {copy.pricing.cta}
               <Arrow />
@@ -413,7 +382,7 @@ function SegmentButton({
       onClick={onClick}
       aria-pressed={selected}
       className={cn(
-        "inline-flex min-h-10 items-center gap-2 rounded-full px-5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+        "inline-flex min-h-10 items-center gap-2 rounded-full px-5 text-sm font-medium transition-colors",
         selected
           ? "bg-primary text-primary-foreground"
           : "text-white/55 hover:text-white/85"

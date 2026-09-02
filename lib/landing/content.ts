@@ -1,19 +1,24 @@
-import type { LandingLanguageSlug } from "@/lib/landing/languages";
 import type { AppLocale } from "@/lib/i18n/types";
 
 /**
- * Every word on the landing page, in both locales.
+ * The parts of the landing page that do not change with the course.
  *
- * The page is a server component with no copy of its own, so the whole
- * narrative lives here as data. Two consequences worth keeping: a language can
- * be added without touching a component, and the entire page is present in the
- * server-rendered HTML — which is what keeps it indexable.
+ * The split against `decks.ts` is deliberate. A sentence that describes a
+ * language belongs to that language and is written four times; a sentence that
+ * describes Laparli is written once and takes the course name through
+ * `{course}`. Copying the method sections per course would be four copies of a
+ * single claim, and the first edit would update one of them.
+ *
+ * Every placeholder is `{course}`, filled with the featured course's name in
+ * the reading locale — so a Persian visitor looking at the German path reads
+ * "آلمانی" everywhere, not a generic "your language".
  */
 
 export type LandingCopy = {
+  /** What a search result and a shared link say. No `{course}` here — the
+      page is a home page first and a course page second. */
+  seo: { title: string; description: string };
   nav: {
-    method: string;
-    languages: string;
     pricing: string;
     faq: string;
     blog: string;
@@ -25,25 +30,24 @@ export type LandingCopy = {
     skipToContent: string;
   };
   hero: {
-    badge: string;
-    title: string;
-    sub: string;
-    ctaPrimary: string;
-    ctaSecondary: string;
-    trust: string[];
+    /** Sits above the course name. */
+    eyebrow: string;
+    cta: string;
+    /** The prompt on the scroll cue. `{course}` allowed. */
+    scrollHint: string;
+    /** Accessible name for a side globe. `{course}` is the target. */
+    showCourse: string;
+    /** Accessible name for the scroll control. */
+    scrollLabel: string;
   };
-  /** The marquee under the hero: a real phrase and what it means. */
-  ticker: { phrase: string; lang: string; meaning: string }[];
-  why: {
-    title: string;
-    sub: string;
-    beforeLabel: string;
-    afterLabel: string;
-    rows: { before: string; after: string }[];
-  };
+  /** Badge on a course that is priced but not open yet. */
+  comingSoon: string;
+  ticker: { title: string };
+  hurdles: { title: string; sub: string };
   lesson: {
     title: string;
     sub: string;
+    /** The four pieces every module is made of. */
     parts: { title: string; body: string }[];
   };
   features: {
@@ -56,23 +60,13 @@ export type LandingCopy = {
     sub: string;
     items: { title: string; body: string }[];
   };
-  languages: {
-    title: string;
-    sub: string;
-    comingSoon: string;
-    start: string;
-    lettersLabel: string;
-  };
   pricing: {
     title: string;
     sub: string;
     cta: string;
     note: string;
-    /** Replaces `note` while the grid is quoting Toman. */
     tomanNote: string;
-    /** Shown when the selected language has not opened yet. */
     comingSoonNote: string;
-    languageLabel: string;
     periodLabel: string;
     currencyLabel: string;
     monthly: string;
@@ -80,17 +74,14 @@ export type LandingCopy = {
     euro: string;
     toman: string;
     popular: string;
-    /** `{percent}` — the quarterly incentive, on the period toggle. */
+    /** `{percent}` — the quarterly incentive. */
     save: string;
-    /** `{percent}` — a plan's own discount, under its price. */
+    /** `{percent}` — a plan's own discount. */
     off: string;
     /** `{amount}` — the per-month equivalent of a quarterly price. */
     perMonth: string;
-    /** Unit printed after a monthly price. */
     perMonthUnit: string;
-    /** Unit printed after a three-month price. */
     perQuarter: string;
-    /** Rendered when the plans table has nothing to show. */
     fallback: string[];
   };
   day: {
@@ -101,13 +92,10 @@ export type LandingCopy = {
   faq: {
     title: string;
     sub: string;
+    /** Asked about Laparli rather than about one course. */
     items: { q: string; a: string }[];
   };
-  final: {
-    title: string;
-    sub: string;
-    cta: string;
-  };
+  final: { cta: string };
   footer: {
     tagline: string;
     about: string;
@@ -118,88 +106,44 @@ export type LandingCopy = {
 };
 
 const fa: LandingCopy = {
+  seo: {
+    title: "زبان تازه‌ات را از جمله شروع کن",
+    description:
+      "چهار مسیر کامل از صفر — ایتالیایی، انگلیسی، آلمانی و ترکی. هر درس یک ویدیوی کوتاه با زیرنویس دوزبانه است، به‌علاوهٔ دستور زبان، واژگان و آزمونی که تا قبولش نشوی بخش بعدی باز نمی‌شود.",
+  },
   nav: {
-    method: "روش کار",
-    languages: "زبان‌ها",
     pricing: "اشتراک",
     faq: "پرسش‌ها",
     blog: "وبلاگ",
     signIn: "ورود",
-    signUp: "ثبت‌نام رایگان",
+    signUp: "ثبت‌نام",
     dashboard: "داشبورد من",
     menuOpen: "باز کردن منو",
     menuClose: "بستن منو",
     skipToContent: "رفتن به محتوا",
   },
   hero: {
-    badge: "مسیر ایتالیایی کامل شد",
-    title: "زبان را از جمله شروع کن، نه از جدول صرف فعل",
-    sub: "هر درس یک تکه از یک روز واقعی است — سفارش دادن، پرسیدن راه، عذرخواهی کردن. قاعده وقتی می‌آید که لازمش داری.",
-    ctaPrimary: "شروع رایگان",
-    ctaSecondary: "ببین درس چه شکلی است",
-    trust: [
-      "مسیر A1 کامل",
-      "درس تصویری با زیرنویس دوزبانه",
-      "آزمون در پایان هر بخش",
-    ],
+    eyebrow: "زبان",
+    cta: "شروع کنید",
+    scrollHint: "همه چیز دربارهٔ {course}",
+    showCourse: "{course} را نشان بده",
+    scrollLabel: "اسکرول به بخش بعدی",
   },
-  ticker: [
-    { phrase: "Un caffè, per favore", lang: "IT", meaning: "یک قهوه، لطفاً" },
-    { phrase: "Dov'è la stazione?", lang: "IT", meaning: "ایستگاه کجاست؟" },
-    { phrase: "Ich habe mich verlaufen", lang: "DE", meaning: "گم شده‌ام" },
-    { phrase: "Was kostet das?", lang: "DE", meaning: "این چند است؟" },
-    { phrase: "Hesap, lütfen", lang: "TR", meaning: "صورت‌حساب، لطفاً" },
-    {
-      phrase: "Anlamadım, tekrar eder misiniz?",
-      lang: "TR",
-      meaning: "نفهمیدم، دوباره می‌گویید؟",
-    },
-    {
-      phrase: "Could you say that again?",
-      lang: "EN",
-      meaning: "می‌شود دوباره بگویید؟",
-    },
-    {
-      phrase: "I'd like to change my ticket",
-      lang: "EN",
-      meaning: "می‌خواهم بلیتم را عوض کنم",
-    },
-  ],
-  why: {
-    title: "از حفظ کردن تا حرف زدن",
-    sub: "فرق لاپارلی با کلاسی که یک‌بار رفتی و ول کردی، در ترتیب است — نه در حجم.",
-    beforeLabel: "کلاس معمولی",
-    afterLabel: "لاپارلی",
-    rows: [
-      {
-        before: "اول جدول صرف فعل، بعد شاید جمله",
-        after: "اول جمله، قاعده وقتی لازم شد",
-      },
-      {
-        before: "فهرست پانصد واژه، بی‌بستر",
-        after: "هر واژه در جمله‌ای که دیده‌ای‌اش",
-      },
-      {
-        before: "متن کتاب روان، گفتار واقعی نامفهوم",
-        after: "صدای طبیعی از درس اول، با زیرنویس دوزبانه",
-      },
-      {
-        before: "امتحان آخر ترم، سه ماه دیر",
-        after: "آزمون پایان هر بخش، همان‌جا",
-      },
-      {
-        before: "درسی که نمی‌دانی کجای مسیری",
-        after: "مسیر A1 با نقشهٔ روشن و پیشرفت ذخیره‌شده",
-      },
-    ],
+  comingSoon: "به‌زودی",
+  ticker: {
+    title: "چیزهایی که در هفتهٔ اول {course} می‌گویی",
+  },
+  hurdles: {
+    title: "{course} کجا سخت می‌شود",
+    sub: "هر زبان جای گیر کردن خودش را دارد. این‌ها جاهایی‌اند که {course} زبان‌آموز را زمین می‌زند — و کاری که مسیر با هرکدام می‌کند.",
   },
   lesson: {
     title: "چهار بخش، یک درس",
-    sub: "هر ماژول همین چهار تکه را دارد. نه بیشتر، نه کمتر — و هیچ‌کدام اختیاری نیست.",
+    sub: "هر ماژول {course} همین چهار تکه را دارد. نه بیشتر، نه کمتر — و هیچ‌کدام اختیاری نیست.",
     parts: [
       {
         title: "درس تصویری",
-        body: "ویدیوی کوتاه با زیرنویس فارسی و زبان مقصد. هر جمله را می‌شود جدا تکرار کرد تا گوش عادت کند.",
+        body: "ویدیوی کوتاه با زیرنویس فارسی و {course}. هر جمله را می‌شود جدا تکرار کرد تا گوش عادت کند.",
       },
       {
         title: "دستور زبان",
@@ -217,11 +161,11 @@ const fa: LandingCopy = {
   },
   features: {
     title: "ساخته‌شده برای همان جایی که گیر می‌کنی",
-    sub: "چیزهایی که موقع یاد گرفتن واقعاً اذیت می‌کنند، نه آنچه در فهرست ویژگی‌ها قشنگ به نظر می‌رسد.",
+    sub: "چیزهایی که موقع یاد گرفتن {course} واقعاً اذیت می‌کنند، نه آنچه در فهرست ویژگی‌ها قشنگ به نظر می‌رسد.",
     items: [
       {
         title: "زیرنویس دوزبانه",
-        body: "فارسی و زبان مقصد کنار هم. هر بار که کمتر به فارسی نگاه کنی، خودت می‌فهمی جلو رفته‌ای.",
+        body: "فارسی و {course} کنار هم. هر بار که کمتر به فارسی نگاه کنی، خودت می‌فهمی جلو رفته‌ای.",
       },
       {
         title: "تکرار جمله‌به‌جمله",
@@ -237,7 +181,7 @@ const fa: LandingCopy = {
       },
       {
         title: "منبع کلاس‌های واقعی",
-        body: "مسیر ایتالیایی روی کتاب‌های مرجعی بسته شده که در کلاس‌های خود ایتالیا استفاده می‌شوند.",
+        body: "مسیر روی کتاب‌های مرجعی بسته شده که در کلاس‌های واقعی همان زبان استفاده می‌شوند.",
       },
       {
         title: "روی موبایل، بدون نصب",
@@ -246,7 +190,7 @@ const fa: LandingCopy = {
     ],
   },
   steps: {
-    title: "سه گام تا اولین جمله",
+    title: "سه گام تا اولین جملهٔ {course}",
     sub: "بدون کارت بانکی، بدون تماس فروش.",
     items: [
       {
@@ -254,7 +198,7 @@ const fa: LandingCopy = {
         body: "ایمیل و شماره کافی است. چند ثانیه بیشتر طول نمی‌کشد.",
       },
       {
-        title: "زبانت را انتخاب کن",
+        title: "{course} را انتخاب کن",
         body: "مسیر از صفر شروع می‌شود؛ لازم نیست چیزی از قبل بدانی.",
       },
       {
@@ -263,21 +207,15 @@ const fa: LandingCopy = {
       },
     ],
   },
-  languages: {
-    title: "از کجا شروع کنیم",
-    sub: "هر زبان یک مسیر کامل از صفر است. مسیرها یکی‌یکی باز می‌شوند و هر کدام آماده شود همین‌جا اضافه می‌شود.",
-    comingSoon: "به‌زودی",
-    start: "شروع دوره",
-    lettersLabel: "حرف‌هایی که فارسی ندارد",
-  },
   pricing: {
-    title: "یک اشتراک، همهٔ مسیرها",
-    sub: "لازم نیست برای هر زبان جدا حساب کنی. تا وقتی اشتراکت فعال است، هر مسیری که باز باشد در دسترس توست.",
+    title: "قیمت {course}",
+    sub: "یک اشتراک همهٔ مسیرهای باز را باز می‌کند. این عددی است که برای {course} پرداخت می‌کنی.",
     cta: "تهیهٔ اشتراک",
     note: "همین قیمت است. پرداخت بعد از ساختن حساب انجام می‌شود.",
-    tomanNote: "مبلغ تومانی با نرخ روز حساب می‌شود و تا لحظهٔ پرداخت ممکن است کمی جابه‌جا شود.",
-    comingSoonNote: "این مسیر هنوز باز نشده. قیمت‌ها همان‌هایی است که روز افتتاح اعمال می‌شود.",
-    languageLabel: "زبان",
+    tomanNote:
+      "مبلغ تومانی با نرخ روز حساب می‌شود و تا لحظهٔ پرداخت ممکن است کمی جابه‌جا شود.",
+    comingSoonNote:
+      "مسیر {course} هنوز باز نشده. قیمت‌ها همان‌هایی است که روز افتتاح اعمال می‌شود.",
     periodLabel: "دورهٔ پرداخت",
     currencyLabel: "واحد پول",
     monthly: "۱ ماهه",
@@ -298,7 +236,7 @@ const fa: LandingCopy = {
     ],
   },
   day: {
-    title: "درس کجای روزت می‌نشیند",
+    title: "{course} کجای روزت می‌نشیند",
     sub: "ماژول‌ها کوتاه‌اند چون قرار است واقعاً انجام شوند، نه اینکه در فهرست کارها بمانند.",
     items: [
       {
@@ -323,14 +261,6 @@ const fa: LandingCopy = {
     sub: "اگر جوابت اینجا نبود، از صفحهٔ تماس بپرس.",
     items: [
       {
-        q: "از صفر شروع می‌شود؟",
-        a: "بله. مسیر از الفبا و اولین جمله‌ها شروع می‌شود و لازم نیست هیچ پیش‌زمینه‌ای داشته باشی. اگر قبلاً چیزی خوانده‌ای، می‌توانی سریع‌تر رد شوی چون آزمون هر بخش جلوی وقت تلف کردن را می‌گیرد.",
-      },
-      {
-        q: "چقدر طول می‌کشد تا بتوانم حرف بزنم؟",
-        a: "بستگی به خودت دارد و ما عدد الکی نمی‌دهیم. چیزی که می‌توانیم بگوییم این است که از همان ماژول اول جملهٔ کامل می‌سازی، نه اینکه چند ماه صبر کنی تا نوبت مکالمه برسد.",
-      },
-      {
         q: "با موبایل هم می‌شود؟",
         a: "بله. همه‌چیز در مرورگر کار می‌کند و چیزی برای نصب نیست. درس‌ها اندازه‌ای هستند که در یک مسیر رفت‌وآمد تمام شوند.",
       },
@@ -348,11 +278,7 @@ const fa: LandingCopy = {
       },
     ],
   },
-  final: {
-    title: "اولین درس همین امروز",
-    sub: "حساب رایگان بساز و اولین ماژول را ببین. اگر روشش به تو نخورد، چیزی از دست نداده‌ای.",
-    cta: "شروع رایگان",
-  },
+  final: { cta: "شروع رایگان" },
   footer: {
     tagline: "هر درس، یک قدم به روانی",
     about: "دربارهٔ ما",
@@ -363,166 +289,116 @@ const fa: LandingCopy = {
 };
 
 const en: LandingCopy = {
+  seo: {
+    title: "Start your next language from a sentence",
+    description:
+      "Four complete paths from zero — Italian, English, German and Turkish. Every lesson is a short video with bilingual subtitles, plus grammar, vocabulary and a quiz that keeps the next section locked until you pass it.",
+  },
   nav: {
-    method: "Method",
-    languages: "Languages",
     pricing: "Pricing",
-    faq: "FAQ",
+    faq: "Questions",
     blog: "Blog",
     signIn: "Sign in",
-    signUp: "Start free",
+    signUp: "Sign up",
     dashboard: "My dashboard",
-    menuOpen: "Open menu",
-    menuClose: "Close menu",
+    menuOpen: "Open navigation",
+    menuClose: "Close navigation",
     skipToContent: "Skip to content",
   },
   hero: {
-    badge: "The Italian path is complete",
-    title: "Start a language at the sentence, not the conjugation table",
-    sub: "Every lesson is a piece of a real day — ordering, asking directions, apologising. The rule arrives when you need it.",
-    ctaPrimary: "Start free",
-    ctaSecondary: "See what a lesson looks like",
-    trust: [
-      "A complete A1 path",
-      "Video lessons subtitled in both languages",
-      "A quiz closing every section",
-    ],
+    eyebrow: "LANGUAGE",
+    cta: "GET STARTED",
+    scrollHint: "Everything about {course}",
+    showCourse: "Show {course}",
+    scrollLabel: "Scroll to next section",
   },
-  ticker: [
-    { phrase: "Un caffè, per favore", lang: "IT", meaning: "A coffee, please" },
-    { phrase: "Dov'è la stazione?", lang: "IT", meaning: "Where is the station?" },
-    { phrase: "Ich habe mich verlaufen", lang: "DE", meaning: "I'm lost" },
-    { phrase: "Was kostet das?", lang: "DE", meaning: "How much is this?" },
-    { phrase: "Hesap, lütfen", lang: "TR", meaning: "The bill, please" },
-    {
-      phrase: "Anlamadım, tekrar eder misiniz?",
-      lang: "TR",
-      meaning: "I didn't catch that — again?",
-    },
-    {
-      phrase: "Could you say that again?",
-      lang: "EN",
-      meaning: "Asking someone to repeat",
-    },
-    {
-      phrase: "I'd like to change my ticket",
-      lang: "EN",
-      meaning: "At the counter",
-    },
-  ],
-  why: {
-    title: "From memorising to speaking",
-    sub: "What separates this from the class you quit is the order things come in — not how much of them there is.",
-    beforeLabel: "The usual class",
-    afterLabel: "Laparli",
-    rows: [
-      {
-        before: "Conjugation tables first, sentences maybe later",
-        after: "Sentence first, the rule when it is needed",
-      },
-      {
-        before: "Five hundred words on a list, no context",
-        after: "Every word inside a sentence you have met",
-      },
-      {
-        before: "The textbook reads fine, real speech doesn't",
-        after: "Natural speed from lesson one, subtitled in both",
-      },
-      {
-        before: "An end-of-term exam, three months late",
-        after: "A quiz at the end of each section, on the spot",
-      },
-      {
-        before: "No idea where you are on the path",
-        after: "A mapped A1 route with your progress saved",
-      },
-    ],
+  comingSoon: "Coming soon",
+  ticker: {
+    title: "What you say in your first week of {course}",
+  },
+  hurdles: {
+    title: "Where {course} gets hard",
+    sub: "Every language has its own place to get stuck. These are the ones {course} trips people on — and what the path does about each.",
   },
   lesson: {
     title: "Four parts, one lesson",
-    sub: "Every module holds the same four pieces. No more, no fewer — and none of them optional.",
+    sub: "Every {course} module is these four pieces. No more, no less, and none of them optional.",
     parts: [
       {
         title: "Video lesson",
-        body: "A short film subtitled in both languages, with every line replayable on its own until your ear catches it.",
+        body: "A short video with subtitles in both your language and {course}. Any line can be replayed on its own until the ear settles.",
       },
       {
         title: "Grammar",
-        body: "Explained plainly, with examples drawn from this lesson rather than from some other book.",
+        body: "Explained in plain language, with examples from this lesson rather than from some other book.",
       },
       {
         title: "Vocabulary",
-        body: "Words with pronunciation, gender and a sample sentence — each where you already met it.",
+        body: "Each word with its pronunciation, gender and a sample sentence — in the place you already met it.",
       },
       {
         title: "Quiz",
-        body: "A handful of questions closing the section. The next one stays shut until you pass.",
+        body: "A few short questions at the end of the section. The next one stays locked until you pass.",
       },
     ],
   },
   features: {
-    title: "Built for the places you actually get stuck",
-    sub: "The things that genuinely slow a learner down, rather than the ones that look good on a feature list.",
+    title: "Built for the place you actually get stuck",
+    sub: "The things that genuinely get in the way of learning {course}, rather than the ones that look good in a feature list.",
     items: [
       {
-        title: "Subtitles in both languages",
-        body: "Persian and the target side by side. Each time you need the Persian less, you can see it for yourself.",
+        title: "Bilingual subtitles",
+        body: "Your language and {course} side by side. Every time you glance at the left one less, you can feel the progress yourself.",
       },
       {
         title: "Line-by-line replay",
-        body: "Send any line of the video back and hear it again, without scrubbing the timeline by hand.",
+        body: "Any line of the video can be rewound and heard again on its own, without dragging the scrubber back by hand.",
       },
       {
-        title: "Progress that persists",
-        body: "The path resumes where you left it, on whatever device you sign in from.",
+        title: "Saved progress",
+        body: "The path picks up where you left it, on any device you sign in from.",
       },
       {
-        title: "Locked until it lands",
-        body: "The next section opens when you pass the quiz. Coasting forward isn't possible, and that is the point.",
+        title: "Locked until you have it",
+        body: "The next section opens by passing the quiz. Coasting through is not possible, and that is the point.",
       },
       {
-        title: "Real classroom sources",
-        body: "The Italian path is built on the textbooks Italian classrooms actually teach from.",
+        title: "Built on real classroom books",
+        body: "The path is built on the reference textbooks used in actual classrooms for that language.",
       },
       {
-        title: "On the phone, nothing to install",
+        title: "On mobile, nothing to install",
         body: "Lessons are sized to finish in one commute. A browser is enough.",
       },
     ],
   },
   steps: {
-    title: "Three steps to the first sentence",
+    title: "Three steps to your first {course} sentence",
     sub: "No card, no sales call.",
     items: [
       {
-        title: "Make a free account",
-        body: "An email and a number. It takes a few seconds.",
+        title: "Create a free account",
+        body: "An email and a number is all it takes. It is a matter of seconds.",
       },
       {
-        title: "Choose your language",
-        body: "The path starts at zero; you don't need to know anything going in.",
+        title: "Choose {course}",
+        body: "The path starts from zero; nothing is assumed.",
       },
       {
-        title: "Take the first module",
-        body: "Video, grammar, vocabulary and the quiz. If the method isn't for you, you've lost nothing.",
+        title: "Watch the first module",
+        body: "Video, grammar, vocabulary and quiz. If the method is not for you, you have lost nothing.",
       },
     ],
   },
-  languages: {
-    title: "Where to begin",
-    sub: "Every language is a complete path from zero. They open one at a time, and each new one appears here as it is finished.",
-    comingSoon: "Coming soon",
-    start: "Start the course",
-    lettersLabel: "Letters Persian doesn't have",
-  },
   pricing: {
-    title: "One subscription, every path",
-    sub: "No separate account per language. While your subscription is active, every open path is yours.",
-    cta: "Get this plan",
-    note: "This is the price. Payment comes after you create your account.",
-    tomanNote: "The Toman figure follows the day's rate and can move slightly before you pay.",
-    comingSoonNote: "This path has not opened yet. These are the prices that will apply on the day it does.",
-    languageLabel: "Language",
+    title: "What {course} costs",
+    sub: "One subscription opens every path that is live. This is the number you pay for {course}.",
+    cta: "Get the subscription",
+    note: "This is the price. Payment happens after the account exists.",
+    tomanNote:
+      "The Toman figure is calculated at today's rate and may shift slightly before payment.",
+    comingSoonNote:
+      "The {course} path has not opened yet. These are the prices that will apply on the day it does.",
     periodLabel: "Billing period",
     currencyLabel: "Currency",
     monthly: "1 month",
@@ -532,24 +408,24 @@ const en: LandingCopy = {
     popular: "Most popular",
     save: "{percent}% less",
     off: "{percent}% off",
-    perMonth: "{amount} per month",
+    perMonth: "{amount} a month",
     perMonthUnit: "/ month",
     perQuarter: "/ 3 months",
     fallback: [
-      "Access to every active language",
+      "Access to every live language",
       "New lessons at no extra cost",
-      "Pick the path up where you left it",
-      "On phone and desktop, nothing to install",
+      "Continue from where you left off",
+      "On mobile and desktop, nothing to install",
     ],
   },
   day: {
-    title: "Where a lesson fits in your day",
-    sub: "Modules are short because they are meant to actually get done, not to sit on a list.",
+    title: "Where {course} sits in your day",
+    sub: "Modules are short because they are meant to actually happen, not to sit on a list.",
     items: [
       {
         when: "Morning",
         title: "One video on the way",
-        body: "The video lesson is shorter than a metro ride. Subtitles on, sound in your headphones.",
+        body: "The video lesson is shorter than a metro ride. Subtitles on, audio in your ear.",
       },
       {
         when: "Midday",
@@ -559,47 +435,35 @@ const en: LandingCopy = {
       {
         when: "Evening",
         title: "The section quiz",
-        body: "Five questions to see what stuck. If it stuck, the next section opens.",
+        body: "Five questions to see what stayed. If it did, the next section opens.",
       },
     ],
   },
   faq: {
     title: "What people usually ask",
-    sub: "If your question isn't here, send it from the contact page.",
+    sub: "If your answer is not here, ask from the contact page.",
     items: [
       {
-        q: "Does it start from zero?",
-        a: "Yes. The path begins at the alphabet and the first sentences, and assumes nothing. If you have studied before you can move faster — the section quizzes stop you wasting time on what you already know.",
-      },
-      {
-        q: "How long until I can speak?",
-        a: "That depends on you, and we won't invent a number. What we can say is that you build complete sentences from the first module rather than waiting months for conversation to come round.",
-      },
-      {
         q: "Does it work on a phone?",
-        a: "Yes. Everything runs in the browser with nothing to install, and lessons are sized to finish in one commute.",
+        a: "Yes. Everything runs in the browser and there is nothing to install. Lessons are sized to finish in one commute.",
       },
       {
         q: "Is the subscription per language?",
-        a: "No. One subscription opens every active language, and any language added later is included at no extra cost.",
+        a: "No. One subscription opens every live language, and any language added later is included at no new cost.",
       },
       {
         q: "Can I try it first?",
-        a: "Yes. Make a free account and take the whole first module — video, grammar, vocabulary and its quiz. No card required.",
+        a: "Yes. Create a free account and work through the whole first module — video, grammar, vocabulary and its quiz. No card is needed.",
       },
       {
         q: "Why is the next section locked?",
-        a: "It opens once you pass the current section's quiz. It is annoying at first, and it is also the thing that stops you moving on without learning and discovering three months later that the foundation is thin.",
+        a: "It stays locked until you pass the current section's quiz. It is annoying at first, but it is what stops you from moving on without learning and finding out three months later that the base was hollow.",
       },
     ],
   },
-  final: {
-    title: "The first lesson, today",
-    sub: "Make a free account and take the first module. If the method isn't for you, you've lost nothing.",
-    cta: "Start free",
-  },
+  final: { cta: "Start free" },
   footer: {
-    tagline: "Every lesson, a step towards fluency",
+    tagline: "Every lesson, one step closer to fluent",
     about: "About",
     contact: "Contact",
     blog: "Blog",
@@ -607,117 +471,208 @@ const en: LandingCopy = {
   },
 };
 
-const LANDING_COPY: Partial<Record<AppLocale, LandingCopy>> = { fa, en };
-
-/**
- * Per-language copy for the rail.
- *
- * `letters` is the typographic detail that gives each card an identity without
- * a photograph: the characters that language has and Persian does not. It is
- * real information about the language, which is more than a stock photo of a
- * monument would have carried.
- */
-export type LandingLanguageCopy = {
-  region: string;
-  title: string;
-  letters: string;
-  body: string;
+const it: LandingCopy = {
+  seo: {
+    title: "Inizia la tua prossima lingua da una frase",
+    description:
+      "Quattro percorsi completi da zero: italiano, inglese, tedesco e turco. Ogni lezione è un video breve con sottotitoli bilingui, più grammatica, vocabolario e un quiz che tiene chiusa la sezione successiva finché non lo superi.",
+  },
+  nav: {
+    pricing: "Prezzi",
+    faq: "Domande",
+    blog: "Blog",
+    signIn: "Accedi",
+    signUp: "Iscriviti",
+    dashboard: "La mia dashboard",
+    menuOpen: "Apri il menu",
+    menuClose: "Chiudi il menu",
+    skipToContent: "Vai al contenuto",
+  },
+  hero: {
+    eyebrow: "LINGUA",
+    cta: "INIZIA ORA",
+    scrollHint: "Tutto su {course}",
+    showCourse: "Mostra {course}",
+    scrollLabel: "Scorri alla sezione successiva",
+  },
+  comingSoon: "Presto",
+  ticker: {
+    title: "Cosa dici nella prima settimana di {course}",
+  },
+  hurdles: {
+    title: "{course}: dove si complica",
+    sub: "Ogni lingua ha il suo punto in cui ci si blocca. Questi sono quelli su cui {course} fa inciampare — e cosa fa il percorso per ciascuno.",
+  },
+  lesson: {
+    title: "Quattro parti, una lezione",
+    sub: "Ogni modulo di {course} è fatto di questi quattro pezzi. Non di più, non di meno, e nessuno è facoltativo.",
+    parts: [
+      {
+        title: "Lezione video",
+        body: "Un video breve con sottotitoli nella tua lingua e in {course}. Ogni riga si può ripetere da sola finché l’orecchio non si abitua.",
+      },
+      {
+        title: "Grammatica",
+        body: "Spiegata senza gergo, con esempi presi da questa lezione e non da un altro libro.",
+      },
+      {
+        title: "Vocabolario",
+        body: "Ogni parola con pronuncia, genere e frase d’esempio — nel punto in cui l’hai già incontrata.",
+      },
+      {
+        title: "Quiz",
+        body: "Poche domande alla fine della sezione. La successiva resta chiusa finché non la superi.",
+      },
+    ],
+  },
+  features: {
+    title: "Costruito per il punto in cui ti blocchi davvero",
+    sub: "Le cose che ostacolano davvero l’apprendimento di {course}, non quelle che stanno bene in un elenco di funzionalità.",
+    items: [
+      {
+        title: "Sottotitoli bilingui",
+        body: "La tua lingua e {course} affiancate. Ogni volta che guardi meno la prima, senti da solo di essere avanzato.",
+      },
+      {
+        title: "Ripetizione riga per riga",
+        body: "Ogni riga del video si può riascoltare da sola, senza riportare indietro la barra a mano.",
+      },
+      {
+        title: "Progressi salvati",
+        body: "Il percorso riparte da dove l’hai lasciato, su qualsiasi dispositivo con cui accedi.",
+      },
+      {
+        title: "Chiuso finché non l’hai imparato",
+        body: "La sezione successiva si apre superando il quiz. Andare avanti a vuoto non è possibile, ed è proprio il punto.",
+      },
+      {
+        title: "Basato su manuali veri",
+        body: "Il percorso è costruito sui manuali di riferimento usati nelle classi reali di quella lingua.",
+      },
+      {
+        title: "Su mobile, senza installare nulla",
+        body: "Le lezioni durano quanto un tragitto in metro. Basta un browser.",
+      },
+    ],
+  },
+  steps: {
+    title: "Tre passi alla tua prima frase in {course}",
+    sub: "Nessuna carta, nessuna telefonata commerciale.",
+    items: [
+      {
+        title: "Crea un account gratuito",
+        body: "Bastano un’email e un numero. È questione di secondi.",
+      },
+      {
+        title: "Scegli {course}",
+        body: "Il percorso parte da zero: non si dà nulla per scontato.",
+      },
+      {
+        title: "Guarda il primo modulo",
+        body: "Video, grammatica, vocabolario e quiz. Se il metodo non fa per te, non hai perso niente.",
+      },
+    ],
+  },
+  pricing: {
+    title: "{course}: quanto costa",
+    sub: "Un solo abbonamento apre tutti i percorsi attivi. Questa è la cifra che paghi per {course}.",
+    cta: "Attiva l’abbonamento",
+    note: "Il prezzo è questo. Il pagamento avviene dopo aver creato l’account.",
+    tomanNote:
+      "L’importo in toman è calcolato al cambio del giorno e può variare leggermente fino al pagamento.",
+    comingSoonNote:
+      "Il percorso di {course} non è ancora aperto. Questi sono i prezzi che si applicheranno il giorno dell’apertura.",
+    periodLabel: "Periodo di fatturazione",
+    currencyLabel: "Valuta",
+    monthly: "1 mese",
+    quarterly: "3 mesi",
+    euro: "Euro",
+    toman: "Toman",
+    popular: "Il più scelto",
+    save: "{percent}% in meno",
+    off: "{percent}% di sconto",
+    perMonth: "{amount} al mese",
+    perMonthUnit: "/ mese",
+    perQuarter: "/ 3 mesi",
+    fallback: [
+      "Accesso a tutte le lingue attive",
+      "Nuove lezioni senza costi aggiuntivi",
+      "Riprendi da dove avevi lasciato",
+      "Su mobile e desktop, senza installare nulla",
+    ],
+  },
+  day: {
+    title: "{course} nella tua giornata",
+    sub: "I moduli sono brevi perché devono essere fatti davvero, non restare in una lista.",
+    items: [
+      {
+        when: "Mattina",
+        title: "Un video per strada",
+        body: "La lezione video dura meno di un tragitto in metro. Sottotitoli accesi, audio nell’orecchio.",
+      },
+      {
+        when: "Metà giornata",
+        title: "Dieci minuti di vocabolario",
+        body: "Le stesse parole ascoltate la mattina, stavolta con pronuncia e frase d’esempio.",
+      },
+      {
+        when: "Sera",
+        title: "Il quiz della sezione",
+        body: "Cinque domande per vedere cosa è rimasto. Se è rimasto, la sezione successiva si apre.",
+      },
+    ],
+  },
+  faq: {
+    title: "Quello che chiedono di solito",
+    sub: "Se la tua risposta non è qui, scrivici dalla pagina contatti.",
+    items: [
+      {
+        q: "Funziona da telefono?",
+        a: "Sì. Tutto gira nel browser e non c’è nulla da installare. Le lezioni durano quanto un tragitto casa-lavoro.",
+      },
+      {
+        q: "L’abbonamento è per singola lingua?",
+        a: "No. Un abbonamento apre tutte le lingue attive, e ogni lingua aggiunta in seguito è inclusa senza costi nuovi.",
+      },
+      {
+        q: "Posso provarlo prima?",
+        a: "Sì. Crea un account gratuito e completa il primo modulo — video, grammatica, vocabolario e quiz. Non serve la carta.",
+      },
+      {
+        q: "Perché la sezione successiva è bloccata?",
+        a: "Resta chiusa finché non superi il quiz di quella corrente. All’inizio dà fastidio, ma è ciò che impedisce di andare avanti senza imparare e scoprire tre mesi dopo che le basi non c’erano.",
+      },
+    ],
+  },
+  final: { cta: "Inizia gratis" },
+  footer: {
+    tagline: "Ogni lezione, un passo verso la fluenza",
+    about: "Chi siamo",
+    contact: "Contatti",
+    blog: "Blog",
+    rights: "Tutti i diritti riservati.",
+  },
 };
 
-const LANDING_LANGUAGE_COPY: Partial<
-  Record<AppLocale, Partial<Record<LandingLanguageSlug, LandingLanguageCopy>>>
-> = {
-  fa: {
-    italian: {
-      region: "ایتالیا",
-      title: "ایتالیایی",
-      letters: "à è é ì ò ù",
-      body: "کامل‌ترین مسیر ما. دوره‌ای بر پایهٔ کتاب‌های مرجع کلاس‌های ایتالیا، با دستور زبان، واژگان، درس تصویری و آزمون در هر بخش.",
-    },
-    english: {
-      region: "بریتانیا و آمریکا",
-      title: "انگلیسی",
-      letters: "th gh ough",
-      body: "از الفبا تا مکالمهٔ روان. همان ساختاری که در ایتالیایی جواب داده، این‌بار برای زبانی که همه‌جا لازمش داری.",
-    },
-    german: {
-      region: "آلمان",
-      title: "آلمانی",
-      letters: "ä ö ü ß",
-      body: "زبانی که شهرتش سخت بودن است و مشکلش فقط ترتیب یاد دادن. از جمله‌های کوتاه شروع می‌کنیم و حالت‌ها را وقتی می‌آوریم که لازم شده‌اند.",
-    },
-    turkish: {
-      region: "ترکیه",
-      title: "ترکی",
-      letters: "ç ğ ı ö ş ü",
-      body: "نزدیک‌ترین زبان به گوش فارسی‌زبان‌ها و پرکاربردترین‌شان در سفر. از خواندن و گفتن شروع می‌کنیم، نه از جدول صرف فعل.",
-    },
-    french: {
-      region: "فرانسه",
-      title: "فرانسوی",
-      letters: "ç é è ê œ",
-      body: "مسیر فرانسوی در حال ساخت است. به‌محض آماده شدن اولین ماژول، همین‌جا باز می‌شود.",
-    },
-    spanish: {
-      region: "اسپانیا",
-      title: "اسپانیایی",
-      letters: "ñ á í ó ¿ ¡",
-      body: "مسیر اسپانیایی در حال ساخت است. به‌محض آماده شدن اولین ماژول، همین‌جا باز می‌شود.",
-    },
-  },
-  en: {
-    italian: {
-      region: "Italy",
-      title: "Italian",
-      letters: "à è é ì ò ù",
-      body: "Our most complete path. Built on the textbooks Italian classrooms actually use, with grammar, vocabulary, a video lesson and a quiz in every module.",
-    },
-    english: {
-      region: "Britain & the US",
-      title: "English",
-      letters: "th gh ough",
-      body: "From the alphabet to fluent conversation. The structure that worked for Italian, turned on the language you need everywhere.",
-    },
-    german: {
-      region: "Germany",
-      title: "German",
-      letters: "ä ö ü ß",
-      body: "A language with a reputation for being hard, whose real problem is the order it gets taught in. Short sentences first, cases once they are needed.",
-    },
-    turkish: {
-      region: "Türkiye",
-      title: "Turkish",
-      letters: "ç ğ ı ö ş ü",
-      body: "The easiest of these on a Persian ear and the most useful on the road. Reading and speaking first, not conjugation tables.",
-    },
-    french: {
-      region: "France",
-      title: "French",
-      letters: "ç é è ê œ",
-      body: "The French path is being built. It opens here the moment the first module is ready.",
-    },
-    spanish: {
-      region: "Spain",
-      title: "Spanish",
-      letters: "ñ á í ó ¿ ¡",
-      body: "The Spanish path is being built. It opens here the moment the first module is ready.",
-    },
-  },
-};
+const LANDING_COPY: Record<AppLocale, LandingCopy> = { fa, en, it };
 
-/**
- * Copy for a locale, falling back to Persian.
- *
- * The app carries an Italian UI locale this page has no translation for yet.
- * Falling back keeps the page rendering instead of throwing at request time,
- * and makes adding a locale one entry above rather than a change here.
- */
+/** Chrome and method copy for a locale, Persian as the fallback. */
 export function getLandingCopy(locale: AppLocale): LandingCopy {
   return LANDING_COPY[locale] ?? fa;
 }
 
-export function getLandingLanguageCopy(
-  locale: AppLocale
-): Partial<Record<LandingLanguageSlug, LandingLanguageCopy>> {
-  return LANDING_LANGUAGE_COPY[locale] ?? LANDING_LANGUAGE_COPY.fa!;
+/**
+ * Fills `{course}` — and anything else passed — into a copy string.
+ *
+ * Kept here rather than reaching for the billing interpolator because this is
+ * the only substitution the page makes and it has to run on the client, where
+ * the featured course changes without a request.
+ */
+export function fill(
+  text: string,
+  values: Record<string, string | number>
+): string {
+  return text.replace(/\{(\w+)\}/g, (match, key: string) =>
+    key in values ? String(values[key]) : match
+  );
 }

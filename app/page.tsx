@@ -1,48 +1,37 @@
 import type { Metadata } from "next";
 
-import { LandingHeader } from "@/components/landing/landing-header";
-import {
-  LandingHero,
-  LandingTicker,
-  LandingWhy,
-} from "@/components/landing/landing-opening";
-import {
-  LandingFeatures,
-  LandingLanguages,
-  LandingLesson,
-  LandingSteps,
-  type JourneyLanguage,
-} from "@/components/landing/landing-middle";
-import {
-  LandingDay,
-  LandingFaq,
-  LandingFinal,
-  LandingFooter,
-} from "@/components/landing/landing-closing";
-import {
-  LandingPricing,
-  LandingPricingFallback,
-} from "@/components/landing/landing-pricing";
-import { LatticeRule } from "@/components/landing/lattice";
-import { ScrollEffects } from "@/components/landing/scroll-effects";
+import { Landing } from "@/components/landing/landing";
+import type { LandingCourse } from "@/components/landing/hero";
+import { getLanguagesWithAvailability } from "@/lib/curriculum/availability";
+import { getLanguageCode } from "@/lib/curriculum/language-codes";
+import { LANGUAGES } from "@/lib/curriculum/languages";
+import type { LanguageSlug } from "@/lib/curriculum/types";
+import { getDataRepository } from "@/lib/data";
+import { getLocaleDefinition } from "@/lib/i18n/config";
 import { getServerLocale } from "@/lib/i18n/server-locale";
+import { getLandingCopy, type LandingCopy } from "@/lib/landing/content";
 import {
-  getLandingCopy,
-  getLandingLanguageCopy,
-} from "@/lib/landing/content";
+  COURSE_ORDER,
+  getCourseDecks,
+  type CourseDeck,
+} from "@/lib/landing/decks";
+import { LANDING_LANGUAGES } from "@/lib/landing/languages";
 import { getLandingPricing } from "@/lib/landing/pricing";
 import { getVisibleLandingLanguages } from "@/lib/landing/visibility";
-import { getDataRepository } from "@/lib/data";
 import { getSiteUrl } from "@/lib/seo/site-url";
 
 /**
  * The public landing page.
  *
- * A server component from top to bottom. Every heading, paragraph, answer and
- * link is in the HTML the server sends; the only client JavaScript is the
- * header's drawer, the hero's WebGL scene, and a scroll module that decorates
- * markup already on the page. That ordering is what keeps the page indexable
- * and its LCP honest.
+ * The hero is a course switcher, and everything below it follows whatever is
+ * flying at the top: the phrases, the difficulties, the questions and the
+ * price all belong to one course at a time. Everything the client needs to
+ * make that switch — four decks of copy in the reading locale, and the prices
+ * for every course — is resolved here on the server and handed down, so
+ * changing course costs no request and no price is ever computed in a browser.
+ *
+ * The server-rendered HTML carries the default course in full, which is what
+ * keeps the page indexable; the structured data below describes it.
  */
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -51,80 +40,88 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteUrl = await getSiteUrl();
 
   return {
-    title: `${copy.hero.title} — Laparli`,
-    description: copy.hero.sub,
+    title: `${copy.seo.title} — Laparli`,
+    description: copy.seo.description,
     alternates: { canonical: siteUrl },
     openGraph: {
-      title: `${copy.hero.title} — Laparli`,
-      description: copy.hero.sub,
+      title: `${copy.seo.title} — Laparli`,
+      description: copy.seo.description,
       url: siteUrl,
       type: "website",
     },
   };
 }
 
+/** Backdrops and globes live in `public/landing/`, keyed by flag code. */
+const FLAG_CODE: Record<LanguageSlug, string> = {
+  italian: "it",
+  english: "us",
+  german: "de",
+  turkish: "tr",
+};
+
 export default async function Home() {
   const repo = getDataRepository();
   const locale = await getServerLocale();
-  const copy = getLandingCopy(locale);
 
-  const [user, definitions, pricing, siteUrl] = await Promise.all([
+  const [user, visible, languages, pricing, siteUrl] = await Promise.all([
     repo.getAuthUser().catch(() => null),
-    getVisibleLandingLanguages(repo),
-    // Null when there is nothing to price — a fresh install with no plans, or
-    // a database this process cannot reach. Either way the section falls back
+    // Which courses appear at all is a super-admin toggle, so a path can be
+    // revealed or hidden without a deploy.
+    getVisibleLandingLanguages(repo).catch(() => LANDING_LANGUAGES),
+    // Whether a course is *open* is a different toggle, and drives the
+    // "not open yet" note in the pricing section rather than hiding anything.
+    getLanguagesWithAvailability(repo).catch(() => LANGUAGES),
+    // Null when there is nothing honest to price — a fresh install with no
+    // plans, or a database this process cannot reach. The section falls back
     // to copy rather than an empty grid.
     getLandingPricing(repo, locale).catch(() => null),
     getSiteUrl(),
   ]);
 
-  const isSignedIn = Boolean(user);
-  const languageCopy = getLandingLanguageCopy(locale);
+  const decks = getCourseDecks(locale);
+  const copy = getLandingCopy(locale);
 
-  // A language with no copy entry is dropped rather than rendered blank — the
-  // rail is the one place a half-configured language would be visible.
-  const languages: JourneyLanguage[] = definitions.flatMap((definition) => {
-    const entry = languageCopy[definition.slug];
-    return entry ? [{ ...definition, copy: entry }] : [];
-  });
+  const shown = new Set(visible.map((language) => language.slug));
+  const open = new Set(
+    languages.filter((language) => language.available).map((l) => l.slug)
+  );
 
-  const dir = locale === "fa" ? "rtl" : "ltr";
+  // The ring order comes from `COURSE_ORDER`, not from the toggle list, so the
+  // hero's left and right neighbours stay put as paths open and close. A
+  // course the admin has hidden, or one with no copy written for it, is
+  // dropped rather than rendered as a blank flag.
+  const courses: LandingCourse[] = COURSE_ORDER.filter(
+    (slug) => shown.has(slug) && decks[slug]
+  ).map((slug) => ({
+    slug,
+    name: decks[slug].name,
+    code: getLanguageCode(slug),
+    available: open.has(slug),
+    flag: `/landing/bg-${FLAG_CODE[slug]}.webp`,
+    flagPhone: `/landing/bgm-${FLAG_CODE[slug]}.webp`,
+    globe: `/landing/circle-${FLAG_CODE[slug]}.svg`,
+  }));
 
   return (
     <>
-      <JsonLd siteUrl={siteUrl} copy={copy} languages={languages} />
+      <JsonLd
+        siteUrl={siteUrl}
+        copy={copy}
+        decks={decks}
+        courses={courses}
+        featured={courses[0]?.slug ?? "italian"}
+      />
 
-      <LandingHeader copy={copy} isSignedIn={isSignedIn} dir={dir} />
-
-      <main id="main" className="grain relative bg-[#090014]">
-        <LandingHero copy={copy} isSignedIn={isSignedIn} />
-        <LandingTicker copy={copy} />
-        <LandingWhy copy={copy} />
-        <LatticeRule />
-        <LandingLesson copy={copy} />
-        <LandingFeatures copy={copy} />
-        <LatticeRule />
-        <LandingSteps copy={copy} />
-        <LandingLanguages copy={copy} languages={languages} />
-        {pricing ? (
-          <LandingPricing
-            copy={copy}
-            data={pricing}
-            isSignedIn={isSignedIn}
-            defaultToToman={locale === "fa"}
-          />
-        ) : (
-          <LandingPricingFallback copy={copy} isSignedIn={isSignedIn} />
-        )}
-        <LandingDay copy={copy} />
-        <LatticeRule />
-        <LandingFaq copy={copy} />
-        <LandingFinal copy={copy} isSignedIn={isSignedIn} />
-      </main>
-
-      <LandingFooter copy={copy} />
-
-      <ScrollEffects />
+      <Landing
+        courses={courses}
+        decks={decks}
+        copy={copy}
+        pricing={pricing}
+        locale={locale}
+        dir={getLocaleDefinition(locale).dir}
+        isSignedIn={Boolean(user)}
+      />
     </>
   );
 }
@@ -132,27 +129,38 @@ export default async function Home() {
 /**
  * Structured data for the organisation, the course catalogue and the FAQ.
  *
- * Each open language is emitted as a `Course`, which is what lets a result
- * carry the provider and the course name rather than a bare page title. Paths
- * with no curriculum are left out — marking up a course nobody can enrol in is
- * the kind of thing that earns a manual action.
+ * The questions marked up are the ones the server actually rendered — the
+ * default course's own, followed by the shared ones. Marking up all four
+ * courses' questions would describe a page no visitor is looking at.
+ *
+ * Each open course is emitted as a `Course`, which is what lets a result carry
+ * the provider and the course name rather than a bare page title. Paths with
+ * no curriculum behind them are left out; marking up a course nobody can enrol
+ * in is the kind of thing that earns a manual action.
  */
 function JsonLd({
   siteUrl,
   copy,
-  languages,
+  decks,
+  courses,
+  featured,
 }: {
   siteUrl: string;
-  copy: ReturnType<typeof getLandingCopy>;
-  languages: JourneyLanguage[];
+  copy: LandingCopy;
+  decks: Record<LanguageSlug, CourseDeck>;
+  courses: LandingCourse[];
+  featured: LanguageSlug;
 }) {
+  const href = (slug: LanguageSlug) =>
+    LANDING_LANGUAGES.find((language) => language.slug === slug)?.href ?? null;
+
   const graph = [
     {
       "@type": "Organization",
       "@id": `${siteUrl}/#organization`,
       name: "Laparli",
       url: siteUrl,
-      description: copy.hero.sub,
+      description: copy.seo.description,
     },
     {
       "@type": "WebSite",
@@ -165,21 +173,21 @@ function JsonLd({
     {
       "@type": "FAQPage",
       "@id": `${siteUrl}/#faq`,
-      mainEntity: copy.faq.items.map((item) => ({
+      mainEntity: [...decks[featured].faq, ...copy.faq.items].map((item) => ({
         "@type": "Question",
         name: item.q,
         acceptedAnswer: { "@type": "Answer", text: item.a },
       })),
     },
-    ...languages
-      .filter((language) => language.href)
-      .map((language) => ({
+    ...courses
+      .filter((course) => course.available && href(course.slug))
+      .map((course) => ({
         "@type": "Course",
-        name: language.copy.title,
-        description: language.copy.body,
-        url: `${siteUrl}${language.href}`,
+        name: decks[course.slug].name,
+        description: decks[course.slug].intro,
+        url: `${siteUrl}${href(course.slug)}`,
         inLanguage: "fa-IR",
-        teaches: language.nativeName,
+        teaches: decks[course.slug].nativeName,
         provider: { "@id": `${siteUrl}/#organization` },
       })),
   ];

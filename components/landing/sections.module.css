@@ -1,0 +1,73 @@
+/*
+ * The few things under the hero that Tailwind cannot express: a marquee, a
+ * scroll reveal, and the typographic treatment of the one sentence the lesson
+ * section pulls apart.
+ */
+
+/* The run is built from an even number of identical sets and travels exactly
+   half its own width, so the frame it resets to is pixel-identical to the one
+   it started from. How many sets that takes depends on how wide the phrases
+   render, which only the browser knows — `LandingTicker` measures one set and
+   sets the count and the duration. Fewer sets than the viewport can hold is
+   what produces a gap and a visible restart. */
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: slide linear infinite;
+}
+
+.set {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+@keyframes slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Reading right to left, the phrases should arrive from the left. Same
+   keyframes, played backwards — and seamless either way, because both ends of
+   the animation land on an identical frame. */
+:global([dir="rtl"]) .marquee {
+  animation-direction: reverse;
+}
+
+.marquee:hover {
+  animation-play-state: paused;
+}
+
+/* The target-language line is always LTR, whatever the interface language is:
+   an Italian sentence set right-to-left is unreadable. */
+.line {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    animation: none;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
