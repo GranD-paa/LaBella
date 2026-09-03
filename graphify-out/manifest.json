@@ -1332,9 +1332,9 @@
     "semantic_hash": ""
   },
   "lib/auth/better-auth.ts": {
-    "mtime": 1788420520.1469378,
-    "seen": 1788422748.4733167,
-    "ast_hash": "1d3875654f2cf19374c08a0b54ac3377",
+    "mtime": 1788425624.7530713,
+    "seen": 1788425711.2724504,
+    "ast_hash": "babc1f95d1cb10076fc13960f7c7278c",
     "semantic_hash": ""
   },
   "lib/auth/local-middleware.ts": {
@@ -2634,9 +2634,9 @@
     "semantic_hash": ""
   },
   "db/005_send_limits.sql": {
-    "mtime": 1788424308.8141155,
-    "seen": 1788424342.4376135,
-    "ast_hash": "10ea95ecc96345f03ba220623b07ef5f",
+    "mtime": 1788425639.4687476,
+    "seen": 1788425711.2724504,
+    "ast_hash": "7631d3144e87f7130bddf4ce9e75c282",
     "semantic_hash": ""
   },
   "lib/notify/send-limit.ts": {

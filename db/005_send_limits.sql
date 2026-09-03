@@ -43,20 +43,24 @@ create index if not exists send_attempts_created_at_idx
 -- rule lives, and nothing to forget to re-create on a fresh database.
 
 -- -------------------------------------------------------------------------
--- Retiring `user.region`
+-- `user.region` — optional cleanup, not required
 --
 -- The column is not in any migration here: Better Auth created it from the
 -- `additionalFields` declaration that used to pick a verification path. That
--- declaration is gone — every account is now proved by an SMS code to an
--- Iranian number — so nothing writes the column any more.
+-- decision is gone.
 --
--- Checked against the live database before writing this: `is_nullable = NO`
--- and no default. Left alone, the first sign-up after deploy fails on the
--- insert, and it reads as an auth bug rather than a schema one.
+-- Checked against the live database: `is_nullable = NO`, no default. So an
+-- insert that omits it fails. Rather than change the live schema, the app
+-- writes a constant into it — see the `region` shim in
+-- `lib/auth/better-auth.ts`. Sign-up works either way; nothing below is
+-- needed to deploy.
 --
--- Made nullable rather than dropped. Nullable is enough to unblock the insert,
--- it keeps whatever the existing rows say, and it is reversible; dropping is
--- none of those and buys nothing today. Drop it once the column has been
--- meaningless long enough that nobody would miss it.
+-- When you do want the column gone, run both lines together with the shim
+-- deleted, in either order:
+--
+--   alter table public."user" alter column region drop not null;
+--   alter table public."user" drop column region;
+--
+-- Left commented out on purpose. Dropping a column is not something a
+-- migration file should do on a re-run by accident.
 -- -------------------------------------------------------------------------
-alter table if exists public."user" alter column region drop not null;

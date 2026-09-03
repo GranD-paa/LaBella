@@ -1,16 +1,16 @@
 # Graph Report - cursor P  (2026-09-03)
 
 ## Corpus Check
-- 421 files · ~315,015 words
+- 421 files · ~315,194 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2103 nodes · 6224 edges · 149 communities (95 shown, 54 thin omitted)
+- 2102 nodes · 6224 edges · 148 communities (95 shown, 53 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 52 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f9f50876`
+- Built from commit: `c36826b4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -151,7 +151,6 @@
 - @supabase/ssr
 - tailwind-merge
 - @types/nodemailer
-- public."user"
 - subscription-view.tsx
 
 ## God Nodes (most connected - your core abstractions)
@@ -181,7 +180,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (149 total, 54 thin omitted)
+## Communities (148 total, 53 thin omitted)
 
 ### Community 0 - "revalidateAppContent"
 Cohesion: 0.22
@@ -522,17 +521,17 @@ Nodes (19): cancelSubscriptionAction(), CheckoutResult, recoverMyPendingPayments
 ## Knowledge Gaps
 - **470 isolated node(s):** `next/core-web-vitals`, `next/typescript`, `ActionResult`, `CheckoutResult`, `optionalText` (+465 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **54 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **53 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `useTranslations()` connect `useTranslations` to `revalidateAppContent`, `app-shell.tsx`, `actions/auth.ts`, `user-management-panel.tsx`, `Lesson`, `cn`, `[quiz_id]/page.tsx`, `local/repository.ts`, `quiz-management-table.tsx`, `about/page.tsx`, `utils.ts`, `user-row-actions.tsx`, `subscription-view.tsx`, `curriculum-level-manager.tsx`, `locale-provider.tsx`, `resolve-navigation.ts`, `data/index.ts`, `level-category-grid.tsx`, `card.tsx`, `my-subscriptions-card.tsx`, `video-embed.ts`, `admin-accounting-page-view.tsx`, `AdminDashboard`, `BannerUploadForm`, `sections.tsx`, `lesson-manager.tsx`, `curriculum/types.ts`?**
-  _High betweenness centrality (0.088) - this node is a cross-community bridge._
+  _High betweenness centrality (0.091) - this node is a cross-community bridge._
 - **Why does `getDataRepository()` connect `getDataRepository` to `revalidateAppContent`, `postgres/repository.ts`, `app-shell.tsx`, `actions/auth.ts`, `admin.ts`, `isLocalDataMode`, `[quiz_id]/page.tsx`, `getServerTranslator`, `quiz-management-table.tsx`, `[language]/page.tsx`, `about/page.tsx`, `landing.ts`, `user-row-actions.tsx`, `subscription-view.tsx`, `curriculum-level-manager.tsx`, `dashboard-data.ts`, `[provider]/route.ts`, `data-source.ts`, `requireAdminPermission`, `resolve-navigation.ts`, `data/index.ts`, `blog-post-editor.tsx`, `blog.ts`, `app/page.tsx`, `[slug]/page.tsx`?**
-  _High betweenness centrality (0.070) - this node is a cross-community bridge._
+  _High betweenness centrality (0.064) - this node is a cross-community bridge._
 - **Why does `cn()` connect `cn` to `app-shell.tsx`, `user-management-panel.tsx`, `[quiz_id]/page.tsx`, `local/repository.ts`, `app/layout.tsx`, `quiz-management-table.tsx`, `utils.ts`, `subscription-view.tsx`, `curriculum-level-manager.tsx`, `locale-provider.tsx`, `level-category-grid.tsx`, `blog-post-editor.tsx`, `card.tsx`, `my-subscriptions-card.tsx`, `useTranslations`, `admin-accounting-page-view.tsx`, `[slug]/page.tsx`, `BannerUploadForm`, `sections.tsx`, `curriculum/types.ts`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
+  _High betweenness centrality (0.051) - this node is a cross-community bridge._
 - **What connects `next/core-web-vitals`, `next/typescript`, `ActionResult` to the rest of the system?**
   _470 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `DataRepository` be split into smaller, more focused modules?**

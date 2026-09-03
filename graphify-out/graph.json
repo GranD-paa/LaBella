@@ -1899,7 +1899,7 @@
       "file_type": "code",
       "norm_label": "verifiableuser",
       "source_file": "lib/auth/better-auth.ts",
-      "source_location": "L53"
+      "source_location": "L80"
     },
     {
       "id": "lib_auth_rate_limit_ratelimitentry",
@@ -9586,7 +9586,7 @@
       "file_type": "code",
       "norm_label": "assertverifiablephone()",
       "source_file": "lib/auth/better-auth.ts",
-      "source_location": "L69"
+      "source_location": "L96"
     },
     {
       "id": "lib_auth_better_auth_isverified",
@@ -9598,7 +9598,7 @@
       "file_type": "code",
       "norm_label": "isverified()",
       "source_file": "lib/auth/better-auth.ts",
-      "source_location": "L58"
+      "source_location": "L85"
     },
     {
       "id": "lib_auth_rate_limit_buildauthratelimitkey",
@@ -14133,17 +14133,6 @@
       "norm_label": "@types/nodemailer",
       "source_file": "package.json",
       "source_location": "L27"
-    },
-    {
-      "id": "public_user",
-      "label": "public.\"user\"",
-      "_origin": "ast",
-      "community": 152,
-      "community_name": "public.\"user\"",
-      "file_type": "code",
-      "norm_label": "public.\"user\"",
-      "source_file": "",
-      "source_location": ""
     },
     {
       "id": "app_actions_checkout",
@@ -33840,18 +33829,6 @@
     },
     {
       "source": "lib_auth_better_auth_assertverifiablephone",
-      "target": "lib_notify_phone_normalizephone",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "lib/auth/better-auth.ts",
-      "source_location": "L72",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_auth_better_auth_assertverifiablephone",
       "target": "lib_notify_phone_isiranianphone",
       "relation": "calls",
       "_origin": "ast",
@@ -33859,7 +33836,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "lib/auth/better-auth.ts",
-      "source_location": "L76",
+      "source_location": "L103",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_auth_better_auth_assertverifiablephone",
+      "target": "lib_notify_phone_normalizephone",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "lib/auth/better-auth.ts",
+      "source_location": "L99",
       "weight": 1.0
     },
     {
@@ -33871,7 +33860,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "lib/auth/better-auth.ts",
-      "source_location": "L42",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -86906,7 +86895,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/auth/better-auth.ts",
-      "source_location": "L53",
+      "source_location": "L80",
       "weight": 1.0
     },
     {
@@ -86917,7 +86906,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/auth/better-auth.ts",
-      "source_location": "L58",
+      "source_location": "L85",
       "weight": 1.0
     },
     {
@@ -86928,7 +86917,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/auth/better-auth.ts",
-      "source_location": "L69",
+      "source_location": "L96",
       "weight": 1.0
     },
     {
@@ -97775,5 +97764,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f9f508760222ad7a751279c1b92c8c1657962d19"
+  "built_at_commit": "c36826b46d6eceba37728a2523c0198a42821119"
 }

@@ -30,6 +30,33 @@ export const auth = betterAuth({
     connectionString: resolveConnectionString(),
     ...POOL_OPTIONS,
   }),
+  user: {
+    additionalFields: {
+      /**
+       * Not a feature — a shim around a column we have not been able to
+       * retire yet.
+       *
+       * `user.region` used to decide the verification path. That decision is
+       * gone, but Better Auth created the column as `not null` with no
+       * default, so an insert that omits it fails, and the failure surfaces
+       * as a broken sign-up rather than as a schema complaint.
+       *
+       * Writing a constant is the smallest thing that keeps sign-up working
+       * without touching the live schema. `input: false` keeps it off the
+       * API, so nothing outside this file can set or read it, and no other
+       * code should start meaning anything by it.
+       *
+       * Delete this block together with the column — see
+       * `db/005_send_limits.sql`.
+       */
+      region: {
+        type: "string",
+        required: false,
+        defaultValue: "ir",
+        input: false,
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     // The phone is what proves an account — see `isVerified`.
