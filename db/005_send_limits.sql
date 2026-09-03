@@ -37,20 +37,10 @@ create index if not exists send_attempts_lookup_idx
 create index if not exists send_attempts_created_at_idx
   on public.send_attempts (created_at);
 
--- -------------------------------------------------------------------------
--- Pruning
---
--- Nothing here is worth keeping past a day or two — the longest window any
--- limit uses is 24 hours. Called opportunistically from the application
--- rather than by a cron job, so there is one less moving part to forget.
--- -------------------------------------------------------------------------
-create or replace function public.prune_send_attempts()
-returns void
-language sql
-as $$
-  delete from public.send_attempts
-  where created_at < now() - interval '2 days';
-$$;
+-- Old rows are deleted by the application itself, roughly once an hour — the
+-- longest window any limit uses is 24 hours, so nothing here is worth keeping.
+-- A plain DELETE from the app rather than a stored function: one place the
+-- rule lives, and nothing to forget to re-create on a fresh database.
 
 -- -------------------------------------------------------------------------
 -- Retiring `user.region`

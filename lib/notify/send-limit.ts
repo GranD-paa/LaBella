@@ -161,7 +161,9 @@ async function prune(): Promise<void> {
   lastPruneAt = now;
 
   try {
-    await execute("select public.prune_send_attempts()");
+    await execute(
+      "delete from public.send_attempts where created_at < now() - interval '2 days'"
+    );
   } catch {
     // Housekeeping must never be the reason a message did not go out.
   }
