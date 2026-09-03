@@ -1,11 +1,12 @@
 import nodemailer, { type Transporter } from "nodemailer";
 
+import { claimSend } from "@/lib/notify/send-limit";
+
 /**
  * Outgoing mail.
  *
- * Only foreign accounts need email — they verify by link instead of SMS,
- * because an international SMS costs about 146x a domestic one. Everything
- * else the app says to a user goes out over another channel.
+ * No account is proved by email — that is the SMS code's job — but every
+ * account gives an address, and receipts and notices go to it.
  *
  * The sender is an ordinary SMTP mailbox rather than an email API. The app
  * runs on Iranian infrastructure and the transactional-email providers refuse
@@ -54,11 +55,27 @@ function getTransport(host: string, user: string, pass: string): Transporter {
   return transport;
 }
 
+/**
+ * Sends one email, or declines to.
+ *
+ * The send limit is enforced here rather than left to each caller. A rule the
+ * caller has to remember holds only until someone adds a feature without
+ * reading this file — and the whole point of the limit is the message nobody
+ * thought about. Anything that goes out through this function is counted,
+ * whatever adds it later.
+ *
+ * Returns false when the limit refused it. Callers should treat a refusal as
+ * "sent" in anything they say back to a visitor: a response that differs
+ * between the two turns the endpoint into a way of discovering which addresses
+ * have accounts.
+ */
 export async function sendEmail(
   to: string,
   subject: string,
-  body: string
-): Promise<void> {
+  body: string,
+  /** The caller's IP, when the send is on behalf of a request. */
+  ip?: string | null
+): Promise<boolean> {
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
@@ -72,8 +89,11 @@ export async function sendEmail(
     // Development has no mailbox and should not need one: the link a
     // developer is waiting on is more useful in the terminal than in an inbox.
     console.info(`[email:dev] ${to} | ${subject}\n${body}`);
-    return;
+    // No quota is spent, because nothing left the building.
+    return true;
   }
+
+  if (!(await claimSend("email", { recipient: to, ip }))) return false;
 
   await getTransport(host, user, pass).sendMail({
     from: process.env.MAIL_FROM ?? FALLBACK_FROM,
@@ -81,4 +101,6 @@ export async function sendEmail(
     subject,
     text: body,
   });
+
+  return true;
 }

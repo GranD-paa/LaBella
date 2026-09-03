@@ -53,10 +53,19 @@ const SMS_RULES: Rule[] = [
 ];
 
 /**
- * Nothing in the product mails a stranger — an address only receives once it
- * belongs to an account — so these are quota guards rather than defences.
+ * The same shape as the SMS rules, and for the same reason.
+ *
+ * It is tempting to argue an address only ever receives once it belongs to an
+ * account, so nothing here can be aimed at a stranger. That holds for the code
+ * as it stands today and would stop holding the first time anyone adds a
+ * "resend", a "share with a friend" or a password reset — and the person who
+ * adds it will not think to come back here. Cheaper to be strict now.
+ *
+ * The IP cap is looser than the per-address one for the same reason as the SMS
+ * one: carrier NAT puts many real users behind a single address.
  */
 const EMAIL_RULES: Rule[] = [
+  { scope: "email", max: 1, windowMs: MINUTE },
   { scope: "email", max: 3, windowMs: DAY },
   { scope: "ip", max: 20, windowMs: HOUR },
   { scope: "global", max: 400, windowMs: DAY },
@@ -84,10 +93,24 @@ export type SendSubjects = {
  * leave a window where several requests all pass the check before any of them
  * writes, which is exactly the burst this is meant to stop.
  *
- * Returns `false` when any rule is at its limit. It never throws for a full
- * bucket; a caller that cannot send should carry on as if it had.
+ * Returns `false` when any rule is at its limit, and also when the counters
+ * cannot be read at all. Refusing on a database error is deliberate: these
+ * limits guard a bill and a stranger's inbox, and a send we are unable to
+ * count is exactly the send worth skipping. Nothing is lost by it either —
+ * every path that sends needs the database anyway.
  */
 export async function claimSend(
+  channel: SendChannel,
+  subjects: SendSubjects
+): Promise<boolean> {
+  try {
+    return await countAndClaim(channel, subjects);
+  } catch {
+    return false;
+  }
+}
+
+async function countAndClaim(
   channel: SendChannel,
   subjects: SendSubjects
 ): Promise<boolean> {
