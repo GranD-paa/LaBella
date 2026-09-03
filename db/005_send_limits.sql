@@ -50,9 +50,13 @@ create index if not exists send_attempts_created_at_idx
 -- declaration is gone — every account is now proved by an SMS code to an
 -- Iranian number — so nothing writes the column any more.
 --
--- It is dropped rather than left behind because a `not null` column that no
--- code fills is a sign-up that fails on the first insert after deploy, and
--- the failure would look like an auth bug rather than a schema one. Existing
--- rows lose a value that no longer means anything.
+-- Checked against the live database before writing this: `is_nullable = NO`
+-- and no default. Left alone, the first sign-up after deploy fails on the
+-- insert, and it reads as an auth bug rather than a schema one.
+--
+-- Made nullable rather than dropped. Nullable is enough to unblock the insert,
+-- it keeps whatever the existing rows say, and it is reversible; dropping is
+-- none of those and buys nothing today. Drop it once the column has been
+-- meaningless long enough that nobody would miss it.
 -- -------------------------------------------------------------------------
-alter table if exists public."user" drop column if exists region;
+alter table if exists public."user" alter column region drop not null;
