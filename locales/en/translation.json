@@ -85,16 +85,11 @@
       "confirmPasswordRequired": "Please confirm your password",
       "passwordsMismatch": "Passwords do not match",
       "phoneRequired": "Phone number is required",
-      "phoneMax": "Phone number is too long"
+      "phoneMax": "Phone number is too long",
+      "phoneIran": "Enter an Iranian mobile number — accounts are confirmed by SMS."
     },
-    "region": "Where are you signing up from?",
-    "regionIran": "Inside Iran",
-    "regionAbroad": "Outside Iran",
-    "regionHint": "Accounts inside Iran are confirmed by SMS; from anywhere else we send an email link instead.",
     "phone": "Mobile number",
-    "phonePlaceholder": "09121234567",
-    "phoneIntlPlaceholder": "+49 151 23456789",
-    "phoneHint": "Include your country code if you are outside Iran."
+    "phonePlaceholder": "09121234567"
   },
   "menu": {
     "badge": "Main Menu",
@@ -1430,7 +1425,8 @@
       "levelExamLocked": "The level exam needs an active subscription. Choose a plan to unlock it.",
       "confirmPhone": "We sent a code to your phone. Enter it to finish signing up.",
       "invalidPhone": "That phone number does not look right.",
-      "iranPhoneRequired": "You chose Iran, so the number must be an Iranian mobile."
+      "iranPhoneRequired": "Sign-up needs an Iranian mobile number — that is where the code is sent.",
+      "tooManyCodes": "Too many codes requested for this number. Try again in a few hours."
     }
   },
   "validation": {

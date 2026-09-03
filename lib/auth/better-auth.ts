@@ -7,51 +7,33 @@ import {
   POOL_OPTIONS,
   resolveConnectionString,
 } from "@/lib/data/postgres/client";
-import { sendEmail } from "@/lib/notify/email";
 import { isIranianPhone, normalizePhone } from "@/lib/notify/phone";
 import { sendSms } from "@/lib/notify/sms";
-
-/** Which verification path an account follows, chosen by the user at sign-up. */
-export type Region = "ir" | "intl";
 
 /**
  * Auth for the ArvanCloud Postgres deployment, replacing Supabase Auth.
  *
- * Verification is deliberately NOT enforced here. Better Auth can only gate
- * sign-in on one channel globally (`requireVerification`), but our rule splits
- * by audience: accounts inside Iran pass SMS OTP, accounts abroad verify by
- * email link because an international SMS costs ~146x a domestic one.
- * `isVerified` below is the single place that rule lives.
+ * One rule, no branches: an account is proved by an SMS code to an Iranian
+ * number. Someone living abroad supplies an Iranian number too — that is
+ * deliberate, and it is why the sign-up form has no country choice on it.
  *
- * The split follows the region the user picks before signing up, not the phone
- * prefix — an explicit answer beats inferring one, and `assertRegionMatchesPhone`
- * keeps the two from disagreeing. Every account stores a phone number either
- * way; it is what SpotPlayer burns into the video watermark.
+ * An email address is still required of everyone, because receipts and notices
+ * go there. It is never verified: nothing in the product waits on it, and a
+ * confirmation link the user can ignore is a step that only loses sign-ups.
+ *
+ * Verification is not enforced by Better Auth's own `requireVerification` —
+ * `isVerified` below is the single place that rule lives, so the answer stays
+ * one function rather than a setting plus a gate that can disagree.
  */
 export const auth = betterAuth({
   database: new Pool({
     connectionString: resolveConnectionString(),
     ...POOL_OPTIONS,
   }),
-  user: {
-    additionalFields: {
-      region: { type: "string", required: true, defaultValue: "ir", input: true },
-    },
-  },
   emailAndPassword: {
     enabled: true,
-    // Our own gate decides this per audience — see `isVerified`.
+    // The phone is what proves an account — see `isVerified`.
     requireEmailVerification: false,
-  },
-  emailVerification: {
-    sendOnSignUp: false,
-    async sendVerificationEmail({ user, url }) {
-      await sendEmail(
-        user.email,
-        "Laparli — confirm your email",
-        `Confirm your account: ${url}`
-      );
-    },
   },
   plugins: [
     phoneNumber({
@@ -69,39 +51,29 @@ export const auth = betterAuth({
 });
 
 type VerifiableUser = {
-  region?: string | null;
   phoneNumberVerified?: boolean | null;
-  emailVerified?: boolean | null;
 };
 
-/**
- * Whether an account has cleared the verification step that applies to it:
- * SMS inside Iran, an email link abroad. Unknown regions fall back to the
- * email path, which costs nothing to send.
- */
+/** Whether the account has passed its SMS code. Nothing else counts. */
 export function isVerified(user: VerifiableUser): boolean {
-  return user.region === "ir"
-    ? Boolean(user.phoneNumberVerified)
-    : Boolean(user.emailVerified);
+  return Boolean(user.phoneNumberVerified);
 }
 
 /**
- * Someone who says they are in Iran but hands us a foreign number would never
- * receive their code — the SMS gateway only serves +98. Reject the pair at
- * sign-up rather than stranding the account half-verified.
+ * The number in E.164, or the reason it cannot be used.
  *
- * The reverse is allowed on purpose: an Iranian number is perfectly normal for
- * someone living abroad, and they verify by email regardless.
+ * A foreign number would never receive its code — the gateway only serves
+ * +98 — so it is refused at sign-up rather than stranding an account that can
+ * never finish verifying.
  */
-export function assertRegionMatchesPhone(
-  region: Region,
+export function assertVerifiablePhone(
   rawPhone: string
 ): { ok: true; phone: string } | { ok: false; error: string } {
   const phone = normalizePhone(rawPhone);
   if (!phone) {
     return { ok: false, error: "actions.errors.invalidPhone" };
   }
-  if (region === "ir" && !isIranianPhone(phone)) {
+  if (!isIranianPhone(phone)) {
     return { ok: false, error: "actions.errors.iranPhoneRequired" };
   }
   return { ok: true, phone };

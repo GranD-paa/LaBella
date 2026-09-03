@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { isVerifiablePhone } from "@/lib/validations/auth";
+
 type Translator = (key: string, params?: Record<string, string | number>) => string;
 
 export function createSignInSchema(t: Translator) {
@@ -16,13 +18,11 @@ export function createSignInSchema(t: Translator) {
 export function createSignUpSchema(t: Translator) {
   return z
     .object({
-      // Answered before the rest of the form: it picks the verification path
-      // (SMS inside Iran, email link abroad).
-      region: z.enum(["ir", "intl"]),
       phone: z
         .string()
         .min(1, t("auth.validation.phoneRequired"))
-        .max(20, t("auth.validation.phoneMax")),
+        .max(20, t("auth.validation.phoneMax"))
+        .refine(isVerifiablePhone, t("auth.validation.phoneIran")),
       fullName: z
         .string()
         .min(2, t("auth.validation.fullNameMin"))

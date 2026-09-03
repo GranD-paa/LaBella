@@ -191,11 +191,11 @@ export async function signOutAction() {
 async function signUpWithPostgres(
   values: SignUpValues
 ): Promise<ActionResult | void> {
-  const { assertRegionMatchesPhone, auth } = await import(
+  const { assertVerifiablePhone, auth } = await import(
     "@/lib/auth/better-auth"
   );
 
-  const phoneCheck = assertRegionMatchesPhone(values.region, values.phone);
+  const phoneCheck = assertVerifiablePhone(values.phone);
   if (!phoneCheck.ok) {
     return { error: phoneCheck.error };
   }
@@ -209,7 +209,6 @@ async function signUpWithPostgres(
         password: values.password,
         name: values.fullName,
         phoneNumber: phoneCheck.phone,
-        region: values.region,
       },
       headers: requestHeaders,
     });
@@ -221,19 +220,27 @@ async function signUpWithPostgres(
     };
   }
 
-  // Iranian accounts prove themselves by SMS; everyone else gets an email
-  // link, because an international SMS costs ~146x a domestic one.
-  if (values.region === "ir") {
-    await auth.api.sendPhoneNumberOTP({
-      body: { phoneNumber: phoneCheck.phone },
-      headers: requestHeaders,
-    });
-    return { success: true, message: "actions.errors.confirmPhone" };
+  // The one way an account is proved. The email address is stored but never
+  // confirmed — see `lib/auth/better-auth.ts`.
+  //
+  // The account exists at this point whether or not the code goes out, so a
+  // refused send is reported plainly rather than pretended away: the visitor
+  // is asking about a number they just typed themselves, and telling them to
+  // come back later beats leaving them waiting for a message that is not
+  // coming. Enumeration is not the risk here — sign-up already answers
+  // "is this address taken".
+  const { claimSend } = await import("@/lib/notify/send-limit");
+  const allowed = await claimSend("sms", {
+    recipient: phoneCheck.phone,
+    ip: await getClientIpForRateLimit(),
+  });
+  if (!allowed) {
+    return { error: "actions.errors.tooManyCodes" };
   }
 
-  await auth.api.sendVerificationEmail({
-    body: { email: values.email, callbackURL: "/login" },
+  await auth.api.sendPhoneNumberOTP({
+    body: { phoneNumber: phoneCheck.phone },
     headers: requestHeaders,
   });
-  return { success: true, message: "actions.errors.confirmEmail" };
+  return { success: true, message: "actions.errors.confirmPhone" };
 }

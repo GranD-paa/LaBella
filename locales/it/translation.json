@@ -85,16 +85,11 @@
       "confirmPasswordRequired": "Conferma la password",
       "passwordsMismatch": "Le password non corrispondono",
       "phoneRequired": "Il numero di telefono è obbligatorio",
-      "phoneMax": "Il numero di telefono è troppo lungo"
+      "phoneMax": "Il numero di telefono è troppo lungo",
+      "phoneIran": "Inserisci un numero di cellulare iraniano — la conferma avviene via SMS."
     },
-    "region": "Da dove ti registri?",
-    "regionIran": "Dall'Iran",
-    "regionAbroad": "Fuori dall'Iran",
-    "regionHint": "Gli account in Iran si confermano via SMS; da ogni altro paese inviamo un link per email.",
     "phone": "Numero di cellulare",
-    "phonePlaceholder": "09121234567",
-    "phoneIntlPlaceholder": "+39 320 1234567",
-    "phoneHint": "Se sei fuori dall'Iran, includi il prefisso internazionale."
+    "phonePlaceholder": "09121234567"
   },
   "menu": {
     "badge": "Menu principale",
@@ -1430,7 +1425,8 @@
       "levelExamLocked": "L’esame del livello richiede un abbonamento attivo. Scegli un piano per sbloccarlo.",
       "confirmPhone": "Ti abbiamo inviato un codice via SMS. Inseriscilo per completare la registrazione.",
       "invalidPhone": "Questo numero di telefono non sembra valido.",
-      "iranPhoneRequired": "Hai scelto l'Iran, quindi il numero deve essere un cellulare iraniano."
+      "iranPhoneRequired": "La registrazione richiede un numero di cellulare iraniano: il codice arriva lì.",
+      "tooManyCodes": "Troppi codici richiesti per questo numero. Riprova tra qualche ora."
     }
   },
   "validation": {

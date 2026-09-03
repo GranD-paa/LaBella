@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+import { isIranianPhone, normalizePhone } from "@/lib/notify/phone";
+
+/**
+ * Every account is confirmed by an SMS code, so the number has to be one an
+ * Iranian gateway can reach. Someone signing up from abroad supplies an
+ * Iranian number too — that is the product decision, not an oversight.
+ */
+export function isVerifiablePhone(value: string): boolean {
+  const e164 = normalizePhone(value);
+  return e164 !== null && isIranianPhone(e164);
+}
+
 export const signInSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
@@ -10,13 +22,11 @@ export type SignInValues = z.infer<typeof signInSchema>;
 
 export const signUpSchema = z
   .object({
-    // Asked before anything else on the form: it decides whether the account
-    // is verified by SMS or by an email link. See lib/auth/better-auth.ts.
-    region: z.enum(["ir", "intl"]),
     phone: z
       .string()
       .min(1, "Phone number is required")
-      .max(20, "Phone number is too long"),
+      .max(20, "Phone number is too long")
+      .refine(isVerifiablePhone, "Enter an Iranian mobile number"),
     fullName: z
       .string()
       .min(2, "Full name must be at least 2 characters")
