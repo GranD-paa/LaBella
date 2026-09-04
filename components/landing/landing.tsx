@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 import { useLocale } from "@/components/providers/locale-provider";
 
@@ -60,7 +59,6 @@ export function Landing({
   dir: "rtl" | "ltr";
   isSignedIn: boolean;
 }) {
-  const router = useRouter();
   const { setLocale } = useLocale();
   const [featured, setFeatured] = useState<LanguageSlug>(
     () => courses[0]?.slug ?? "italian"
@@ -68,27 +66,6 @@ export function Landing({
 
   const deck = decks[featured];
   const course = courses.find((entry) => entry.slug === featured);
-
-  /**
-   * Switching interface language takes two steps, and both are needed.
-   *
-   * `setLocale` is the app's own switch: it writes the cookie and localStorage
-   * and puts `lang`/`dir` on `<html>`. On a normal page load the bootstrap
-   * script in the layout does that, but a soft refresh never re-runs it, so
-   * without this call the document would keep the old direction while the copy
-   * changed underneath it.
-   *
-   * `router.refresh()` then re-runs the server component, which is where this
-   * page's copy is resolved — in place, so the featured course and the scroll
-   * position both survive.
-   */
-  const changeLocale = useCallback(
-    (next: AppLocale) => {
-      setLocale(next);
-      router.refresh();
-    },
-    [router, setLocale]
-  );
 
   return (
     <>
@@ -101,7 +78,7 @@ export function Landing({
         locale={locale}
         dir={dir}
         isSignedIn={isSignedIn}
-        onLocaleChange={changeLocale}
+        onLocaleChange={setLocale}
       />
 
       <main id="main" className="grain relative bg-[#090014]">

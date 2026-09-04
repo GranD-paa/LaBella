@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   createContext,
   useCallback,
@@ -30,9 +31,31 @@ type LocaleContextValue = {
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
+function readLocaleCookie(): string | null {
+  const match = document.cookie.match(
+    new RegExp(`(?:^|; )${LOCALE_COOKIE_KEY}=([^;]*)`)
+  );
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+/**
+ * The cookie wins over localStorage, because the cookie is what the server
+ * just rendered this page with. Trusting storage first would let the context
+ * settle on a different language than the HTML already on screen, and the two
+ * would stay out of step until the next full load.
+ */
 function readStoredLocale(): AppLocale {
   if (typeof window === "undefined") {
     return DEFAULT_LOCALE;
+  }
+
+  try {
+    const fromCookie = readLocaleCookie();
+    if (fromCookie && isAppLocale(fromCookie)) {
+      return fromCookie;
+    }
+  } catch {
+    // ignore cookie access errors
   }
 
   try {
@@ -62,6 +85,7 @@ function applyDocumentLocale(locale: AppLocale) {
 }
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [locale, setLocaleState] = useState<AppLocale>(DEFAULT_LOCALE);
 
   useEffect(() => {
@@ -70,15 +94,33 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
     applyDocumentLocale(stored);
   }, []);
 
-  const setLocale = useCallback((next: AppLocale) => {
-    setLocaleState(next);
-    try {
-      window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
-    } catch {
-      // ignore storage errors
-    }
-    applyDocumentLocale(next);
-  }, []);
+  /**
+   * Switching language takes two steps, and both are needed.
+   *
+   * The state and the cookie cover everything rendered in the browser, which
+   * flips immediately. But most of this app's copy is resolved on the server —
+   * `getServerTranslator` reads the same cookie while rendering — so that half
+   * of the page is already-rendered HTML holding the previous language.
+   *
+   * `router.refresh()` re-runs those server components with the new cookie and
+   * swaps the result in place: no reload, no lost form state, no lost scroll.
+   * It also drops the client router cache, which is what keeps the *next* page
+   * from arriving in the old language — those cached payloads otherwise
+   * survive for thirty seconds, and five minutes for prefetched routes.
+   */
+  const setLocale = useCallback(
+    (next: AppLocale) => {
+      setLocaleState(next);
+      try {
+        window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
+      } catch {
+        // ignore storage errors
+      }
+      applyDocumentLocale(next);
+      router.refresh();
+    },
+    [router]
+  );
 
   const definition = getLocaleDefinition(locale);
   const translator = useMemo(() => createTranslator(messages[locale]), [locale]);
