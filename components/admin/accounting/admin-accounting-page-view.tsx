@@ -89,7 +89,7 @@ export function AdminAccountingPageView({
             </p>
           </div>
           <Button variant="outline" className="border-white/20" asChild>
-            <Link href="/admin">
+            <Link href="/dashboard">
               <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
               {t("admin.accounting.backToDashboard")}
             </Link>

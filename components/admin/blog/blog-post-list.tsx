@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowRight,
+  ArrowLeft,
   ExternalLink,
   FileText,
   Pencil,
@@ -70,18 +70,20 @@ export function BlogPostList({
               {posts.length.toLocaleString("fa-IR")} مطلب، که{" "}
               {published.toLocaleString("fa-IR")} تای آن منتشر شده است.
             </p>
-            <Button asChild variant="ghost" size="sm" className="mt-2">
-              <Link href="/admin">
-                <ArrowRight className="me-1 h-4 w-4" />
-                بازگشت به پنل
-              </Link>
-            </Button>
+            <div>
+              <Button asChild>
+                <Link href="/admin/blog/new">
+                  <Plus className="me-1 h-4 w-4" />
+                  مطلب جدید
+                </Link>
+              </Button>
+            </div>
           </div>
 
-          <Button asChild>
-            <Link href="/admin/blog/new">
-              <Plus className="me-1 h-4 w-4" />
-              مطلب جدید
+          <Button variant="outline" className="border-white/20" asChild>
+            <Link href="/dashboard">
+              <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+              بازگشت به داشبورد
             </Link>
           </Button>
         </div>
