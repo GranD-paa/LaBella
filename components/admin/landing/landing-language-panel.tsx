@@ -127,14 +127,14 @@ export function LandingLanguagePanel({
                 className="flex flex-wrap items-center gap-4 px-4 py-4"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="flex flex-wrap items-center gap-2 font-medium">
+                  <div className="flex flex-wrap items-center gap-2 font-medium">
                     {LANGUAGE_LABELS[language.slug] ?? language.slug}
                     {language.teaserOnly ? (
                       <Badge variant="secondary" className="text-xs">
                         بدون محتوا
                       </Badge>
                     ) : null}
-                  </p>
+                  </div>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {LANDMARK_LABELS[language.landmark] ?? language.landmark}
                   </p>

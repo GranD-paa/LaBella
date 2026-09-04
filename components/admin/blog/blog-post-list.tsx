@@ -115,7 +115,7 @@ export function BlogPostList({
                   <li key={post.id} className="px-4 py-4">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="min-w-0 flex-1">
-                        <p className="flex flex-wrap items-center gap-2 font-medium">
+                        <div className="flex flex-wrap items-center gap-2 font-medium">
                           {post.title}
                           {post.status === "published" ? (
                             <Badge className="border-brand-accent/30 bg-brand-accent/10 text-brand-accent">
@@ -129,7 +129,7 @@ export function BlogPostList({
                               بدون ایندکس
                             </Badge>
                           ) : null}
-                        </p>
+                        </div>
 
                         <p className="mt-1 truncate text-sm text-muted-foreground">
                           /blog/{post.slug}

@@ -175,14 +175,14 @@ export function UserManagementPanel({
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0 space-y-0.5">
-                            <p className="flex items-center gap-1.5 truncate font-medium">
+                            <div className="flex items-center gap-1.5 truncate font-medium">
                               {displayName}
                               {isSelf ? (
                                 <Badge variant="secondary" className="text-[10px]">
                                   {t("admin.users.you")}
                                 </Badge>
                               ) : null}
-                            </p>
+                            </div>
                             <p className="truncate text-xs text-muted-foreground md:hidden">
                               {user.email || t("admin.users.noEmail")}
                             </p>
