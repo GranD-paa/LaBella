@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Check, Crown, Gem, Sparkles, Sprout, Zap } from "lucide-react";
 import { toast } from "sonner";
@@ -44,6 +45,7 @@ const PLAN_ICONS = {
 
 export function SubscriptionPlanCards({
   isAdmin,
+  isSignedIn = true,
   language,
   plans,
   currency = "EUR",
@@ -53,6 +55,8 @@ export function SubscriptionPlanCards({
   availableProviders = [],
 }: {
   isAdmin: boolean;
+  /** Defaults to true so the dashboard's own use of this card is unchanged. */
+  isSignedIn?: boolean;
   language?: CurriculumLanguage;
   plans: SubscriptionPlanRow[];
   currency?: BillingCurrency;
@@ -61,6 +65,7 @@ export function SubscriptionPlanCards({
   fxRate?: FxRate | null;
   availableProviders?: PaymentProviderSlug[];
 }) {
+  const router = useRouter();
   const { t, locale } = useTranslations();
   const [checkoutPlan, setCheckoutPlan] = useState<SubscriptionPlanRow | null>(
     null
@@ -86,6 +91,14 @@ export function SubscriptionPlanCards({
   }
 
   function handleSubscribe(plan: SubscriptionPlanRow) {
+    // A visitor reading the plans without an account: send them to sign-up
+    // rather than into a checkout the server would refuse anyway. Same
+    // destination the landing page's pricing gives them.
+    if (!isSignedIn) {
+      router.push("/sign-up?redirectedFrom=%2Fsubscription");
+      return;
+    }
+
     // Admins previewing the storefront should not be able to buy from it.
     if (isAdmin) {
       toast.info(t("subscription.paymentSoon"), {

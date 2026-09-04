@@ -5,7 +5,10 @@ import { getDataRepository } from "@/lib/data";
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
   const repo = getDataRepository();
-  const user = await repo.getAuthUser();
+  // `/about`, `/contact` and `/subscription` render under this shell without a
+  // session now, so an unreachable session store must not take the header down
+  // with it.
+  const user = await repo.getAuthUser().catch(() => null);
 
   let fullName: string | null = null;
   let isAdmin = false;
@@ -25,6 +28,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             fullName={fullName}
             email={user?.email ?? null}
             isAdmin={isAdmin}
+            isSignedIn={Boolean(user)}
           />
         }
       />

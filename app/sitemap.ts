@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 
 import { getDataRepository } from "@/lib/data";
-import { LANDING_LANGUAGES } from "@/lib/landing/languages";
 import { getStaticSiteUrl } from "@/lib/seo/site-url";
 
 /**
@@ -23,15 +22,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${site}/contact`, changeFrequency: "yearly", priority: 0.4 },
   ];
 
-  // Only languages with a real course get a URL — listing a landmark-only
-  // teaser would put a 404 in the sitemap.
-  const languageRoutes: MetadataRoute.Sitemap = LANDING_LANGUAGES.filter(
-    (language) => language.href !== null
-  ).map((language) => ({
-    url: `${site}${language.href}`,
-    changeFrequency: "weekly",
-    priority: 0.6,
-  }));
+  // The course pages under `/learn` are deliberately absent. They are the
+  // product itself: robots.txt disallows them and the middleware redirects
+  // anyone without a session, so listing them here only ever offered a
+  // crawler a door it is told not to open.
 
   let postRoutes: MetadataRoute.Sitemap = [];
   try {
@@ -51,5 +45,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // routes are still worth serving.
   }
 
-  return [...staticRoutes, ...languageRoutes, ...postRoutes];
+  return [...staticRoutes, ...postRoutes];
 }

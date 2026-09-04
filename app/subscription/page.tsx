@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 import { SubscriptionView } from "@/components/subscription/subscription-view";
 import { getAvailableProviders } from "@/lib/billing/providers";
@@ -15,18 +14,20 @@ export async function generateMetadata(): Promise<Metadata> {
   );
 }
 
+/**
+ * Public, so the plans can be read before anyone signs up — the landing page
+ * quotes the same prices, so nothing here was ever secret. Buying is still
+ * gated: `SubscriptionPlanCards` sends a signed-out visitor to sign-up, and
+ * `startCheckoutAction` refuses them regardless of what the page rendered.
+ */
 export default async function SubscriptionPage() {
   const repo = getDataRepository();
-  const user = await repo.getAuthUser();
-
-  if (!user) {
-    redirect("/login");
-  }
+  const user = await repo.getAuthUser().catch(() => null);
 
   const { t } = await getServerTranslator();
-  const profile = await repo.getProfileById(user.id);
+  const profile = user ? await repo.getProfileById(user.id) : null;
   const displayName =
-    profile?.full_name || user.email?.split("@")[0] || t("common.guestName");
+    profile?.full_name || user?.email?.split("@")[0] || t("common.guestName");
   const [languages, plans, pageContent, settings, fxRate] = await Promise.all([
     getLanguagesWithAvailability(repo),
     repo.getSubscriptionPlans(),
@@ -45,6 +46,7 @@ export default async function SubscriptionPage() {
   return (
     <SubscriptionView
       isAdmin={profile?.is_admin ?? false}
+      isSignedIn={Boolean(user)}
       displayName={displayName}
       languages={languages}
       plans={plans}

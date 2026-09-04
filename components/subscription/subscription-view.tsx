@@ -27,6 +27,7 @@ import type {
 
 type SubscriptionViewProps = {
   isAdmin: boolean;
+  isSignedIn: boolean;
   displayName: string;
   languages: CurriculumLanguage[];
   plans: SubscriptionPlanRow[];
@@ -39,6 +40,7 @@ type SubscriptionViewProps = {
 
 export function SubscriptionView({
   isAdmin,
+  isSignedIn,
   displayName,
   languages,
   plans,
@@ -252,6 +254,7 @@ export function SubscriptionView({
 
       <SubscriptionPlanCards
         isAdmin={isAdmin}
+        isSignedIn={isSignedIn}
         language={selectedLanguage}
         plans={plans}
         currency={currency}

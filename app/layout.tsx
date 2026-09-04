@@ -12,6 +12,7 @@ import {
   LOCALE_STORAGE_KEY,
 } from "@/lib/i18n/config";
 import { createPageMetadata } from "@/lib/i18n/metadata";
+import { isSiteIndexable } from "@/lib/seo/indexing";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const vazirmatn = Vazirmatn({
@@ -37,6 +38,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     ...localized,
+    // Until launch every page carries `noindex`. robots.txt asks crawlers to
+    // stay out; this is what binds the ones that come in anyway, and it
+    // inherits to every route because it is declared on the root layout.
+    robots: isSiteIndexable()
+      ? undefined
+      : { index: false, follow: false, nocache: true },
     manifest: "/manifest.json",
     appleWebApp: {
       capable: true,

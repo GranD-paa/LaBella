@@ -16,6 +16,13 @@ const PUBLIC_ROUTES = [
   "/auth",
   "/api/auth",
   "/blog",
+  // The marketing surface. Prices are already quoted on the landing page, so
+  // `/subscription` puts nothing new in the open; what it does is let someone
+  // read the plans before deciding to make an account. Buying still needs one
+  // — the plan cards send a signed-out visitor to sign-up.
+  "/about",
+  "/contact",
+  "/subscription",
   "/sitemap.xml",
   "/robots.txt",
 ];
