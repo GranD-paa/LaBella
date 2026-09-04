@@ -69,6 +69,22 @@ export function LandingHero({
 }) {
   const stageRef = useRef<HTMLElement | null>(null);
   const [navOpen, setNavOpen] = useState(false);
+
+  /**
+   * Which cell the switcher's thumb sits under.
+   *
+   * `locale` is the truth, but it arrives from a server re-render: the click
+   * writes a cookie and asks for a refresh, and the prop only changes once
+   * that round trip lands. A control that stays put for a second after being
+   * pressed reads as broken rather than slow, so the press moves it at once
+   * and the prop reconciles when it catches up — including when it disagrees,
+   * which is what a failed switch should look like.
+   */
+  const [shownLocale, setShownLocale] = useState<AppLocale>(locale);
+
+  useEffect(() => {
+    setShownLocale(locale);
+  }, [locale]);
   const [anim, setAnim] = useState<"on" | "play" | null>(null);
 
   // Only the featured backdrop is fetched up front; the others arrive on
@@ -313,25 +329,57 @@ export function LandingHero({
             <nav className={styles.links} id="landing-nav">
               <a href="#pricing">{copy.nav.pricing}</a>
               <a href="#faq">{copy.nav.faq}</a>
-              <Link className={styles.enroll} href={href}>
-                {isSignedIn ? copy.nav.dashboard : copy.nav.signUp}
-              </Link>
-              <span className={styles.langtoggle} role="group" aria-label="Language">
+
+              {/* Splits the bar into what you read and what you press. Without
+                  it the two links, the switcher and the call to action are one
+                  undifferentiated run of controls. */}
+              <span className={styles.navsplit} aria-hidden />
+
+              {/*
+                A segmented control, not three chips.
+                
+                Three separately outlined pills read as three choices to weigh;
+                one track with a thumb reads as one setting with a current
+                value, which is what a language switcher is. The thumb is
+                positioned from `--lang-i` rather than measured, because the
+                three cells are equal fractions of the track — no layout read,
+                nothing to resynchronise on resize or a late webfont.
+
+                Buttons, not anchors: these change a setting in place and go
+                nowhere, and `aria-pressed` is what says which one is on.
+              */}
+              <span
+                className={styles.langtoggle}
+                role="group"
+                aria-label={copy.nav.language}
+                style={
+                  {
+                    "--lang-i": Math.max(
+                      0,
+                      LOCALES.findIndex((entry) => entry.code === shownLocale)
+                    ),
+                  } as React.CSSProperties
+                }
+              >
+                <span className={styles.langThumb} aria-hidden />
                 {LOCALES.map((entry) => (
-                  <a
+                  <button
                     key={entry.code}
-                    href="#"
-                    className={entry.code === locale ? styles.langActive : undefined}
-                    aria-current={entry.code === locale ? "true" : undefined}
-                    onClick={(event) => {
-                      event.preventDefault();
+                    type="button"
+                    aria-pressed={entry.code === shownLocale}
+                    onClick={() => {
+                      setShownLocale(entry.code);
                       onLocaleChange(entry.code);
                     }}
                   >
                     {entry.label}
-                  </a>
+                  </button>
                 ))}
               </span>
+
+              <Link className={styles.enroll} href={href}>
+                {isSignedIn ? copy.nav.dashboard : copy.nav.signUp}
+              </Link>
             </nav>
 
             <button

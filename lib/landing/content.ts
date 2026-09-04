@@ -28,6 +28,9 @@ export type LandingCopy = {
     menuOpen: string;
     menuClose: string;
     skipToContent: string;
+    /** Accessible name for the locale switcher — it is a group of buttons
+        whose labels are language codes, which say nothing on their own. */
+    language: string;
   };
   hero: {
     /** Sits above the course name. */
@@ -121,6 +124,7 @@ const fa: LandingCopy = {
     menuOpen: "باز کردن منو",
     menuClose: "بستن منو",
     skipToContent: "رفتن به محتوا",
+    language: "زبان سایت",
   },
   hero: {
     eyebrow: "زبان",
@@ -304,6 +308,7 @@ const en: LandingCopy = {
     menuOpen: "Open navigation",
     menuClose: "Close navigation",
     skipToContent: "Skip to content",
+    language: "Site language",
   },
   hero: {
     eyebrow: "LANGUAGE",
@@ -487,6 +492,7 @@ const it: LandingCopy = {
     menuOpen: "Apri il menu",
     menuClose: "Chiudi il menu",
     skipToContent: "Vai al contenuto",
+    language: "Lingua del sito",
   },
   hero: {
     eyebrow: "LINGUA",

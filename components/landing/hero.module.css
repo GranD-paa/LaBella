@@ -405,8 +405,12 @@
 .links {
   display: flex;
   align-items: center;
+  gap: calc(4 * var(--u));
 }
 
+/* Text links carry no chrome of their own. A filled pill on hover would put a
+   third button-shaped object next to the switcher and the call to action, and
+   the bar already has as many of those as it can hold. */
 .links a {
   position: relative;
   display: flex;
@@ -415,13 +419,13 @@
   font-size: calc(17.4 * var(--u));
   font-weight: 400;
   line-height: 1;
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(255, 255, 255, 0.82);
   text-decoration: none;
-  padding: 0 calc(15 * var(--u));
+  padding: 0 calc(14 * var(--u));
   letter-spacing: calc(-0.6 * var(--u));
   white-space: nowrap;
   border-radius: calc(22 * var(--u));
-  transition: color 0.18s linear, background 0.18s linear;
+  transition: color 0.18s linear;
 }
 
 .stage[data-fa="true"] .links a {
@@ -429,19 +433,135 @@
   font-size: calc(16.6 * var(--u));
 }
 
+/* The underline grows from the centre and is the brand gold at a weight that
+   reads as emphasis rather than as a second button. */
+.links a::after {
+  content: "";
+  position: absolute;
+  inset-inline: calc(14 * var(--u));
+  bottom: calc(9 * var(--u));
+  height: calc(1.5 * var(--u));
+  border-radius: calc(1 * var(--u));
+  background: linear-gradient(
+    90deg,
+    rgba(251, 191, 36, 0),
+    rgba(251, 191, 36, 0.95),
+    rgba(251, 191, 36, 0)
+  );
+  transform: scaleX(0);
+  transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .links a:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.07);
 }
 
-.links a:nth-child(2) {
-  margin-inline-start: calc(4 * var(--u));
+.links a:hover::after {
+  transform: scaleX(1);
 }
 
-/* The one solid object on the pane, in the brand's own gold — the colour every
-   other call to action on the site already uses. */
+/* The hairline that separates reading from pressing. */
+.navsplit {
+  width: calc(1 * var(--u));
+  height: calc(22 * var(--u));
+  margin-inline: calc(10 * var(--u));
+  border-radius: calc(1 * var(--u));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.22),
+    rgba(255, 255, 255, 0)
+  );
+  flex: none;
+}
+
+/* ------------------------------------------------------ locale switcher */
+
+/*
+ * Forced LTR whatever the page direction: FA · EN · IT is a fixed run of
+ * Latin codes, and the thumb's arithmetic below assumes the cell order the
+ * array is written in.
+ */
+.langtoggle {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: center;
+  height: calc(34 * var(--u));
+  padding: calc(3 * var(--u));
+  border-radius: calc(17 * var(--u));
+  background: rgba(10, 2, 24, 0.34);
+  border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 calc(1 * var(--u)) calc(2 * var(--u)) rgba(3, 0, 10, 0.4);
+  flex: none;
+  direction: ltr;
+}
+
+/*
+ * The thumb. One third of the track wide, moved by index — so switching is a
+ * slide between two known places rather than a repaint of three chips, and
+ * the eye follows the change instead of hunting for it.
+ */
+.langThumb {
+  position: absolute;
+  z-index: 0;
+  top: calc(3 * var(--u));
+  bottom: calc(3 * var(--u));
+  left: calc(3 * var(--u));
+  width: calc((100% - 6 * var(--u)) / 3);
+  border-radius: calc(14 * var(--u));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.97),
+    rgba(255, 255, 255, 0.86)
+  );
+  box-shadow:
+    0 calc(2 * var(--u)) calc(8 * var(--u)) rgba(3, 0, 10, 0.35),
+    inset 0 calc(1 * var(--u)) 0 #fff;
+  transform: translateX(calc(var(--lang-i, 0) * 100%));
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.langtoggle button {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: calc(38 * var(--u));
+  padding: 0 calc(9 * var(--u));
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: calc(12.5 * var(--u));
+  font-weight: 600;
+  letter-spacing: calc(0.4 * var(--u));
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.75);
+  border-radius: calc(14 * var(--u));
+  transition: color 0.22s linear;
+}
+
+.langtoggle button:hover {
+  color: #fff;
+}
+
+/* Dark ink on the light thumb — the highest-contrast pair available here, and
+   it needs no colour of its own to read as selected. */
+.langtoggle button[aria-pressed="true"] {
+  color: var(--brand-ink);
+  font-weight: 700;
+}
+
+/* ----------------------------------------------------------- the one CTA */
+
+/* The only filled object on the bar, and the only gold. Everything else was
+   given a quieter treatment so this one does not have to compete. */
 .links a.enroll {
-  margin-inline-start: calc(14 * var(--u));
+  margin-inline-start: calc(10 * var(--u));
   min-width: calc(104 * var(--u));
   height: calc(42 * var(--u));
   border-radius: calc(21 * var(--u));
@@ -456,54 +576,25 @@
     0 calc(4 * var(--u)) calc(16 * var(--u)) rgba(251, 191, 36, 0.34),
     inset 0 calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.55);
   flex: none;
+  transition: box-shadow 0.24s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The underline belongs to the text links; the button has its own language. */
+.links a.enroll::after {
+  content: none;
 }
 
 .links a.enroll:hover {
   color: var(--brand-ink);
-  background: linear-gradient(180deg, #ffe291 0%, #fdc93c 48%, #f0ad17 100%);
+  transform: translateY(calc(-1 * var(--u)));
+  box-shadow:
+    0 calc(7 * var(--u)) calc(22 * var(--u)) rgba(251, 191, 36, 0.42),
+    inset 0 calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.6);
 }
 
 .stage[data-fa="true"] .links a.enroll {
   letter-spacing: 0;
   padding-bottom: calc(3 * var(--u));
-}
-
-/* ------------------------------------------------------------ locale chips */
-
-.langtoggle {
-  display: flex;
-  align-items: center;
-  gap: calc(5 * var(--u));
-  margin-inline-start: calc(12 * var(--u));
-  flex: none;
-  direction: ltr;
-}
-
-.links .langtoggle a {
-  height: calc(28 * var(--u));
-  padding: 0 calc(10 * var(--u));
-  font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: calc(12.5 * var(--u));
-  font-weight: 600;
-  letter-spacing: calc(0.4 * var(--u));
-  border-radius: calc(14 * var(--u));
-  border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1;
-}
-
-.links .langtoggle a:hover {
-  border-color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-}
-
-.links .langtoggle a.langActive {
-  background: linear-gradient(180deg, #ffd968 0%, #fbbf24 100%);
-  color: var(--brand-ink);
-  border-color: rgba(255, 226, 145, 0.85);
-  box-shadow: 0 calc(2 * var(--u)) calc(10 * var(--u)) rgba(251, 191, 36, 0.35);
 }
 
 /* --------------------------------------------------------------- hero copy */
@@ -751,6 +842,7 @@
 }
 
 .links a:focus-visible,
+.langtoggle button:focus-visible,
 .logo:focus-visible {
   outline: calc(2 * var(--u)) solid var(--brand);
   outline-offset: calc(3 * var(--u));
@@ -833,8 +925,14 @@
     letter-spacing: 0;
   }
 
-  .links a + a {
+  .links a + a:not(.enroll) {
     border-top: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* The centred underline is a desktop affordance; in the stacked sheet each
+     link is already its own full-width row. */
+  .links a::after {
+    content: none;
   }
 
   .links a.enroll {
@@ -848,14 +946,31 @@
     border-top: 0;
   }
 
+  /* Full width in the sheet: the control is a single row of three equal
+     cells either way, so it stretches rather than being re-thought. */
   .langtoggle {
-    margin: calc(10 * var(--u)) 0 0;
-    justify-content: center;
+    margin: calc(12 * var(--u)) 0 calc(2 * var(--u));
+    width: 100%;
+    height: auto;
+    border-radius: calc(25 * var(--u));
   }
 
-  .links .langtoggle a {
-    height: auto;
-    border-top: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.3);
+  .langThumb {
+    border-radius: calc(22 * var(--u));
+  }
+
+  /* The one place a real pixel belongs in a layout scaled entirely by `--u`.
+     44px is a physical minimum for a finger, not a proportion of the design,
+     so it must not shrink with the rest of the page on a small phone. */
+  .langtoggle button {
+    min-height: 44px;
+    font-size: calc(14 * var(--u));
+    border-radius: calc(22 * var(--u));
+  }
+
+  /* The hairline divides a row; stacked, the sheet's own separators do it. */
+  .navsplit {
+    display: none;
   }
 }
 
@@ -1184,6 +1299,8 @@
 .stage[data-anim] .navrow,
 .stage[data-anim] .logo,
 .stage[data-anim] .links a,
+.stage[data-anim] .langtoggle,
+.stage[data-anim] .navsplit,
 .stage[data-anim] .burger,
 .stage[data-anim] .lede,
 .stage[data-anim] .label,
@@ -1220,15 +1337,19 @@
   animation: entRise 0.55s var(--e-quint) 0.31s both;
 }
 
+.stage[data-anim="play"] .navsplit {
+  animation: entFade 0.5s var(--e-quint) 0.38s both;
+}
+
 .stage[data-anim="play"] .links a.enroll,
 .stage[data-anim="play"] .burger {
   --rise: 8px;
-  animation: entSettle 0.6s var(--e-quint) 0.46s both;
+  animation: entSettle 0.6s var(--e-quint) 0.5s both;
 }
 
-.stage[data-anim="play"] .links .langtoggle a {
+.stage[data-anim="play"] .langtoggle {
   --rise: 8px;
-  animation: entRise 0.55s var(--e-quint) 0.52s both;
+  animation: entRise 0.55s var(--e-quint) 0.44s both;
 }
 
 .stage[data-anim="play"] .eyebrow .line {
