@@ -30,6 +30,13 @@
   height: 100vh;
   overflow: hidden;
   isolation: isolate;
+  /* The bar inside is `fixed` and so escapes this clip, but it is still
+     painted inside the stacking context `isolation` opens here — so the whole
+     hero has to sit above the page below it, or the first section would cover
+     the bar as soon as it scrolled under it. The hero's own box is clipped to
+     100vh and never overlaps that content, and the film grain still runs at
+     60, above everything. */
+  z-index: 20;
   background: #04101f;
   color: #fff;
   font-family: var(--font-body);
@@ -219,23 +226,74 @@
    the brand's gold and deep purple, not the neutral white the composition
    started from. */
 
+/*
+ * The bar rides the viewport rather than scrolling away with the flag, so the
+ * two section links and the language switcher stay one click from anywhere on
+ * the page. `fixed` and not `sticky`: `.stage` clips its overflow and is only
+ * 100vh tall, so a sticky child would come unstuck at the hero's own bottom
+ * edge. A fixed child escapes that clip — see the z-index note on `.stage`.
+ *
+ * The box is the full width of the screen but only the pane inside it is
+ * pressable; without that, an invisible 88u band across the top of every
+ * section below would be swallowing clicks meant for the page.
+ *
+ * `data-nav` is the scroll state, and the three geometry variables below are
+ * the whole of the difference between the states. They are lengths, not
+ * keywords, so the bar interpolates between them instead of snapping.
+ */
 .navbar {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 6;
   height: calc(88 * var(--u));
+  pointer-events: none;
+
+  /* `--bar-rest` is the inset the bar sits at when it is showing everything,
+     and every responsive tier re-states these five rather than reaching past
+     them to the pane — the compact state is written once, in terms of them. */
+  --bar-rest: calc(25 * var(--u));
+  --bar-inset: var(--bar-rest);
+  --bar-top: calc(14 * var(--u));
+  --bar-h: calc(62 * var(--u));
+  --bar-r: calc(31 * var(--u));
+  --bar-pad: calc(14 * var(--u));
 }
 
 .navrow {
   position: absolute;
-  left: calc(25 * var(--u));
-  right: calc(25 * var(--u));
-  top: calc(14 * var(--u));
-  height: calc(62 * var(--u));
-  padding-inline: calc(14 * var(--u));
-  border-radius: calc(31 * var(--u));
+  left: var(--bar-inset);
+  right: var(--bar-inset);
+  top: var(--bar-top);
+  height: var(--bar-h);
+  padding-inline: var(--bar-pad);
+  border-radius: var(--bar-r);
+  pointer-events: auto;
+
+  /*
+   * How far down the page you are, drawn inside the pane itself rather than
+   * as a hairline stuck to the top of the screen. `--read` is the fraction
+   * read, written from the component; the second stop repeats the first
+   * position, which is what makes the edge hard instead of a gradient.
+   *
+   * Barely there on purpose. It is a thing you notice once and then read past
+   * — a filling bar bright enough to watch would be competing with the page
+   * for attention, and the page is what you came for.
+   */
+  --read-fill: linear-gradient(
+    var(--read-dir, 90deg),
+    rgba(255, 255, 255, 0.085) var(--read, 0%),
+    rgba(255, 255, 255, 0) 0
+  );
+  transition:
+    left 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+    right 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.3s linear,
+    box-shadow 0.3s linear;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -246,6 +304,7 @@
      it from reading as plain frosted grey. Both stay low-alpha — glass is what
      shows *through* it. */
   background:
+    var(--read-fill),
     linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.13) 0%,
@@ -268,8 +327,10 @@
 }
 
 .stage[data-rtl="true"] .navrow {
-  left: calc(25 * var(--u));
-  right: calc(25 * var(--u));
+  left: var(--bar-inset);
+  right: var(--bar-inset);
+  /* Progress runs the way the page is read. */
+  --read-dir: 270deg;
 }
 
 /* The light source: a highlight falling in from the upper left and a warm
@@ -312,6 +373,92 @@
   );
 }
 
+/* ---------------------------------------------------------- scrolled away
+   Two states once the bar leaves the top.
+
+   Scrolling down takes everything off the bar but the logo and pulls what is
+   left into a small pill, floating alone over the page. The links, the
+   switcher and the account buttons fade and shrink toward their own centres
+   rather than sliding away, so nothing appears to travel anywhere: the bar
+   simply has less on it. Any scroll upward brings all of it back.
+
+   `--mark` is the logo's own width in pixels, written from the component, and
+   the pill is that width plus its padding. The `max()` is the guard and the
+   `200%` fallback is what makes it safe: with no measurement yet the second
+   term goes negative and the inset stays at the full-width 25, so a bar that
+   is never measured is a bar that never moves. The same arithmetic covers a
+   screen too narrow to gain anything by pulling in. */
+.navbar[data-nav="compact"] {
+  --bar-inset: max(
+    var(--bar-rest),
+    calc((100% - var(--mark, 200%) * 0.85 - var(--bar-pad) * 2) / 2)
+  );
+  --bar-top: calc(10 * var(--u));
+  --bar-h: calc(44 * var(--u));
+  --bar-r: calc(22 * var(--u));
+}
+
+/* The logo shrinks with the pill, by transform rather than by type size, so
+   that `--mark` stays the one number it was measured to be. Scaling it for
+   real would change that number, which would resize the pill, which would be
+   measured again — and the bar would find its resting size in two visible
+   steps instead of one move.
+
+   The origin is the inline start, not the centre: the pill is exactly the
+   scaled logo plus its padding, and a logo that shrank toward its middle
+   would leave the padding uneven and hang over the closing edge. */
+.navbar[data-nav="compact"] .brand {
+  transform: scale(0.85);
+}
+
+/* Everything else leaves. `visibility` waits for the fade to finish so the
+   links are gone from the tab order rather than merely invisible, and comes
+   back the instant the bar reopens. They are still in the row's flow while
+   they go, which is what lets them spill past the closing edge and vanish
+   there instead of being squeezed. */
+.navbar[data-nav="compact"] .links,
+.navbar[data-nav="compact"] .burger {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.82);
+  pointer-events: none;
+  transition:
+    opacity 0.16s linear,
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0.16s;
+}
+
+/* Detached, in either state.
+
+   At the top the pane only ever has to sit over a photograph of a flag and can
+   afford to be almost all blur. Further down it floats over the sections'
+   own dark panels, where the same recipe reads as a smudge — so it takes on a
+   real fill and a deeper shadow, enough to look like it is in front of the
+   page rather than printed on it. */
+.navbar[data-nav="compact"] .navrow,
+.navbar[data-nav="full"] .navrow {
+  background:
+    var(--read-fill),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.045) 42%,
+      rgba(255, 255, 255, 0.02) 100%
+    ),
+    linear-gradient(
+      115deg,
+      rgba(251, 191, 36, 0.12) 0%,
+      rgba(251, 191, 36, 0) 44%,
+      rgba(60, 9, 108, 0.34) 100%
+    ),
+    rgba(12, 1, 26, 0.62);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 0 calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.28),
+    inset 0 calc(-1.5 * var(--u)) calc(3 * var(--u)) rgba(9, 0, 20, 0.4),
+    0 calc(16 * var(--u)) calc(46 * var(--u)) rgba(3, 0, 10, 0.58);
+}
+
 /* ------------------------------------------------------------------- brand */
 
 .brand {
@@ -319,6 +466,12 @@
   align-items: center;
   gap: calc(11 * var(--u));
   flex: none;
+  transform-origin: 0 50%;
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stage[data-rtl="true"] .brand {
+  transform-origin: 100% 50%;
 }
 
 /* The reserved place for the logo, drawn while there is no file yet. It holds
@@ -366,6 +519,10 @@
 .burger {
   display: none;
   position: relative;
+  transition:
+    opacity 0.22s linear,
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s;
   width: calc(44 * var(--u));
   height: calc(44 * var(--u));
   padding: 0;
@@ -406,6 +563,10 @@
   display: flex;
   align-items: center;
   gap: calc(4 * var(--u));
+  transition:
+    opacity 0.22s linear,
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s;
 }
 
 /* Text links carry no chrome of their own. A filled pill on hover would put a
@@ -425,7 +586,8 @@
   letter-spacing: calc(-0.6 * var(--u));
   white-space: nowrap;
   border-radius: calc(22 * var(--u));
-  transition: color 0.18s linear;
+  /* The height and radius are what the compact bar trims. */
+  transition: color 0.18s linear, height 0.36s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .stage[data-fa="true"] .links a {
@@ -464,6 +626,7 @@
 .navsplit {
   width: calc(1 * var(--u));
   height: calc(22 * var(--u));
+  transition: height 0.36s cubic-bezier(0.22, 1, 0.36, 1);
   margin-inline: calc(10 * var(--u));
   border-radius: calc(1 * var(--u));
   background: linear-gradient(
@@ -496,6 +659,7 @@
   box-shadow: inset 0 calc(1 * var(--u)) calc(2 * var(--u)) rgba(3, 0, 10, 0.4);
   flex: none;
   direction: ltr;
+  transition: height 0.36s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /*
@@ -584,7 +748,8 @@
   border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.24);
   box-shadow: inset 0 calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.1);
   flex: none;
-  transition: background 0.24s ease, border-color 0.24s ease, color 0.24s ease;
+  transition: background 0.24s ease, border-color 0.24s ease, color 0.24s ease,
+    height 0.36s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.36s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* The underline belongs to the text links; this one is a button. */
@@ -622,7 +787,8 @@
     0 calc(4 * var(--u)) calc(16 * var(--u)) rgba(251, 191, 36, 0.34),
     inset 0 calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.55);
   flex: none;
-  transition: box-shadow 0.24s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: box-shadow 0.24s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.36s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.36s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* The pair's own spacing. The 10 above separates the group from the switcher;
@@ -911,20 +1077,14 @@
 
 /* A) nav collapse */
 @media (max-width: 1030px), (max-height: 620px) {
-  .navrow,
-  .stage[data-rtl="true"] .navrow {
-    left: calc(25 * var(--u));
-    right: calc(25 * var(--u));
-  }
-
   .burger {
     display: flex;
   }
 
   .links {
     position: absolute;
-    /* Clears the pane: it starts at 14u and stands 62u tall. */
-    top: calc(86 * var(--u));
+    /* Clears the pane, whatever height it is currently standing at. */
+    top: calc(var(--bar-top) + var(--bar-h) + 10 * var(--u));
     inset-inline-end: 0;
     z-index: 5;
     width: min(calc(324 * var(--u)), calc(100vw - 50 * var(--u)));
@@ -1086,16 +1246,11 @@
 
   .navbar {
     height: calc(76 * var(--u));
-  }
-
-  .navrow,
-  .stage[data-rtl="true"] .navrow {
-    left: calc(16 * var(--u));
-    right: calc(16 * var(--u));
-    top: calc(11 * var(--u));
-    height: calc(54 * var(--u));
-    border-radius: calc(27 * var(--u));
-    padding-inline: calc(10 * var(--u));
+    --bar-rest: calc(16 * var(--u));
+    --bar-top: calc(11 * var(--u));
+    --bar-h: calc(54 * var(--u));
+    --bar-r: calc(27 * var(--u));
+    --bar-pad: calc(10 * var(--u));
   }
 
   .logoSlot {
@@ -1105,7 +1260,7 @@
   }
 
   .links {
-    top: calc(72 * var(--u));
+    top: calc(var(--bar-top) + var(--bar-h) + 7 * var(--u));
   }
 
   .copy {
@@ -1273,7 +1428,13 @@
   }
 
   .links,
-  .burger span {
+  .burger,
+  .burger span,
+  .navrow,
+  .navrow .brand,
+  .navrow .links a,
+  .navrow .langtoggle,
+  .navrow .navsplit {
     transition: none;
   }
 

@@ -2520,9 +2520,9 @@
     "semantic_hash": ""
   },
   "components/landing/hero.tsx": {
-    "mtime": 1788509875.8655202,
-    "seen": 1788510254.4106216,
-    "ast_hash": "e1fcb0183d10a2447edc0050a25249d6",
+    "mtime": 1788509012.714666,
+    "seen": 1788509263.0332253,
+    "ast_hash": "af3da8bf024af1c33ecf53673ca20d16",
     "semantic_hash": ""
   },
   "components/landing/landing.tsx": {

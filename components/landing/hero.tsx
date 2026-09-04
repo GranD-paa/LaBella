@@ -68,7 +68,25 @@ export function LandingHero({
   onLocaleChange: (locale: AppLocale) => void;
 }) {
   const stageRef = useRef<HTMLElement | null>(null);
+  const navRef = useRef<HTMLElement | null>(null);
+  const rowRef = useRef<HTMLDivElement | null>(null);
   const [navOpen, setNavOpen] = useState(false);
+
+  /**
+   * Where the bar is relative to the page.
+   *
+   * `top` is the hero's own bar, drawn exactly as composed. Past the first few
+   * pixels it detaches and rides the viewport, because the two section links
+   * and the language switcher are worth reaching from halfway down the page
+   * without scrolling back up for them.
+   *
+   * Once detached there are two states, and the direction of travel picks
+   * between them: scrolling down takes everything off the bar but the logo and
+   * pulls what is left into a small floating pill, and any scroll upward hands
+   * the whole bar back — someone scrolling up is looking for something, and
+   * the bar is usually it.
+   */
+  const [nav, setNav] = useState<"top" | "compact" | "full">("top");
 
   /**
    * Which cell the switcher's thumb sits under.
@@ -254,6 +272,129 @@ export function LandingHero({
     };
   }, [navOpen, next.slug, previous.slug, select]);
 
+  /* ------------------------------------------------------------ scrolling ---
+     The scroll state, read once per frame rather than per event.
+
+     The direction test carries a dead zone. Without it a trackpad's own
+     jitter, or the rubber-banding at the end of a fling, flips the bar open
+     and shut while the page is effectively standing still — and a bar that
+     twitches is worse than one that does not move at all. Small moves
+     accumulate instead of being thrown away, so a slow deliberate scroll
+     still registers; it just has to mean it. */
+  useEffect(() => {
+    const TOP = 24;
+    const DEAD = 6;
+
+    let last = window.scrollY;
+    let frame = 0;
+
+    const read = () => {
+      frame = 0;
+      const y = window.scrollY;
+
+      /* How much of the page is behind you, for the fill inside the pane. It
+         is written on every frame, including the ones the state machine below
+         decides to ignore — the bar's shape is a question about direction,
+         but the fill is only ever a question about position. */
+      const runway = document.documentElement.scrollHeight - window.innerHeight;
+      navRef.current?.style.setProperty(
+        "--read",
+        `${runway > 0 ? Math.min(100, (y / runway) * 100).toFixed(2) : 0}%`
+      );
+
+      if (y <= TOP) {
+        last = y;
+        setNav("top");
+        return;
+      }
+
+      const delta = y - last;
+      if (Math.abs(delta) < DEAD) {
+        /* Not a deliberate move — but a page restored mid-scroll by the
+           browser has to leave the top state on the first read anyway. */
+        setNav((state) => (state === "top" ? "compact" : state));
+        return;
+      }
+
+      last = y;
+      setNav(delta > 0 ? "compact" : "full");
+    };
+
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(read);
+    };
+
+    read();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  /* The logo's own width in pixels, published to CSS as `--mark`. The compact
+     pill is that width and its padding and nothing else.
+
+     Measured rather than authored, because the logo is not one fixed object:
+     the wordmark is a different width in three locales, and it gives up its
+     place entirely once a brand file lands. A written-down width would be
+     right for exactly one of those states. `offsetWidth` and not the painted
+     rectangle, because the compact bar shrinks the logo with a transform —
+     asking for the painted size would return the shrunken one, which would
+     shrink the pill, which would be measured again.
+
+     The stylesheet clamps it, so an absent or absurd measurement just leaves
+     the bar at full width rather than collapsing it to nothing. */
+  useEffect(() => {
+    const brand = rowRef.current?.querySelector<HTMLElement>(`.${styles.brand}`);
+    if (!brand || typeof ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver(() => {
+      navRef.current?.style.setProperty("--mark", `${brand.offsetWidth}px`);
+    });
+
+    observer.observe(brand);
+    return () => observer.disconnect();
+  }, []);
+
+  /* ------------------------------------------------------------ in-page ---
+     The two section links glide down the page instead of teleporting.
+
+     Done here rather than with `scroll-behavior: smooth` on the document,
+     which would apply to every anchor on every page this app renders — including
+     the ones inside the app, where a jump is the right answer. This is the same
+     move the scroll cue at the bottom of the hero already makes. */
+  const jump = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+      const target = document.getElementById(id);
+      // Nothing to scroll to: let the browser do whatever it would have done.
+      if (!target) return;
+
+      event.preventDefault();
+      setNavOpen(false);
+
+      /* The bar floats over the page, so the section has to stop below it
+         rather than under it. The offset is the bar's own outer box, which
+         stands one notch taller than the pane inside it: tall enough to clear
+         the pane at its full height even when the trip down compacts it, with
+         that notch left over as breathing room. Measured, so it holds at any
+         viewport — the whole hero is drawn in units derived from the screen,
+         and a written-down number would only be right on one. */
+      const offset = navRef.current?.getBoundingClientRect().height ?? 0;
+      window.scrollTo({
+        top: target.getBoundingClientRect().top + window.scrollY - offset,
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+      });
+      // The address bar should still say where we ended up. Replaced rather
+      // than pushed: a link that scrolls is not a page the Back button owes
+      // anyone a way out of.
+      window.history.replaceState(null, "", `#${id}`);
+    },
+    []
+  );
+
   /* Close the menu on an outside click or Escape. */
   useEffect(() => {
     if (!navOpen) return;
@@ -303,8 +444,16 @@ export function LandingHero({
       <div className={styles.scrim} aria-hidden />
 
       <div className={styles.ui}>
-        <header className={styles.navbar}>
-          <div className={styles.navrow} data-open={navOpen}>
+        {/* The open menu holds the bar at full width. The sheet is anchored to
+            the pane's end edge, and a pane that narrows out from under it
+            while the visitor is reading it is not a transition, it is a
+            moving target. */}
+        <header
+          ref={navRef}
+          className={styles.navbar}
+          data-nav={navOpen && nav === "compact" ? "full" : nav}
+        >
+          <div className={styles.navrow} ref={rowRef} data-open={navOpen}>
             <Link className={styles.brand} href="/" aria-label="Laparli">
               {BRAND_MARK ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -327,8 +476,12 @@ export function LandingHero({
             </Link>
 
             <nav className={styles.links} id="landing-nav">
-              <a href="#pricing">{copy.nav.pricing}</a>
-              <a href="#faq">{copy.nav.faq}</a>
+              <a href="#pricing" onClick={(event) => jump(event, "pricing")}>
+                {copy.nav.pricing}
+              </a>
+              <a href="#faq" onClick={(event) => jump(event, "faq")}>
+                {copy.nav.faq}
+              </a>
 
               {/* Splits the bar into what you read and what you press. Without
                   it the two links, the switcher and the call to action are one
