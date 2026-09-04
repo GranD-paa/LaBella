@@ -560,6 +560,52 @@
 
 /* The only filled object on the bar, and the only gold. Everything else was
    given a quieter treatment so this one does not have to compete. */
+/*
+ * The quiet half of the pair.
+ *
+ * It borrows the filled pill's geometry — same height, same radius — so the
+ * two read as one control with two answers, and differs only in weight: a
+ * hairline and a breath of white instead of amber and a glow. The bar already
+ * runs three tiers of emphasis (bare text, the switcher's track, the amber
+ * pill) and this sits on the second, where an account action belongs: louder
+ * than a link you might read, quieter than the thing we are asking for.
+ */
+.links a.signin {
+  margin-inline-start: calc(10 * var(--u));
+  height: calc(42 * var(--u));
+  border-radius: calc(21 * var(--u));
+  justify-content: center;
+  font-size: calc(16.5 * var(--u));
+  font-weight: 600;
+  letter-spacing: calc(-0.4 * var(--u));
+  color: rgba(255, 255, 255, 0.92);
+  padding: 0 calc(17 * var(--u));
+  background: rgba(255, 255, 255, 0.07);
+  border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.24);
+  box-shadow: inset 0 calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.1);
+  flex: none;
+  transition: background 0.24s ease, border-color 0.24s ease, color 0.24s ease;
+}
+
+/* The underline belongs to the text links; this one is a button. */
+.links a.signin::after {
+  content: none;
+}
+
+/* No lift on hover. The amber pill rises, and one thing rising is what makes
+   it the primary; two would make the pair a tie. */
+.links a.signin:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.42);
+}
+
+/* Persian sits low in this face at button weight, as on the filled pill. */
+.stage[data-fa="true"] .links a.signin {
+  letter-spacing: 0;
+  padding-bottom: calc(3 * var(--u));
+}
+
 .links a.enroll {
   margin-inline-start: calc(10 * var(--u));
   min-width: calc(104 * var(--u));
@@ -577,6 +623,13 @@
     inset 0 calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.55);
   flex: none;
   transition: box-shadow 0.24s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The pair's own spacing. The 10 above separates the group from the switcher;
+   between the two pills 8 is enough to keep them independent targets and
+   close enough that they read as one thing. */
+.links a.signin + a.enroll {
+  margin-inline-start: calc(8 * var(--u));
 }
 
 /* The underline belongs to the text links; the button has its own language. */
@@ -925,7 +978,7 @@
     letter-spacing: 0;
   }
 
-  .links a + a:not(.enroll) {
+  .links a + a:not(.enroll):not(.signin) {
     border-top: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.08);
   }
 
@@ -935,8 +988,11 @@
     content: none;
   }
 
+  /* Both halves of the pair stretch in the sheet, stacked, with the filled
+     one underneath: the sheet is read top to bottom, and the thing we are
+     asking for should be the last thing under the thumb. */
+  .links a.signin,
   .links a.enroll {
-    margin: calc(14 * var(--u)) 0 calc(2 * var(--u));
     width: 100%;
     height: calc(46 * var(--u));
     border-radius: calc(23 * var(--u));
@@ -944,6 +1000,16 @@
     font-size: calc(18 * var(--u));
     letter-spacing: calc(-0.4 * var(--u));
     border-top: 0;
+  }
+
+  .links a.signin {
+    margin: calc(14 * var(--u)) 0 0;
+    border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.24);
+  }
+
+  .links a.signin + a.enroll,
+  .links a.enroll {
+    margin: calc(8 * var(--u)) 0 calc(2 * var(--u));
   }
 
   /* Full width in the sheet: the control is a single row of three equal
@@ -1339,6 +1405,11 @@
 
 .stage[data-anim="play"] .navsplit {
   animation: entFade 0.5s var(--e-quint) 0.38s both;
+}
+
+.stage[data-anim="play"] .links a.signin {
+  --rise: 8px;
+  animation: entSettle 0.6s var(--e-quint) 0.47s both;
 }
 
 .stage[data-anim="play"] .links a.enroll,

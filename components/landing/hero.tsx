@@ -377,6 +377,25 @@ export function LandingHero({
                 ))}
               </span>
 
+              {/*
+                Two doors, not one. A visitor who already has an account was
+                being offered nothing but "sign up", and the honest reading of
+                that bar is that this is the only way through — so they either
+                make a second account or go looking for the link.
+
+                They are a pair and are spaced as one: the outlined pill takes
+                the bar's separation from the switcher, and only eight units
+                sit between the two of them, so they read as one decision with
+                two answers rather than two unrelated controls. The filled one
+                stays the loud one, because signing up is still what we want
+                from someone who has no account.
+              */}
+              {!isSignedIn && (
+                <Link className={styles.signin} href="/login">
+                  {copy.nav.signIn}
+                </Link>
+              )}
+
               <Link className={styles.enroll} href={href}>
                 {isSignedIn ? copy.nav.dashboard : copy.nav.signUp}
               </Link>
