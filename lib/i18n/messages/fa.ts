@@ -809,6 +809,7 @@ export const fa: Messages = {
       "برای پشتیبانی، بازخورد یا همکاری با تیم لاپارلی در تماس باشید.",
     admin: "مدیریت — Laparli",
     adminQuizzes: "مدیریت آزمون — Laparli",
+    adminLessonsMonitor: "مانیتورینگ درس‌ها — Laparli",
     quizBrowse: "مرور آزمون‌ها — Laparli",
     quiz: "آزمون — Laparli",
     languageCourse: "دوره زبان — Laparli",

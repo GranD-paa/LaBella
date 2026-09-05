@@ -814,6 +814,7 @@ export const en = {
       "Get in touch with the Laparli team for support, feedback, or partnership inquiries.",
     admin: "Admin — Laparli",
     adminQuizzes: "Quiz Management — Laparli",
+    adminLessonsMonitor: "Lesson Monitor — Laparli",
     quizBrowse: "Browse Quizzes — Laparli",
     quiz: "Quiz — Laparli",
     languageCourse: "Language Course — Laparli",

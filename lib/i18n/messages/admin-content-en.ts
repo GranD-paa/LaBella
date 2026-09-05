@@ -24,6 +24,20 @@ export const adminContentEn = {
     "Quiz published. Learners will see it at Learn → {level} → Quiz.",
   addAnother: "Add more content",
   startOver: "Start over",
+  monitor: {
+    title: "Lesson monitor",
+    description:
+      "Every lesson has four squares: grammar, vocabulary, video and quiz. A filled square is published, an outlined one with a dot holds drafts only, and an empty one has nothing yet. Clicking an unfinished square opens the form for exactly that slot.",
+    levelColumn: "Lesson",
+    backToContent: "Back to the quiz centre",
+    bandSummary: "{levels} lessons · {done} of {total} slots published",
+    slotLabel: "{level} · {category} · {state}",
+    stateEmpty: "Empty",
+    stateDraft: "Draft",
+    statePublished: "Published",
+    noLessonYet: "No lesson created for this level yet",
+    noLevels: "No levels have been defined for this language yet.",
+  },
   categories: {
     grammar: {
       title: "Grammar",

@@ -24,6 +24,20 @@ export const adminContentFa = {
     "آزمون منتشر شد. یادگیرندگان آن را در یادگیری → {level} → آزمون می‌بینند.",
   addAnother: "افزودن محتوای بیشتر",
   startOver: "شروع دوباره",
+  monitor: {
+    title: "مانیتورینگ درس‌ها",
+    description:
+      "هر درس چهار مربع دارد: گرامر، واژگان، ویدیو و آزمون. مربع پر یعنی منتشر شده، مربع تو‌خالی با نقطه یعنی فقط پیش‌نویس دارد و مربع خالی یعنی هنوز چیزی ثبت نشده. با کلیک روی هر مربع ناتمام، فرم ساخت همان بخش باز می‌شود.",
+    levelColumn: "درس",
+    backToContent: "بازگشت به مرکز آزمون",
+    bandSummary: "{levels} درس · {done} از {total} بخش منتشر شده",
+    slotLabel: "{level} · {category} · {state}",
+    stateEmpty: "خالی",
+    stateDraft: "پیش‌نویس",
+    statePublished: "منتشرشده",
+    noLessonYet: "هنوز درسی برای این سطح ساخته نشده",
+    noLevels: "برای این زبان هنوز سطحی تعریف نشده است.",
+  },
   categories: {
     grammar: {
       title: "گرامر",

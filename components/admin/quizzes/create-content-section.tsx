@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FlagIcon } from "@/components/menu/flag-icon";
 import {
   BookOpen,
@@ -28,6 +28,7 @@ import {
 import type {
   ContentCategorySlug,
   ContentWizardContext,
+  ContentWizardTarget,
 } from "@/lib/content-management/categories";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
 import type { Lesson } from "@/types";
@@ -78,23 +79,57 @@ const CONTENT_TYPES: Array<{
 ];
 
 /**
+ * Where a jump from the lesson monitor lands.
+ *
+ * The square that was clicked already answered the first three questions, so
+ * the wizard goes straight to the form — unless the level has no lesson row
+ * yet, in which case there is nothing to attach content to and the lesson step
+ * comes first.
+ */
+function stepForJump(
+  target: ContentWizardTarget,
+  languages: CurriculumLanguage[],
+  lessons: Lesson[]
+) {
+  const language = languages.find((entry) => entry.slug === target.languageSlug);
+  const level = language?.levels.find((entry) => entry.slug === target.levelSlug);
+  const lesson = level
+    ? lessons.find((entry) => entry.order_number === level.orderNumber)
+    : undefined;
+
+  return lesson ? 4 : 2;
+}
+
+/**
  * Replaces the legacy quiz-creation wizard on /admin/quizzes.
  * Flow: Language → Lesson → Content Type → Create form.
  */
 export function CreateContentSection({
   lessons,
   languages,
+  jumpTarget,
   onSuccess,
 }: {
   lessons: Lesson[];
   languages: CurriculumLanguage[];
+  /** Set by the lesson monitor to drop the admin straight onto one slot. */
+  jumpTarget?: ContentWizardTarget | null;
   onSuccess?: () => void;
 }) {
   const { t } = useTranslations();
-  const [step, setStep] = useState(1);
-  const [languageSlug, setLanguageSlug] = useState("italian");
-  const [levelSlug, setLevelSlug] = useState("a1-1");
-  const [contentType, setContentType] = useState<ContentCategorySlug | null>(null);
+  // A jump target that is already known on the first render is applied here
+  // rather than in the effect below, so the wizard never flashes step 1 on the
+  // way to the slot the admin actually clicked.
+  const [step, setStep] = useState(() =>
+    jumpTarget ? stepForJump(jumpTarget, languages, lessons) : 1
+  );
+  const [languageSlug, setLanguageSlug] = useState(
+    jumpTarget?.languageSlug ?? "italian"
+  );
+  const [levelSlug, setLevelSlug] = useState(jumpTarget?.levelSlug ?? "a1-1");
+  const [contentType, setContentType] = useState<ContentCategorySlug | null>(
+    jumpTarget?.category ?? null
+  );
 
   const selectedLanguage = useMemo(
     () => languages.find((language) => language.slug === languageSlug),
@@ -118,6 +153,19 @@ export function CreateContentSection({
       null
     );
   }, [lessons, selectedLevel]);
+
+  // Later jumps — the admin comes back from the monitor without this component
+  // being remounted — arrive as a new nonce and are applied here.
+  const appliedJump = useRef(jumpTarget?.nonce ?? 0);
+  useEffect(() => {
+    if (!jumpTarget || jumpTarget.nonce === appliedJump.current) return;
+    appliedJump.current = jumpTarget.nonce;
+
+    setLanguageSlug(jumpTarget.languageSlug);
+    setLevelSlug(jumpTarget.levelSlug);
+    setContentType(jumpTarget.category);
+    setStep(stepForJump(jumpTarget, languages, lessons));
+  }, [jumpTarget, languages, lessons]);
 
   const selectedType = useMemo(
     () => CONTENT_TYPES.find((entry) => entry.slug === contentType) ?? null,

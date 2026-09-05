@@ -25,6 +25,20 @@ export type ContentWizardContext = {
 
 export type ContentStatus = "draft" | "published";
 
+/**
+ * A request to open the creation wizard already pointed at one slot — sent by
+ * the lesson monitor when an admin clicks a square that still needs content.
+ *
+ * `nonce` is bumped on every request so that clicking the same square twice
+ * reopens it rather than looking like unchanged state.
+ */
+export type ContentWizardTarget = {
+  languageSlug: LanguageSlug;
+  levelSlug: LevelSlug;
+  category: ContentCategorySlug;
+  nonce: number;
+};
+
 export const CONTENT_CATEGORIES: Array<{
   slug: ContentCategorySlug;
   icon: LucideIcon;

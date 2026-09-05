@@ -25,6 +25,20 @@ export const adminContentIt = {
     "Quiz pubblicato. Gli studenti lo vedranno in Impara → {level} → Quiz.",
   addAnother: "Aggiungi altro contenuto",
   startOver: "Ricomincia",
+  monitor: {
+    title: "Monitoraggio delle lezioni",
+    description:
+      "Ogni lezione ha quattro quadrati: grammatica, vocabolario, video e quiz. Il quadrato pieno è pubblicato, quello con solo il bordo e un punto contiene bozze e quello vuoto non ha ancora nulla. Cliccando un quadrato incompleto si apre il modulo di quella sezione.",
+    levelColumn: "Lezione",
+    backToContent: "Torna al centro quiz",
+    bandSummary: "{levels} lezioni · {done} di {total} sezioni pubblicate",
+    slotLabel: "{level} · {category} · {state}",
+    stateEmpty: "Vuoto",
+    stateDraft: "Bozza",
+    statePublished: "Pubblicato",
+    noLessonYet: "Nessuna lezione creata per questo livello",
+    noLevels: "Per questa lingua non è ancora stato definito alcun livello.",
+  },
   categories: {
     grammar: {
       title: "Grammatica",

@@ -1,36 +1,47 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { ArrowLeft, LayoutGrid, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { LessonsTable } from "@/components/admin/lessons/lessons-table";
 import { CreateContentSection } from "@/components/admin/quizzes/create-content-section";
-import { QuizManagementTable } from "@/components/admin/quizzes/quiz-management-table";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { ContentWizardTarget } from "@/lib/content-management/categories";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
-import type { EnrichedQuiz } from "@/lib/quiz-management/data";
-import type { Lesson, QuizQuestion, UserQuizAttempt } from "@/types";
+import type { Lesson } from "@/types";
 
 export function AdminQuizzesPageView({
   displayName,
-  quizzes,
-  quizQuestions,
-  attempts,
   lessons,
   languages,
+  requestedSlot,
 }: {
   displayName: string;
-  quizzes: EnrichedQuiz[];
-  quizQuestions: QuizQuestion[];
-  attempts: UserQuizAttempt[];
   lessons: Lesson[];
   languages: CurriculumLanguage[];
+  /** A slot the lesson monitor asked to open, taken from the query string. */
+  requestedSlot: Omit<ContentWizardTarget, "nonce"> | null;
 }) {
   const { t } = useTranslations();
   const router = useRouter();
+
+  // The nonce distinguishes one request from the next, so returning from the
+  // monitor to the same square reopens the wizard instead of looking like
+  // unchanged state.
+  const [jumpTarget] = useState<ContentWizardTarget | null>(() =>
+    requestedSlot ? { ...requestedSlot, nonce: Date.now() } : null
+  );
+
+  useEffect(() => {
+    if (!jumpTarget) return;
+    document.getElementById("create-content-section")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [jumpTarget]);
 
   return (
     <div className="space-y-8">
@@ -49,27 +60,32 @@ export function AdminQuizzesPageView({
               {t("admin.quizzes.pageSubtitle")}
             </p>
           </div>
-          <Button variant="outline" className="border-white/20" asChild>
-            <Link href="/dashboard">
-              <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
-              {t("admin.quizzes.fullAdminPanel")}
-            </Link>
-          </Button>
+          <div className="flex flex-col items-stretch gap-2">
+            <Button variant="outline" className="border-white/20" asChild>
+              <Link href="/dashboard">
+                <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+                {t("admin.quizzes.fullAdminPanel")}
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              className="border-brand-accent/40 text-brand-accent hover:bg-brand-accent/10 hover:text-brand-accent"
+              asChild
+            >
+              <Link href="/admin/quizzes/monitor">
+                <LayoutGrid className="h-4 w-4" />
+                {t("admin.content.monitor.title")}
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
 
       <CreateContentSection
         lessons={lessons}
         languages={languages}
+        jumpTarget={jumpTarget}
         onSuccess={() => router.refresh()}
-      />
-
-      <LessonsTable lessons={lessons} />
-
-      <QuizManagementTable
-        quizzes={quizzes}
-        quizQuestions={quizQuestions}
-        attempts={attempts}
       />
     </div>
   );

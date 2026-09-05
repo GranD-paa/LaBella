@@ -820,6 +820,7 @@ export const it: Messages = {
       "Contatta il team Laparli per supporto, feedback o richieste di partnership.",
     admin: "Admin — Laparli",
     adminQuizzes: "Gestione quiz — Laparli",
+    adminLessonsMonitor: "Monitoraggio lezioni — Laparli",
     quizBrowse: "Sfoglia quiz — Laparli",
     quiz: "Quiz — Laparli",
     languageCourse: "Corso di lingua — Laparli",
