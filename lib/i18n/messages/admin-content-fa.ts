@@ -59,6 +59,11 @@ export const adminContentFa = {
     documentLabel: "فایل PDF",
     choosePdf: "انتخاب فایل PDF",
     documentHint: "حداکثر {pages} صفحه و {size} مگابایت.",
+    entryNumber: "عنوان {number}",
+    addAnother: "افزودن عنوان دیگر",
+    removeEntry: "حذف این عنوان",
+    progress: "در حال آماده‌سازی {done} از {total}…",
+    stoppedAt: "روی «{title}» متوقف شد. عنوان‌های قبلی ثبت شدند.",
     errors: {
       storageUnconfigured:
         "فضای ذخیره‌سازی پیکربندی نشده است، پس فعلاً نمی‌توان فایلی بارگذاری کرد.",

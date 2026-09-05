@@ -60,6 +60,11 @@ export const adminContentIt = {
     documentLabel: "PDF",
     choosePdf: "Scegli un PDF",
     documentHint: "Fino a {pages} pagine e {size}MB.",
+    entryNumber: "Titolo {number}",
+    addAnother: "Aggiungi un altro titolo",
+    removeEntry: "Rimuovi questo titolo",
+    progress: "Preparazione {done} di {total}…",
+    stoppedAt: "Interrotto su “{title}”. I titoli precedenti sono stati salvati.",
     errors: {
       storageUnconfigured:
         "L'archivio file non è configurato, quindi non è ancora possibile caricare documenti.",

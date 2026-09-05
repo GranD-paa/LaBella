@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -84,6 +84,16 @@ function ContentActionBar({
   );
 }
 
+type GrammarEntry = {
+  key: string;
+  title: string;
+  file: File | null;
+};
+
+function emptyGrammarEntry(): GrammarEntry {
+  return { key: crypto.randomUUID(), title: "", file: null };
+}
+
 export function GrammarContentPanel({
   context,
   onSuccess,
@@ -93,35 +103,69 @@ export function GrammarContentPanel({
 }) {
   const { t } = useTranslations();
   const [isPending, startTransition] = useTransition();
-  const [title, setTitle] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [entries, setEntries] = useState<GrammarEntry[]>([emptyGrammarEntry()]);
+  const [done, setDone] = useState(0);
 
-  const ready = title.trim().length >= 2 && file !== null;
+  const filled = entries.filter(
+    (entry) => entry.title.trim().length >= 2 && entry.file !== null
+  );
+  const ready = filled.length > 0 && filled.length === entries.length;
 
+  function update(key: string, patch: Partial<GrammarEntry>) {
+    setEntries((current) =>
+      current.map((entry) => (entry.key === key ? { ...entry, ...patch } : entry))
+    );
+  }
+
+  /**
+   * Sends one title at a time rather than all at once.
+   *
+   * Each PDF is rendered page by page on the server, so a batch of them is
+   * minutes of work. Doing them in sequence means the count on the button is
+   * honest, and that a document which fails does not take the ones already
+   * stored down with it — the admin keeps that work and is told which title to
+   * try again.
+   */
   function submit(status: "draft" | "published") {
-    if (!ready || !file) return;
-
-    const formData = new FormData();
-    formData.set("lessonId", context.lessonId);
-    formData.set("title", title.trim());
-    formData.set("status", status);
-    formData.set("document", file);
+    if (!ready || isPending) return;
 
     startTransition(async () => {
-      const result = await createContentGrammar(formData);
-      if ("error" in result) {
-        toast.error(resolveMessage(t, result.error));
-        return;
+      setDone(0);
+
+      for (let index = 0; index < entries.length; index += 1) {
+        const entry = entries[index];
+        const formData = new FormData();
+        formData.set("lessonId", context.lessonId);
+        formData.set("title", entry.title.trim());
+        formData.set("status", status);
+        formData.set("document", entry.file as File);
+
+        const result = await createContentGrammar(formData);
+
+        if ("error" in result) {
+          toast.error(resolveMessage(t, result.error));
+          if (index > 0) {
+            toast.info(
+              t("admin.content.grammar.stoppedAt", { title: entry.title.trim() })
+            );
+          }
+          // Drop what was stored and keep what still needs doing, so pressing
+          // the button again does not create the same titles twice.
+          setEntries(entries.slice(index));
+          setDone(0);
+          return;
+        }
+
+        setDone(index + 1);
       }
+
       toast.success(
         status === "published"
           ? t("admin.content.publishedContent")
           : t("admin.content.savedDraft")
       );
-      setTitle("");
-      setFile(null);
-      if (inputRef.current) inputRef.current.value = "";
+      setEntries([emptyGrammarEntry()]);
+      setDone(0);
       onSuccess(status === "published");
     });
   }
@@ -135,52 +179,134 @@ export function GrammarContentPanel({
         </p>
       </div>
 
-      <div className="grid gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="grammar-title">{t("common.title")}</Label>
-          <Input
-            id="grammar-title"
-            value={title}
+      <div className="space-y-4">
+        {entries.map((entry, index) => (
+          <GrammarEntryFields
+            key={entry.key}
+            entry={entry}
+            index={index}
+            total={entries.length}
             disabled={isPending}
-            onChange={(event) => setTitle(event.target.value)}
+            onChange={(patch) => update(entry.key, patch)}
+            onRemove={() =>
+              setEntries((current) =>
+                current.filter((item) => item.key !== entry.key)
+              )
+            }
           />
-        </div>
+        ))}
 
-        <div className="space-y-2">
-          <Label>{t("admin.content.grammar.documentLabel")}</Label>
-          <input
-            ref={inputRef}
-            type="file"
-            accept="application/pdf"
-            className="hidden"
-            onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-          />
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={() => inputRef.current?.click()}
-            className="flex w-full items-center gap-3 rounded-lg border border-dashed px-4 py-6 text-start transition hover:border-solid hover:bg-muted/30 disabled:opacity-60"
-          >
-            <FileText className="h-5 w-5 shrink-0 text-muted-foreground" />
-            <span className="min-w-0">
-              <span dir="auto" className="block truncate text-sm font-medium">
-                {file ? file.name : t("admin.content.grammar.choosePdf")}
-              </span>
-              <span className="block text-xs text-muted-foreground">
-                {t("admin.content.grammar.documentHint", {
-                  pages: MAX_PDF_PAGES,
-                  size: MAX_PDF_BYTES / (1024 * 1024),
-                })}
-              </span>
-            </span>
-          </button>
-        </div>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isPending}
+          onClick={() =>
+            setEntries((current) => [...current, emptyGrammarEntry()])
+          }
+        >
+          <Plus className="h-4 w-4" />
+          {t("admin.content.grammar.addAnother")}
+        </Button>
+
+        {isPending && entries.length > 1 ? (
+          <p className="text-sm text-muted-foreground">
+            {t("admin.content.grammar.progress", {
+              done: done,
+              total: entries.length,
+            })}
+          </p>
+        ) : null}
 
         <ContentActionBar
           isPending={isPending}
           onSaveDraft={() => submit("draft")}
           onPublish={() => submit("published")}
         />
+      </div>
+    </div>
+  );
+}
+
+/** One title and the document that belongs under it. */
+function GrammarEntryFields({
+  entry,
+  index,
+  total,
+  disabled,
+  onChange,
+  onRemove,
+}: {
+  entry: GrammarEntry;
+  index: number;
+  total: number;
+  disabled: boolean;
+  onChange: (patch: Partial<GrammarEntry>) => void;
+  onRemove: () => void;
+}) {
+  const { t } = useTranslations();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const titleId = `grammar-title-${entry.key}`;
+
+  return (
+    <div className="space-y-3 rounded-lg border p-4">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-medium text-muted-foreground">
+          {t("admin.content.grammar.entryNumber", { number: index + 1 })}
+        </span>
+        {total > 1 ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            disabled={disabled}
+            onClick={onRemove}
+            aria-label={t("admin.content.grammar.removeEntry")}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        ) : null}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor={titleId}>{t("common.title")}</Label>
+        <Input
+          id={titleId}
+          value={entry.title}
+          disabled={disabled}
+          onChange={(event) => onChange({ title: event.target.value })}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>{t("admin.content.grammar.documentLabel")}</Label>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="application/pdf"
+          className="hidden"
+          onChange={(event) => onChange({ file: event.target.files?.[0] ?? null })}
+        />
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => inputRef.current?.click()}
+          className="flex w-full items-center gap-3 rounded-lg border border-dashed px-4 py-6 text-start transition hover:border-solid hover:bg-muted/30 disabled:opacity-60"
+        >
+          <FileText className="h-5 w-5 shrink-0 text-muted-foreground" />
+          <span className="min-w-0">
+            <span dir="auto" className="block truncate text-sm font-medium">
+              {entry.file
+                ? entry.file.name
+                : t("admin.content.grammar.choosePdf")}
+            </span>
+            <span className="block text-xs text-muted-foreground">
+              {t("admin.content.grammar.documentHint", {
+                pages: MAX_PDF_PAGES,
+                size: MAX_PDF_BYTES / (1024 * 1024),
+              })}
+            </span>
+          </span>
+        </button>
       </div>
     </div>
   );

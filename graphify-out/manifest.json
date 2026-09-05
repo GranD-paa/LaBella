@@ -534,9 +534,9 @@
     "semantic_hash": ""
   },
   "components/admin/content/content-form-panels.tsx": {
-    "mtime": 1788620189.3461003,
-    "seen": 1788620921.7809765,
-    "ast_hash": "4439ba45a6be759217eb14b5ec9d8e03",
+    "mtime": 1788621407.5236611,
+    "seen": 1788621515.7799413,
+    "ast_hash": "c18513c06e533ce01e9367a5a6c62637",
     "semantic_hash": ""
   },
   "components/admin/delete-confirm-dialog.tsx": {
@@ -1788,21 +1788,21 @@
     "semantic_hash": ""
   },
   "lib/i18n/messages/admin-content-en.ts": {
-    "mtime": 1788620818.3322575,
-    "seen": 1788620921.7814775,
-    "ast_hash": "d964a1102c2e9ad9b263639a92f41edc",
+    "mtime": 1788621385.255338,
+    "seen": 1788621515.7799413,
+    "ast_hash": "c631fa3e33c62cbf73244da53b3113c0",
     "semantic_hash": ""
   },
   "lib/i18n/messages/admin-content-fa.ts": {
-    "mtime": 1788620818.3332572,
-    "seen": 1788620921.7814775,
-    "ast_hash": "1998597b29df382efc650c0f518a299e",
+    "mtime": 1788621385.2558384,
+    "seen": 1788621515.7799413,
+    "ast_hash": "b870b482d84e104f56faac7a6fb24754",
     "semantic_hash": ""
   },
   "lib/i18n/messages/admin-content-it.ts": {
-    "mtime": 1788620818.3342578,
-    "seen": 1788620921.7814775,
-    "ast_hash": "6708839fd464be3b8d791fc9e57c0267",
+    "mtime": 1788621385.256339,
+    "seen": 1788621515.7799413,
+    "ast_hash": "6defe024a420a8890af20d897b7d11c7",
     "semantic_hash": ""
   },
   "lib/i18n/messages/admin-languages-en.ts": {
@@ -2172,21 +2172,21 @@
     "semantic_hash": ""
   },
   "locales/en/translation.json": {
-    "mtime": 1788620821.12952,
-    "seen": 1788620921.7814775,
-    "ast_hash": "0eab06fbf3b5c9d7e38ba6f7497354b8",
+    "mtime": 1788621387.939935,
+    "seen": 1788621515.7804408,
+    "ast_hash": "512847447abd3750202603d8ead5d47d",
     "semantic_hash": ""
   },
   "locales/fa/translation.json": {
-    "mtime": 1788620821.1304893,
-    "seen": 1788620921.7814775,
-    "ast_hash": "770d24d85aebd201c701da5042945502",
+    "mtime": 1788621387.9414072,
+    "seen": 1788621515.7804408,
+    "ast_hash": "a1e10f118e15366eb9180c1cca0543b9",
     "semantic_hash": ""
   },
   "locales/it/translation.json": {
-    "mtime": 1788620821.1319885,
-    "seen": 1788620921.7814775,
-    "ast_hash": "87420cc61726e882c97a7479ba509aa1",
+    "mtime": 1788621387.9424043,
+    "seen": 1788621515.7804408,
+    "ast_hash": "405a7e41bb330014a76dad78cae5758c",
     "semantic_hash": ""
   },
   "middleware.ts": {

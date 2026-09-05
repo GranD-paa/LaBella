@@ -59,6 +59,11 @@ export const adminContentEn = {
     documentLabel: "PDF",
     choosePdf: "Choose a PDF",
     documentHint: "Up to {pages} pages and {size}MB.",
+    entryNumber: "Title {number}",
+    addAnother: "Add another title",
+    removeEntry: "Remove this title",
+    progress: "Preparing {done} of {total}…",
+    stoppedAt: "Stopped at “{title}”. The titles before it were saved.",
     errors: {
       storageUnconfigured:
         "File storage is not configured, so documents cannot be uploaded yet.",
