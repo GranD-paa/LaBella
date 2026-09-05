@@ -24,6 +24,10 @@ export const adminContentFa = {
     "آزمون منتشر شد. یادگیرندگان آن را در یادگیری → {level} → آزمون می‌بینند.",
   addAnother: "افزودن محتوای بیشتر",
   startOver: "شروع دوباره",
+  errors: {
+    connectionLost:
+      "پاسخ سرور نرسید. ممکن است محتوا با موفقیت ثبت شده باشد — در صفحهٔ مانیتورینگ درس‌ها بررسی کنید و اگر مربع همچنان خالی بود، دوباره تلاش کنید.",
+  },
   monitor: {
     title: "مانیتورینگ درس‌ها",
     description:
@@ -77,6 +81,8 @@ export const adminContentFa = {
     addAnother: "افزودن عنوان دیگر",
     removeEntry: "حذف این عنوان",
     progress: "در حال آماده‌سازی {done} از {total}…",
+    pageProgress: "«{title}» — صفحهٔ {page} از {total}",
+    reading: "«{title}» در حال خوانده شدن…",
     stoppedAt: "روی «{title}» متوقف شد. عنوان‌های قبلی ثبت شدند.",
     errors: {
       storageUnconfigured:

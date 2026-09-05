@@ -5,11 +5,17 @@ import { getDataRepository } from "@/lib/data";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
 import {
+  GRAMMAR_PAGES_PER_REQUEST,
+  type RenderGrammarPagesResult,
+  type StartGrammarUploadResult,
+} from "@/lib/content-management/grammar-upload";
+import {
   contentVocabularySchema,
   videoLessonSchema,
 } from "@/lib/validations/admin";
 import {
   deleteObjects,
+  getObject,
   isObjectStorageConfigured,
   putObject,
 } from "@/lib/storage";
@@ -20,20 +26,23 @@ import {
   renderPdfToPages,
 } from "@/lib/storage/pdf-pages";
 
+/** The parked document is addressed by a key the client hands back, so its
+ *  shape is checked rather than trusted. */
+const UPLOAD_KEY_PATTERN = /^grammar-uploads\/[0-9a-f-]{36}\.pdf$/;
+
 /**
- * Adds one grammar title to a lesson, with the document a learner will read.
+ * Takes the title and the document, and hands back the work still to do.
  *
- * Grammar is a PDF, not prose, so this is a single step: the title and the
- * file arrive together and either both land or neither does. The pages are
- * rendered here and the PDF is discarded — what the learner eventually
- * receives is a signed link to one page image at a time, never the document.
- *
- * The lesson comes from the wizard's own context, so an upload is always
- * bound to the lesson the admin is standing in.
+ * The PDF is parked in the bucket rather than held in memory: its pages are
+ * rendered by later requests, and the bucket is the only place both can reach
+ * it. The title is created as a draft no matter what the admin asked for, so
+ * a run that stops halfway never leaves a learner an entry that opens onto
+ * half a document. Publishing waits for finishGrammarUpload, once every page
+ * is in.
  */
-export async function createContentGrammar(
+export async function startGrammarUpload(
   formData: FormData
-): Promise<ActionResult> {
+): Promise<StartGrammarUploadResult> {
   const guard = await requireAdminPermission("manageContent");
   if (!guard.ok) return { error: guard.error };
 
@@ -43,14 +52,12 @@ export async function createContentGrammar(
 
   const lessonId = formData.get("lessonId");
   const title = formData.get("title");
-  const status = formData.get("status");
   const file = formData.get("document");
 
   if (
     typeof lessonId !== "string" ||
     typeof title !== "string" ||
-    title.trim().length < 2 ||
-    (status !== "draft" && status !== "published")
+    title.trim().length < 2
   ) {
     return { error: "actions.errors.invalidInput" };
   }
@@ -81,11 +88,11 @@ export async function createContentGrammar(
     return { error: "admin.content.grammar.errors.tooManyPages" };
   }
 
-  let rendered;
+  const uploadKey = `grammar-uploads/${crypto.randomUUID()}.pdf`;
   try {
-    rendered = await renderPdfToPages(bytes);
+    await putObject(uploadKey, bytes, "application/pdf");
   } catch {
-    return { error: "admin.content.grammar.errors.renderFailed" };
+    return { error: "admin.content.grammar.errors.uploadFailed" };
   }
 
   const repo = getDataRepository();
@@ -94,12 +101,64 @@ export async function createContentGrammar(
     title: title.trim(),
     description: null,
     example: null,
-    status,
+    status: "draft",
   });
   if (created.error || !created.id) {
+    await deleteObjects([uploadKey]).catch(() => {});
     return { error: "actions.errors.generic" };
   }
-  const ruleId = created.id;
+
+  return { ruleId: created.id, uploadKey, pageCount };
+}
+
+/**
+ * Renders one stretch of the parked document and files those pages.
+ *
+ * Pages are appended, so 1-3 followed by 4-6 leaves the title numbered the way
+ * the document reads. A batch that fails takes only itself down: what earlier
+ * calls stored stays put, and the caller decides whether to retry this stretch
+ * or give the title up.
+ */
+export async function renderGrammarPages(input: {
+  ruleId: string;
+  uploadKey: string;
+  documentName: string;
+  from: number;
+  to: number;
+}): Promise<RenderGrammarPagesResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
+  if (
+    !UPLOAD_KEY_PATTERN.test(input.uploadKey) ||
+    !Number.isInteger(input.from) ||
+    !Number.isInteger(input.to) ||
+    input.from < 1 ||
+    input.to < input.from ||
+    input.to - input.from >= GRAMMAR_PAGES_PER_REQUEST
+  ) {
+    return { error: "actions.errors.invalidInput" };
+  }
+
+  let source: Buffer;
+  try {
+    source = await getObject(input.uploadKey);
+  } catch {
+    return { error: "admin.content.grammar.errors.uploadFailed" };
+  }
+
+  let rendered;
+  try {
+    rendered = await renderPdfToPages(source, {
+      from: input.from,
+      to: input.to,
+    });
+  } catch {
+    return { error: "admin.content.grammar.errors.renderFailed" };
+  }
+  if (rendered.length === 0) {
+    return { error: "admin.content.grammar.errors.renderFailed" };
+  }
 
   // Upload before recording. A page row pointing at an object that was never
   // written would render as a broken page for every learner; an object with no
@@ -113,7 +172,7 @@ export async function createContentGrammar(
 
   try {
     for (const page of rendered) {
-      const objectKey = `grammar/${ruleId}/${crypto.randomUUID()}.webp`;
+      const objectKey = `grammar/${input.ruleId}/${crypto.randomUUID()}.webp`;
       await putObject(objectKey, page.bytes, "image/webp");
       uploaded.push({
         objectKey,
@@ -123,17 +182,71 @@ export async function createContentGrammar(
       });
     }
 
-    const appended = await repo.appendGrammarPages(ruleId, file.name, uploaded);
+    const appended = await getDataRepository().appendGrammarPages(
+      input.ruleId,
+      input.documentName,
+      uploaded
+    );
     if (appended.error) throw new Error(appended.error);
   } catch {
-    // Leave nothing half-made: a title with no pages would show a learner an
-    // entry that opens onto nothing.
     await deleteObjects(uploaded.map((page) => page.objectKey)).catch(() => {});
-    await repo.deleteGrammarRule(ruleId).catch(() => {});
     return { error: "admin.content.grammar.errors.uploadFailed" };
   }
 
-  revalidateAppContent(lessonId);
+  return { rendered: rendered.length };
+}
+
+/**
+ * Closes a title whose pages are all in: publishes it if that is what was
+ * asked for, and drops the parked PDF, which has done its job.
+ */
+export async function finishGrammarUpload(input: {
+  ruleId: string;
+  uploadKey: string;
+  lessonId: string;
+  status: "draft" | "published";
+}): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
+  if (UPLOAD_KEY_PATTERN.test(input.uploadKey)) {
+    await deleteObjects([input.uploadKey]).catch(() => {});
+  }
+
+  if (input.status === "published") {
+    const updated = await getDataRepository().updateGrammarRule(input.ruleId, {
+      status: "published",
+    });
+    if (updated.error) return { error: "actions.errors.generic" };
+  }
+
+  revalidateAppContent(input.lessonId);
+  return { success: true };
+}
+
+/**
+ * Clears away a title whose pages never all arrived.
+ *
+ * Leaving nothing half-made is the rule the single-request version followed
+ * too; it just has to be asked for now, because the client is the only one
+ * that knows the run was abandoned.
+ */
+export async function abortGrammarUpload(input: {
+  ruleId: string;
+  uploadKey: string;
+}): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
+  const repo = getDataRepository();
+  const keys: string[] = await repo
+    .getGrammarPageKeys(input.ruleId)
+    .catch(() => []);
+  if (UPLOAD_KEY_PATTERN.test(input.uploadKey)) keys.push(input.uploadKey);
+
+  await deleteObjects(keys).catch(() => {});
+  await repo.deleteGrammarRule(input.ruleId).catch(() => {});
+
   return { success: true };
 }
 

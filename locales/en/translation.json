@@ -603,6 +603,9 @@
       "publishedQuiz": "Quiz published. Learners will see it at Learn → {level} → Quiz.",
       "addAnother": "Add more content",
       "startOver": "Start over",
+      "errors": {
+        "connectionLost": "No answer came back from the server. The content may well have been saved — check the lesson monitor, and try again only if the square is still empty."
+      },
       "monitor": {
         "title": "Lesson monitor",
         "description": "Every lesson has four squares: grammar, vocabulary, video and quiz. A filled square is published, an outlined one with a dot holds drafts only, and an empty one has nothing yet. Clicking an unfinished square opens the form for exactly that slot.",
@@ -653,6 +656,8 @@
         "addAnother": "Add another title",
         "removeEntry": "Remove this title",
         "progress": "Preparing {done} of {total}…",
+        "pageProgress": "{title} — page {page} of {total}",
+        "reading": "Reading {title}…",
         "stoppedAt": "Stopped at “{title}”. The titles before it were saved.",
         "errors": {
           "storageUnconfigured": "File storage is not configured, so documents cannot be uploaded yet.",

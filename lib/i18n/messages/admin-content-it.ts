@@ -25,6 +25,10 @@ export const adminContentIt = {
     "Quiz pubblicato. Gli studenti lo vedranno in Impara → {level} → Quiz.",
   addAnother: "Aggiungi altro contenuto",
   startOver: "Ricomincia",
+  errors: {
+    connectionLost:
+      "Nessuna risposta dal server. Il contenuto potrebbe essere stato salvato — controlla il monitoraggio delle lezioni e riprova solo se il quadrato è ancora vuoto.",
+  },
   monitor: {
     title: "Monitoraggio delle lezioni",
     description:
@@ -78,6 +82,8 @@ export const adminContentIt = {
     addAnother: "Aggiungi un altro titolo",
     removeEntry: "Rimuovi questo titolo",
     progress: "Preparazione {done} di {total}…",
+    pageProgress: "{title} — pagina {page} di {total}",
+    reading: "Lettura di {title}…",
     stoppedAt: "Interrotto su “{title}”. I titoli precedenti sono stati salvati.",
     errors: {
       storageUnconfigured:

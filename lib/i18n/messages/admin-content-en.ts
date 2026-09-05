@@ -24,6 +24,10 @@ export const adminContentEn = {
     "Quiz published. Learners will see it at Learn → {level} → Quiz.",
   addAnother: "Add more content",
   startOver: "Start over",
+  errors: {
+    connectionLost:
+      "No answer came back from the server. The content may well have been saved — check the lesson monitor, and try again only if the square is still empty.",
+  },
   monitor: {
     title: "Lesson monitor",
     description:
@@ -77,6 +81,8 @@ export const adminContentEn = {
     addAnother: "Add another title",
     removeEntry: "Remove this title",
     progress: "Preparing {done} of {total}…",
+    pageProgress: "{title} — page {page} of {total}",
+    reading: "Reading {title}…",
     stoppedAt: "Stopped at “{title}”. The titles before it were saved.",
     errors: {
       storageUnconfigured:

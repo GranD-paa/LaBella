@@ -89,14 +89,23 @@ export async function countPdfPages(bytes: Buffer): Promise<number> {
 }
 
 /**
- * Renders every page, in order.
+ * Renders pages `range.from` through `range.to`, or the whole document when no
+ * range is given.
  *
  * `pdftoppm` writes one PNG per page into a directory and `cwebp` compresses
  * each one; both ship with the container image (poppler-utils, libwebp-tools).
  * Doing it through the filesystem rather than a pipe keeps memory flat — a
  * long document never has more than one page decoded at a time.
+ *
+ * The range exists because rendering a whole document takes longer than the
+ * network between the browser and the app is willing to wait. A caller that
+ * asks for a handful of pages per request finishes each one in seconds, and
+ * can say how far along it is while it works.
  */
-export async function renderPdfToPages(bytes: Buffer): Promise<RenderedPage[]> {
+export async function renderPdfToPages(
+  bytes: Buffer,
+  range?: { from: number; to: number }
+): Promise<RenderedPage[]> {
   if (!isPdf(bytes)) {
     throw new Error("not a pdf");
   }
@@ -110,26 +119,33 @@ export async function renderPdfToPages(bytes: Buffer): Promise<RenderedPage[]> {
       "-png",
       "-r",
       String(RENDER_DPI),
+      ...(range ? ["-f", String(range.from), "-l", String(range.to)] : []),
       source,
       path.join(directory, "page"),
     ]);
 
-    // pdftoppm zero-pads the page number to the document's width, so plain
-    // lexical order is already page order.
+    // pdftoppm names each file after the page it came from, so the number in
+    // the name is the answer even when only the middle of a document was
+    // asked for — counting the files instead would number a second batch from
+    // one again.
     const rendered = (await readdir(directory))
       .filter((name) => name.startsWith("page") && name.endsWith(".png"))
-      .sort();
+      .map((name) => ({
+        name,
+        pageNumber: Number(name.match(/-(\d+)\.png$/)?.[1] ?? 0),
+      }))
+      .filter((entry) => entry.pageNumber > 0)
+      .sort((a, b) => a.pageNumber - b.pageNumber);
 
     const pages: RenderedPage[] = [];
-    for (let index = 0; index < rendered.length; index += 1) {
-      const name = rendered[index];
-      const png = path.join(directory, name);
+    for (const entry of rendered) {
+      const png = path.join(directory, entry.name);
       const webp = `${png}.webp`;
       await run("cwebp", ["-quiet", "-q", String(WEBP_QUALITY), png, "-o", webp]);
 
       const output = await readFile(webp);
       pages.push({
-        pageNumber: index + 1,
+        pageNumber: entry.pageNumber,
         bytes: output,
         ...readWebpDimensions(output),
       });

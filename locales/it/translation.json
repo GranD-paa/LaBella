@@ -603,6 +603,9 @@
       "publishedQuiz": "Quiz pubblicato. Gli studenti lo vedranno in Impara → {level} → Quiz.",
       "addAnother": "Aggiungi altro contenuto",
       "startOver": "Ricomincia",
+      "errors": {
+        "connectionLost": "Nessuna risposta dal server. Il contenuto potrebbe essere stato salvato — controlla il monitoraggio delle lezioni e riprova solo se il quadrato è ancora vuoto."
+      },
       "monitor": {
         "title": "Monitoraggio delle lezioni",
         "description": "Ogni lezione ha quattro quadrati: grammatica, vocabolario, video e quiz. Il quadrato pieno è pubblicato, quello con solo il bordo e un punto contiene bozze e quello vuoto non ha ancora nulla. Cliccando un quadrato incompleto si apre il modulo di quella sezione.",
@@ -653,6 +656,8 @@
         "addAnother": "Aggiungi un altro titolo",
         "removeEntry": "Rimuovi questo titolo",
         "progress": "Preparazione {done} di {total}…",
+        "pageProgress": "{title} — pagina {page} di {total}",
+        "reading": "Lettura di {title}…",
         "stoppedAt": "Interrotto su “{title}”. I titoli precedenti sono stati salvati.",
         "errors": {
           "storageUnconfigured": "L'archivio file non è configurato, quindi non è ancora possibile caricare documenti.",

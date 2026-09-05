@@ -92,6 +92,22 @@ export function signedReadUrl(key: string): Promise<string> {
   );
 }
 
+/**
+ * Reads one object back into memory.
+ *
+ * Used for the PDF a grammar upload parks in the bucket while its pages are
+ * rendered a few at a time: the file has to outlive the request that carried
+ * it, and the bucket is the only place both requests can see.
+ */
+export async function getObject(key: string): Promise<Buffer> {
+  const response = await getClient().send(
+    new GetObjectCommand({ Bucket: getBucket(), Key: key })
+  );
+  const body = response.Body;
+  if (!body) throw new Error(`object ${key} has no body`);
+  return Buffer.from(await body.transformToByteArray());
+}
+
 export async function deleteObject(key: string): Promise<void> {
   await getClient().send(
     new DeleteObjectCommand({ Bucket: getBucket(), Key: key })

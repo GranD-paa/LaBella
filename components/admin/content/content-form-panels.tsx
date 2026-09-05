@@ -7,9 +7,12 @@ import { FileText, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
-  createContentGrammar,
+  abortGrammarUpload,
   createContentVocabulary,
   createContentVideo,
+  finishGrammarUpload,
+  renderGrammarPages,
+  startGrammarUpload,
 } from "@/app/admin/actions/content";
 import { createStructuredQuiz } from "@/app/admin/actions/quizzes";
 import { WizardQuestionFields } from "@/components/admin/quizzes/wizard-question-fields";
@@ -26,7 +29,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import type { ActionResult } from "@/lib/action-result";
 import type { ContentWizardContext } from "@/lib/content-management/categories";
+import {
+  GRAMMAR_PAGES_PER_REQUEST,
+  type RenderGrammarPagesResult,
+  type StartGrammarUploadResult,
+} from "@/lib/content-management/grammar-upload";
 import { LEVEL_EXAM_SECTION } from "@/lib/quiz-management/types";
 import { resolveMessage } from "@/lib/i18n/resolve-message";
 import { MAX_PDF_BYTES, MAX_PDF_PAGES } from "@/lib/storage/pdf-limits";
@@ -90,6 +99,9 @@ type GrammarEntry = {
   file: File | null;
 };
 
+/** Which title is being rendered, and how far through its pages. */
+type GrammarProgress = { title: string; page: number; total: number };
+
 function emptyGrammarEntry(): GrammarEntry {
   return { key: crypto.randomUUID(), title: "", file: null };
 }
@@ -105,6 +117,7 @@ export function GrammarContentPanel({
   const [isPending, startTransition] = useTransition();
   const [entries, setEntries] = useState<GrammarEntry[]>([emptyGrammarEntry()]);
   const [done, setDone] = useState(0);
+  const [progress, setProgress] = useState<GrammarProgress | null>(null);
 
   const filled = entries.filter(
     (entry) => entry.title.trim().length >= 2 && entry.file !== null
@@ -118,13 +131,17 @@ export function GrammarContentPanel({
   }
 
   /**
-   * Sends one title at a time rather than all at once.
+   * Sends one title at a time, and each title a few pages at a time.
    *
-   * Each PDF is rendered page by page on the server, so a batch of them is
-   * minutes of work. Doing them in sequence means the count on the button is
-   * honest, and that a document which fails does not take the ones already
-   * stored down with it — the admin keeps that work and is told which title to
-   * try again.
+   * Rendering a whole document in one request is what used to lose the answer:
+   * the work finished on the server long after the browser had stopped waiting
+   * for it. Now the document is parked once and its pages are fetched in short
+   * requests, so nothing runs long enough to be cut off and the count on screen
+   * is the real one.
+   *
+   * A title that fails is rolled back whole — a half-rendered document is worse
+   * than none — while the titles already stored keep their work, and the ones
+   * still to do stay in the form.
    */
   function submit(status: "draft" | "published") {
     if (!ready || isPending) return;
@@ -134,25 +151,90 @@ export function GrammarContentPanel({
 
       for (let index = 0; index < entries.length; index += 1) {
         const entry = entries[index];
-        const formData = new FormData();
-        formData.set("lessonId", context.lessonId);
-        formData.set("title", entry.title.trim());
-        formData.set("status", status);
-        formData.set("document", entry.file as File);
+        const title = entry.title.trim();
+        const file = entry.file as File;
 
-        const result = await createContentGrammar(formData);
-
-        if ("error" in result) {
-          toast.error(resolveMessage(t, result.error));
-          if (index > 0) {
-            toast.info(
-              t("admin.content.grammar.stoppedAt", { title: entry.title.trim() })
-            );
+        /** Keeps what is stored and what is left to do, then stops. */
+        const stop = (message: string, info = index > 0) => {
+          toast.error(message);
+          if (info) {
+            toast.info(t("admin.content.grammar.stoppedAt", { title }));
           }
           // Drop what was stored and keep what still needs doing, so pressing
           // the button again does not create the same titles twice.
           setEntries(entries.slice(index));
           setDone(0);
+          setProgress(null);
+        };
+
+        const formData = new FormData();
+        formData.set("lessonId", context.lessonId);
+        formData.set("title", title);
+        formData.set("document", file);
+
+        setProgress({ title, page: 0, total: 0 });
+
+        let started: StartGrammarUploadResult;
+        try {
+          started = await startGrammarUpload(formData);
+        } catch {
+          // An uncaught rejection here reaches the error boundary and replaces
+          // the whole page with "Application error", which tells the admin
+          // nothing about what did or did not happen.
+          stop(t("admin.content.errors.connectionLost"), false);
+          return;
+        }
+
+        if ("error" in started) {
+          stop(resolveMessage(t, started.error));
+          return;
+        }
+
+        const { ruleId, uploadKey, pageCount } = started;
+        setProgress({ title, page: 0, total: pageCount });
+
+        for (let from = 1; from <= pageCount; from += GRAMMAR_PAGES_PER_REQUEST) {
+          const to = Math.min(from + GRAMMAR_PAGES_PER_REQUEST - 1, pageCount);
+
+          let batch: RenderGrammarPagesResult;
+          try {
+            batch = await renderGrammarPages({
+              ruleId,
+              uploadKey,
+              documentName: file.name,
+              from,
+              to,
+            });
+          } catch {
+            await abortGrammarUpload({ ruleId, uploadKey }).catch(() => {});
+            stop(t("admin.content.errors.connectionLost"), false);
+            return;
+          }
+
+          if ("error" in batch) {
+            await abortGrammarUpload({ ruleId, uploadKey }).catch(() => {});
+            stop(resolveMessage(t, batch.error));
+            return;
+          }
+
+          setProgress({ title, page: to, total: pageCount });
+        }
+
+        let finished: ActionResult;
+        try {
+          finished = await finishGrammarUpload({
+            ruleId,
+            uploadKey,
+            lessonId: context.lessonId,
+            status,
+          });
+        } catch {
+          stop(t("admin.content.errors.connectionLost"), false);
+          return;
+        }
+
+        if ("error" in finished) {
+          stop(resolveMessage(t, finished.error));
           return;
         }
 
@@ -166,6 +248,7 @@ export function GrammarContentPanel({
       );
       setEntries([emptyGrammarEntry()]);
       setDone(0);
+      setProgress(null);
       onSuccess(status === "published");
     });
   }
@@ -208,13 +291,36 @@ export function GrammarContentPanel({
           {t("admin.content.grammar.addAnother")}
         </Button>
 
-        {isPending && entries.length > 1 ? (
-          <p className="text-sm text-muted-foreground">
-            {t("admin.content.grammar.progress", {
-              done: done,
-              total: entries.length,
-            })}
-          </p>
+        {isPending && progress ? (
+          <div className="space-y-2 text-sm text-muted-foreground">
+            <p>
+              {progress.total > 0
+                ? t("admin.content.grammar.pageProgress", {
+                    title: progress.title,
+                    page: progress.page,
+                    total: progress.total,
+                  })
+                : t("admin.content.grammar.reading", { title: progress.title })}
+            </p>
+            {progress.total > 0 ? (
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-brand-accent transition-[width] duration-300"
+                  style={{
+                    width: `${Math.round((progress.page / progress.total) * 100)}%`,
+                  }}
+                />
+              </div>
+            ) : null}
+            {entries.length > 1 ? (
+              <p>
+                {t("admin.content.grammar.progress", {
+                  done,
+                  total: entries.length,
+                })}
+              </p>
+            ) : null}
+          </div>
         ) : null}
 
         <ContentActionBar
@@ -339,7 +445,13 @@ export function VocabularyContentPanel({
   function submit(status: "draft" | "published") {
     startTransition(async () => {
       const values = { ...form.getValues(), status };
-      const result = await createContentVocabulary(values);
+      let result: ActionResult;
+      try {
+        result = await createContentVocabulary(values);
+      } catch {
+        toast.error(t("admin.content.errors.connectionLost"));
+        return;
+      }
       if ("error" in result) {
         toast.error(resolveMessage(t, result.error));
         return;
@@ -488,7 +600,13 @@ export function VideoContentPanel({
   function submit(status: "draft" | "published") {
     startTransition(async () => {
       const values = { ...form.getValues(), status };
-      const result = await createContentVideo(values);
+      let result: ActionResult;
+      try {
+        result = await createContentVideo(values);
+      } catch {
+        toast.error(t("admin.content.errors.connectionLost"));
+        return;
+      }
       if ("error" in result) {
         toast.error(resolveMessage(t, result.error));
         return;
@@ -646,7 +764,13 @@ export function QuizContentPanel({
   function submit(status: "draft" | "published") {
     startTransition(async () => {
       const values = { ...form.getValues(), status };
-      const result = await createStructuredQuiz(values);
+      let result: ActionResult;
+      try {
+        result = await createStructuredQuiz(values);
+      } catch {
+        toast.error(t("admin.content.errors.connectionLost"));
+        return;
+      }
       if ("error" in result) {
         toast.error(resolveMessage(t, result.error));
         return;
