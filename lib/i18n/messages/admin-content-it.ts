@@ -25,6 +25,18 @@ export const adminContentIt = {
     "Quiz pubblicato. Gli studenti lo vedranno in Impara → {level} → Quiz.",
   addAnother: "Aggiungi altro contenuto",
   startOver: "Ricomincia",
+  existing: {
+    title: "Cosa c'è già qui",
+    count: "{count} elementi",
+    empty: "In questa sezione non c'è ancora nulla.",
+    loading: "Lettura…",
+    pages: "{count} pagine",
+    questions: "{count} domande",
+    deleteTitle: "Eliminare questo?",
+    deleteDescription:
+      "{title} sparisce per sempre, insieme ai file salvati per esso.",
+    deleted: "Eliminato",
+  },
   errors: {
     connectionLost:
       "Nessuna risposta dal server. Il contenuto potrebbe essere stato salvato — controlla il monitoraggio delle lezioni e riprova solo se il quadrato è ancora vuoto.",

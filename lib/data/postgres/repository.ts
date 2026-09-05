@@ -737,6 +737,9 @@ export function createPostgresRepository(): DataRepository {
         )
       ),
 
+    deleteVideoLesson: (id) =>
+      mutate(() => execute("delete from video_lessons where id = $1", [id])),
+
     // A quiz with no questions is useless and a half-written one is worse, so
     // the quiz and its questions are written in a single transaction.
     createQuizWithQuestions: (input) =>

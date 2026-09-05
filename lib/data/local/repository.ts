@@ -685,6 +685,13 @@ export function createLocalRepository(): DataRepository {
       return {};
     },
 
+    async deleteVideoLesson(id) {
+      const store = getLocalStore();
+      store.videoLessons = store.videoLessons.filter((item) => item.id !== id);
+      commitStore();
+      return {};
+    },
+
     async createQuizWithQuestions({
       lessonId,
       title,

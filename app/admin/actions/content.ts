@@ -5,6 +5,11 @@ import { getDataRepository } from "@/lib/data";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
 import {
+  emptyLessonContent,
+  type LessonContent,
+} from "@/lib/content-management/lesson-content";
+import { LEVEL_EXAM_SECTION } from "@/lib/quiz-management/types";
+import {
   GRAMMAR_PAGES_PER_REQUEST,
   type RenderGrammarPagesResult,
   type StartGrammarUploadResult,
@@ -306,5 +311,141 @@ export async function createContentVideo(values: unknown): Promise<ActionResult>
   }
 
   revalidateAppContent(parsed.data.lessonId);
+  return { success: true };
+}
+
+/**
+ * Everything already filed under one lesson, for the panel that lists it.
+ *
+ * Read through an action rather than handed down from the page, because the
+ * lesson is not known until the admin has walked the wizard to it — and
+ * because the list has to be right again the moment something is deleted.
+ */
+export async function loadLessonContent(
+  lessonId: string
+): Promise<LessonContent | { error: string }> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
+  const repo = getDataRepository();
+  const [grammarRules, vocabulary, videoLessons, quizzes, questions] =
+    await Promise.all([
+      repo.getGrammarRulesByLessonId(lessonId),
+      repo.getVocabularyByLessonId(lessonId),
+      repo.getVideoLessonsByLessonId(lessonId),
+      repo.getQuizzes(),
+      repo.getAllQuizQuestions(),
+    ]);
+
+  // Page counts come from the same summary the learner's tab uses, so a title
+  // whose upload stopped short shows the shortfall here rather than looking
+  // finished.
+  const pageCounts = new Map<string, number>();
+  try {
+    for (const summary of await repo.getGrammarPageSummaries(lessonId, null)) {
+      pageCounts.set(summary.ruleId, summary.pageCount);
+    }
+  } catch {
+    // Local mode has no page storage; the titles still list without counts.
+  }
+
+  const questionCounts = questions.reduce<Record<string, number>>(
+    (counts, question) => {
+      counts[question.quiz_id] = (counts[question.quiz_id] ?? 0) + 1;
+      return counts;
+    },
+    {}
+  );
+
+  const content = emptyLessonContent();
+
+  content.grammar = grammarRules.map((rule) => ({
+    id: rule.id,
+    label: rule.title,
+    note: null,
+    count: pageCounts.get(rule.id) ?? 0,
+    status: rule.status,
+  }));
+
+  content.vocabulary = vocabulary.map((word) => ({
+    id: word.id,
+    label: word.word,
+    note: word.translation,
+    count: null,
+    status: word.status,
+  }));
+
+  content.video = videoLessons.map((video) => ({
+    id: video.id,
+    label: video.title,
+    note: null,
+    count: null,
+    status: video.status,
+  }));
+
+  for (const quiz of quizzes) {
+    if (quiz.lesson_id !== lessonId) continue;
+
+    const item = {
+      id: quiz.id,
+      label: quiz.title,
+      note: null,
+      count: questionCounts[quiz.id] ?? 0,
+      status: quiz.status === "draft" ? ("draft" as const) : ("published" as const),
+    };
+
+    // "custom" is the legacy spelling of the checkpoint section, and a quiz
+    // with no section at all predates them both.
+    if (quiz.section_slug === LEVEL_EXAM_SECTION) {
+      content["level-exam"].push(item);
+    } else {
+      content.quiz.push(item);
+    }
+  }
+
+  return content;
+}
+
+/**
+ * Removes one piece of content from a lesson.
+ *
+ * Every content type the wizard can create needs a way back out — a title
+ * uploaded to the wrong lesson, or a quiz written twice, otherwise stays
+ * there for good. Grammar and vocabulary already had their own actions
+ * elsewhere; these two are the ones that did not.
+ */
+export async function deleteContentVideo(id: string): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageContent");
+  if (!guard.ok) return { error: guard.error };
+
+  const repo = getDataRepository();
+  const row = (await repo.getAllVideoLessons()).find((item) => item.id === id);
+
+  // Once videos come from SpotPlayer rather than a plain URL, revoking
+  // whatever it issued for this lesson belongs here, before the row goes:
+  // afterwards there is nothing left to say which licence to revoke.
+  const result = await repo.deleteVideoLesson(id);
+
+  if (result.error) {
+    return { error: "actions.errors.generic" };
+  }
+
+  revalidateAppContent(row?.lesson_id);
+  return { success: true };
+}
+
+export async function deleteContentQuiz(id: string): Promise<ActionResult> {
+  const guard = await requireAdminPermission("manageQuizzes");
+  if (!guard.ok) return { error: guard.error };
+
+  const repo = getDataRepository();
+  const quiz = await repo.getQuizById(id);
+  const result = await repo.deleteQuiz(id);
+
+  if (result.error) {
+    return { error: "actions.errors.generic" };
+  }
+
+  revalidateAppContent(quiz?.lesson_id);
   return { success: true };
 }

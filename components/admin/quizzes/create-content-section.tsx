@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { ContentFormPanel } from "@/components/admin/content/content-form-panels";
+import { ExistingContentList } from "@/components/admin/content/existing-content-list";
 import { LessonForm } from "@/components/admin/lessons/lesson-form";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
@@ -130,6 +131,9 @@ export function CreateContentSection({
   const [contentType, setContentType] = useState<ContentCategorySlug | null>(
     jumpTarget?.category ?? null
   );
+  // Bumped whenever this panel creates something, so the list of what is
+  // already there reloads without a round trip through the server component.
+  const [contentVersion, setContentVersion] = useState(0);
 
   const selectedLanguage = useMemo(
     () => languages.find((language) => language.slug === languageSlug),
@@ -391,6 +395,13 @@ export function CreateContentSection({
                 <Badge variant="secondary">{selectedLevel?.code}</Badge>
                 <Badge variant="outline">{t(selectedType.titleKey)}</Badge>
               </div>
+              <ExistingContentList
+                lessonId={wizardContext.lessonId}
+                category={wizardContext.category}
+                refreshToken={contentVersion}
+                onChanged={() => onSuccess?.()}
+              />
+
               <div className="rounded-xl border border-white/10 bg-muted/10 p-4 sm:p-6">
                 <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
                   <PenLine className="h-4 w-4 text-brand-accent" />
@@ -398,7 +409,12 @@ export function CreateContentSection({
                 </div>
                 <ContentFormPanel
                   context={wizardContext}
-                  onSuccess={() => onSuccess?.()}
+                  onSuccess={() => {
+                    // Pulls the list above forward, so what was just created
+                    // is on screen rather than one refresh away.
+                    setContentVersion((current) => current + 1);
+                    onSuccess?.();
+                  }}
                 />
               </div>
               <div className="flex flex-wrap gap-2 border-t border-white/10 pt-4">

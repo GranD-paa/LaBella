@@ -24,6 +24,18 @@ export const adminContentEn = {
     "Quiz published. Learners will see it at Learn → {level} → Quiz.",
   addAnother: "Add more content",
   startOver: "Start over",
+  existing: {
+    title: "What is already here",
+    count: "{count} items",
+    empty: "Nothing has been filed in this section yet.",
+    loading: "Reading…",
+    pages: "{count} pages",
+    questions: "{count} questions",
+    deleteTitle: "Delete this?",
+    deleteDescription:
+      "{title} goes for good, and so do the files stored for it.",
+    deleted: "Deleted",
+  },
   errors: {
     connectionLost:
       "No answer came back from the server. The content may well have been saved — check the lesson monitor, and try again only if the square is still empty.",

@@ -626,6 +626,15 @@ export function createSupabaseRepository(): DataRepository {
       return error ? { error: error.message } : {};
     },
 
+    async deleteVideoLesson(id) {
+      const supabase = await createClient();
+      const { error } = await supabase
+        .from("video_lessons")
+        .delete()
+        .eq("id", id);
+      return error ? { error: error.message } : {};
+    },
+
     async createQuizWithQuestions({
       lessonId,
       title,

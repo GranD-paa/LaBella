@@ -258,6 +258,7 @@ export interface DataRepository {
   createVideoLesson(
     input: Omit<VideoLesson, "id" | "created_at">
   ): Promise<{ error?: string }>;
+  deleteVideoLesson(id: string): Promise<{ error?: string }>;
 
   createQuizWithQuestions(input: {
     lessonId: string;

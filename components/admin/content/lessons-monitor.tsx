@@ -77,9 +77,9 @@ const STATE_KEY: Record<CoverageState, string> = {
  * dot means a draft is sitting there, and a bare outline means nothing has
  * been filed yet.
  *
- * Only the two unfinished states are buttons: a published slot is one where
- * there is nothing left to do, so it reads as a result rather than as an
- * invitation.
+ * Every square opens its section, published ones included — a slot that is
+ * done is exactly the one an admin wants to look inside, to check what is in
+ * it or take something back out.
  */
 function SlotSquare({
   slot,
@@ -163,11 +163,7 @@ function LevelRow({
               category: t(meta.titleKey),
               state: t(STATE_KEY[slot.state]),
             })}
-            onOpen={
-              slot.state === "published"
-                ? null
-                : () => onOpenSlot(level.slug, meta.category)
-            }
+            onOpen={() => onOpenSlot(level.slug, meta.category)}
           />
         );
       })}
@@ -325,9 +321,9 @@ export function LessonsMonitor({
                         state: t(STATE_KEY[band.levelExam.state]),
                       })}
                       onOpen={
-                        band.levelExam.state === "published" || !band.levels[0]
-                          ? null
-                          : () => open(band.levels[0]!.slug, "level-exam")
+                        band.levels[0]
+                          ? () => open(band.levels[0]!.slug, "level-exam")
+                          : null
                       }
                     />
                   </div>
