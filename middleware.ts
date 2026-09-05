@@ -59,7 +59,17 @@ export const config = {
      * - api/payments  -> the gateway is re-asked server-to-server whether the
      *                    payment succeeded, quoting the amount from our own
      *                    ledger, so the query string proves nothing on its own
+     *
+     * api/banner-images is excluded for a different reason: it serves image
+     * bytes, and images are fetched by things that carry no session. Today the
+     * two components that render a banner pass `unoptimized`, so the browser
+     * asks for it directly and does send the cookie — but the moment one of
+     * them drops that prop, the request moves to Next's image optimizer, which
+     * fetches server-side with no cookie and would be bounced to /sign-up. The
+     * route is safe to leave open: it only ever returns image bytes, and only
+     * to someone who already knows an unguessable UUID, exactly as the public
+     * Supabase Storage bucket it replaced did.
      */
-    "/((?!_next/static|_next/image|favicon.ico|api/cron|api/webhooks|api/payments|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/cron|api/webhooks|api/payments|api/banner-images|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
