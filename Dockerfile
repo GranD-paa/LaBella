@@ -30,9 +30,22 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
 # Grammar is uploaded as PDF and served as one image per page, so the learner
 # never receives a document to save. poppler-utils renders the pages
-# (pdftoppm, pdfinfo) and libwebp-tools compresses them (cwebp). Together they
-# add roughly 20MB to an image that is otherwise about 60MB.
-RUN apk add --no-cache poppler-utils libwebp-tools
+# (pdftoppm, pdfinfo) and libwebp-tools compresses them (cwebp).
+#
+# The fonts are not optional. A PDF may reference one of the standard PDF
+# fonts — Helvetica, Times, Courier — without embedding it, expecting the
+# renderer to substitute a local equivalent. On a stock Alpine image there are
+# no local fonts at all, and poppler renders those pages with the text simply
+# missing: "Couldn't find a font for 'Helvetica'". DejaVu covers the
+# substitutions, and Noto carries the scripts this course deals in, Persian
+# included, for the documents that leave their fonts out.
+RUN apk add --no-cache \
+      poppler-utils \
+      libwebp-tools \
+      fontconfig \
+      ttf-dejavu \
+      font-noto \
+      font-noto-arabic
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
