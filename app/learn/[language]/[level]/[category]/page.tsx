@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { LearnCategoryView } from "@/components/learn/learn-category-view";
 import { getLanguageWithAvailability } from "@/lib/curriculum/availability";
 import { getLevel, isCategorySlug } from "@/lib/curriculum/languages";
+import type { GrammarRuleWithPages } from "@/components/lessons/grammar-rules-list";
+import { attachGrammarPages } from "@/lib/grammar/pages";
 import { resolveLessonForLevel } from "@/lib/curriculum/resolve-lesson";
 import { getDataRepository } from "@/lib/data";
 import {
@@ -69,7 +71,7 @@ export default async function CategoryPage({ params }: PageProps) {
   }
 
   let vocabulary: import("@/types").Vocabulary[] = [];
-  let grammarRules: import("@/types").GrammarRule[] = [];
+  let grammarRules: GrammarRuleWithPages[] = [];
   let videoLessons: import("@/types").VideoLesson[] = [];
   let levelQuizzes: import("@/types").Quiz[] = [];
   let quizAttempts: import("@/types").UserQuizAttempt[] = [];
@@ -142,7 +144,14 @@ export default async function CategoryPage({ params }: PageProps) {
     ]);
 
     vocabulary = vocabularyData.filter((item) => item.status === "published");
-    grammarRules = grammarData.filter((item) => item.status === "published");
+    // Same signing as the standalone lesson page: pages reach the learner as
+    // short-lived links minted here, never as object names.
+    grammarRules = await attachGrammarPages(
+      repo,
+      lesson.id,
+      user?.id ?? null,
+      grammarData.filter((item) => item.status === "published")
+    );
     videoLessons = videoData.filter((item) => item.status === "published");
   }
 

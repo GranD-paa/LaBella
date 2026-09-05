@@ -1,4 +1,10 @@
 import type {
+  GrammarDocumentSummary,
+  GrammarPage,
+  GrammarPageSummary,
+} from "@/lib/grammar/types";
+
+import type {
   AccountingSnapshot,
   Banner,
   BillingCurrency,
@@ -224,6 +230,41 @@ export interface DataRepository {
     input: Partial<Omit<GrammarRule, "id" | "created_at">>
   ): Promise<{ error?: string }>;
   deleteGrammarRule(id: string): Promise<{ error?: string }>;
+
+  // ------------------------------------------------------- grammar documents
+  /** Every page of a title, in reading order. */
+  getGrammarPages(ruleId: string): Promise<GrammarPage[]>;
+  /** Page counts, and where this learner stopped, for a lesson's whole tab. */
+  getGrammarPageSummaries(
+    lessonId: string,
+    userId: string | null
+  ): Promise<GrammarPageSummary[]>;
+  /** What has been uploaded into a title, for the admin to review or remove. */
+  getGrammarDocuments(ruleId: string): Promise<GrammarDocumentSummary[]>;
+  /** Appends a rendered document's pages after whatever is already there. */
+  appendGrammarPages(
+    ruleId: string,
+    sourceDocument: string,
+    pages: Array<{
+      objectKey: string;
+      width: number;
+      height: number;
+      sourcePage: number;
+    }>
+  ): Promise<{ error?: string }>;
+  /** Removes one document's pages and closes the gap it leaves in the order.
+   *  Returns the object keys so the caller can delete the files themselves. */
+  removeGrammarDocument(
+    ruleId: string,
+    sourceDocument: string
+  ): Promise<{ objectKeys: string[]; error?: string }>;
+  /** Object keys for every page of a title, for cleanup before deleting it. */
+  getGrammarPageKeys(ruleId: string): Promise<string[]>;
+  saveGrammarReadingProgress(
+    userId: string,
+    ruleId: string,
+    pageNumber: number
+  ): Promise<{ error?: string }>;
 
   createVideoLesson(
     input: Omit<VideoLesson, "id" | "created_at">

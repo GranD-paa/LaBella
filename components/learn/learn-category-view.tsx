@@ -6,7 +6,10 @@ import {
 } from "@/components/learn/learn-category-hero";
 import { LockedContentNotice } from "@/components/learn/locked-content-notice";
 import { VideoLessonsGrid } from "@/components/learn/video-lessons-grid";
-import { GrammarRulesList } from "@/components/lessons/grammar-rules-list";
+import {
+  GrammarRulesList,
+  type GrammarRuleWithPages,
+} from "@/components/lessons/grammar-rules-list";
 import { QuizTabContent } from "@/components/lessons/quiz-tab-content";
 import { VocabularyFlashcards } from "@/components/lessons/vocabulary-flashcards";
 import { useTranslations } from "@/components/providers/locale-provider";
@@ -16,7 +19,6 @@ import type {
   CurriculumLevel,
 } from "@/lib/curriculum/types";
 import type {
-  GrammarRule,
   Lesson,
   LocalizedText,
   Quiz,
@@ -43,7 +45,7 @@ export function LearnCategoryView({
   category: CategorySlug;
   lesson: Lesson | null;
   vocabulary: Vocabulary[];
-  grammarRules: GrammarRule[];
+  grammarRules: GrammarRuleWithPages[];
   videoLessons?: VideoLesson[];
   quizzes?: Quiz[];
   quizAttempts?: UserQuizAttempt[];

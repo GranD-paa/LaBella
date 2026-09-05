@@ -5,14 +5,17 @@ import { useState } from "react";
 import { GrammarForm } from "@/components/admin/grammar/grammar-form";
 import { GrammarTable } from "@/components/admin/grammar/grammar-table";
 import { useTranslations } from "@/components/providers/locale-provider";
+import type { GrammarDocumentSummary } from "@/lib/grammar/types";
 import type { GrammarRule, Lesson } from "@/types";
 
 export function GrammarManager({
   lessons,
   grammarRules,
+  documentsByRule,
 }: {
   lessons: Lesson[];
   grammarRules: GrammarRule[];
+  documentsByRule: Record<string, GrammarDocumentSummary[]>;
 }) {
   const { t } = useTranslations();
   const sortedLessons = [...lessons].sort(
@@ -41,7 +44,11 @@ export function GrammarManager({
         defaultLessonId={selectedLessonId}
         onLessonChange={setSelectedLessonId}
       />
-      <GrammarTable grammarRules={filtered} lessons={lessons} />
+      <GrammarTable
+        grammarRules={filtered}
+        lessons={lessons}
+        documentsByRule={documentsByRule}
+      />
     </div>
   );
 }

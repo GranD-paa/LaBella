@@ -268,6 +268,14 @@ export const fa: Messages = {
     quiz: "آزمون",
     noVocabulary: "هنوز واژگانی به این درس اضافه نشده است.",
     noGrammar: "هنوز قاعده گرامری به این درس اضافه نشده است.",
+    grammarOpen: "خواندن",
+    grammarNoPages: "هنوز برای این تیتر فایلی بارگذاری نشده است.",
+    grammarPageOf: "صفحه {page} از {total}",
+    grammarNextPage: "بعدی",
+    grammarPreviousPage: "قبلی",
+    grammarReadTo: "تا صفحه {page} از {total} خوانده‌اید",
+    grammarPageCount: "{total} صفحه",
+    grammarClose: "بستن",
     pronunciation: "تلفظ",
   },
   dashboard: {
@@ -575,6 +583,32 @@ export const fa: Messages = {
       deleted: "واژگان حذف شد",
     },
     grammar: {
+      document: {
+        heading: "فایل",
+        description:
+          "یک PDF بارگذاری کنید. صفحاتش به تصویر تبدیل می‌شود و همان چیزی است که زبان‌آموز می‌خواند؛ خود فایل هرگز برای او فرستاده نمی‌شود.",
+        uploadButton: "بارگذاری PDF",
+        uploading: "در حال آماده‌سازی صفحات…",
+        uploaded: "فایل اضافه شد.",
+        removed: "فایل حذف شد.",
+        removeButton: "حذف",
+        removeConfirm: "این فایل و همه صفحاتش حذف شود؟",
+        pages: "{count} صفحه",
+        empty: "هنوز فایلی بارگذاری نشده است.",
+        limits: "فقط PDF، حداکثر {pages} صفحه و {size} مگابایت.",
+      },
+      errors: {
+        storageUnconfigured:
+          "فضای ذخیره‌سازی پیکربندی نشده است، پس فعلاً نمی‌توان فایلی بارگذاری کرد.",
+        fileRequired: "یک فایل PDF انتخاب کنید.",
+        notPdf: "اینجا فقط فایل PDF پذیرفته می‌شود.",
+        tooLarge: "حجم این PDF بیش از حد مجاز است.",
+        tooManyPages: "تعداد صفحات این PDF برای یک بارگذاری بیش از حد است.",
+        unreadable: "این فایل به‌عنوان PDF خوانده نشد.",
+        renderFailed: "صفحات این PDF قابل تبدیل به تصویر نبود.",
+        uploadFailed:
+          "صفحات ساخته‌شده ذخیره نشدند. چیزی ثبت نشد.",
+      },
       createLessonFirst:
         "قبل از افزودن قواعد گرامری، ابتدا در تب درس‌ها یک درس ایجاد کنید.",
       addTitle: "افزودن قاعده گرامری",

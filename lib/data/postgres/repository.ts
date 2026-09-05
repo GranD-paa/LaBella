@@ -1,6 +1,11 @@
 import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth/better-auth";
+import type {
+  GrammarDocumentSummary,
+  GrammarPage,
+  GrammarPageSummary,
+} from "@/lib/grammar/types";
 import {
   BANNER_IMAGE_ROUTE,
   bannerImageUrl,
@@ -842,6 +847,125 @@ export function createPostgresRepository(): DataRepository {
 
     deleteQuizQuestion: (id) =>
       mutate(() => execute("delete from quiz_questions where id = $1", [id])),
+
+    // ----------------------------------------------------- grammar documents
+    getGrammarPages: (ruleId) =>
+      query<GrammarPage>(
+        `select id, rule_id as "ruleId", page_number as "pageNumber",
+                object_key as "objectKey", width, height,
+                source_document as "sourceDocument", source_page as "sourcePage"
+           from grammar_pages
+          where rule_id = $1
+          order by page_number`,
+        [ruleId]
+      ),
+
+    // One query for the whole tab rather than one per title, and the learner's
+    // place comes back with it so the list can say where they stopped.
+    getGrammarPageSummaries: (lessonId, userId) =>
+      query<GrammarPageSummary>(
+        `select r.id as "ruleId",
+                count(p.id)::int as "pageCount",
+                max(progress.page_number) as "lastReadPage"
+           from grammar_rules r
+           left join grammar_pages p on p.rule_id = r.id
+           left join grammar_reading_progress progress
+             on progress.rule_id = r.id and progress.user_id = $2
+          where r.lesson_id = $1
+          group by r.id`,
+        [lessonId, userId]
+      ),
+
+    getGrammarDocuments: (ruleId) =>
+      query<GrammarDocumentSummary>(
+        `select source_document as "sourceDocument", count(*)::int as "pageCount"
+           from grammar_pages
+          where rule_id = $1 and source_document is not null
+          group by source_document
+          order by min(page_number)`,
+        [ruleId]
+      ),
+
+    // Pages land after whatever is already in the title, so uploading a second
+    // document extends the run instead of colliding with it. Numbering the
+    // rows from the current maximum inside one statement is what keeps two
+    // uploads racing each other from claiming the same positions.
+    appendGrammarPages: (ruleId, sourceDocument, pages) =>
+      mutate(() =>
+        execute(
+          `insert into grammar_pages
+             (rule_id, page_number, object_key, width, height,
+              source_document, source_page)
+           select $1,
+                  coalesce(
+                    (select max(page_number) from grammar_pages where rule_id = $1),
+                    0
+                  ) + ordinality,
+                  page.object_key, page.width, page.height, $2, page.source_page
+             from unnest(
+                    $3::text[], $4::int[], $5::int[], $6::int[]
+                  ) with ordinality
+                  as page(object_key, width, height, source_page, ordinality)`,
+          [
+            ruleId,
+            sourceDocument,
+            pages.map((page) => page.objectKey),
+            pages.map((page) => page.width),
+            pages.map((page) => page.height),
+            pages.map((page) => page.sourcePage),
+          ]
+        )
+      ),
+
+    // Deleting from the middle would leave a hole in the page numbers and the
+    // reader counts on them being contiguous, so the survivors are renumbered
+    // in the same transaction.
+    async removeGrammarDocument(ruleId, sourceDocument) {
+      try {
+        return await withTransaction(async (run) => {
+          const removed = (await run(
+            `delete from grammar_pages
+              where rule_id = $1 and source_document = $2
+              returning object_key`,
+            [ruleId, sourceDocument]
+          )) as Array<{ object_key: string }>;
+
+          await run(
+            `update grammar_pages set page_number = renumbered.position
+               from (
+                 select id, row_number() over (order by page_number) as position
+                   from grammar_pages where rule_id = $1
+               ) as renumbered
+              where grammar_pages.id = renumbered.id
+                and grammar_pages.page_number is distinct from renumbered.position`,
+            [ruleId]
+          );
+
+          return { objectKeys: removed.map((row) => row.object_key) };
+        });
+      } catch (error) {
+        return { objectKeys: [], ...failure(error) };
+      }
+    },
+
+    async getGrammarPageKeys(ruleId) {
+      const rows = await query<{ object_key: string }>(
+        "select object_key from grammar_pages where rule_id = $1",
+        [ruleId]
+      );
+      return rows.map((row) => row.object_key);
+    },
+
+    saveGrammarReadingProgress: (userId, ruleId, pageNumber) =>
+      mutate(() =>
+        execute(
+          `insert into grammar_reading_progress (user_id, rule_id, page_number)
+           values ($1, $2, $3)
+           on conflict (user_id, rule_id)
+           do update set page_number = excluded.page_number, updated_at = now()`,
+          [userId, ruleId, pageNumber]
+        )
+      ),
 
     // -------------------------------------------------------------- banners
     getActiveBanners: () =>

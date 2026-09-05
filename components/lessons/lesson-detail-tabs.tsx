@@ -2,12 +2,15 @@
 
 import { BookMarked, Languages, ListChecks } from "lucide-react";
 
-import { GrammarRulesList } from "@/components/lessons/grammar-rules-list";
+import {
+  GrammarRulesList,
+  type GrammarRuleWithPages,
+} from "@/components/lessons/grammar-rules-list";
 import { QuizTabContent } from "@/components/lessons/quiz-tab-content";
 import { VocabularyFlashcards } from "@/components/lessons/vocabulary-flashcards";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { GrammarRule, Quiz, UserQuizAttempt, Vocabulary } from "@/types";
+import type { Quiz, UserQuizAttempt, Vocabulary } from "@/types";
 
 export function LessonDetailTabs({
   vocabulary,
@@ -16,7 +19,7 @@ export function LessonDetailTabs({
   quizAttempt,
 }: {
   vocabulary: Vocabulary[];
-  grammarRules: GrammarRule[];
+  grammarRules: GrammarRuleWithPages[];
   quiz: Quiz | null;
   quizAttempt: UserQuizAttempt | null;
 }) {

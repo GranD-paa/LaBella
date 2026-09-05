@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, BookOpen } from "lucide-react";
 
+import type { GrammarRuleWithPages } from "@/components/lessons/grammar-rules-list";
 import { LessonDetailTabs } from "@/components/lessons/lesson-detail-tabs";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Button } from "@/components/ui/button";
@@ -10,12 +11,12 @@ import {
   getLocalizedLanguageName,
 } from "@/lib/curriculum/localize";
 import type { LanguageSlug } from "@/lib/curriculum/types";
-import type { GrammarRule, Lesson, Quiz, UserQuizAttempt, Vocabulary } from "@/types";
+import type { Lesson, Quiz, UserQuizAttempt, Vocabulary } from "@/types";
 
 type LessonViewProps = {
   lesson: Lesson;
   vocabulary: Vocabulary[];
-  grammarRules: GrammarRule[];
+  grammarRules: GrammarRuleWithPages[];
   quiz: Quiz | null;
   quizAttempt: UserQuizAttempt | null;
   backHref: string;

@@ -650,6 +650,40 @@ export function createLocalRepository(): DataRepository {
       return {};
     },
 
+    // Local mode has no object storage to render pages into, so the grammar
+    // reader has nothing to show. Reads come back empty rather than pretending
+    // there is a document; see lib/storage for what the real path needs.
+    async getGrammarPages() {
+      return [];
+    },
+
+    async getGrammarPageSummaries() {
+      return [];
+    },
+
+    async getGrammarDocuments() {
+      return [];
+    },
+
+    async appendGrammarPages() {
+      return { error: "Grammar documents need object storage, which local mode has none of." };
+    },
+
+    async removeGrammarDocument() {
+      return {
+        objectKeys: [],
+        error: "Grammar documents need object storage, which local mode has none of.",
+      };
+    },
+
+    async getGrammarPageKeys() {
+      return [];
+    },
+
+    async saveGrammarReadingProgress() {
+      return {};
+    },
+
     async createVideoLesson(input) {
       getLocalStore().videoLessons.push({
         ...input,

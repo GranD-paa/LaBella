@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "app/admin/actions/grammar.ts": {
-    "mtime": 1784788780.0883727,
-    "seen": 1788154327.4755392,
-    "ast_hash": "f67475ced0914d05415212e66520e71b",
+    "mtime": 1788606383.0358691,
+    "seen": 1788607997.7631862,
+    "ast_hash": "80bc29dc6d18ea258b38c92eb35cbd07",
     "semantic_hash": ""
   },
   "app/admin/actions/landing.ts": {
@@ -216,9 +216,9 @@
     "semantic_hash": ""
   },
   "app/admin/quizzes/page.tsx": {
-    "mtime": 1784726683.3414464,
-    "seen": 1788154327.4755392,
-    "ast_hash": "215a86952d6f865b9ca3ad35c21be03a",
+    "mtime": 1788606951.6959407,
+    "seen": 1788607997.7631862,
+    "ast_hash": "0f14ec4b8880545023e549b0a4cdd051",
     "semantic_hash": ""
   },
   "app/admin/subscription/page.tsx": {
@@ -318,9 +318,9 @@
     "semantic_hash": ""
   },
   "app/learn/[language]/[level]/[category]/page.tsx": {
-    "mtime": 1786711350.5555117,
-    "seen": 1788154327.4755392,
-    "ast_hash": "e6c63ae66436d8ef023b4c2f6ccdcd3b",
+    "mtime": 1788607055.2383566,
+    "seen": 1788607997.7631862,
+    "ast_hash": "1c60066e89aaad6acef768f01e28297e",
     "semantic_hash": ""
   },
   "app/learn/[language]/[level]/page.tsx": {
@@ -348,9 +348,9 @@
     "semantic_hash": ""
   },
   "app/lesson/[id]/page.tsx": {
-    "mtime": 1785782648.4842644,
-    "seen": 1788154327.4755392,
-    "ast_hash": "733b24d15ff28a557fe2eca0821bf259",
+    "mtime": 1788607031.1853328,
+    "seen": 1788607997.7631862,
+    "ast_hash": "ea0311a65ad6bdea9282c5bde516ad9d",
     "semantic_hash": ""
   },
   "app/lesson/layout.tsx": {
@@ -558,15 +558,15 @@
     "semantic_hash": ""
   },
   "components/admin/grammar/grammar-manager.tsx": {
-    "mtime": 1784114760.2647047,
-    "seen": 1788154327.4755392,
-    "ast_hash": "560d24d03ff15e1d1d9467dfb56ee565",
+    "mtime": 1788606937.9671876,
+    "seen": 1788607997.7631862,
+    "ast_hash": "08c7cb69d246d8a2c74d25022487aff3",
     "semantic_hash": ""
   },
   "components/admin/grammar/grammar-table.tsx": {
-    "mtime": 1784114764.6659164,
-    "seen": 1788154327.4755392,
-    "ast_hash": "05f53d6af3a6619fa24081f75eb912a1",
+    "mtime": 1788606723.0139918,
+    "seen": 1788607997.7631862,
+    "ast_hash": "a569c1b317b9eb893cdcb05ec5e615d5",
     "semantic_hash": ""
   },
   "components/admin/landing/landing-language-panel.tsx": {
@@ -636,9 +636,9 @@
     "semantic_hash": ""
   },
   "components/admin/quizzes/admin-quizzes-page-view.tsx": {
-    "mtime": 1785480482.5085692,
-    "seen": 1788154327.4755392,
-    "ast_hash": "7a737f78cbdd58a1624947806aff28d3",
+    "mtime": 1788606937.9676569,
+    "seen": 1788607997.7631862,
+    "ast_hash": "f754b6cbd59481de5df56aa78eb5d335",
     "semantic_hash": ""
   },
   "components/admin/quizzes/create-content-section.tsx": {
@@ -984,9 +984,9 @@
     "semantic_hash": ""
   },
   "components/learn/learn-category-view.tsx": {
-    "mtime": 1786711350.5690112,
-    "seen": 1788154327.476039,
-    "ast_hash": "4838d982b75d0986c132191a277b3ae6",
+    "mtime": 1788607925.1422138,
+    "seen": 1788607997.7631862,
+    "ast_hash": "db6d102b2af404f352e3dfe5655921ff",
     "semantic_hash": ""
   },
   "components/learn/learn-language-view.tsx": {
@@ -1020,9 +1020,9 @@
     "semantic_hash": ""
   },
   "components/lessons/grammar-rules-list.tsx": {
-    "mtime": 1784114846.9722044,
-    "seen": 1788154327.476039,
-    "ast_hash": "41b3b2e91b7d5c99cc7dff6a12ffee47",
+    "mtime": 1788606998.6372657,
+    "seen": 1788607997.7631862,
+    "ast_hash": "86556cabfe9191b9d1f80a4003f8a7c2",
     "semantic_hash": ""
   },
   "components/lessons/lesson-card.tsx": {
@@ -1032,15 +1032,15 @@
     "semantic_hash": ""
   },
   "components/lessons/lesson-detail-tabs.tsx": {
-    "mtime": 1784530946.583864,
-    "seen": 1788154327.476039,
-    "ast_hash": "2db39d70b5126d3d1012f58d377403f0",
+    "mtime": 1788607917.2253,
+    "seen": 1788607997.7631862,
+    "ast_hash": "cd9fc53494ec9bcd09efc41d2d2a1c70",
     "semantic_hash": ""
   },
   "components/lessons/lesson-view.tsx": {
-    "mtime": 1784784913.497323,
-    "seen": 1788154327.476039,
-    "ast_hash": "3d97e35b2b5f9100a6eefb4b61f907e0",
+    "mtime": 1788607917.2669492,
+    "seen": 1788607997.7631862,
+    "ast_hash": "b760606b0e52ff014fe6cd9ddbb2d30a",
     "semantic_hash": ""
   },
   "components/lessons/quiz-tab-content.tsx": {
@@ -1662,9 +1662,9 @@
     "semantic_hash": ""
   },
   "lib/data/local/repository.ts": {
-    "mtime": 1788598491.566727,
-    "seen": 1788599106.588737,
-    "ast_hash": "4dad23b1de19ae817067aa659625909f",
+    "mtime": 1788606335.6804156,
+    "seen": 1788607997.7631862,
+    "ast_hash": "5797b1d71842f94ca783162f117d70aa",
     "semantic_hash": ""
   },
   "lib/data/local/seed.ts": {
@@ -1692,21 +1692,21 @@
     "semantic_hash": ""
   },
   "lib/data/postgres/repository.ts": {
-    "mtime": 1788598491.607691,
-    "seen": 1788599106.588737,
-    "ast_hash": "1f33c2737e9cc2c7faca68fda9fa307a",
+    "mtime": 1788606314.3520076,
+    "seen": 1788607997.7631862,
+    "ast_hash": "6ec3b87276944a33bb080815f3499e5c",
     "semantic_hash": ""
   },
   "lib/data/repository.ts": {
-    "mtime": 1788153215.8359087,
-    "seen": 1788154327.476039,
-    "ast_hash": "23ec906a939db4f69410cbc3cdc06687",
+    "mtime": 1788606277.0158513,
+    "seen": 1788607997.7631862,
+    "ast_hash": "f2d38f57457b4f0d2d82c304c3c61b7c",
     "semantic_hash": ""
   },
   "lib/data/supabase/repository.ts": {
-    "mtime": 1788598491.5886922,
-    "seen": 1788599106.588737,
-    "ast_hash": "e7d5b2268d72f27d353f9d22718e8a62",
+    "mtime": 1788606335.681418,
+    "seen": 1788607997.7631862,
+    "ast_hash": "98fa23e0f96bfd26dde5f7aaa1257cca",
     "semantic_hash": ""
   },
   "lib/entitlements/index.test.ts": {
@@ -1878,9 +1878,9 @@
     "semantic_hash": ""
   },
   "lib/i18n/messages/en.ts": {
-    "mtime": 1788420723.7666585,
-    "seen": 1788422748.4738147,
-    "ast_hash": "a072930d79084af68d521b0ab9daec87",
+    "mtime": 1788606606.501418,
+    "seen": 1788607997.7636867,
+    "ast_hash": "cefbdbbf47108be1a59358448d667e86",
     "semantic_hash": ""
   },
   "lib/i18n/messages/export-locales.ts": {
@@ -1890,9 +1890,9 @@
     "semantic_hash": ""
   },
   "lib/i18n/messages/fa.ts": {
-    "mtime": 1788420723.7686584,
-    "seen": 1788422748.4738147,
-    "ast_hash": "3d0f4e4fdd452145a2783866a007ab38",
+    "mtime": 1788606606.5039184,
+    "seen": 1788607997.7636867,
+    "ast_hash": "b5826bebe9265a37063a834e6c5239d0",
     "semantic_hash": ""
   },
   "lib/i18n/messages/index.ts": {
@@ -1902,9 +1902,9 @@
     "semantic_hash": ""
   },
   "lib/i18n/messages/it.ts": {
-    "mtime": 1788420723.769659,
-    "seen": 1788422748.4738147,
-    "ast_hash": "863775dde00cfc6502cb33253484b830",
+    "mtime": 1788606606.5054176,
+    "seen": 1788607997.7636867,
+    "ast_hash": "4ec1e2b50e95c253c36179d0d86e2c7f",
     "semantic_hash": ""
   },
   "lib/i18n/metadata.ts": {
@@ -2172,27 +2172,27 @@
     "semantic_hash": ""
   },
   "locales/en/translation.json": {
-    "mtime": 1788420723.7561598,
-    "seen": 1788422748.4738147,
-    "ast_hash": "edf7826ee4a544f8411eb5bb6c3a02a2",
+    "mtime": 1788606669.196224,
+    "seen": 1788607997.7636867,
+    "ast_hash": "0c3886a2fcbb8a894cb9a74151ba9465",
     "semantic_hash": ""
   },
   "locales/fa/translation.json": {
-    "mtime": 1788420723.7596595,
-    "seen": 1788422748.4738147,
-    "ast_hash": "8f12fd1db8d0181c3109f14565f8802a",
+    "mtime": 1788606669.1971936,
+    "seen": 1788607997.7636867,
+    "ast_hash": "e62f5e76149925ef2576363035e8dd84",
     "semantic_hash": ""
   },
   "locales/it/translation.json": {
-    "mtime": 1788420723.7631583,
-    "seen": 1788422748.4738147,
-    "ast_hash": "74136be18f50f79c5d34e81acc775fe3",
+    "mtime": 1788606669.1981933,
+    "seen": 1788607997.7636867,
+    "ast_hash": "68ab54cb48ef51d9090aab989f0fd152",
     "semantic_hash": ""
   },
   "middleware.ts": {
-    "mtime": 1788504764.9009285,
-    "seen": 1788509263.0337253,
-    "ast_hash": "a0aecea93c217bfe8d8fa970aebd8e33",
+    "mtime": 1788601709.2815993,
+    "seen": 1788607997.7636867,
+    "ast_hash": "ca1cb5ffa5e48703b467f907c00e7709",
     "semantic_hash": ""
   },
   "next.config.mjs": {
@@ -2202,9 +2202,9 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1788414054.2117543,
-    "seen": 1788422748.4738147,
-    "ast_hash": "272a305d950bd18cb10ea5d310ddd342",
+    "mtime": 1788605982.5254242,
+    "seen": 1788607997.7636867,
+    "ast_hash": "dc3929b8a7796b3b3cbe0d218fe88156",
     "semantic_hash": ""
   },
   "postcss.config.mjs": {
@@ -2657,18 +2657,6 @@
     "ast_hash": "c782f570d636b19937a11923e60695aa",
     "semantic_hash": ""
   },
-  ".tmp-banner-test.cjs": {
-    "mtime": 1788598730.6265938,
-    "seen": 1788599106.5882382,
-    "ast_hash": "1126afb70631b60717c3efacef039def",
-    "semantic_hash": ""
-  },
-  ".tmp-banner-test.mjs": {
-    "mtime": 1788598588.923684,
-    "seen": 1788599106.5882382,
-    "ast_hash": "720f126e78750850e6ca3df80774896c",
-    "semantic_hash": ""
-  },
   "app/api/banner-images/[id]/route.ts": {
     "mtime": 1788598431.5000927,
     "seen": 1788599106.5882382,
@@ -2691,6 +2679,54 @@
     "mtime": 1788597219.4078588,
     "seen": 1788599106.588737,
     "ast_hash": "bc173d4c9d364578eb7432e938ab0a10",
+    "semantic_hash": ""
+  },
+  "app/actions/grammar-reading.ts": {
+    "mtime": 1788606399.2598574,
+    "seen": 1788607997.7631862,
+    "ast_hash": "6746aa4d552e96460435162f8a7703ba",
+    "semantic_hash": ""
+  },
+  "components/admin/grammar/grammar-document-dialog.tsx": {
+    "mtime": 1788606970.1394408,
+    "seen": 1788607997.7631862,
+    "ast_hash": "ebbfb7aaa48481ab04f8507dfaf03ed1",
+    "semantic_hash": ""
+  },
+  "components/lessons/grammar-reader.tsx": {
+    "mtime": 1788606423.919904,
+    "seen": 1788607997.7631862,
+    "ast_hash": "50c7df18d85e0e6efb1f66d7b23be298",
+    "semantic_hash": ""
+  },
+  "db/007_grammar_pages.sql": {
+    "mtime": 1788606252.2032232,
+    "seen": 1788607997.7631862,
+    "ast_hash": "90d5a0fffbedf5f551b0cbedc6e36a66",
+    "semantic_hash": ""
+  },
+  "lib/grammar/pages.ts": {
+    "mtime": 1788607031.21762,
+    "seen": 1788607997.7631862,
+    "ast_hash": "f84e684e3988f295219b0f30adce7608",
+    "semantic_hash": ""
+  },
+  "lib/grammar/types.ts": {
+    "mtime": 1788606252.2917418,
+    "seen": 1788607997.7631862,
+    "ast_hash": "5c69c345141b2524a882b85eb68a31fe",
+    "semantic_hash": ""
+  },
+  "lib/storage/index.ts": {
+    "mtime": 1788606197.3842802,
+    "seen": 1788607997.7636867,
+    "ast_hash": "7e80f2185c0ab143c81129dd1a453a30",
+    "semantic_hash": ""
+  },
+  "lib/storage/pdf-pages.ts": {
+    "mtime": 1788606615.796346,
+    "seen": 1788607997.7636867,
+    "ast_hash": "c493949f3fff113e7b9d8551bf9a4900",
     "semantic_hash": ""
   }
 }

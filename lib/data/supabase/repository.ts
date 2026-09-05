@@ -593,6 +593,40 @@ export function createSupabaseRepository(): DataRepository {
       return error ? { error: error.message } : {};
     },
 
+    // Grammar documents shipped after the move to self-hosted Postgres and
+    // their tables were never created in Supabase. Reads come back empty and
+    // writes refuse, rather than throwing against tables that do not exist.
+    async getGrammarPages() {
+      return [];
+    },
+
+    async getGrammarPageSummaries() {
+      return [];
+    },
+
+    async getGrammarDocuments() {
+      return [];
+    },
+
+    async appendGrammarPages() {
+      return { error: "Grammar documents require the Postgres data source." };
+    },
+
+    async removeGrammarDocument() {
+      return {
+        objectKeys: [],
+        error: "Grammar documents require the Postgres data source.",
+      };
+    },
+
+    async getGrammarPageKeys() {
+      return [];
+    },
+
+    async saveGrammarReadingProgress() {
+      return { error: "Grammar documents require the Postgres data source." };
+    },
+
     async createVideoLesson(input) {
       const supabase = await createClient();
       const { error } = await supabase.from("video_lessons").insert(input);

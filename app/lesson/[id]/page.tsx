@@ -6,6 +6,7 @@ import { getLanguagesWithAvailability } from "@/lib/curriculum/availability";
 import { resolveLessonNavigation } from "@/lib/curriculum/resolve-navigation";
 import { getDataRepository } from "@/lib/data";
 import { getServerTranslator } from "@/lib/i18n/server-locale";
+import { attachGrammarPages } from "@/lib/grammar/pages";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -43,7 +44,16 @@ export default async function LessonPage({ params }: PageProps) {
     ]);
 
   const vocabulary = vocabularyData.filter((item) => item.status === "published");
-  const grammarRules = grammarData.filter((item) => item.status === "published");
+
+  // Grammar arrives as page images behind links signed for this learner. The
+  // signing happens here, on the server, after the session is known — a page
+  // URL is never something the client can construct for itself.
+  const grammarRules = await attachGrammarPages(
+    repo,
+    id,
+    user?.id ?? null,
+    grammarData.filter((item) => item.status === "published")
+  );
   const quiz =
     quizzes.find(
       (entry) => entry.lesson_id === id && entry.status === "published"

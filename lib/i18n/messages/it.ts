@@ -273,6 +273,14 @@ export const it: Messages = {
     quiz: "Quiz",
     noVocabulary: "Nessun vocabolario aggiunto a questa lezione ancora.",
     noGrammar: "Nessuna regola grammaticale aggiunta a questa lezione ancora.",
+    grammarOpen: "Leggi",
+    grammarNoPages: "Nessun documento è ancora stato caricato per questo titolo.",
+    grammarPageOf: "Pagina {page} di {total}",
+    grammarNextPage: "Avanti",
+    grammarPreviousPage: "Indietro",
+    grammarReadTo: "Letto fino a pagina {page} di {total}",
+    grammarPageCount: "{total} pagine",
+    grammarClose: "Chiudi",
     pronunciation: "Pronuncia",
   },
   dashboard: {
@@ -585,6 +593,32 @@ export const it: Messages = {
       deleted: "Vocabolario eliminato",
     },
     grammar: {
+      document: {
+        heading: "Documento",
+        description:
+          "Carica un PDF. Le sue pagine diventano immagini ed è ciò che gli studenti leggono; il file non viene mai inviato loro.",
+        uploadButton: "Carica PDF",
+        uploading: "Preparazione delle pagine…",
+        uploaded: "Documento aggiunto.",
+        removed: "Documento rimosso.",
+        removeButton: "Rimuovi",
+        removeConfirm: "Rimuovere questo documento e tutte le sue pagine?",
+        pages: "{count} pagine",
+        empty: "Nessun documento ancora caricato.",
+        limits: "Solo PDF, fino a {pages} pagine e {size}MB.",
+      },
+      errors: {
+        storageUnconfigured:
+          "L'archivio file non è configurato, quindi non è ancora possibile caricare documenti.",
+        fileRequired: "Scegli un PDF da caricare.",
+        notPdf: "Qui si possono caricare solo file PDF.",
+        tooLarge: "Questo PDF è troppo grande.",
+        tooManyPages: "Questo PDF ha troppe pagine per un solo caricamento.",
+        unreadable: "Non è stato possibile leggere il file come PDF.",
+        renderFailed: "Non è stato possibile convertire le pagine del PDF.",
+        uploadFailed:
+          "Le pagine generate non sono state salvate. Nulla è stato registrato.",
+      },
       createLessonFirst:
         "Crea prima una lezione nella scheda Lezioni prima di aggiungere regole grammaticali.",
       addTitle: "Aggiungi una regola grammaticale",

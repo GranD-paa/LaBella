@@ -16,13 +16,26 @@ export default async function AdminQuizzesPage() {
   const { profile, user } = await requireAdmin();
   const repo = getDataRepository();
 
-  const [quizzes, quizQuestions, attempts, lessons, languages] = await Promise.all([
-    fetchEnrichedQuizzes(repo),
-    repo.getAllQuizQuestions(),
-    repo.getAllAttempts(),
-    repo.getLessons(),
-    getLanguagesWithAvailability(repo),
-  ]);
+  const [quizzes, quizQuestions, attempts, lessons, languages, grammarRules] =
+    await Promise.all([
+      fetchEnrichedQuizzes(repo),
+      repo.getAllQuizQuestions(),
+      repo.getAllAttempts(),
+      repo.getLessons(),
+      getLanguagesWithAvailability(repo),
+      repo.getAllGrammarRules(),
+    ]);
+
+  // Which PDFs sit behind each grammar title. Fetched per rule because the
+  // admin table shows them inline, and there are tens of rules, not thousands.
+  const grammarDocumentsByRule = Object.fromEntries(
+    await Promise.all(
+      grammarRules.map(
+        async (rule) =>
+          [rule.id, await repo.getGrammarDocuments(rule.id)] as const
+      )
+    )
+  );
 
   const { t } = await getServerTranslator();
   const displayName =
@@ -36,6 +49,8 @@ export default async function AdminQuizzesPage() {
       attempts={attempts}
       lessons={lessons}
       languages={languages}
+      grammarRules={grammarRules}
+      grammarDocumentsByRule={grammarDocumentsByRule}
     />
   );
 }

@@ -28,6 +28,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # process already owns the filesystem.
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
+# Grammar is uploaded as PDF and served as one image per page, so the learner
+# never receives a document to save. poppler-utils renders the pages
+# (pdftoppm, pdfinfo) and libwebp-tools compresses them (cwebp). Together they
+# add roughly 20MB to an image that is otherwise about 60MB.
+RUN apk add --no-cache poppler-utils libwebp-tools
+
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
