@@ -12,28 +12,14 @@
     },
     {
       "name": "laparli",
-      "url": "https://laparli.vercel.app"
-    },
-    {
-      "name": "laparli-local",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "node",
       "runtimeArgs": [
-        "run",
-        "dev"
+        "node_modules/next/dist/bin/next",
+        "dev",
+        "-p",
+        "3000"
       ],
-      "port": 3001
-    },
-    {
-      "name": "landing-v2",
-      "runtimeExecutable": "python",
-      "runtimeArgs": [
-        "-m",
-        "http.server",
-        "5180",
-        "--directory",
-        "E:/cursor P/preview-landing"
-      ],
-      "port": 5180
+      "port": 3000
     }
   ]
 }
