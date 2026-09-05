@@ -5074,7 +5074,7 @@
       "file_type": "code",
       "norm_label": "globeslot()",
       "source_file": "components/landing/hero.tsx",
-      "source_location": "L658"
+      "source_location": "L660"
     },
     {
       "id": "app_layout_rootlayout",
@@ -31662,7 +31662,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landing/hero.tsx",
-      "source_location": "L597",
+      "source_location": "L599",
       "weight": 1.0
     },
     {
@@ -83873,7 +83873,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landing/hero.tsx",
-      "source_location": "L658",
+      "source_location": "L660",
       "weight": 1.0
     },
     {

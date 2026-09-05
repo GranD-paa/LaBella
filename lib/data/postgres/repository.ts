@@ -1,6 +1,11 @@
 import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth/better-auth";
+import {
+  BANNER_IMAGE_ROUTE,
+  bannerImageUrl,
+  validateBannerImage,
+} from "@/lib/data/banner-image";
 import { getAccountingSnapshot } from "@/lib/data/postgres/accounting";
 import {
   buildUpdate,
@@ -847,14 +852,24 @@ export function createPostgresRepository(): DataRepository {
     getAllBanners: () =>
       query<Banner>("select * from banners order by order_number"),
 
-    async uploadBannerImage() {
-      // Supabase Storage held these. ArvanCloud object storage is provisioned
-      // later in the migration (nothing to migrate yet), so this fails plainly
-      // instead of pretending to have stored the file.
-      return {
-        error:
-          "Image upload is not available yet — object storage is not configured.",
-      };
+    // Supabase Storage held these before the move to ArvanCloud. The bytes now
+    // live in the database rather than an object store: banners are a handful
+    // of rows capped at 5MB each, and the container filesystem is not an
+    // option because its image tag is pinned to a commit SHA, so every deploy
+    // starts from a fresh filesystem. See db/006_banner_images.sql.
+    async uploadBannerImage(file) {
+      const validated = await validateBannerImage(file);
+      if (!validated.ok) return { error: validated.error };
+
+      const row = await queryOne<{ id: string }>(
+        `insert into banner_images (content_type, bytes)
+         values ($1, $2)
+         returning id`,
+        [file.type, validated.bytes]
+      );
+      if (!row) return { error: "actions.errors.generic" };
+
+      return { url: bannerImageUrl(row.id) };
     },
 
     createBanner: (input) =>
@@ -882,8 +897,19 @@ export function createPostgresRepository(): DataRepository {
         );
       }),
 
+    // Deletes the bytes along with the row that pointed at them, in one
+    // statement, so a banner can never leave an orphaned image behind.
     deleteBanner: (id) =>
-      mutate(() => execute("delete from banners where id = $1", [id])),
+      mutate(() =>
+        execute(
+          `with removed as (
+             delete from banners where id = $1 returning image_url
+           )
+           delete from banner_images
+            where $2 || id::text in (select image_url from removed)`,
+          [id, `${BANNER_IMAGE_ROUTE}/`]
+        )
+      ),
 
     // Swaps places with the adjacent banner rather than renumbering the list,
     // so concurrent reorders cannot collapse two slides onto one position.

@@ -5,7 +5,7 @@ import {
   DEFAULT_PAYMENT_SETTINGS,
   DEFAULT_SUBSCRIPTION_TIERS,
 } from "@/lib/billing/defaults";
-import { matchesImageSignature } from "@/lib/data/image-signature";
+import { validateBannerImage } from "@/lib/data/banner-image";
 import { deriveQuizMetadataFromLesson } from "@/lib/quiz-management/helpers";
 import {
   DEFAULT_SUBSCRIPTION_PAGE_CONTENT,
@@ -732,30 +732,17 @@ export function createSupabaseRepository(): DataRepository {
     },
 
     async uploadBannerImage(file) {
-      const allowedTypes: Record<string, string> = {
-        "image/jpeg": "jpg",
-        "image/png": "png",
-        "image/webp": "webp",
-        "image/gif": "gif",
-      };
-      const extension = allowedTypes[file.type];
-      if (!extension) {
-        return { error: "Please upload a JPEG, PNG, WebP, or GIF image." };
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        return { error: "Image must be smaller than 5MB." };
-      }
-
-      const bytes = Buffer.from(await file.arrayBuffer());
-      if (!matchesImageSignature(file.type, bytes)) {
-        return { error: "This file's contents don't match a valid image." };
-      }
+      const validated = await validateBannerImage(file);
+      if (!validated.ok) return { error: validated.error };
 
       const supabase = await createClient();
-      const objectPath = `${crypto.randomUUID()}.${extension}`;
+      const objectPath = `${crypto.randomUUID()}.${validated.extension}`;
       const { error } = await supabase.storage
         .from("banners")
-        .upload(objectPath, bytes, { contentType: file.type, upsert: false });
+        .upload(objectPath, validated.bytes, {
+          contentType: file.type,
+          upsert: false,
+        });
       if (error) return { error: error.message };
 
       const { data } = supabase.storage.from("banners").getPublicUrl(objectPath);

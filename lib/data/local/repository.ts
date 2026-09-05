@@ -17,16 +17,10 @@ import {
 } from "@/lib/billing/money";
 import { computeRenewalPeriod, isEntitled } from "@/lib/billing/period";
 import { createLocalId, getLocalStore, persistLocalStore } from "@/lib/data/local/store";
-import { matchesImageSignature } from "@/lib/data/image-signature";
+import { validateBannerImage } from "@/lib/data/banner-image";
 import { deriveQuizMetadataFromLesson } from "@/lib/quiz-management/helpers";
 
 const BANNER_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "banners");
-const ALLOWED_IMAGE_EXTENSIONS: Record<string, string> = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-  "image/gif": "gif",
-};
 
 export function createLocalRepository(): DataRepository {
   function commitStore() {
@@ -800,22 +794,12 @@ export function createLocalRepository(): DataRepository {
     },
 
     async uploadBannerImage(file) {
-      const extension = ALLOWED_IMAGE_EXTENSIONS[file.type];
-      if (!extension) {
-        return { error: "Please upload a JPEG, PNG, WebP, or GIF image." };
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        return { error: "Image must be smaller than 5MB." };
-      }
+      const validated = await validateBannerImage(file);
+      if (!validated.ok) return { error: validated.error };
 
-      const bytes = Buffer.from(await file.arrayBuffer());
-      if (!matchesImageSignature(file.type, bytes)) {
-        return { error: "This file's contents don't match a valid image." };
-      }
-
-      const filename = `${crypto.randomUUID()}.${extension}`;
+      const filename = `${crypto.randomUUID()}.${validated.extension}`;
       await mkdir(BANNER_UPLOAD_DIR, { recursive: true });
-      await writeFile(path.join(BANNER_UPLOAD_DIR, filename), bytes);
+      await writeFile(path.join(BANNER_UPLOAD_DIR, filename), validated.bytes);
 
       return { url: `/uploads/banners/${filename}` };
     },
