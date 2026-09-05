@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -29,8 +29,8 @@ import {
 import type { ContentWizardContext } from "@/lib/content-management/categories";
 import { LEVEL_EXAM_SECTION } from "@/lib/quiz-management/types";
 import { resolveMessage } from "@/lib/i18n/resolve-message";
+import { MAX_PDF_BYTES, MAX_PDF_PAGES } from "@/lib/storage/pdf-limits";
 import {
-  createContentGrammarRuleSchema,
   createContentVocabularySchema,
   createStructuredQuizSchema,
   createVideoLessonSchema,
@@ -93,23 +93,23 @@ export function GrammarContentPanel({
 }) {
   const { t } = useTranslations();
   const [isPending, startTransition] = useTransition();
-  const schema = useMemo(() => createContentGrammarRuleSchema(t), [t]);
+  const [title, setTitle] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const form = useForm({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      lessonId: context.lessonId,
-      title: "",
-      description: "",
-      example: "",
-      status: "draft" as const,
-    },
-  });
+  const ready = title.trim().length >= 2 && file !== null;
 
   function submit(status: "draft" | "published") {
+    if (!ready || !file) return;
+
+    const formData = new FormData();
+    formData.set("lessonId", context.lessonId);
+    formData.set("title", title.trim());
+    formData.set("status", status);
+    formData.set("document", file);
+
     startTransition(async () => {
-      const values = { ...form.getValues(), status };
-      const result = await createContentGrammar(values);
+      const result = await createContentGrammar(formData);
       if ("error" in result) {
         toast.error(resolveMessage(t, result.error));
         return;
@@ -119,13 +119,9 @@ export function GrammarContentPanel({
           ? t("admin.content.publishedContent")
           : t("admin.content.savedDraft")
       );
-      form.reset({
-        lessonId: context.lessonId,
-        title: "",
-        description: "",
-        example: "",
-        status: "draft",
-      });
+      setTitle("");
+      setFile(null);
+      if (inputRef.current) inputRef.current.value = "";
       onSuccess(status === "published");
     });
   }
@@ -138,54 +134,54 @@ export function GrammarContentPanel({
           {t("admin.content.grammar.formDescription")}
         </p>
       </div>
-      <Form {...form}>
-        <form className="grid gap-4">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("common.title")}</FormLabel>
-                <FormControl>
-                  <Input disabled={isPending} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+
+      <div className="grid gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="grammar-title">{t("common.title")}</Label>
+          <Input
+            id="grammar-title"
+            value={title}
+            disabled={isPending}
+            onChange={(event) => setTitle(event.target.value)}
           />
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("admin.fields.descriptionOptional")}</FormLabel>
-                <FormControl>
-                  <Textarea disabled={isPending} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+        </div>
+
+        <div className="space-y-2">
+          <Label>{t("admin.content.grammar.documentLabel")}</Label>
+          <input
+            ref={inputRef}
+            type="file"
+            accept="application/pdf"
+            className="hidden"
+            onChange={(event) => setFile(event.target.files?.[0] ?? null)}
           />
-          <FormField
-            control={form.control}
-            name="example"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("admin.content.grammar.exerciseLabel")}</FormLabel>
-                <FormControl>
-                  <Textarea disabled={isPending} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <ContentActionBar
-            isPending={isPending}
-            onSaveDraft={() => form.handleSubmit(() => submit("draft"))()}
-            onPublish={() => form.handleSubmit(() => submit("published"))()}
-          />
-        </form>
-      </Form>
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => inputRef.current?.click()}
+            className="flex w-full items-center gap-3 rounded-lg border border-dashed px-4 py-6 text-start transition hover:border-solid hover:bg-muted/30 disabled:opacity-60"
+          >
+            <FileText className="h-5 w-5 shrink-0 text-muted-foreground" />
+            <span className="min-w-0">
+              <span dir="auto" className="block truncate text-sm font-medium">
+                {file ? file.name : t("admin.content.grammar.choosePdf")}
+              </span>
+              <span className="block text-xs text-muted-foreground">
+                {t("admin.content.grammar.documentHint", {
+                  pages: MAX_PDF_PAGES,
+                  size: MAX_PDF_BYTES / (1024 * 1024),
+                })}
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <ContentActionBar
+          isPending={isPending}
+          onSaveDraft={() => submit("draft")}
+          onPublish={() => submit("published")}
+        />
+      </div>
     </div>
   );
 }

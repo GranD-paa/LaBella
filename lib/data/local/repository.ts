@@ -625,14 +625,15 @@ export function createLocalRepository(): DataRepository {
     },
 
     async createGrammarRule(input) {
+      const id = createLocalId("grammar");
       getLocalStore().grammarRules.push({
         ...input,
         status: input.status ?? "published",
-        id: createLocalId("grammar"),
+        id,
         created_at: new Date().toISOString(),
       });
       commitStore();
-      return {};
+      return { id };
     },
 
     async updateGrammarRule(id, input) {
@@ -661,19 +662,8 @@ export function createLocalRepository(): DataRepository {
       return [];
     },
 
-    async getGrammarDocuments() {
-      return [];
-    },
-
     async appendGrammarPages() {
       return { error: "Grammar documents need object storage, which local mode has none of." };
-    },
-
-    async removeGrammarDocument() {
-      return {
-        objectKeys: [],
-        error: "Grammar documents need object storage, which local mode has none of.",
-      };
     },
 
     async getGrammarPageKeys() {

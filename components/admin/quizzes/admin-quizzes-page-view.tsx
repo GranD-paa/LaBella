@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { GrammarManager } from "@/components/admin/grammar/grammar-manager";
 import { LessonsTable } from "@/components/admin/lessons/lessons-table";
 import { CreateContentSection } from "@/components/admin/quizzes/create-content-section";
 import { QuizManagementTable } from "@/components/admin/quizzes/quiz-management-table";
@@ -13,8 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
 import type { EnrichedQuiz } from "@/lib/quiz-management/data";
-import type { GrammarDocumentSummary } from "@/lib/grammar/types";
-import type { GrammarRule, Lesson, QuizQuestion, UserQuizAttempt } from "@/types";
+import type { Lesson, QuizQuestion, UserQuizAttempt } from "@/types";
 
 export function AdminQuizzesPageView({
   displayName,
@@ -23,8 +21,6 @@ export function AdminQuizzesPageView({
   attempts,
   lessons,
   languages,
-  grammarRules,
-  grammarDocumentsByRule,
 }: {
   displayName: string;
   quizzes: EnrichedQuiz[];
@@ -32,8 +28,6 @@ export function AdminQuizzesPageView({
   attempts: UserQuizAttempt[];
   lessons: Lesson[];
   languages: CurriculumLanguage[];
-  grammarRules: GrammarRule[];
-  grammarDocumentsByRule: Record<string, GrammarDocumentSummary[]>;
 }) {
   const { t } = useTranslations();
   const router = useRouter();
@@ -68,12 +62,6 @@ export function AdminQuizzesPageView({
         lessons={lessons}
         languages={languages}
         onSuccess={() => router.refresh()}
-      />
-
-      <GrammarManager
-        lessons={lessons}
-        grammarRules={grammarRules}
-        documentsByRule={grammarDocumentsByRule}
       />
 
       <LessonsTable lessons={lessons} />

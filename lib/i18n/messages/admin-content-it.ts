@@ -28,8 +28,8 @@ export const adminContentIt = {
   categories: {
     grammar: {
       title: "Grammatica",
-      description: "Spiegazioni, esempi ed esercizi grammaticali",
-      features: "Aggiungi spiegazioni · Esempi · Esercizi",
+      description: "Documenti che lo studente legge una pagina alla volta",
+      features: "Aggiungi un titolo · Carica un PDF · Leggi nell'app",
     },
     vocabulary: {
       title: "Vocabolario importante con immagini",
@@ -54,9 +54,24 @@ export const adminContentIt = {
     },
   },
   grammar: {
-    formTitle: "Aggiungi contenuto grammaticale",
-    formDescription: "Crea una spiegazione grammaticale per la lezione selezionata.",
-    exerciseLabel: "Esercizio o nota d'uso (opzionale)",
+    formTitle: "Aggiungi un documento di grammatica",
+    formDescription:
+      "Dai un titolo alla sezione e carica il suo PDF. Gli studenti ne leggono le pagine nell'app; il file non viene mai inviato loro.",
+    documentLabel: "PDF",
+    choosePdf: "Scegli un PDF",
+    documentHint: "Fino a {pages} pagine e {size}MB.",
+    errors: {
+      storageUnconfigured:
+        "L'archivio file non è configurato, quindi non è ancora possibile caricare documenti.",
+      fileRequired: "Scegli un PDF da caricare.",
+      notPdf: "Qui si possono caricare solo file PDF.",
+      tooLarge: "Questo PDF è troppo grande.",
+      tooManyPages: "Questo PDF ha troppe pagine per un solo caricamento.",
+      unreadable: "Non è stato possibile leggere il file come PDF.",
+      renderFailed: "Non è stato possibile convertire le pagine del PDF.",
+      uploadFailed:
+        "Le pagine non sono state salvate, quindi non è stato registrato nulla. Riprova.",
+    },
   },
   vocabulary: {
     formTitle: "Aggiungi vocabolario con immagine",

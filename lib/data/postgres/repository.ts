@@ -1,11 +1,7 @@
 import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth/better-auth";
-import type {
-  GrammarDocumentSummary,
-  GrammarPage,
-  GrammarPageSummary,
-} from "@/lib/grammar/types";
+import type { GrammarPage, GrammarPageSummary } from "@/lib/grammar/types";
 import {
   BANNER_IMAGE_ROUTE,
   bannerImageUrl,
@@ -683,11 +679,12 @@ export function createPostgresRepository(): DataRepository {
     deleteVocabulary: (id) =>
       mutate(() => execute("delete from vocabulary where id = $1", [id])),
 
-    createGrammarRule: (input) =>
-      mutate(() =>
-        execute(
+    async createGrammarRule(input) {
+      try {
+        const row = await queryOne<{ id: string }>(
           `insert into grammar_rules (lesson_id, title, description, example, status)
-           values ($1, $2, $3, $4, $5)`,
+           values ($1, $2, $3, $4, $5)
+           returning id`,
           [
             input.lesson_id,
             input.title,
@@ -695,8 +692,12 @@ export function createPostgresRepository(): DataRepository {
             input.example,
             input.status,
           ]
-        )
-      ),
+        );
+        return row ? { id: row.id } : { error: "Grammar rule was not created" };
+      } catch (error) {
+        return failure(error);
+      }
+    },
 
     updateGrammarRule: (id, input) =>
       mutate(() => {
@@ -876,15 +877,6 @@ export function createPostgresRepository(): DataRepository {
         [lessonId, userId]
       ),
 
-    getGrammarDocuments: (ruleId) =>
-      query<GrammarDocumentSummary>(
-        `select source_document as "sourceDocument", count(*)::int as "pageCount"
-           from grammar_pages
-          where rule_id = $1 and source_document is not null
-          group by source_document
-          order by min(page_number)`,
-        [ruleId]
-      ),
 
     // Pages land after whatever is already in the title, so uploading a second
     // document extends the run instead of colliding with it. Numbering the
@@ -917,36 +909,6 @@ export function createPostgresRepository(): DataRepository {
         )
       ),
 
-    // Deleting from the middle would leave a hole in the page numbers and the
-    // reader counts on them being contiguous, so the survivors are renumbered
-    // in the same transaction.
-    async removeGrammarDocument(ruleId, sourceDocument) {
-      try {
-        return await withTransaction(async (run) => {
-          const removed = (await run(
-            `delete from grammar_pages
-              where rule_id = $1 and source_document = $2
-              returning object_key`,
-            [ruleId, sourceDocument]
-          )) as Array<{ object_key: string }>;
-
-          await run(
-            `update grammar_pages set page_number = renumbered.position
-               from (
-                 select id, row_number() over (order by page_number) as position
-                   from grammar_pages where rule_id = $1
-               ) as renumbered
-              where grammar_pages.id = renumbered.id
-                and grammar_pages.page_number is distinct from renumbered.position`,
-            [ruleId]
-          );
-
-          return { objectKeys: removed.map((row) => row.object_key) };
-        });
-      } catch (error) {
-        return { objectKeys: [], ...failure(error) };
-      }
-    },
 
     async getGrammarPageKeys(ruleId) {
       const rows = await query<{ object_key: string }>(

@@ -89,12 +89,6 @@ export function createGrammarRuleSchema(t: Translator) {
   });
 }
 
-export function createContentGrammarRuleSchema(t: Translator) {
-  return createGrammarRuleSchema(t).extend({
-    status: z.enum(["draft", "published"]).default("draft"),
-  });
-}
-
 export function createVideoLessonSchema(t: Translator) {
   return z.object({
     lessonId: z.string().uuid(t("validation.admin.selectLesson")),
@@ -242,9 +236,6 @@ export type ContentVocabularyValues = z.infer<
 >;
 export type GrammarRuleValues = z.infer<
   ReturnType<typeof createGrammarRuleSchema>
->;
-export type ContentGrammarRuleValues = z.infer<
-  ReturnType<typeof createContentGrammarRuleSchema>
 >;
 export type VideoLessonValues = z.infer<
   ReturnType<typeof createVideoLessonSchema>

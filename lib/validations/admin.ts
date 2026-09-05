@@ -56,10 +56,6 @@ export const grammarRuleSchema = z.object({
 
 export type GrammarRuleValues = z.infer<typeof grammarRuleSchema>;
 
-export const contentGrammarSchema = grammarRuleSchema.extend({
-  status: z.enum(["draft", "published"]).default("draft"),
-});
-
 export const contentVocabularySchema = vocabularySchema.extend({
   imageUrl: z.string().url("Must be a valid URL").max(2000),
   pronunciation: optionalText(200),

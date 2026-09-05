@@ -587,32 +587,6 @@ export const en = {
       deleted: "Vocabulary deleted",
     },
     grammar: {
-      document: {
-        heading: "Document",
-        description:
-          "Upload a PDF. Its pages are rendered as images and become what learners read; the file itself is never sent to them.",
-        uploadButton: "Upload PDF",
-        uploading: "Rendering pages…",
-        uploaded: "Document added.",
-        removed: "Document removed.",
-        removeButton: "Remove",
-        removeConfirm: "Remove this document and all its pages?",
-        pages: "{count} pages",
-        empty: "No document uploaded yet.",
-        limits: "PDF only, up to {pages} pages and {size}MB.",
-      },
-      errors: {
-        storageUnconfigured:
-          "File storage is not configured, so documents cannot be uploaded yet.",
-        fileRequired: "Choose a PDF to upload.",
-        notPdf: "Only PDF files can be uploaded here.",
-        tooLarge: "That PDF is too large.",
-        tooManyPages: "That PDF has too many pages to render in one upload.",
-        unreadable: "That file could not be read as a PDF.",
-        renderFailed: "The pages of that PDF could not be rendered.",
-        uploadFailed:
-          "The rendered pages could not be stored. Nothing was saved.",
-      },
       createLessonFirst:
         "Create a lesson first in the Lessons tab before adding grammar rules.",
       addTitle: "Add a grammar rule",

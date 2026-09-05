@@ -19,21 +19,16 @@ import {
 } from "@/components/ui/table";
 import { deleteGrammarRule } from "@/app/admin/actions/grammar";
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
-import { GrammarDocumentDialog } from "@/components/admin/grammar/grammar-document-dialog";
 import { GrammarEditDialog } from "@/components/admin/grammar/grammar-edit-dialog";
 import { useTranslations } from "@/components/providers/locale-provider";
-import type { GrammarDocumentSummary } from "@/lib/grammar/types";
 import type { GrammarRule, Lesson } from "@/types";
 
 export function GrammarTable({
   grammarRules,
   lessons,
-  documentsByRule,
 }: {
   grammarRules: GrammarRule[];
   lessons: Lesson[];
-  /** The PDFs uploaded into each title, keyed by rule id. */
-  documentsByRule: Record<string, GrammarDocumentSummary[]>;
 }) {
   const { t } = useTranslations();
 
@@ -63,7 +58,7 @@ export function GrammarTable({
                   <TableHead className="hidden md:table-cell">
                     {t("common.example")}
                   </TableHead>
-                  <TableHead className="w-32 text-right">
+                  <TableHead className="w-24 text-right">
                     {t("common.actions")}
                   </TableHead>
                 </TableRow>
@@ -80,12 +75,6 @@ export function GrammarTable({
                     </TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-1">
-                        <GrammarDocumentDialog
-                          ruleId={rule.id}
-                          lessonId={rule.lesson_id}
-                          title={rule.title}
-                          documents={documentsByRule[rule.id] ?? []}
-                        />
                         <GrammarEditDialog
                           grammarRule={rule}
                           lessons={lessons}

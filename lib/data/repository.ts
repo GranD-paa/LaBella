@@ -1,8 +1,4 @@
-import type {
-  GrammarDocumentSummary,
-  GrammarPage,
-  GrammarPageSummary,
-} from "@/lib/grammar/types";
+import type { GrammarPage, GrammarPageSummary } from "@/lib/grammar/types";
 
 import type {
   AccountingSnapshot,
@@ -222,9 +218,10 @@ export interface DataRepository {
   ): Promise<{ error?: string }>;
   deleteVocabulary(id: string): Promise<{ error?: string }>;
 
+  /** Returns the new row's id, so the caller can attach a document to it. */
   createGrammarRule(
     input: Omit<GrammarRule, "id" | "created_at">
-  ): Promise<{ error?: string }>;
+  ): Promise<{ error?: string; id?: string }>;
   updateGrammarRule(
     id: string,
     input: Partial<Omit<GrammarRule, "id" | "created_at">>
@@ -239,8 +236,6 @@ export interface DataRepository {
     lessonId: string,
     userId: string | null
   ): Promise<GrammarPageSummary[]>;
-  /** What has been uploaded into a title, for the admin to review or remove. */
-  getGrammarDocuments(ruleId: string): Promise<GrammarDocumentSummary[]>;
   /** Appends a rendered document's pages after whatever is already there. */
   appendGrammarPages(
     ruleId: string,
@@ -252,12 +247,6 @@ export interface DataRepository {
       sourcePage: number;
     }>
   ): Promise<{ error?: string }>;
-  /** Removes one document's pages and closes the gap it leaves in the order.
-   *  Returns the object keys so the caller can delete the files themselves. */
-  removeGrammarDocument(
-    ruleId: string,
-    sourceDocument: string
-  ): Promise<{ objectKeys: string[]; error?: string }>;
   /** Object keys for every page of a title, for cleanup before deleting it. */
   getGrammarPageKeys(ruleId: string): Promise<string[]>;
   saveGrammarReadingProgress(

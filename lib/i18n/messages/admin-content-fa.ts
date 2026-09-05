@@ -27,8 +27,8 @@ export const adminContentFa = {
   categories: {
     grammar: {
       title: "گرامر",
-      description: "توضیحات، مثال‌ها و تمرین‌های گرامری",
-      features: "افزودن توضیح · افزودن مثال · افزودن تمرین",
+      description: "جزوه‌های گرامری که زبان‌آموز صفحه‌به‌صفحه می‌خواند",
+      features: "افزودن عنوان · بارگذاری PDF · خواندن داخل اپ",
     },
     vocabulary: {
       title: "واژگان مهم با تصویر",
@@ -53,9 +53,24 @@ export const adminContentFa = {
     },
   },
   grammar: {
-    formTitle: "افزودن محتوای گرامر",
-    formDescription: "یک توضیح گرامری برای درس انتخاب‌شده ایجاد کنید.",
-    exerciseLabel: "تمرین یا نکته کاربرد (اختیاری)",
+    formTitle: "افزودن جزوه گرامر",
+    formDescription:
+      "برای این بخش یک عنوان بگذارید و PDF آن را بارگذاری کنید. زبان‌آموز صفحاتش را داخل اپ می‌خواند و خود فایل هرگز برایش فرستاده نمی‌شود.",
+    documentLabel: "فایل PDF",
+    choosePdf: "انتخاب فایل PDF",
+    documentHint: "حداکثر {pages} صفحه و {size} مگابایت.",
+    errors: {
+      storageUnconfigured:
+        "فضای ذخیره‌سازی پیکربندی نشده است، پس فعلاً نمی‌توان فایلی بارگذاری کرد.",
+      fileRequired: "یک فایل PDF انتخاب کنید.",
+      notPdf: "اینجا فقط فایل PDF پذیرفته می‌شود.",
+      tooLarge: "حجم این PDF بیش از حد مجاز است.",
+      tooManyPages: "تعداد صفحات این PDF برای یک بارگذاری بیش از حد است.",
+      unreadable: "این فایل به‌عنوان PDF خوانده نشد.",
+      renderFailed: "صفحات این PDF قابل تبدیل به تصویر نبود.",
+      uploadFailed:
+        "صفحات ذخیره نشدند و چیزی ثبت نشد. دوباره تلاش کنید.",
+    },
   },
   vocabulary: {
     formTitle: "افزودن واژه با تصویر",

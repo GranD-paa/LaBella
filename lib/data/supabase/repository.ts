@@ -571,8 +571,12 @@ export function createSupabaseRepository(): DataRepository {
 
     async createGrammarRule(input) {
       const supabase = await createClient();
-      const { error } = await supabase.from("grammar_rules").insert(input);
-      return error ? { error: error.message } : {};
+      const { data, error } = await supabase
+        .from("grammar_rules")
+        .insert(input)
+        .select("id")
+        .single();
+      return error ? { error: error.message } : { id: data.id };
     },
 
     async updateGrammarRule(id, input) {
@@ -604,19 +608,8 @@ export function createSupabaseRepository(): DataRepository {
       return [];
     },
 
-    async getGrammarDocuments() {
-      return [];
-    },
-
     async appendGrammarPages() {
       return { error: "Grammar documents require the Postgres data source." };
-    },
-
-    async removeGrammarDocument() {
-      return {
-        objectKeys: [],
-        error: "Grammar documents require the Postgres data source.",
-      };
     },
 
     async getGrammarPageKeys() {

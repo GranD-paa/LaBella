@@ -30,8 +30,3 @@ export type GrammarPageSummary = {
   /** The page this learner last read, absent if they have not opened it. */
   lastReadPage: number | null;
 };
-
-export type GrammarDocumentSummary = {
-  sourceDocument: string;
-  pageCount: number;
-};

@@ -27,8 +27,8 @@ export const adminContentEn = {
   categories: {
     grammar: {
       title: "Grammar",
-      description: "Explanations, examples, and grammar exercises",
-      features: "Add explanations · Add examples · Add exercises",
+      description: "Documents a learner reads a page at a time",
+      features: "Add a title · Upload a PDF · Read in the app",
     },
     vocabulary: {
       title: "Important Vocabulary with Images",
@@ -53,9 +53,24 @@ export const adminContentEn = {
     },
   },
   grammar: {
-    formTitle: "Add grammar content",
-    formDescription: "Create a grammar explanation for the selected lesson.",
-    exerciseLabel: "Exercise or usage note (optional)",
+    formTitle: "Add a grammar document",
+    formDescription:
+      "Give the section a title and upload its PDF. Learners read its pages in the app; the file itself is never sent to them.",
+    documentLabel: "PDF",
+    choosePdf: "Choose a PDF",
+    documentHint: "Up to {pages} pages and {size}MB.",
+    errors: {
+      storageUnconfigured:
+        "File storage is not configured, so documents cannot be uploaded yet.",
+      fileRequired: "Choose a PDF to upload.",
+      notPdf: "Only PDF files can be uploaded here.",
+      tooLarge: "That PDF is too large.",
+      tooManyPages: "That PDF has too many pages to render in one upload.",
+      unreadable: "That file could not be read as a PDF.",
+      renderFailed: "The pages of that PDF could not be rendered.",
+      uploadFailed:
+        "The pages could not be stored, so nothing was saved. Try again.",
+    },
   },
   vocabulary: {
     formTitle: "Add vocabulary with image",

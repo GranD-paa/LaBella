@@ -22,9 +22,7 @@ const run = promisify(execFile);
 const RENDER_DPI = 200;
 const WEBP_QUALITY = 90;
 
-/** Beyond this a single upload takes long enough that the request would hang. */
-export const MAX_PDF_PAGES = 80;
-export const MAX_PDF_BYTES = 60 * 1024 * 1024;
+export { MAX_PDF_BYTES, MAX_PDF_PAGES } from "@/lib/storage/pdf-limits";
 
 export type RenderedPage = {
   /** 1-based position within the source document. */
