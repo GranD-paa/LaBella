@@ -13,7 +13,16 @@ export function isVerifiablePhone(value: string): boolean {
 }
 
 export const signInSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
+  // Trimmed before it is judged an address. iOS password autofill and a
+  // long-press paste both hand over a trailing space often enough, and an
+  // address with one on the end fails the format check — which the form then
+  // reports as "check your email and password", sending someone to hunt for a
+  // typo that is not there.
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email is required")
+    .email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
   rememberMe: z.boolean(),
 });
@@ -33,6 +42,7 @@ export const signUpSchema = z
       .max(80, "Full name is too long"),
     email: z
       .string()
+      .trim()
       .min(1, "Email is required")
       .email("Invalid email address"),
     password: z
