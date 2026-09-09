@@ -286,9 +286,11 @@ export async function verifyPhoneCode(
     };
   }
 
+  const { auth } = await import("@/lib/auth/better-auth");
+
+  let verified;
   try {
-    const { auth } = await import("@/lib/auth/better-auth");
-    await auth.api.verifyPhoneNumber({
+    verified = await auth.api.verifyPhoneNumber({
       body: { phoneNumber: phone, code: parsed.data.code },
       headers: await headers(),
     });
@@ -306,20 +308,36 @@ export async function verifyPhoneCode(
   // A number that verifies without an account gets one, created by the
   // plugin, holding a placeholder name. `/welcome` is where a person is
   // attached to it, and nothing else is reachable until they do.
-  const repo = getDataRepository();
-  const user = await repo.getAuthUser();
-  if (!user) {
+  //
+  // The user comes from the call that just verified them, and it has to.
+  // Better Auth issues the session cookie onto the *response*; `headers()` is
+  // the request that arrived. Asking for the session again here reads a
+  // request that predates the cookie by a few milliseconds, finds nothing,
+  // and answers "not signed in" — so every correct code ended in "something
+  // went wrong" while the session sat in the database, already valid. The
+  // person was signed in and being told they were not.
+  const userId = verified?.user?.id;
+  if (!userId) {
+    console.error("[auth] verification succeeded but returned no user");
     return { ok: false, error: "actions.errors.generic" };
   }
 
   const { readProfileState } = await import("@/lib/auth/phone-accounts");
-  const profile = await readProfileState(user.id);
+  const profile = await readProfileState(userId);
 
   // A suspended account can still prove it owns its number — that was never
   // the question. The session it just earned is taken back here, which used to
   // be the job of the password sign-in this replaced.
   if (profile?.isSuspended) {
-    await repo.signOut();
+    // `signOut` reads the same request that has no cookie on it, so it would
+    // find no session and leave the one it was called to take away. The token
+    // came back from the call that created it; delete that row directly.
+    if (verified?.token) {
+      const { execute } = await import("@/lib/data/postgres/client");
+      await execute('delete from public."session" where token = $1', [
+        verified.token,
+      ]);
+    }
     return { ok: false, error: "actions.errors.accountSuspended" };
   }
 
