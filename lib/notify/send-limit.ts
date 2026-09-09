@@ -41,25 +41,41 @@ const DAY = 24 * HOUR;
  * The wait before the nth code to one number, counting from the first.
  *
  * The first is free — a real person who mistyped their number should not be
- * punished for fixing it. After that the cost climbs steeply, so a quarter of
- * an hour spent pestering a stranger's phone buys three messages instead of
- * thirty, and the fifth is the last one that day.
+ * punished for fixing it. After that the gap is a flat two minutes, which is
+ * exactly how long a code lives: a resend becomes available at the moment the
+ * old code dies, and never before. Five is the day's allowance, and the sixth
+ * attempt waits until tomorrow — the ceiling, not the climb, is what stops
+ * someone pestering a stranger's phone.
  */
-const PHONE_LADDER_MS = [0, 1 * MINUTE, 5 * MINUTE, 30 * MINUTE, 2 * HOUR];
+const PHONE_LADDER_MS = [0, 2 * MINUTE, 2 * MINUTE, 2 * MINUTE, 2 * MINUTE];
 const PHONE_DAILY_MAX = PHONE_LADDER_MS.length;
 
 /**
- * Deliberately looser than the per-number rules: an Iranian mobile IP behind
- * carrier NAT carries dozens of real users, and a tight count there locks out
- * the innocent. The distinct-number cap is the one that bites, and ten
- * different numbers in an hour is generous for a household and fatal for a
- * pumping script.
+ * Deliberately looser than the per-number rules, and looser than it used to
+ * be, because the old numbers did not match their own reasoning.
+ *
+ * An Iranian mobile carrier does not give a subscriber a public address. It
+ * puts thousands of them behind one, so "ten different numbers from this IP
+ * in an hour" is not a household — it is ten customers, and the eleventh real
+ * person to open the app on mobile data was being turned away for what the
+ * ten before them did. That is the failure this cap was least able to
+ * survive: it gets worse exactly as the product succeeds.
+ *
+ * What actually protects a stranger's phone is the per-number ladder above —
+ * five codes a day, two minutes apart, and no IP can lift that. These
+ * counters exist for a different animal: a script walking a number range,
+ * which does not do forty numbers an hour, it does hundreds. Set high enough
+ * to miss the crowd and still catch the script.
  */
-const IP_SENDS_PER_HOUR = 20;
-const IP_DISTINCT_RECIPIENTS_PER_HOUR = 10;
+const IP_SENDS_PER_HOUR = 60;
+const IP_DISTINCT_RECIPIENTS_PER_HOUR = 40;
 
-/** Cheap proxy pools rent whole /24s; one IP moving is not one attacker leaving. */
-const SUBNET_SENDS_PER_HOUR = 40;
+/**
+ * Cheap proxy pools rent whole /24s; one IP moving is not one attacker
+ * leaving. Raised with the per-IP numbers for the same reason — a carrier's
+ * /24 is a city, not a customer.
+ */
+const SUBNET_SENDS_PER_HOUR = 200;
 
 /**
  * The global ceiling, and the one thing about it that matters:

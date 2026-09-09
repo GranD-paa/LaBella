@@ -25,6 +25,7 @@ import {
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
 
 const quiet: Counts = {
   recipientDay: 0,
@@ -40,13 +41,14 @@ const counts = (overrides: Partial<Counts>): Counts => ({ ...quiet, ...overrides
 
 describe("decideSms — the ladder", () => {
   it("lets the first code through with no wait", () => {
-    expect(decideSms(quiet, false)).toEqual({ allowed: true, nextGapMs: MINUTE });
+    expect(decideSms(quiet, false)).toEqual({ allowed: true, nextGapMs: 2 * MINUTE });
   });
 
   it.each([
-    [1, MINUTE, 5 * MINUTE],
-    [2, 5 * MINUTE, 30 * MINUTE],
-    [3, 30 * MINUTE, 2 * HOUR],
+    [1, 2 * MINUTE, 2 * MINUTE],
+    [2, 2 * MINUTE, 2 * MINUTE],
+    [3, 2 * MINUTE, 2 * MINUTE],
+    [4, 2 * MINUTE, DAY],
   ])(
     "after %i codes, waits %i ms and then promises the next gap",
     (sent, requiredGap, nextGap) => {
@@ -72,7 +74,7 @@ describe("decideSms — the ladder", () => {
     expect(decision).toEqual({
       allowed: false,
       reason: "cooldown",
-      retryAfterMs: 40_000,
+      retryAfterMs: 100_000,
     });
   });
 
@@ -85,20 +87,41 @@ describe("decideSms — the ladder", () => {
 
 describe("decideSms — where the request came from", () => {
   it("refuses an IP asking about too many different numbers", () => {
-    expect(decideSms(counts({ ipDistinctHour: 10 }), false)).toEqual({
+    expect(decideSms(counts({ ipDistinctHour: 40 }), false)).toEqual({
       allowed: false,
       reason: "origin",
     });
   });
 
   it("tolerates an IP sending a lot to few numbers, which is what a NAT looks like", () => {
-    expect(decideSms(counts({ ipHour: 19, ipDistinctHour: 2 }), false)).toMatchObject({
+    expect(decideSms(counts({ ipHour: 59, ipDistinctHour: 2 }), false)).toMatchObject({
       allowed: true,
     });
   });
 
+  /**
+   * The shape a carrier NAT actually makes: twenty different people, twenty
+   * different numbers, one public address, each asking for a first code.
+   * Under the old ceiling the eleventh was refused for what the ten before
+   * them had done.
+   */
+  it("lets twenty strangers behind one carrier address each ask for a first code", () => {
+    for (let alreadySent = 0; alreadySent < 20; alreadySent += 1) {
+      expect(
+        decideSms(
+          counts({
+            ipHour: alreadySent,
+            ipDistinctHour: alreadySent,
+            subnetHour: alreadySent,
+          }),
+          false
+        )
+      ).toMatchObject({ allowed: true });
+    }
+  });
+
   it("refuses a whole /24 that is busy even when one IP is not", () => {
-    expect(decideSms(counts({ ipHour: 1, subnetHour: 40 }), false)).toEqual({
+    expect(decideSms(counts({ ipHour: 1, subnetHour: 200 }), false)).toEqual({
       allowed: false,
       reason: "origin",
     });

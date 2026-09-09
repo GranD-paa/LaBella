@@ -34,8 +34,13 @@ export function resolveConnectionString(): string | undefined {
 
 /**
  * One pool per process. Next.js reloads modules in dev, so it is stashed on
- * globalThis to avoid leaking a new pool (and its connections) on every edit —
- * the ArvanCloud Starter cluster allows 250 connections in total.
+ * globalThis to avoid leaking a new pool (and its connections) on every edit.
+ *
+ * The budget is smaller than it looks. The cluster reports
+ * `max_connections = 50` with three held back for superusers, and a rolling
+ * deploy runs the old pod and the new one at once — two pools, not one — with
+ * Better Auth keeping its own alongside. Sizing this to the headline number
+ * would mean a deploy that cannot open a connection.
  */
 /**
  * Connection settings shared by this pool and Better Auth's.
@@ -62,7 +67,21 @@ export function getPool(): Pool {
   if (!globalForPool.laparliPool) {
     globalForPool.laparliPool = new Pool({
       connectionString: resolveConnectionString(),
-      max: 10,
+      /**
+       * Sixteen, sized against the fifty above rather than against hope.
+       *
+       * Ten was the number that made a crowd feel like an outage: a burst of
+       * sign-ins holds one client each for the length of a transaction, and
+       * once all ten are held every other query on the site queues behind
+       * them until `connectionTimeoutMillis` gives up. The page that fails is
+       * not the one that caused the burst.
+       *
+       * Two pods at sixteen leaves room under fifty for Better Auth and for
+       * whoever else is connected. Raising it further is not free: past the
+       * cluster's ceiling the failure moves from "slow" to "refused", which
+       * is strictly worse.
+       */
+      max: 16,
       ...POOL_OPTIONS,
     });
   }
