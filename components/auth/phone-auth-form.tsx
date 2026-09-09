@@ -36,7 +36,17 @@ export function PhoneAuthForm({ redirectTo }: { redirectTo?: string }) {
   const [rawPhone, setRawPhone] = useState("");
   const [sentTo, setSentTo] = useState("");
   const [code, setCode] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  /**
+   * The refusal as a key and a deadline, not as a finished sentence.
+   *
+   * "Try again in a few hours" was written into the string, so it could not
+   * be right for both a two-minute wait and a day-long one, and it could not
+   * move. Holding the key means the sentence is built on every render and the
+   * time inside it ticks.
+   */
+  const [refusal, setRefusal] = useState<{ key: string; until: number | null } | null>(
+    null
+  );
   const [resendAt, setResendAt] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
@@ -64,15 +74,37 @@ export function PhoneAuthForm({ redirectTo }: { redirectTo?: string }) {
   }, [resendAt, now]);
 
   function fail(key: string, retryAfterMs?: number) {
-    setError(resolveMessage(t, key));
-    if (retryAfterMs && retryAfterMs > 0) {
-      setResendAt(Date.now() + retryAfterMs);
+    const until =
+      retryAfterMs && retryAfterMs > 0 ? Date.now() + retryAfterMs : null;
+    setRefusal({ key, until });
+    if (until !== null) {
+      setResendAt(until);
       setNow(Date.now());
     }
   }
 
+  /**
+   * The refusal as one sentence, rebuilt every render so the wait inside it
+   * moves.
+   *
+   * The countdown is appended rather than written into each message: only
+   * some refusals carry a deadline, and a `{time}` placeholder in a message
+   * that has none would print itself on the screen. Kept separate from the
+   * resend clock too, so a wrong code never inherits the sentence belonging
+   * to the wait before it.
+   */
+  const refusalMsLeft =
+    refusal?.until == null ? 0 : Math.max(0, refusal.until - now);
+  const error = refusal
+    ? refusalMsLeft > 0
+      ? `${resolveMessage(t, refusal.key)} ${t("auth.retryIn", {
+          time: toPersianDigits(formatCountdown(refusalMsLeft, t)),
+        })}`
+      : resolveMessage(t, refusal.key)
+    : null;
+
   function submitPhone() {
-    setError(null);
+    setRefusal(null);
     startTransition(async () => {
       // The ticket is solved while the user types, so this almost never
       // waits. When it does — a very slow phone, or a submit two seconds
@@ -103,7 +135,7 @@ export function PhoneAuthForm({ redirectTo }: { redirectTo?: string }) {
 
   const submitCode = useCallback(
     (entered: string) => {
-      setError(null);
+      setRefusal(null);
       startTransition(async () => {
         const result = await verifyPhoneCode({
           phone: sentTo,
@@ -112,16 +144,20 @@ export function PhoneAuthForm({ redirectTo }: { redirectTo?: string }) {
         });
         // Success redirects, so anything returned here is a refusal.
         if (result && !result.ok) {
-          setError(resolveMessage(t, result.error));
+          const until =
+            result.retryAfterMs && result.retryAfterMs > 0
+              ? Date.now() + result.retryAfterMs
+              : null;
+          setRefusal({ key: result.error, until });
           setCode("");
-          if (result.retryAfterMs) {
-            setResendAt(Date.now() + result.retryAfterMs);
+          if (until !== null) {
+            setResendAt(until);
             setNow(Date.now());
           }
         }
       });
     },
-    [redirectTo, sentTo, t]
+    [redirectTo, sentTo]
   );
 
   const heading =
@@ -254,7 +290,7 @@ export function PhoneAuthForm({ redirectTo }: { redirectTo?: string }) {
               className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               onClick={() => {
                 setStep("phone");
-                setError(null);
+                setRefusal(null);
                 setCode("");
               }}
             >
