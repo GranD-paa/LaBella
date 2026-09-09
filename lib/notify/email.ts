@@ -93,7 +93,7 @@ export async function sendEmail(
     return true;
   }
 
-  if (!(await claimSend("email", { recipient: to, ip }))) return false;
+  if (!(await claimSend("email", { recipient: to, ip })).allowed) return false;
 
   await getTransport(host, user, pass).sendMail({
     from: process.env.MAIL_FROM ?? FALLBACK_FROM,

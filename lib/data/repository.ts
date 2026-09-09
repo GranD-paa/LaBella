@@ -40,6 +40,12 @@ export type AuthUser = {
 
 export type LocalAuthUser = AuthUser & {
   password: string;
+  /**
+   * E.164, so offline development goes through the same phone-and-code door
+   * as production instead of a second sign-in path that only exists here and
+   * only breaks here.
+   */
+  phone: string;
 };
 
 export type ProfileSummary = Pick<
@@ -67,10 +73,6 @@ export type QuizWithLessonTitle = Quiz & {
 export interface DataRepository {
   // Auth
   getAuthUser(): Promise<AuthUser | null>;
-  signInWithPassword(
-    email: string,
-    password: string
-  ): Promise<{ error?: string }>;
   signOut(): Promise<void>;
 
   // Profiles
@@ -82,7 +84,6 @@ export interface DataRepository {
     userId: string,
     status: Profile["status"]
   ): Promise<{ error?: string }>;
-  sendPasswordResetEmail(email: string): Promise<{ error?: string }>;
 
   // Language availability — super-admin overrides for which languages are
   // open ("active") vs. "coming soon". Returned as a sparse map; a missing

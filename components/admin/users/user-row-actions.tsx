@@ -6,7 +6,6 @@ import {
   Ban,
   Copy,
   Eye,
-  KeyRound,
   MoreHorizontal,
   PenSquare,
   PlayCircle,
@@ -16,7 +15,6 @@ import {
 import { toast } from "sonner";
 
 import {
-  sendPasswordResetEmail,
   updateUserAdminStatus,
   updateUserStatus,
 } from "@/app/admin/actions/users";
@@ -35,7 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { ActionResult } from "@/lib/action-result";
 
-type PendingActionType = "promote" | "demote" | "suspend" | "activate" | "resetPassword";
+type PendingActionType = "promote" | "demote" | "suspend" | "activate";
 
 export function UserRowActions({
   user,
@@ -124,20 +122,6 @@ export function UserRowActions({
       onConfirm: () => updateUserStatus(user.id, "active"),
       withRefresh: true,
     };
-  } else if (pendingAction === "resetPassword") {
-    const email = user.email ?? "";
-    const isLocalMode = process.env.NEXT_PUBLIC_DATA_SOURCE === "local";
-    pendingConfig = {
-      title: t("admin.users.resetPasswordConfirmTitle"),
-      description: t("admin.users.resetPasswordConfirmDescription", { email }),
-      confirmLabel: t("admin.users.resetPassword"),
-      destructive: false,
-      successMessage: isLocalMode
-        ? t("admin.users.resetPasswordSimulated", { email })
-        : t("admin.users.resetPasswordSent", { email }),
-      onConfirm: () => sendPasswordResetEmail(email),
-      withRefresh: false,
-    };
   }
 
   return (
@@ -197,15 +181,6 @@ export function UserRowActions({
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuSeparator />
-
-          <DropdownMenuItem
-            disabled={!user.email}
-            onClick={() => setPendingAction("resetPassword")}
-          >
-            <KeyRound className="h-4 w-4" />
-            {t("admin.users.resetPassword")}
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 

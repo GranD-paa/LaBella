@@ -86,10 +86,16 @@ export function getLocalDevCredentials() {
     admin: {
       email: process.env.LOCAL_DEV_ADMIN_EMAIL ?? "admin@laparli.local",
       password: process.env.LOCAL_DEV_ADMIN_PASSWORD ?? "Admin123!",
+      // Sign in offline by typing this number and the code 000000. Real
+      // numbers on purpose in shape but not in fact: 0912 111 1111 belongs to
+      // an allocated range, so it passes the same validation production uses,
+      // and no code is ever sent anywhere in local mode.
+      phone: process.env.LOCAL_DEV_ADMIN_PHONE ?? "+989121111111",
     },
     user: {
       email: process.env.LOCAL_DEV_USER_EMAIL ?? "learner@laparli.local",
       password: process.env.LOCAL_DEV_USER_PASSWORD ?? "Learner123!",
+      phone: process.env.LOCAL_DEV_USER_PHONE ?? "+989122222222",
     },
   } as const;
 }
@@ -102,11 +108,13 @@ export const LOCAL_SEED: LocalDatabase = {
       id: "21fdd721-b367-4b77-bf6d-d7fccbb4694f",
       email: LOCAL_DEV_CREDENTIALS.admin.email,
       password: LOCAL_DEV_CREDENTIALS.admin.password,
+      phone: LOCAL_DEV_CREDENTIALS.admin.phone,
     },
     {
       id: "710a5c03-ffbc-4032-a3d2-154458b15bdd",
       email: LOCAL_DEV_CREDENTIALS.user.email,
       password: LOCAL_DEV_CREDENTIALS.user.password,
+      phone: LOCAL_DEV_CREDENTIALS.user.phone,
     },
   ],
   profiles: [

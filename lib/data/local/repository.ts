@@ -5,7 +5,6 @@ import path from "node:path";
 import {
   clearLocalSession,
   getLocalSessionUserId,
-  setLocalSessionUserId,
 } from "@/lib/auth/local-session";
 import type { DataRepository } from "@/lib/data/repository";
 import { buildAccountingSnapshot } from "@/lib/billing/accounting";
@@ -42,30 +41,6 @@ export function createLocalRepository(): DataRepository {
       }
 
       return { id: user.id, email: user.email };
-    },
-
-    async signInWithPassword(email, password) {
-      const store = getLocalStore();
-      const user = store.users.find(
-        (entry) =>
-          entry.email.toLowerCase() === email.toLowerCase() &&
-          entry.password === password
-      );
-
-      if (!user) {
-        return { error: "Invalid login credentials" };
-      }
-
-      const profile = store.profiles.find((entry) => entry.id === user.id);
-      if (profile?.status === "suspended") {
-        return {
-          error:
-            "Your account has been suspended. Contact an administrator.",
-        };
-      }
-
-      await setLocalSessionUserId(user.id);
-      return {};
     },
 
     async signOut() {
@@ -148,12 +123,6 @@ export function createLocalRepository(): DataRepository {
       if (!profile) return { error: "User not found." };
       profile.status = status;
       commitStore();
-      return {};
-    },
-
-    async sendPasswordResetEmail() {
-      // Local dev mode has no email provider; treat as a successful no-op so
-      // the UI can surface a "simulated" confirmation toast.
       return {};
     },
 

@@ -1,191 +1,423 @@
-import { query, execute } from "@/lib/data/postgres/client";
+import { withTransaction } from "@/lib/data/postgres/client";
 
 /**
  * How many messages this app is willing to send, and to whom.
  *
  * The shape follows what the abuse actually looks like rather than one number
  * per channel. A verification code has three different victims — the person
- * whose phone rings, the account being farmed, and the bill — and each wants
- * a different limit:
+ * whose phone rings, the bill, and the queue of real people trying to sign in
+ * — and each wants a different rule:
  *
- *   - a cooldown per recipient, which is what stops the "press resend fifty
- *     times" case and is the single most effective rule here;
- *   - a daily cap per recipient, which is what stops a stranger's phone being
- *     used as a doorbell;
- *   - an hourly cap per IP, deliberately looser than the per-recipient one,
- *     because an Iranian mobile IP behind carrier NAT carries dozens of real
- *     users and a tight limit there locks out the innocent;
- *   - a daily ceiling for the whole app, which is not an anti-abuse rule at
- *     all — it is what keeps a bug from burning the SMS credit or getting the
- *     mailbox suspended for exceeding its sending quota overnight.
+ *   - an escalating gap per number, which is what stops "press resend fifty
+ *     times" and is the single most effective rule here;
+ *   - a daily cap per number, so a stranger's phone cannot be used as a
+ *     doorbell;
+ *   - a cap per IP on how many DIFFERENT numbers it asks about, which is the
+ *     actual signature of SMS pumping. A plain count per IP cannot see it: a
+ *     carrier NAT legitimately sends plenty, and a script walking a number
+ *     range sends no more than a busy office does;
+ *   - a ceiling for the whole app, which is not an anti-abuse rule at all —
+ *     it keeps a bug from burning the SMS credit overnight.
  *
- * The counters live in Postgres (`db/005_send_limits.sql`) rather than in
- * process memory, because a limit that a deploy resets is a limit an attacker
- * waits out.
+ * The counters live in Postgres (`db/005_send_limits.sql`, widened by 008)
+ * rather than in process memory, because a limit that a deploy resets is a
+ * limit an attacker waits out.
  *
  * The one rule not enforced here, because it belongs to the caller: whether a
- * send happened or was refused must look identical to whoever asked. A
- * different response turns this into a way of discovering which numbers and
- * addresses have accounts.
+ * send happened or was refused must not reveal whether the number has an
+ * account. Refusals here are about a number's own recent history, which
+ * anyone can discover about their own number, so returning the wait is safe;
+ * returning "no such account" would not be.
  */
 
 export type SendChannel = "sms" | "email";
 
-type Rule = {
-  scope: "phone" | "email" | "ip" | "global";
-  max: number;
-  windowMs: number;
-};
-
-const MINUTE = 60_000;
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
 /**
- * A code costs money to send and rings a real phone, so the recipient rules
- * are strict and the IP rule is not.
+ * The wait before the nth code to one number, counting from the first.
+ *
+ * The first is free — a real person who mistyped their number should not be
+ * punished for fixing it. After that the cost climbs steeply, so a quarter of
+ * an hour spent pestering a stranger's phone buys three messages instead of
+ * thirty, and the fifth is the last one that day.
  */
-const SMS_RULES: Rule[] = [
-  { scope: "phone", max: 1, windowMs: MINUTE },
-  { scope: "phone", max: 3, windowMs: DAY },
-  { scope: "ip", max: 15, windowMs: HOUR },
-  { scope: "global", max: 300, windowMs: DAY },
-];
+const PHONE_LADDER_MS = [0, 1 * MINUTE, 5 * MINUTE, 30 * MINUTE, 2 * HOUR];
+const PHONE_DAILY_MAX = PHONE_LADDER_MS.length;
 
 /**
- * The same shape as the SMS rules, and for the same reason.
- *
- * It is tempting to argue an address only ever receives once it belongs to an
- * account, so nothing here can be aimed at a stranger. That holds for the code
- * as it stands today and would stop holding the first time anyone adds a
- * "resend", a "share with a friend" or a password reset — and the person who
- * adds it will not think to come back here. Cheaper to be strict now.
- *
- * The IP cap is looser than the per-address one for the same reason as the SMS
- * one: carrier NAT puts many real users behind a single address.
+ * Deliberately looser than the per-number rules: an Iranian mobile IP behind
+ * carrier NAT carries dozens of real users, and a tight count there locks out
+ * the innocent. The distinct-number cap is the one that bites, and ten
+ * different numbers in an hour is generous for a household and fatal for a
+ * pumping script.
  */
-const EMAIL_RULES: Rule[] = [
-  { scope: "email", max: 1, windowMs: MINUTE },
-  { scope: "email", max: 3, windowMs: DAY },
-  { scope: "ip", max: 20, windowMs: HOUR },
-  { scope: "global", max: 400, windowMs: DAY },
-];
+const IP_SENDS_PER_HOUR = 20;
+const IP_DISTINCT_RECIPIENTS_PER_HOUR = 10;
 
-const RULES: Record<SendChannel, Rule[]> = {
-  sms: SMS_RULES,
-  email: EMAIL_RULES,
-};
+/** Cheap proxy pools rent whole /24s; one IP moving is not one attacker leaving. */
+const SUBNET_SENDS_PER_HOUR = 40;
 
-/** The subject a `global` row is counted against. */
+/**
+ * The global ceiling, and the one thing about it that matters:
+ *
+ * a cap on everything is also a lever an attacker can pull. Burn it and real
+ * sign-ins stop. So it counts only codes going to numbers with no account —
+ * whatever a flood does to the budget, an existing customer can always get
+ * back in.
+ */
+const GLOBAL_SENDS_PER_HOUR = 200;
+const GLOBAL_SENDS_PER_DAY = 300;
+
+const EMAIL_PER_ADDRESS_PER_DAY = 3;
+const EMAIL_ADDRESS_COOLDOWN_MS = 1 * MINUTE;
+const EMAIL_SENDS_PER_IP_PER_HOUR = 20;
+const EMAIL_SENDS_PER_DAY = 400;
+
 const GLOBAL_KEY = "all";
 
 export type SendSubjects = {
-  /** The phone number or email address the message is aimed at. */
+  /** The phone number in E.164, or the email address. */
   recipient: string;
   /** The caller's IP, when there is one to attribute this to. */
   ip?: string | null;
+  /**
+   * Whether the recipient already has an account.
+   *
+   * Only consulted for SMS, and only to decide whether the global ceiling
+   * applies. Defaults to false, which is the safe reading for a caller that
+   * has not checked.
+   */
+  hasAccount?: boolean;
 };
+
+export type SendRefusal =
+  /** This number may have another code, just not yet. */
+  | { allowed: false; reason: "cooldown"; retryAfterMs: number }
+  /** This number has had its share for today. */
+  | { allowed: false; reason: "daily"; retryAfterMs: number }
+  /** This address, or the range it sits in, is asking about too many numbers. */
+  | { allowed: false; reason: "origin" }
+  /** The app itself is at its ceiling, or could not count. */
+  | { allowed: false; reason: "capacity" };
+
+export type SendAllowed = {
+  allowed: true;
+  /**
+   * How long before this recipient may have another.
+   *
+   * Handed back so the form can run an honest countdown instead of guessing
+   * at the ladder, and so the two cannot drift apart when the ladder changes.
+   */
+  nextGapMs: number;
+};
+
+export type SendDecision = SendAllowed | SendRefusal;
+
+const REFUSED_UNCOUNTABLE: SendRefusal = { allowed: false, reason: "capacity" };
 
 /**
  * Whether one more message may go out, and the counting of it if so.
  *
- * Deliberately one call rather than a check and a separate record: two calls
- * leave a window where several requests all pass the check before any of them
- * writes, which is exactly the burst this is meant to stop.
+ * One call rather than a check and a separate record, and — unlike the
+ * version this replaces — actually atomic. That one ran every SELECT and then
+ * every INSERT with nothing between them: twenty simultaneous requests all
+ * read zero, all passed, and all wrote, which turned "one per minute" into
+ * "as many as you can send at once". The transaction and the advisory locks
+ * below are what close that.
  *
- * Returns `false` when any rule is at its limit, and also when the counters
- * cannot be read at all. Refusing on a database error is deliberate: these
- * limits guard a bill and a stranger's inbox, and a send we are unable to
- * count is exactly the send worth skipping. Nothing is lost by it either —
- * every path that sends needs the database anyway.
+ * Refuses when the counters cannot be read at all. These limits guard a bill
+ * and a stranger's phone, and a send we are unable to count is exactly the
+ * send worth skipping. Nothing is lost by it either — every path that sends
+ * needs the database anyway.
  */
 export async function claimSend(
   channel: SendChannel,
   subjects: SendSubjects
-): Promise<boolean> {
+): Promise<SendDecision> {
   try {
     return await countAndClaim(channel, subjects);
   } catch {
-    return false;
+    return REFUSED_UNCOUNTABLE;
   }
 }
 
 async function countAndClaim(
   channel: SendChannel,
   subjects: SendSubjects
-): Promise<boolean> {
-  const rules = RULES[channel];
+): Promise<SendDecision> {
   const recipient = subjects.recipient.trim().toLowerCase();
   const ip = subjects.ip?.trim() || null;
+  const subnet = ip ? subnetOf(ip) : null;
+  const recipientScope = channel === "sms" ? "phone" : "email";
 
-  for (const rule of rules) {
-    const subject = subjectFor(rule.scope, recipient, ip);
-    // An IP rule with no IP to blame cannot be enforced; skipping it is
-    // better than counting every anonymous request against one bucket.
-    if (subject === null) continue;
-
-    const since = new Date(Date.now() - rule.windowMs);
-    const rows = await query<{ used: string }>(
-      `select count(*)::text as used
-         from public.send_attempts
-        where channel = $1 and scope = $2 and subject = $3
-          and created_at >= $4`,
-      [channel, rule.scope, subject, since]
+  return withTransaction(async (run) => {
+    // Locking by number serialises the burst the old code let through. The IP
+    // is locked too, because a pumping script hits many different numbers at
+    // once and would otherwise race past the distinct-number cap on all of
+    // them. Both keys are sorted before locking, so two requests that share a
+    // lock can never take them in opposite orders and deadlock.
+    const keys = [`${channel}:${recipientScope}:${recipient}`];
+    if (ip) {
+      keys.push(`${channel}:ip:${ip}`);
+    }
+    await run(
+      `select pg_advisory_xact_lock(h)
+         from (select hashtext(k) as h
+                 from unnest($1::text[]) as k
+                order by 1) as locks`,
+      [keys]
     );
 
-    if (Number(rows[0]?.used ?? 0) >= rule.max) return false;
-  }
-
-  // Past every rule: write one row per scope, so the next call sees this send.
-  for (const rule of rules) {
-    const subject = subjectFor(rule.scope, recipient, ip);
-    if (subject === null) continue;
-
-    await execute(
-      `insert into public.send_attempts (channel, scope, subject)
-       values ($1, $2, $3)`,
-      [channel, rule.scope, subject]
+    const counts = await readCounts(
+      run,
+      channel,
+      recipientScope,
+      recipient,
+      ip,
+      subnet
     );
-  }
+    const decision =
+      channel === "sms"
+        ? decideSms(counts, subjects.hasAccount === true)
+        : decideEmail(counts);
 
-  void prune();
-  return true;
+    if (!decision.allowed) {
+      return decision;
+    }
+
+    const scopes = [recipientScope, "global"];
+    const subjectValues = [recipient, GLOBAL_KEY];
+    if (ip) {
+      scopes.push("ip");
+      subjectValues.push(ip);
+    }
+    if (subnet) {
+      scopes.push("subnet");
+      subjectValues.push(subnet);
+    }
+
+    await run(
+      `insert into public.send_attempts (channel, scope, subject, target)
+       select $1, s.scope, s.subject, $2
+         from unnest($3::text[], $4::text[]) as s(scope, subject)`,
+      [channel, recipient, scopes, subjectValues]
+    );
+
+    void prune();
+    return decision;
+  });
 }
 
-function subjectFor(
-  scope: Rule["scope"],
+export type Counts = {
+  recipientDay: number;
+  msSinceRecipientLast: number | null;
+  ipHour: number;
+  ipDistinctHour: number;
+  subnetHour: number;
+  globalHour: number;
+  globalDay: number;
+};
+
+type Run = (text: string, values?: unknown[]) => Promise<unknown[]>;
+
+async function readCounts(
+  run: Run,
+  channel: SendChannel,
+  recipientScope: string,
   recipient: string,
-  ip: string | null
-): string | null {
-  switch (scope) {
-    case "global":
-      return GLOBAL_KEY;
-    case "ip":
-      return ip;
-    default:
-      // 'phone' and 'email' are both the recipient; the scope name is there so
-      // a number and an address can never collide in one bucket.
-      return recipient;
+  ip: string | null,
+  subnet: string | null
+): Promise<Counts> {
+  const rows = (await run(
+    `with recent as (
+       select scope, subject, target, created_at
+         from public.send_attempts
+        where channel = $1 and created_at >= now() - interval '24 hours'
+     )
+     select
+       (select count(*) from recent
+         where scope = $2 and subject = $3)                     as recipient_day,
+       (select extract(epoch from now() - max(created_at)) * 1000 from recent
+         where scope = $2 and subject = $3)                     as ms_since_last,
+       (select count(*) from recent
+         where scope = 'ip' and subject = $4
+           and created_at >= now() - interval '1 hour')         as ip_hour,
+       (select count(distinct target) from recent
+         where scope = 'ip' and subject = $4
+           and created_at >= now() - interval '1 hour')         as ip_distinct_hour,
+       (select count(*) from recent
+         where scope = 'subnet' and subject = $5
+           and created_at >= now() - interval '1 hour')         as subnet_hour,
+       (select count(*) from recent
+         where scope = 'global'
+           and created_at >= now() - interval '1 hour')         as global_hour,
+       (select count(*) from recent where scope = 'global')     as global_day`,
+    [channel, recipientScope, recipient, ip, subnet]
+  )) as Array<Record<string, unknown>>;
+
+  const row = rows[0] ?? {};
+  const num = (key: string): number => Number(row[key] ?? 0);
+  const sinceLast = row.ms_since_last;
+
+  return {
+    recipientDay: num("recipient_day"),
+    msSinceRecipientLast:
+      sinceLast === null || sinceLast === undefined ? null : Number(sinceLast),
+    ipHour: num("ip_hour"),
+    ipDistinctHour: num("ip_distinct_hour"),
+    subnetHour: num("subnet_hour"),
+    globalHour: num("global_hour"),
+    globalDay: num("global_day"),
+  };
+}
+
+/**
+ * Exported for its tests. The ladder and the ceilings are pure arithmetic
+ * over counts and belong under test; the atomicity around them is a
+ * transaction and two advisory locks, which only a real Postgres can prove.
+ */
+export function decideSms(counts: Counts, hasAccount: boolean): SendDecision {
+  if (counts.recipientDay >= PHONE_DAILY_MAX) {
+    return { allowed: false, reason: "daily", retryAfterMs: DAY };
   }
+
+  const requiredGap = PHONE_LADDER_MS[counts.recipientDay] ?? 0;
+  const elapsed = counts.msSinceRecipientLast;
+  if (requiredGap > 0 && elapsed !== null && elapsed < requiredGap) {
+    return {
+      allowed: false,
+      reason: "cooldown",
+      retryAfterMs: Math.ceil(requiredGap - elapsed),
+    };
+  }
+
+  if (
+    counts.ipHour >= IP_SENDS_PER_HOUR ||
+    counts.ipDistinctHour >= IP_DISTINCT_RECIPIENTS_PER_HOUR ||
+    counts.subnetHour >= SUBNET_SENDS_PER_HOUR
+  ) {
+    return { allowed: false, reason: "origin" };
+  }
+
+  // Strangers share the ceiling; customers are never locked out by it.
+  if (
+    !hasAccount &&
+    (counts.globalHour >= GLOBAL_SENDS_PER_HOUR ||
+      counts.globalDay >= GLOBAL_SENDS_PER_DAY)
+  ) {
+    return { allowed: false, reason: "capacity" };
+  }
+
+  // The gap the send being allowed right now will impose on the next one.
+  const sentAfterThis = counts.recipientDay + 1;
+  return {
+    allowed: true,
+    nextGapMs:
+      sentAfterThis >= PHONE_DAILY_MAX ? DAY : PHONE_LADDER_MS[sentAfterThis],
+  };
+}
+
+export function decideEmail(counts: Counts): SendDecision {
+  if (counts.recipientDay >= EMAIL_PER_ADDRESS_PER_DAY) {
+    return { allowed: false, reason: "daily", retryAfterMs: DAY };
+  }
+
+  const elapsed = counts.msSinceRecipientLast;
+  if (elapsed !== null && elapsed < EMAIL_ADDRESS_COOLDOWN_MS) {
+    return {
+      allowed: false,
+      reason: "cooldown",
+      retryAfterMs: Math.ceil(EMAIL_ADDRESS_COOLDOWN_MS - elapsed),
+    };
+  }
+  if (counts.ipHour >= EMAIL_SENDS_PER_IP_PER_HOUR) {
+    return { allowed: false, reason: "origin" };
+  }
+  if (counts.globalDay >= EMAIL_SENDS_PER_DAY) {
+    return { allowed: false, reason: "capacity" };
+  }
+  return { allowed: true, nextGapMs: EMAIL_ADDRESS_COOLDOWN_MS };
+}
+
+/**
+ * Gives back a claim whose message never left.
+ *
+ * Only for the case where the gateway itself failed: the quota was spent on
+ * nothing, and making someone wait out the ladder for a code that was never
+ * sent turns an outage into a lockout. Deliberately narrow — it deletes only
+ * this recipient's rows from the last few seconds, so it cannot be used to
+ * wipe a history.
+ *
+ * Claiming first and releasing on failure, rather than sending first and
+ * counting after, is the safe order: a gateway that hangs must not become a
+ * free channel for the burst the limits exist to stop.
+ */
+export async function releaseSend(
+  channel: SendChannel,
+  recipient: string
+): Promise<void> {
+  try {
+    const { execute } = await import("@/lib/data/postgres/client");
+    await execute(
+      `delete from public.send_attempts
+        where channel = $1
+          and target = $2
+          and created_at >= now() - interval '10 seconds'`,
+      [channel, recipient.trim().toLowerCase()]
+    );
+  } catch {
+    // A refund we could not make costs the user one cooldown, not their account.
+  }
+}
+
+/**
+ * The range an address sits in: /24 for IPv4, /64 for IPv6.
+ *
+ * Both are the smallest block normally handed out as a unit, so they are the
+ * granularity at which "one more IP" actually costs an attacker something.
+ */
+export function subnetOf(ip: string): string | null {
+  const v4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.\d{1,3}$/.exec(ip);
+  if (v4) {
+    return `${v4[1]}.${v4[2]}.${v4[3]}.0/24`;
+  }
+  if (ip.includes(":")) {
+    const groups = ip.split(":").slice(0, 4);
+    return groups.length === 4 ? `${groups.join(":")}::/64` : null;
+  }
+  return null;
 }
 
 /**
  * Drops rows older than any window, roughly once an hour.
  *
  * Opportunistic rather than scheduled: a cron job is one more thing to set up
- * on a host and one more thing to notice has stopped running, and the table
- * only grows while sends are happening anyway.
+ * on a host and one more thing to notice has stopped running, and the tables
+ * only grow while sends are happening anyway.
  */
 let lastPruneAt = 0;
 
 async function prune(): Promise<void> {
   const now = Date.now();
-  if (now - lastPruneAt < HOUR) return;
+  if (now - lastPruneAt < HOUR) {
+    return;
+  }
   lastPruneAt = now;
 
   try {
+    const { execute } = await import("@/lib/data/postgres/client");
     await execute(
       "delete from public.send_attempts where created_at < now() - interval '2 days'"
+    );
+    await execute(
+      "delete from public.otp_attempts where created_at < now() - interval '2 days'"
+    );
+    await execute(
+      "delete from public.otp_challenges where used_at < now() - interval '1 day'"
     );
   } catch {
     // Housekeeping must never be the reason a message did not go out.

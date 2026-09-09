@@ -29,7 +29,6 @@ import type {
   Lesson,
   Payment,
   PaymentSettings,
-  Profile,
   Quiz,
   QuizQuestion,
   Subscription,
@@ -157,33 +156,6 @@ export function createPostgresRepository(): DataRepository {
       return { id: session.user.id, email: session.user.email };
     },
 
-    async signInWithPassword(email: string, password: string) {
-      try {
-        await auth.api.signInEmail({
-          body: { email, password },
-          headers: await headers(),
-        });
-      } catch {
-        // Better Auth distinguishes unknown-email from wrong-password; we
-        // deliberately do not, so the form cannot be used to discover which
-        // addresses have accounts.
-        return { error: "Invalid login credentials" };
-      }
-
-      const profile = await queryOne<{ status: Profile["status"] }>(
-        "select status from profiles where email = $1",
-        [email]
-      );
-      if (profile?.status === "suspended") {
-        await repository.signOut();
-        return {
-          error: "Your account has been suspended. Contact an administrator.",
-        };
-      }
-
-      return {};
-    },
-
     async signOut(): Promise<void> {
       await auth.api.signOut({ headers: await headers() });
     },
@@ -220,14 +192,6 @@ export function createPostgresRepository(): DataRepository {
           status,
         ])
       ),
-
-    sendPasswordResetEmail: (email) =>
-      mutate(async () => {
-        await auth.api.requestPasswordReset({
-          body: { email, redirectTo: "/login" },
-          headers: await headers(),
-        });
-      }),
 
     // ------------------------------------------------- language & curriculum
     async getLanguageAvailability() {

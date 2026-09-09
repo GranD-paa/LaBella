@@ -1,7 +1,5 @@
 "use server";
 
-import { z } from "zod";
-
 import {
   requireAdminPermission,
 } from "@/lib/auth/action-guards";
@@ -61,26 +59,5 @@ export async function updateUserStatus(
   }
 
   revalidateAppContent();
-  return { success: true };
-}
-
-export async function sendPasswordResetEmail(
-  email: string
-): Promise<ActionResult> {
-  const guard = await requireAdminPermission("manageUsers");
-  if (!guard.ok) return { error: guard.error };
-
-  const parsed = z.string().email().safeParse(email);
-  if (!parsed.success) {
-    return { error: "actions.errors.invalidInput" };
-  }
-
-  const repo = getDataRepository();
-  const result = await repo.sendPasswordResetEmail(parsed.data);
-
-  if (result.error) {
-    return { error: "actions.errors.generic" };
-  }
-
   return { success: true };
 }

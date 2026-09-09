@@ -29,33 +29,6 @@ export function createSupabaseRepository(): DataRepository {
       return user?.email ? { id: user.id, email: user.email } : null;
     },
 
-    async signInWithPassword(email, password) {
-      const supabase = await createClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) return { error: error.message };
-
-      if (data.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("status")
-          .eq("id", data.user.id)
-          .single();
-
-        if (profile?.status === "suspended") {
-          await supabase.auth.signOut();
-          return {
-            error:
-              "Your account has been suspended. Contact an administrator.",
-          };
-        }
-      }
-
-      return {};
-    },
-
     async signOut() {
       const supabase = await createClient();
       await supabase.auth.signOut();
@@ -155,12 +128,6 @@ export function createSupabaseRepository(): DataRepository {
         .update({ status })
         .eq("id", userId);
 
-      return error ? { error: error.message } : {};
-    },
-
-    async sendPasswordResetEmail(email) {
-      const supabase = await createClient();
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
       return error ? { error: error.message } : {};
     },
 
