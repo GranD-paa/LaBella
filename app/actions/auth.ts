@@ -55,13 +55,45 @@ async function padTiming(startedAt: number): Promise<void> {
   }
 }
 
+/** Logged once per process, not once per request. */
+let describedProxyChain = false;
+
+/**
+ * Which address the per-IP and per-subnet limits are counted against.
+ *
+ * `x-forwarded-for` is a list that each hop APPENDS to, so its leftmost entry
+ * is whatever the client sent -- including a client that made it up. Reading
+ * position zero, as this did, means anyone can hand us a fresh address on
+ * every request and walk straight past the ceilings meant to catch a script
+ * working through a range of numbers. The per-number ladder still holds; the
+ * origin rules did not.
+ *
+ * `x-real-ip` is set by the nearest proxy and overwritten rather than
+ * appended, so where the ingress sets it, it is the honest answer and cannot
+ * be dressed up by the caller. It is preferred here for that reason.
+ *
+ * The forwarded list stays as the fallback, still read from the left, and
+ * that is deliberate: taking the rightmost entry instead is only correct when
+ * the number of trusted hops in front of this pod is known, and guessing it
+ * wrong is worse than the bug. Two hops would make every visitor share one
+ * recorded address and one bucket, so a busy hour would lock out everybody --
+ * the exact failure these limits exist to avoid. The line below prints the
+ * shape of the chain once per pod so the hop count can be set from evidence.
+ */
 async function getClientIpForRateLimit(): Promise<string> {
   const headerStore = await headers();
-  return (
-    headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    headerStore.get("x-real-ip") ??
-    "unknown"
-  );
+  const forwarded = headerStore.get("x-forwarded-for");
+  const realIp = headerStore.get("x-real-ip")?.trim();
+
+  if (!describedProxyChain) {
+    describedProxyChain = true;
+    const hops = forwarded ? forwarded.split(",").length : 0;
+    console.info(
+      `[auth] proxy chain: x-forwarded-for entries=${hops}, x-real-ip=${realIp ? "present" : "absent"}`
+    );
+  }
+
+  return realIp || forwarded?.split(",")[0]?.trim() || "unknown";
 }
 
 /**
