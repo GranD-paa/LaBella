@@ -346,7 +346,7 @@ export async function verifyPhoneCode(
   }
 
   await markProfileComplete();
-  redirect(await destinationFor(input.redirectTo, profile.isAdmin));
+  redirect(await destinationFor(input.redirectTo, profile.isAdmin, userId));
 }
 
 export async function completeProfile(
@@ -424,13 +424,23 @@ function welcomeHref(redirectTo?: string): string {
  */
 async function destinationFor(
   redirectTo?: string,
-  knownAdmin?: boolean
+  knownAdmin?: boolean,
+  /**
+   * Who this is, when the caller already knows.
+   *
+   * Straight after a sign-in nobody can look the session up: the cookie is on
+   * the response and `getAuthUser()` reads the request. That returned null
+   * here without failing anything visible -- the person simply landed on the
+   * default screen instead of the lesson they left off at, which reads as the
+   * app forgetting them rather than as a bug.
+   */
+  knownUserId?: string
 ): Promise<string> {
   const repo = getDataRepository();
-  const user = await repo.getAuthUser();
+  const userId = knownUserId ?? (await repo.getAuthUser())?.id ?? null;
   const isAdmin =
     knownAdmin ??
-    Boolean(user ? (await repo.getProfileById(user.id))?.is_admin : false);
+    Boolean(userId ? (await repo.getProfileById(userId))?.is_admin : false);
 
   const requested = redirectTo ? getSafeRedirectPath(redirectTo) : null;
   if (requested && !(isAdmin && requested === "/menu")) {
@@ -444,11 +454,11 @@ async function destinationFor(
 
   const [learningState, languages, lessons, quizzes, attempts] =
     await Promise.all([
-      user ? repo.getLearningState(user.id) : Promise.resolve(null),
+      userId ? repo.getLearningState(userId) : Promise.resolve(null),
       getLanguagesWithAvailability(repo),
       repo.getLessons(),
       repo.getQuizzes(),
-      user ? repo.getAttemptsByUserId(user.id) : Promise.resolve([]),
+      userId ? repo.getAttemptsByUserId(userId) : Promise.resolve([]),
     ]);
 
   // Returning learners resume their last active language, level and section,
