@@ -77,7 +77,16 @@
     "codeHint": "The code is valid for 2 minutes.",
     "wrongNumber": "Wrong number?",
     "resend": "Send the code again",
-    "resendIn": "Resend in {seconds}s",
+    "resendIn": "Resend in {time}",
+    "duration": {
+      "dayOne": "{count} day",
+      "dayOther": "{count} days",
+      "hourOne": "{count} hour",
+      "hourOther": "{count} hours",
+      "minuteOne": "{count} minute",
+      "minuteOther": "{count} minutes",
+      "and": "{first} and {second}"
+    },
     "welcomeTitle": "Welcome",
     "welcomeSubtitle": "A few short things, just this once.",
     "firstName": "First name",

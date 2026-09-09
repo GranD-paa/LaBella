@@ -77,7 +77,16 @@
     "codeHint": "کد تا ۲ دقیقه معتبر است.",
     "wrongNumber": "شماره اشتباه است؟",
     "resend": "ارسال دوبارهٔ کد",
-    "resendIn": "ارسال دوباره تا {seconds} ثانیهٔ دیگر",
+    "resendIn": "ارسال دوباره تا {time} دیگر",
+    "duration": {
+      "dayOne": "{count} روز",
+      "dayOther": "{count} روز",
+      "hourOne": "{count} ساعت",
+      "hourOther": "{count} ساعت",
+      "minuteOne": "{count} دقیقه",
+      "minuteOther": "{count} دقیقه",
+      "and": "{first} و {second}"
+    },
     "welcomeTitle": "خوش آمدید",
     "welcomeSubtitle": "چند چیز کوتاه، فقط همین یک بار.",
     "firstName": "نام",

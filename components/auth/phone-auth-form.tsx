@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { solveChallenge } from "@/lib/auth/otp-challenge-solver";
 import type { AuthMode, Challenge, SolvedChallenge } from "@/lib/auth/phone-auth-types";
+import { countdownTickMs, formatCountdown } from "@/lib/i18n/duration";
 import { resolveMessage } from "@/lib/i18n/resolve-message";
 import { foldDigits } from "@/lib/notify/phone";
 import { cn } from "@/lib/utils";
@@ -43,18 +44,24 @@ export function PhoneAuthForm({ redirectTo }: { redirectTo?: string }) {
 
   const ticket = useSolvedChallenge();
 
+  const msLeft = resendAt === null ? 0 : Math.max(0, resendAt - now);
+  const waiting = msLeft > 0;
+
   // One ticking clock for the resend countdown, running only while there is
-  // something to count down to.
+  // something to count down to — and only as fast as the text it redraws
+  // actually changes. A minute-and-second clock needs every second; a wait
+  // measured in hours does not, and a day of one-second wake-ups to redraw an
+  // unchanged sentence is a battery cost paid for nothing.
   useEffect(() => {
     if (resendAt === null || resendAt <= now) {
       return;
     }
-    const timer = setInterval(() => setNow(Date.now()), 1000);
+    const timer = setInterval(
+      () => setNow(Date.now()),
+      countdownTickMs(resendAt - now)
+    );
     return () => clearInterval(timer);
   }, [resendAt, now]);
-
-  const secondsLeft =
-    resendAt === null ? 0 : Math.max(0, Math.ceil((resendAt - now) / 1000));
 
   function fail(key: string, retryAfterMs?: number) {
     setError(resolveMessage(t, key));
@@ -256,17 +263,19 @@ export function PhoneAuthForm({ redirectTo }: { redirectTo?: string }) {
 
             <button
               type="button"
-              disabled={isPending || secondsLeft > 0}
+              disabled={isPending || waiting}
               onClick={submitPhone}
               className={cn(
                 "underline-offset-4",
-                secondsLeft > 0
+                waiting
                   ? "cursor-not-allowed text-muted-foreground"
                   : "text-primary hover:underline"
               )}
             >
-              {secondsLeft > 0
-                ? t("auth.resendIn", { seconds: toPersianDigits(String(secondsLeft)) })
+              {waiting
+                ? t("auth.resendIn", {
+                    time: toPersianDigits(formatCountdown(msLeft, t)),
+                  })
                 : t("auth.resend")}
             </button>
           </div>

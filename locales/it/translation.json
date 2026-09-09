@@ -77,7 +77,16 @@
     "codeHint": "Il codice è valido per 2 minuti.",
     "wrongNumber": "Numero sbagliato?",
     "resend": "Invia di nuovo il codice",
-    "resendIn": "Reinvia tra {seconds}s",
+    "resendIn": "Reinvia tra {time}",
+    "duration": {
+      "dayOne": "{count} giorno",
+      "dayOther": "{count} giorni",
+      "hourOne": "{count} ora",
+      "hourOther": "{count} ore",
+      "minuteOne": "{count} minuto",
+      "minuteOther": "{count} minuti",
+      "and": "{first} e {second}"
+    },
     "welcomeTitle": "Benvenuto",
     "welcomeSubtitle": "Poche cose, una volta sola.",
     "firstName": "Nome",
