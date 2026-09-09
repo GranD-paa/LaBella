@@ -196,6 +196,48 @@ function refusalKey(reason: "cooldown" | "daily" | "origin" | "capacity"): strin
 }
 
 /**
+ * Why a verification failed, in a form that is safe to write to a log.
+ *
+ * The screen says only that the code did not work, and that stays true: an
+ * expired code and a wrong one have to look alike or the message becomes an
+ * oracle. But from the outside those two are also indistinguishable from a
+ * third case that is not the person's fault at all — the code was right and
+ * something after it broke, which is where account creation lives. Without
+ * this line all three arrive as the same sentence and the only way to tell
+ * them apart is to guess.
+ *
+ * Never the number and never the code. Runs of four or more digits are struck
+ * out, because a database error quotes the value it rejected.
+ */
+function describeVerifyFailure(error: unknown): string {
+  const redact = (text: string) => text.replace(/\d{4,}/g, "…");
+
+  if (error && typeof error === "object") {
+    const candidate = error as {
+      name?: unknown;
+      status?: unknown;
+      code?: unknown;
+      body?: { code?: unknown };
+    };
+    // Better Auth refusals: body.code is the one that names the case, e.g.
+    // OTP_EXPIRED, INVALID_OTP, TOO_MANY_ATTEMPTS, OTP_NOT_FOUND.
+    if (candidate.name === "APIError") {
+      const code = String(candidate.body?.code ?? "UNKNOWN");
+      return code + " (" + String(candidate.status ?? "?") + ")";
+    }
+    // Postgres and friends: the SQLSTATE says more than the sentence does.
+    if (candidate.code !== undefined && candidate.code !== null) {
+      return String(candidate.name ?? "Error") + " " + String(candidate.code);
+    }
+  }
+
+  if (error instanceof Error) {
+    return redact(error.name + ": " + error.message);
+  }
+  return "non-error thrown";
+}
+
+/**
  * Trades a correct code for a session, then decides where the person belongs.
  *
  * Returns only on failure. Success ends in `redirect`, which throws — so
@@ -250,8 +292,10 @@ export async function verifyPhoneCode(
       body: { phoneNumber: phone, code: parsed.data.code },
       headers: await headers(),
     });
-  } catch {
+  } catch (error) {
     await recordVerifyAttempt(phone, false);
+    // The person is told one thing; the log is told which thing it was.
+    console.error("[auth] phone verification refused:", describeVerifyFailure(error));
     // One message for a wrong code and an expired one alike. Telling them
     // apart would say which guesses were close to a live code.
     return { ok: false, error: "actions.errors.codeWrong" };
