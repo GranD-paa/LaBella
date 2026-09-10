@@ -43,6 +43,10 @@ describe("normalizePhone", () => {
     expect(normalizePhone("\u200f۰۹۱۲۱۲۳۴۵۶۷\u200e")).toBe(expected);
   });
 
+  it("strips the isolate a number wears when it is shown back", () => {
+    expect(normalizePhone("\u2066۰۹۱۲ ۱۲۳ ۴۵۶۷\u2069")).toBe(expected);
+  });
+
   it("keeps a foreign number in E.164 rather than guessing at it", () => {
     expect(normalizePhone("+393331234567")).toBe("+393331234567");
   });

@@ -34,7 +34,7 @@ export function foldDigits(raw: string): string {
 
 /** The number in E.164, or null if it is not a phone number at all. */
 export function normalizePhone(raw: string): string | null {
-  const cleaned = foldDigits(raw).replace(/[\s()\-.\u200c\u200f\u200e]/g, "");
+  const cleaned = foldDigits(raw).replace(/[\s()\-.\u200c\u200f\u200e\u2066-\u2069]/g, "");
 
   if (/^0?9\d{9}$/.test(cleaned)) {
     return `+98${cleaned.replace(/^0/, "")}`;

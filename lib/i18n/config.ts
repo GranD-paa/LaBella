@@ -10,6 +10,8 @@ export type LocaleDefinition = {
   nativeLabel: string;
   dir: "rtl" | "ltr";
   dateLocale: string;
+  /** The script its readers count in. See `lib/i18n/digits.ts`. */
+  numerals: "latin" | "persian";
 };
 
 export const LOCALES: LocaleDefinition[] = [
@@ -19,6 +21,7 @@ export const LOCALES: LocaleDefinition[] = [
     nativeLabel: "فارسی",
     dir: "rtl",
     dateLocale: "fa-IR",
+    numerals: "persian",
   },
   {
     code: "it",
@@ -26,6 +29,7 @@ export const LOCALES: LocaleDefinition[] = [
     nativeLabel: "Italiano",
     dir: "ltr",
     dateLocale: "it-IT",
+    numerals: "latin",
   },
   {
     code: "en",
@@ -33,6 +37,7 @@ export const LOCALES: LocaleDefinition[] = [
     nativeLabel: "English",
     dir: "ltr",
     dateLocale: "en-US",
+    numerals: "latin",
   },
 ];
 

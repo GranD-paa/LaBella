@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 
+import { useTranslations } from "@/components/providers/locale-provider";
 import {
   JALALI_MONTHS,
   jalaliMonthLength,
@@ -14,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { localizeDigits } from "@/lib/i18n/digits";
 
 export type JalaliParts = {
   year: number | null;
@@ -58,6 +60,7 @@ export function DateOfBirthField({
   error?: string | null;
   describedBy?: string;
 }) {
+  const { locale } = useTranslations();
   const thisYear = useMemo(() => todayJalali().jy, []);
 
   /**
@@ -110,7 +113,7 @@ export function DateOfBirthField({
           onChange={(year) => onChange(clampDay({ ...value, year }))}
           options={years.map((year) => ({
             value: year,
-            label: toPersianDigits(String(year)),
+            label: localizeDigits(String(year), locale),
           }))}
         />
         <Part
@@ -132,7 +135,7 @@ export function DateOfBirthField({
           onChange={(day) => onChange({ ...value, day })}
           options={days.map((day) => ({
             value: day,
-            label: toPersianDigits(String(day)),
+            label: localizeDigits(String(day), locale),
           }))}
         />
       </div>
@@ -181,10 +184,4 @@ function Part({
       </SelectContent>
     </Select>
   );
-}
-
-const PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
-
-function toPersianDigits(text: string): string {
-  return text.replace(/\d/g, (digit) => PERSIAN_DIGITS[Number(digit)]);
 }

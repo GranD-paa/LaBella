@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { solveChallenge } from "@/lib/auth/otp-challenge-solver";
 import type { AuthMode, Challenge, SolvedChallenge } from "@/lib/auth/phone-auth-types";
+import { localizeDigits } from "@/lib/i18n/digits";
 import { countdownTickMs, formatCountdown } from "@/lib/i18n/duration";
 import { resolveMessage } from "@/lib/i18n/resolve-message";
 import { foldDigits } from "@/lib/notify/phone";
@@ -28,7 +29,7 @@ import { cn } from "@/lib/utils";
  * to be. Until a number is entered, claiming either would be a guess.
  */
 export function PhoneAuthForm({ redirectTo }: { redirectTo?: string }) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [isPending, startTransition] = useTransition();
 
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -98,7 +99,7 @@ export function PhoneAuthForm({ redirectTo }: { redirectTo?: string }) {
   const error = refusal
     ? refusalMsLeft > 0
       ? `${resolveMessage(t, refusal.key)} ${t("auth.retryIn", {
-          time: toPersianDigits(formatCountdown(refusalMsLeft, t)),
+          time: localizeDigits(formatCountdown(refusalMsLeft, t), locale),
         })}`
       : resolveMessage(t, refusal.key)
     : null;
@@ -176,7 +177,9 @@ export function PhoneAuthForm({ redirectTo }: { redirectTo?: string }) {
         <p className="text-sm text-muted-foreground">
           {step === "phone"
             ? t("auth.phoneGateSubtitle")
-            : t("auth.codeSentTo", { phone: toPersianDigits(localFormat(sentTo)) })}
+            : t("auth.codeSentTo", {
+                phone: localizeDigits(localFormat(sentTo), locale),
+              })}
         </p>
       </header>
 
@@ -310,7 +313,7 @@ export function PhoneAuthForm({ redirectTo }: { redirectTo?: string }) {
             >
               {waiting
                 ? t("auth.resendIn", {
-                    time: toPersianDigits(formatCountdown(msLeft, t)),
+                    time: localizeDigits(formatCountdown(msLeft, t), locale),
                   })
                 : t("auth.resend")}
             </button>
@@ -365,14 +368,21 @@ function useSolvedChallenge() {
 /** `+989121234567` shown back as `۰۹۱۲ ۱۲۳ ۴۵۶۷`. */
 function localFormat(e164: string): string {
   if (!e164.startsWith("+98")) {
-    return e164;
+    return ltr(e164);
   }
   const national = `0${e164.slice(3)}`;
-  return `${national.slice(0, 4)} ${national.slice(4, 7)} ${national.slice(7)}`;
+  return ltr(`${national.slice(0, 4)} ${national.slice(4, 7)} ${national.slice(7)}`);
 }
 
-const PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
-
-function toPersianDigits(text: string): string {
-  return text.replace(/\d/g, (digit) => PERSIAN_DIGITS[Number(digit)]);
+/**
+ * A number held in the order it was dialled, inside a Persian sentence.
+ *
+ * The spaces between the groups are neutral, so a right-to-left paragraph
+ * lays the three runs out right to left and `۰۹۱۲ ۱۱۱ ۱۱۱۱` reads back as
+ * `۱۱۱۱ ۱۱۱ ۰۹۱۲` — the right digits in the wrong order. The `+` on an
+ * international number drifts the same way. The isolate settles the direction
+ * of what is inside it and leaves the sentence around it alone.
+ */
+function ltr(text: string): string {
+  return `\u2066${text}\u2069`;
 }
