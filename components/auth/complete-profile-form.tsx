@@ -133,7 +133,7 @@ export function CompleteProfileForm({ redirectTo }: { redirectTo?: string }) {
                       dir="ltr"
                       autoComplete="family-name"
                       disabled={isPending}
-                      placeholder="Mahdiye"
+                      placeholder="Rezaei"
                       className="text-left"
                     />
                   </FormControl>
