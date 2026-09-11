@@ -2106,20 +2106,20 @@
     "semantic_hash": ""
   },
   "locales/en/translation.json": {
-    "mtime": 1789106627.646185,
-    "seen": 1789108260.4012716,
+    "mtime": 1789128767.1752765,
+    "seen": 1789129920.5772786,
     "ast_hash": "e24c61cc3ad1904656d1c63a5407acfd",
     "semantic_hash": ""
   },
   "locales/fa/translation.json": {
-    "mtime": 1789106627.6493886,
-    "seen": 1789108260.4012716,
+    "mtime": 1789128767.176747,
+    "seen": 1789129920.5772786,
     "ast_hash": "1e273ed9140ce3d8bb9368b08074c7e8",
     "semantic_hash": ""
   },
   "locales/it/translation.json": {
-    "mtime": 1789106627.6508975,
-    "seen": 1789108260.4012716,
+    "mtime": 1789128767.1782439,
+    "seen": 1789129920.5772786,
     "ast_hash": "6b62834eaa7ecf26ab834c0a8a482258",
     "semantic_hash": ""
   },
@@ -2436,9 +2436,9 @@
     "semantic_hash": ""
   },
   "lib/landing/content.ts": {
-    "mtime": 1788506597.0170288,
-    "seen": 1788509263.0337253,
-    "ast_hash": "d642047a06da25e19d12abd6ba0f1eb0",
+    "mtime": 1789128647.7272608,
+    "seen": 1789129920.5767815,
+    "ast_hash": "73ee021d7a0ca755379c908fb9ea03ca",
     "semantic_hash": ""
   },
   "components/landing/landing-bits.tsx": {
@@ -2454,9 +2454,9 @@
     "semantic_hash": ""
   },
   "components/landing/hero.tsx": {
-    "mtime": 1789107412.3879182,
-    "seen": 1789108260.400771,
-    "ast_hash": "b725c6ba2e5beb4c76042b5ed52940fe",
+    "mtime": 1789129548.665909,
+    "seen": 1789129920.5767815,
+    "ast_hash": "26596a931453c071327601dbd53308c2",
     "semantic_hash": ""
   },
   "components/landing/landing.tsx": {

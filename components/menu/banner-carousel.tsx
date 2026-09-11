@@ -77,15 +77,79 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
 
   const realIndex = loops ? (((index - 1) % count) + count) % count : index;
 
-  const step = useCallback((delta: number) => {
-    setIndex((current) => current + delta);
+  // Mirrors `index` for the event handlers. Two arrow presses inside one
+  // animation both read the same stale state otherwise, and the second would
+  // step from where the strip *was* rather than where it is already heading.
+  const indexRef = useRef(index);
+  indexRef.current = index;
+
+  /**
+   * Move the strip from a clone onto its identical real twin, with the
+   * transition switched off and the change forced out to the browser before it
+   * paints again, so the jump is never visible. Returns the index the strip now
+   * sits at; anything that is not a clone is left exactly where it is.
+   */
+  const parkOnTwin = useCallback(
+    (current: number) => {
+      const target = current === count + 1 ? 1 : current === 0 ? count : null;
+      if (target === null) return current;
+
+      const element = trackRef.current;
+      if (element) {
+        element.style.transition = "none";
+        // Written in the same shape as the style prop below, so React's next
+        // render computes an identical value and starts no new animation.
+        element.style.transform = `translate3d(calc(${target * -100}% + 0px), 0, 0)`;
+        // Reading layout commits the untransitioned position immediately.
+        void element.offsetHeight;
+        element.style.transition = SETTLE_TRANSITION;
+      }
+
+      return target;
+    },
+    [count]
+  );
+
+  /**
+   * Where the next move should start from.
+   *
+   * Usually that is just the current index. But when someone taps again before
+   * the previous slide has settled, the strip is still parked on a clone and
+   * the re-park that normally happens on transitionend has not run yet.
+   * Stepping on from there walks off the end of the strip onto empty space —
+   * which is what turned the banner black under fast repeated taps. So re-park
+   * first, then step.
+   */
+  const settledIndex = useCallback(() => {
+    const current = indexRef.current;
+    return current > count || current < 1 ? parkOnTwin(current) : current;
+  }, [count, parkOnTwin]);
+
+  const moveTo = useCallback((next: number) => {
+    indexRef.current = next;
+    setIndex(next);
   }, []);
+
+  const step = useCallback(
+    (delta: number) => {
+      if (!loops) {
+        moveTo(Math.min(count - 1, Math.max(0, indexRef.current + delta)));
+        return;
+      }
+      moveTo(settledIndex() + delta);
+    },
+    [count, loops, moveTo, settledIndex]
+  );
 
   const goToBanner = useCallback(
     (bannerIndex: number) => {
-      setIndex(loops ? bannerIndex + 1 : bannerIndex);
+      // Same clone problem as `step`: park before jumping, or the strip travels
+      // all the way back across the set from a position it only appears to be
+      // standing on.
+      if (loops) settledIndex();
+      moveTo(loops ? bannerIndex + 1 : bannerIndex);
     },
-    [loops]
+    [loops, moveTo, settledIndex]
   );
 
   useEffect(() => {
@@ -95,44 +159,27 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
     // React 18 Strict Mode's dev-only double-invoke of this effect can
     // otherwise leak a stray interval that keeps ticking in the background.
     if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      // Never walk past the trailing clone. Normally the re-park below has
-      // already happened by now; this only matters if a transitionend was
-      // ever missed, and keeps that from stranding the strip on blank space.
-      setIndex((current) => (current >= count + 1 ? 1 : current + 1));
-    }, AUTO_ADVANCE_MS);
+    // `step` re-parks off a clone first, so a tick that lands while the strip
+    // is still mid-loop advances by one real slide instead of running off the
+    // end of it.
+    timerRef.current = setInterval(() => step(1), AUTO_ADVANCE_MS);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = null;
     };
-  }, [count, isPaused]);
+  }, [count, isPaused, step]);
 
   /**
-   * Re-park the strip on the real twin of whichever clone it just landed on.
-   *
-   * Done with the transition switched off and the change forced out to the
-   * browser before it paints again, so the jump is never visible — the viewer
-   * only ever sees continuous motion in the direction they asked for.
+   * Re-park the strip on the real twin of whichever clone it just landed on, so
+   * the viewer only ever sees continuous motion in the direction they asked
+   * for. A tap that arrives before this fires is handled by `settledIndex`.
    */
   function handleTransitionEnd(event: ReactTransitionEvent<HTMLDivElement>) {
     if (!loops || event.target !== event.currentTarget) return;
+    if (index !== count + 1 && index !== 0) return;
 
-    const target = index === count + 1 ? 1 : index === 0 ? count : null;
-    if (target === null) return;
-
-    const element = trackRef.current;
-    if (element) {
-      element.style.transition = "none";
-      // Written in the same shape as the style prop below, so React's next
-      // render computes an identical value and starts no new animation.
-      element.style.transform = `translate3d(calc(${target * -100}% + 0px), 0, 0)`;
-      // Reading layout commits the untransitioned position immediately.
-      void element.offsetHeight;
-      element.style.transition = SETTLE_TRANSITION;
-    }
-
-    setIndex(target);
+    moveTo(parkOnTwin(index));
   }
 
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
