@@ -45,9 +45,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: { canonical: url },
-    // `noindex` is the admin's own switch for posts that shouldn't rank —
-    // landing-page duplicates, thin announcements, anything time-boxed.
-    robots: post.noindex ? { index: false, follow: true } : undefined,
+    /**
+     * `noindex` is the admin's own switch for posts that shouldn't rank —
+     * landing-page duplicates, thin announcements, anything time-boxed.
+     *
+     * Spread-or-nothing, never `robots: undefined`. Next merges child metadata
+     * over the parent's by key, and a key that is *present* wins even when its
+     * value is undefined — so `robots: undefined` here does not mean "inherit",
+     * it means "delete whatever the root layout said". The root layout is what
+     * puts `noindex` on every page while the site is closed before launch, and
+     * writing it that way silently took that tag off every article: the index
+     * and the landing page carried it, article pages did not.
+     *
+     * The `X-Robots-Tag` header from middleware.ts still covered them, and
+     * that is the signal that actually binds. But the meta tag is the layer a
+     * reader can see in View Source, and losing it by accident is not a thing
+     * to leave standing.
+     */
+    ...(post.noindex ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       type: "article",
       title,

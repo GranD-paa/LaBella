@@ -264,9 +264,9 @@
     "semantic_hash": ""
   },
   "app/blog/[slug]/page.tsx": {
-    "mtime": 1789121192.5755858,
-    "seen": 1789121664.5134497,
-    "ast_hash": "eb7fd50c33aa9c0ddf1fd382eca1431f",
+    "mtime": 1789126170.779363,
+    "seen": 1789126787.6465085,
+    "ast_hash": "56b2d1019c44dbf3c7655bdd17cbdf0f",
     "semantic_hash": ""
   },
   "app/blog/page.tsx": {
@@ -3021,6 +3021,12 @@
     "mtime": 1789111955.4856527,
     "seen": 1789121664.5134497,
     "ast_hash": "70cb3dbe9c35f9b0bfcc5848c531c874",
+    "semantic_hash": ""
+  },
+  "app/blog/robots-metadata.test.ts": {
+    "mtime": 1789126720.8115294,
+    "seen": 1789126787.6465085,
+    "ast_hash": "c7281eca7eb65b7dcc9b0f7b8d9146c3",
     "semantic_hash": ""
   }
 }
