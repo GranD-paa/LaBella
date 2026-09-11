@@ -6,6 +6,8 @@ import {
   Ban,
   Copy,
   Eye,
+  Gift,
+  Languages,
   MoreHorizontal,
   PenSquare,
   PlayCircle,
@@ -18,7 +20,12 @@ import {
   updateUserAdminStatus,
   updateUserStatus,
 } from "@/app/admin/actions/users";
+import { AssignLanguagesDialog } from "@/components/admin/users/assign-languages-dialog";
 import { ChangeRoleDialog } from "@/components/admin/users/change-role-dialog";
+import {
+  GrantSubscriptionDialog,
+  type GrantPlanOption,
+} from "@/components/admin/users/grant-subscription-dialog";
 import { ConfirmActionDialog } from "@/components/admin/users/confirm-action-dialog";
 import { UserProfileDialog } from "@/components/admin/users/user-profile-dialog";
 import type { ManagedUser } from "@/components/admin/users/types";
@@ -32,11 +39,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { ActionResult } from "@/lib/action-result";
+import { hasPermission } from "@/lib/permissions/admin-nav";
 import {
   canChangeUserRole,
   canChangeUserStatus,
+  isLanguageScopedRole,
   resolveAdminToggleRole,
   type ManagedAccount,
+  type RolePermissions,
   type RoleSlug,
 } from "@/lib/permissions/roles";
 
@@ -46,12 +56,19 @@ export function UserRowActions({
   user,
   currentUserId,
   currentUserRole,
+  currentUserPermissions,
   superAdminCount,
+  plans,
+  languageSlugs,
 }: {
   user: ManagedUser;
   currentUserId: string;
   currentUserRole: RoleSlug;
+  /** The viewer's own effective permissions, overrides already merged. */
+  currentUserPermissions: RolePermissions;
   superAdminCount: number;
+  plans: GrantPlanOption[];
+  languageSlugs: string[];
 }) {
   const { t } = useTranslations();
   const router = useRouter();
@@ -79,11 +96,23 @@ export function UserRowActions({
     "learner",
     superAdminCount
   ).allowed;
-  const canSuspend = canChangeUserStatus(actor, target, "suspended").allowed;
-  const canActivate = canChangeUserStatus(actor, target, "active").allowed;
+  // Two things have to agree before a suspension is offered: the viewer holds
+  // the permission at all, and the rules allow it against this particular
+  // account. Support staff fail the first; a head admin facing a peer fails
+  // the second.
+  const maySuspend = hasPermission(currentUserPermissions, "suspendUsers");
+  const canSuspend =
+    maySuspend && canChangeUserStatus(actor, target, "suspended").allowed;
+  const canActivate =
+    maySuspend && canChangeUserStatus(actor, target, "active").allowed;
+
+  const mayGrant = hasPermission(currentUserPermissions, "manageBilling");
+  const canAssignLanguages = canEditRole && isLanguageScopedRole(target.role);
 
   const [profileOpen, setProfileOpen] = useState(false);
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
+  const [languagesOpen, setLanguagesOpen] = useState(false);
+  const [grantOpen, setGrantOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<PendingActionType | null>(
     null
   );
@@ -183,6 +212,21 @@ export function UserRowActions({
             <PenSquare className="h-4 w-4" />
             {t("admin.users.changeRole")}
           </DropdownMenuItem>
+          {canAssignLanguages ? (
+            <DropdownMenuItem onClick={() => setLanguagesOpen(true)}>
+              <Languages className="h-4 w-4" />
+              {t("admin.users.assignLanguages")}
+            </DropdownMenuItem>
+          ) : null}
+          {mayGrant && !user.isAdmin ? (
+            <DropdownMenuItem
+              disabled={plans.length === 0}
+              onClick={() => setGrantOpen(true)}
+            >
+              <Gift className="h-4 w-4" />
+              {t("admin.users.grantSubscription")}
+            </DropdownMenuItem>
+          ) : null}
 
           <DropdownMenuSeparator />
 
@@ -236,6 +280,23 @@ export function UserRowActions({
         user={user}
         superAdminCount={superAdminCount}
       />
+      {canAssignLanguages ? (
+        <AssignLanguagesDialog
+          open={languagesOpen}
+          onOpenChange={setLanguagesOpen}
+          user={user}
+          languageSlugs={languageSlugs}
+        />
+      ) : null}
+      {mayGrant ? (
+        <GrantSubscriptionDialog
+          open={grantOpen}
+          onOpenChange={setGrantOpen}
+          user={user}
+          plans={plans}
+          languageSlugs={languageSlugs}
+        />
+      ) : null}
       {pendingConfig ? (
         <ConfirmActionDialog
           open={pendingAction !== null}

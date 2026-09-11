@@ -1,82 +1,82 @@
 # Graph Report - cursor P  (2026-09-11)
 
 ## Corpus Check
-- 485 files · ~366,640 words
+- 496 files · ~380,434 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2508 nodes · 7126 edges · 184 communities (120 shown, 64 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 59 edges (avg confidence: 0.82)
+- 2600 nodes · 7502 edges · 187 communities (121 shown, 66 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 60 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f45de897`
+- Built from commit: `35aecf72`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- button.tsx
-- postgres/repository.ts
+- grammar-rules-list.tsx
+- postgres/client.ts
 - DataRepository
 - fa.ts
 - app-shell.tsx
 - better-auth.ts
 - resolveMessage
-- Quiz
+- Lesson
 - cn
 - locale-provider.tsx
 - types/index.ts
 - category/[slug]/page.tsx
-- curriculum/languages.ts
+- curriculum/types.ts
 - store.ts
-- user-management-panel.tsx
+- badge.tsx
 - blog-image.ts
 - 001_app_schema.sql
-- checkout.ts
-- entitlements/schema.test.ts
+- local/repository.ts
+- user-management-panel.tsx
 - providers/index.ts
 - robots-metadata.test.ts
-- isLocalDataMode
+- checkout.ts
 - jalali.ts
 - seed.ts
 - schema.sql
 - compilerOptions
-- blog-post-editor.tsx
+- button.tsx
 - devDependencies
 - dependencies
 - content-form-panels.tsx
-- i18n/types.ts
+- server-locale.ts
 - components.json
-- create-content-section.tsx
 - utils.ts
-- local/repository.ts
-- BannerCarousel
+- learn-category-hero.tsx
+- period.ts
+- fx-rate/route.ts
 - blog-shell.tsx
-- curriculum-levels.ts
+- action-guards.ts
 - getDataRepository
 - page-skeletons.tsx
 - middleware.ts
-- useTranslations
+- [language]/page.tsx
 - blog/[slug]/page.tsx
 - admin.ts
-- admin-schemas.ts
+- markdown.ts
 - quiz-management/types.ts
 - 002_entitlements.sql
 - 20260804120000_billing_accounting.sql
 - data/repository.ts
-- requireSuperAdminAction
+- blog.ts
 - لندینگ‌پیج و بلاگ — سند تحویل
 - pricing.ts
-- edit-curriculum-level-dialog.tsx
+- add-curriculum-level-dialog.tsx
 - final-deployment/manifest.json
-- phone-auth-form.tsx
+- otp-challenge.ts
 - scripts
 - public/manifest.json
 - 20260813120000_entitlements_and_plan_periods.sql
 - quiz-form.tsx
 - video-lessons-grid.tsx
 - sync-local-content.mjs
-- admin-accounting-page-view.tsx
+- useTranslations
 - app/layout.tsx
 - billing-settings-form.tsx
 - billing/schema.test.ts
@@ -97,7 +97,7 @@
 - sections.tsx
 - @hookform/resolvers
 - pg
-- roles.ts
+- permissions/roles.ts
 - my-subscriptions-card.tsx
 - @radix-ui/react-dialog
 - send-limit.ts
@@ -128,9 +128,9 @@
 - public.user_quiz_attempts
 - "verification"
 - graphify reference: extra exports and benchmark
-- blog/types.ts
+- blog-post-card.tsx
 - actions/content.ts
-- dashboard-data.ts
+- availability.ts
 - graphify reference: query, path, explain
 - 004_landing_and_blog.sql
 - clsx
@@ -150,20 +150,20 @@
 - next
 - nodemailer
 - lucide-react
-- revalidateAppContent
+- requireAdminPermission
 - react-hook-form
 - @radix-ui/react-avatar
-- sms.ts
+- lesson-view.tsx
 - [quiz_id]/page.tsx
-- validations/auth.ts
-- [category]/page.tsx
+- edit-curriculum-level-dialog.tsx
+- getServerTranslator
 - @radix-ui/react-tabs
 - AdminDashboard
 - sonner
 - three
 - 006_banner_images.sql
 - public.grammar_rules
-- sha256.ts
+- UserQuizAttempt
 - Search engine visibility
 - 008_phone_auth.sql
 - hero.tsx
@@ -176,133 +176,136 @@
 - public.send_attempts
 - landing.ts
 - band-exams.test.ts
-- data-source.ts
-- rss.xml/route.ts
+- isLocalDataMode
+- llms.txt/route.ts
 - blog/languages.ts
-- quiz-tab-content.tsx
-- index.test.ts
-- decks.ts
-- plans.ts
+- getLocaleDefinition
+- entitlements/index.ts
+- 010_roles_rebuild.sql
+- public.lessons
 - BannerUploadForm
 - blog-share.tsx
+- public.profiles
 - 009_blog_refactor.sql
+- public.subscriptions
+- public.subscription_events
 
 ## God Nodes (most connected - your core abstractions)
-1. `useTranslations()` - 205 edges
+1. `useTranslations()` - 212 edges
 2. `cn()` - 187 edges
-3. `getDataRepository()` - 150 edges
-4. `DataRepository` - 115 edges
-5. `Button` - 67 edges
-6. `resolveMessage()` - 52 edges
-7. `revalidateAppContent()` - 48 edges
-8. `Badge()` - 41 edges
-9. `Lesson` - 38 edges
-10. `getServerTranslator()` - 37 edges
+3. `getDataRepository()` - 156 edges
+4. `DataRepository` - 121 edges
+5. `Button` - 70 edges
+6. `requireAdminPermission()` - 67 edges
+7. `resolveMessage()` - 59 edges
+8. `revalidateAppContent()` - 53 edges
+9. `Badge()` - 43 edges
+10. `Lesson` - 38 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `generateMetadata()` --calls--> `createPageMetadata()`  [EXTRACTED]
   app/(auth)/login/page.tsx → lib/i18n/metadata.ts
 - `generateMetadata()` --calls--> `createPageMetadata()`  [EXTRACTED]
   app/(auth)/welcome/page.tsx → lib/i18n/metadata.ts
-- `remove()` --calls--> `deleteBlogPostAction()`  [EXTRACTED]
-  components/admin/blog/blog-post-list.tsx → app/admin/actions/blog.ts
-- `saveAlt()` --calls--> `updateBlogImageAltAction()`  [EXTRACTED]
-  components/admin/blog/blog-image-library.tsx → app/admin/actions/blog.ts
-- `remove()` --calls--> `deleteBlogImageAction()`  [EXTRACTED]
-  components/admin/blog/blog-image-library.tsx → app/admin/actions/blog.ts
+- `postSchema` --calls--> `getBlogLanguage()`  [EXTRACTED]
+  app/admin/actions/blog.ts → lib/blog/languages.ts
+- `AdminLayout()` --calls--> `requireAdmin()`  [EXTRACTED]
+  app/admin/layout.tsx → lib/supabase/admin-guard.ts
+- `BlogPostPage()` --indirect_call--> `blogImageIdFromUrl()`  [INFERRED]
+  app/blog/[slug]/page.tsx → lib/data/blog-image.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (184 total, 64 thin omitted)
+## Communities (187 total, 66 thin omitted)
 
-### Community 0 - "button.tsx"
-Cohesion: 0.24
-Nodes (9): BandExamCard, BandExamsSection(), GrammarReader(), GrammarRuleWithPages, LessonViewProps, Button, ButtonProps, SignedGrammarPage (+1 more)
+### Community 0 - "grammar-rules-list.tsx"
+Cohesion: 0.16
+Nodes (7): GrammarReader(), attachGrammarPages(), GrammarPage, GrammarPageSummary, SignedGrammarPage, isObjectStorageConfigured(), GrammarRule
 
-### Community 1 - "postgres/repository.ts"
-Cohesion: 0.11
-Nodes (27): dynamic, dynamic, recordVerifyAttempt(), VerifyGate, blogImageUrl(), getAccountingSnapshot(), buildUpdate(), execute() (+19 more)
+### Community 1 - "postgres/client.ts"
+Cohesion: 0.13
+Nodes (20): dynamic, dynamic, recordVerifyAttempt(), VerifyGate, getAccountingSnapshot(), buildUpdate(), execute(), getPool() (+12 more)
 
 ### Community 2 - "DataRepository"
-Cohesion: 0.03
-Nodes (8): BlogImage, BlogPost, DataRepository, getLandingPricing(), GrammarRule, QuizQuestion, VideoLesson, Vocabulary
+Cohesion: 0.04
+Nodes (6): BlogPost, DataRepository, getLandingPricing(), Payment, VideoLesson, Vocabulary
 
 ### Community 3 - "fa.ts"
 Cohesion: 0.06
 Nodes (26): adminAccountingEn, adminAccountingFa, adminAccountingIt, adminBannersEn, adminBannersFa, adminBannersIt, adminContentEn, adminContentFa (+18 more)
 
-### Community 4 - "app-shell.tsx"
-Cohesion: 0.10
-Nodes (7): signOutAction(), AdminLayout(), UserNav(), AppHeader(), AppHeaderLeft(), AppShell(), clearProfileFlag()
-
 ### Community 5 - "better-auth.ts"
-Cohesion: 0.18
-Nodes (13): { GET, POST }, OtpInput(), absorb(), focusBox(), assertVerifiablePhone(), auth, VerifiableUser, POOL_OPTIONS (+5 more)
+Cohesion: 0.11
+Nodes (26): { GET, POST }, OtpInput(), absorb(), focusBox(), assertVerifiablePhone(), auth, VerifiableUser, POOL_OPTIONS (+18 more)
 
 ### Community 6 - "resolveMessage"
 Cohesion: 0.08
-Nodes (23): BillingSettingsForm(), handleRefreshRate(), onSubmit(), runAction(), handleConfirm(), GrammarForm(), onSubmit(), GrammarManager() (+15 more)
+Nodes (24): BillingSettingsForm(), handleRefreshRate(), onSubmit(), runAction(), onSubmit(), onSubmit(), EditCurriculumLevelDialog(), handleConfirm() (+16 more)
 
-### Community 7 - "Quiz"
-Cohesion: 0.14
-Nodes (18): isCategorySlug(), ContinueLearningProgress, resolveContinueLearningPath(), italian, languages, getLevelCheckpointQuizzes(), isLevelPassed(), resolveNextIncompleteLevel() (+10 more)
+### Community 7 - "Lesson"
+Cohesion: 0.17
+Nodes (14): ContinueLearningProgress, resolveContinueLearningPath(), italian, languages, getLevelCheckpointQuizzes(), isLevelPassed(), resolveNextIncompleteLevel(), getDefaultLanguageContext() (+6 more)
 
 ### Community 8 - "cn"
-Cohesion: 0.10
-Nodes (31): PlanActiveToggle(), ConfirmActionDialog(), LaparliLogo(), AuthAsidePanel(), AuthMobileHeader(), BrandLogo(), BrandMark(), LanguageSwitcher() (+23 more)
+Cohesion: 0.08
+Nodes (27): AdminLayout(), CheckRow(), Counter(), LessonsMonitor(), EntitlementSettingsPanel(), PlanActiveToggle(), LaparliLogo(), AdminHeaderBadge() (+19 more)
 
 ### Community 9 - "locale-provider.tsx"
-Cohesion: 0.14
-Nodes (16): AboutView(), TIMELINE_KEYS, VALUE_ICONS, CurriculumLevelManager(), LanguageManagementPanel(), RoleBadge(), StatusBadge(), PERMISSION_ROWS (+8 more)
+Cohesion: 0.15
+Nodes (12): AboutView(), TIMELINE_KEYS, VALUE_ICONS, RoleBadge(), StatusBadge(), UserQuizAttemptsPanel(), LocaleContext, LocaleContextValue (+4 more)
 
 ### Community 10 - "types/index.ts"
-Cohesion: 0.17
-Nodes (20): AccountingInput, buildAccountingSnapshot(), monthKey(), recentMonthKeys(), sliceBy(), sumBy(), build(), FX (+12 more)
+Cohesion: 0.11
+Nodes (25): SubscriptionViewProps, AccountingInput, buildAccountingSnapshot(), monthKey(), recentMonthKeys(), sliceBy(), sumBy(), build() (+17 more)
 
 ### Community 11 - "category/[slug]/page.tsx"
-Cohesion: 0.22
-Nodes (19): postSchema, BlogCategoryPage(), findCategory(), generateMetadata(), Props, BlogLanguagePage(), dynamic, generateMetadata() (+11 more)
+Cohesion: 0.21
+Nodes (20): BlogCategoryPage(), findCategory(), generateMetadata(), Props, BlogLanguagePage(), dynamic, generateMetadata(), Props (+12 more)
 
-### Community 12 - "curriculum/languages.ts"
+### Community 12 - "curriculum/types.ts"
 Cohesion: 0.14
-Nodes (11): ENGLISH_LEVELS, GERMAN_LEVELS, ITALIAN_LEVELS, getLanguagesMissingCodes(), LANGUAGE_CODES, CATEGORY_DEFINITIONS, LANGUAGES, TURKISH_LEVELS (+3 more)
+Nodes (18): LearnCategoryView(), ENGLISH_LEVELS, GERMAN_LEVELS, ITALIAN_LEVELS, getLanguagesMissingCodes(), LANGUAGE_CODES, CATEGORY_DEFINITIONS, LANGUAGES (+10 more)
 
 ### Community 13 - "store.ts"
-Cohesion: 0.17
-Nodes (19): DevModeBanner(), localFormat(), findLocalUserByPhone(), LOCAL_DEV_CODE, signInLocalByPhone(), setLocalSessionUserId(), commitStore(), LOCAL_SEED (+11 more)
+Cohesion: 0.16
+Nodes (19): DevModeBanner(), localFormat(), findLocalUserByPhone(), LOCAL_DEV_CODE, signInLocalByPhone(), setLocalSessionUserId(), LOCAL_SEED, LocalDatabase (+11 more)
 
-### Community 14 - "user-management-panel.tsx"
-Cohesion: 0.13
-Nodes (33): DeleteConfirmDialog(), LANDMARK_LABELS, LANGUAGE_LABELS, Draft, ToggleRow(), PERMISSION_ROWS, ManagedUser, getInitials() (+25 more)
+### Community 14 - "badge.tsx"
+Cohesion: 0.15
+Nodes (23): LANDMARK_LABELS, LANGUAGE_LABELS, CurriculumLevelManager(), LanguageManagementPanel(), discountedPrice(), SubscriptionPlanList(), TIER_COLUMNS, LevelQuizRow (+15 more)
 
 ### Community 15 - "blog-image.ts"
-Cohesion: 0.10
-Nodes (19): ALLOWED_BANNER_IMAGE_TYPES, BANNER_IMAGE_ROUTE, bannerImageUrl(), MAX_BANNER_IMAGE_BYTES, validateBannerImage(), ValidatedBannerImage, ALLOWED_BLOG_IMAGE_TYPES, BLOG_IMAGE_ROUTE (+11 more)
+Cohesion: 0.14
+Nodes (13): ALLOWED_BLOG_IMAGE_TYPES, BLOG_IMAGE_ROUTE, blogImageIdFromUrl(), ImageDimensions, isBlogImageUrl(), MAX_BLOG_IMAGE_BYTES, readImageDimensions(), readJpegDimensions() (+5 more)
 
 ### Community 16 - "001_app_schema.sql"
 Cohesion: 0.11
 Nodes (29): on_user_created, public.banners, public.cancel_my_subscription(), public.create_pending_payment(), public.curriculum_level_overrides, public.fail_payment(), public.fx_rates, public.grammar_rules (+21 more)
 
-### Community 17 - "checkout.ts"
-Cohesion: 0.19
-Nodes (12): buildRecoveryDeps(), CheckoutResult, recoverMyPendingPaymentsAction(), resolveOrigin(), startCheckoutAction(), handlePay(), getAvailableProviders(), failLocalPayment() (+4 more)
+### Community 17 - "local/repository.ts"
+Cohesion: 0.23
+Nodes (14): buildRecoveryDeps(), dynamic, GET(), markFailed(), redirectToResult(), settle(), BANNER_UPLOAD_DIR, BLOG_UPLOAD_DIR (+6 more)
+
+### Community 18 - "user-management-panel.tsx"
+Cohesion: 0.18
+Nodes (19): STATUS_STYLES, DeleteConfirmDialog(), handleConfirm(), LessonsTable(), AccountTierCell(), AccountTierCellData, getInitials(), UserManagementPanel() (+11 more)
 
 ### Community 19 - "providers/index.ts"
-Cohesion: 0.12
-Nodes (19): dynamic, POST(), manualProvider, PROVIDERS, stripeProvider, StripeWebhookEvent, BODY, verifyStripeWebhook() (+11 more)
+Cohesion: 0.17
+Nodes (15): manualProvider, PROVIDERS, stripeProvider, StripeWebhookEvent, CheckoutRequest, CheckoutResponse, PaymentProvider, VerifyRequest (+7 more)
 
-### Community 21 - "isLocalDataMode"
-Cohesion: 0.12
-Nodes (24): dynamic, GET(), supabaseFxStore(), dynamic, GET(), dynamic, GET(), dynamic (+16 more)
+### Community 21 - "checkout.ts"
+Cohesion: 0.15
+Nodes (15): CheckoutResult, recoverMyPendingPaymentsAction(), resolveOrigin(), startCheckoutAction(), dynamic, GET(), handlePay(), getAvailableProviders() (+7 more)
 
 ### Community 22 - "jalali.ts"
-Cohesion: 0.14
-Nodes (25): DateOfBirthField(), clampDay(), JalaliParts, BREAKS, div(), GregorianDate, gregorianToJalali(), gregorianToJdn() (+17 more)
+Cohesion: 0.10
+Nodes (33): DateOfBirthField(), clampDay(), BREAKS, div(), GregorianDate, gregorianToJalali(), gregorianToJdn(), isJalaliLeapYear() (+25 more)
 
 ### Community 23 - "seed.ts"
-Cohesion: 0.09
-Nodes (18): DEFAULT_PAYMENT_SETTINGS, DEFAULT_SUBSCRIPTION_TIERS, lessonIds, LOCAL_DEV_CREDENTIALS, quizIds, LocalAuthUser, DEFAULT_SUBSCRIPTION_PAGE_CONTENT, DEFAULT_SUBSCRIPTION_PLANS (+10 more)
+Cohesion: 0.14
+Nodes (15): DEFAULT_PAYMENT_SETTINGS, DEFAULT_SUBSCRIPTION_TIERS, lessonIds, LOCAL_DEV_CREDENTIALS, quizIds, DEFAULT_SUBSCRIPTION_PAGE_CONTENT, DEFAULT_SUBSCRIPTION_PLANS, LANGUAGE_SLUGS (+7 more)
 
 ### Community 24 - "schema.sql"
 Cohesion: 0.10
@@ -312,9 +315,9 @@ Nodes (18): private.is_admin(), protect_profile_privileged_fields, public.banner
 Cohesion: 0.08
 Nodes (25): dom, dom.iterable, esnext, next-env.d.ts, .next/types/**/*.ts, node_modules, **/*.ts, **/*.tsx (+17 more)
 
-### Community 26 - "blog-post-editor.tsx"
-Cohesion: 0.12
-Nodes (13): ACCEPTED_TYPES, ACCEPTED, BlogImageLibrary(), remove(), saveAlt(), formatBytes(), CheckRow(), Counter() (+5 more)
+### Community 26 - "button.tsx"
+Cohesion: 0.13
+Nodes (12): ACCEPTED_TYPES, ACCEPTED, LOCALES, Draft, ToggleRow(), ContactView(), ContactViewProps, ErrorState() (+4 more)
 
 ### Community 27 - "devDependencies"
 Cohesion: 0.07
@@ -325,40 +328,44 @@ Cohesion: 0.07
 Nodes (27): @aws-sdk/client-s3, gsap, next-themes, dependencies, @aws-sdk/client-s3, gsap, next-themes, @radix-ui/react-alert-dialog (+19 more)
 
 ### Community 29 - "content-form-panels.tsx"
-Cohesion: 0.12
-Nodes (20): ContentActionBar(), ContentFormPanel(), emptyGrammarEntry(), emptyQuestion, GrammarContentPanel(), GrammarEntry, GrammarEntryFields(), GrammarProgress (+12 more)
+Cohesion: 0.06
+Nodes (43): ContentActionBar(), ContentFormPanel(), emptyGrammarEntry(), emptyQuestion, GrammarContentPanel(), GrammarEntry, GrammarEntryFields(), GrammarProgress (+35 more)
 
-### Community 30 - "i18n/types.ts"
-Cohesion: 0.15
-Nodes (19): LOCALES, countdownTickMs(), formatCountdown(), fa, t, Translator, Unit, messages (+11 more)
+### Community 30 - "server-locale.ts"
+Cohesion: 0.17
+Nodes (20): DEFAULT_LOCALE, isAppLocale(), LOCALE_COOKIE_KEY, LOCALE_STORAGE_KEY, LocaleDefinition, LOCALES, fa, t (+12 more)
 
 ### Community 31 - "components.json"
 Cohesion: 0.09
 Nodes (21): aliases, components, hooks, lib, ui, utils, iconLibrary, menuAccent (+13 more)
 
-### Community 32 - "create-content-section.tsx"
-Cohesion: 0.21
-Nodes (9): AdminQuizzesPageView(), CONTENT_TYPES, CreateContentSection(), stepForJump(), CONTENT_CATEGORIES, ContentStatus, ContentWizardContext, ContentWizardTarget (+1 more)
+### Community 32 - "utils.ts"
+Cohesion: 0.13
+Nodes (13): CONTENT_TYPES, CreateContentSection(), findLessonForLevel(), stepForJump(), AdminSubscriptionPageView(), BannerCarousel(), FlagIcon(), FLAGS (+5 more)
 
-### Community 33 - "utils.ts"
-Cohesion: 0.10
-Nodes (35): DashboardWelcomeHeader(), DashboardWelcomeHeaderProps, getInitials(), CategoryWatermark(), CourseLevelAccordion(), COUNT_MESSAGE_KEYS, LearnCategoryHero(), LearnLevelView() (+27 more)
+### Community 33 - "learn-category-hero.tsx"
+Cohesion: 0.11
+Nodes (23): DashboardWelcomeHeader(), DashboardWelcomeHeaderProps, getInitials(), CategoryWatermark(), COUNT_MESSAGE_KEYS, LearnCategoryBackLink(), LearnCategoryHero(), LearnLevelView() (+15 more)
 
-### Community 34 - "local/repository.ts"
-Cohesion: 0.20
-Nodes (14): clearLocalSession(), addBillingMonths(), BillingPeriod, computeGraceDeadline(), computeRenewalPeriod(), daysInUtcMonth(), ENTITLED_STATUSES, isEntitled() (+6 more)
+### Community 34 - "period.ts"
+Cohesion: 0.30
+Nodes (9): addBillingMonths(), BillingPeriod, computeGraceDeadline(), computeRenewalPeriod(), daysInUtcMonth(), daysUntil(), isEntitled(), resolveStatusFromDates() (+1 more)
+
+### Community 35 - "fx-rate/route.ts"
+Cohesion: 0.18
+Nodes (13): dynamic, GET(), supabaseFxStore(), dynamic, GET(), dynamic, POST(), FxRateStore (+5 more)
 
 ### Community 36 - "blog-shell.tsx"
-Cohesion: 0.13
-Nodes (10): BlogShell(), NavChip(), BLOG_THEME_ATTRIBUTE, BLOG_THEME_STORAGE_KEY, BlogTheme, BlogThemeScript(), BlogThemeToggle(), toggle() (+2 more)
+Cohesion: 0.27
+Nodes (8): NavChip(), BLOG_THEME_ATTRIBUTE, BLOG_THEME_STORAGE_KEY, BlogTheme, BlogThemeScript(), BlogThemeToggle(), toggle(), syncBrowserThemeColor()
 
-### Community 37 - "curriculum-levels.ts"
-Cohesion: 0.19
-Nodes (19): addCurriculumLevelAction(), AddCurriculumLevelResult, deleteCurriculumLevelAction(), isCefrBand(), renameCurriculumLevelAction(), resetCurriculumLevelAction(), EditCurriculumLevelDialog(), handleConfirm() (+11 more)
+### Community 37 - "action-guards.ts"
+Cohesion: 0.14
+Nodes (13): RolePermissionsContext, AdminGuardResult, getRolePermissions(), GuardFail, GuardOk, requireAdminAction(), requireContentScope(), requireSuperAdminAction() (+5 more)
 
 ### Community 38 - "getDataRepository"
-Cohesion: 0.08
-Nodes (53): generateMetadata(), AdminQuizAttemptSummary, getUserQuizAttemptsForAdminAction(), destinationFor(), cancelSubscriptionAction(), saveGrammarReadingProgress(), AdminAccountingPage(), generateMetadata() (+45 more)
+Cohesion: 0.07
+Nodes (48): generateMetadata(), AdminQuizAttemptSummary, getUserQuizAttemptsForAdminAction(), cancelSubscriptionAction(), saveGrammarReadingProgress(), AdminAccountingPage(), generateMetadata(), AdminBannersPage() (+40 more)
 
 ### Community 39 - "page-skeletons.tsx"
 Cohesion: 0.15
@@ -366,27 +373,27 @@ Nodes (5): AdminSkeleton(), DashboardSkeleton(), LessonDetailSkeleton(), Profile
 
 ### Community 40 - "middleware.ts"
 Cohesion: 0.12
-Nodes (23): CompleteProfileForm(), onSubmit(), updateLocalSession(), getLocalSessionUserId(), getSessionSecret(), LOCAL_SESSION_COOKIE, signSession(), toBase64Url() (+15 more)
+Nodes (24): CompleteProfileForm(), onSubmit(), updateLocalSession(), clearLocalSession(), getLocalSessionUserId(), getSessionSecret(), LOCAL_SESSION_COOKIE, signSession() (+16 more)
 
-### Community 41 - "useTranslations"
-Cohesion: 0.07
-Nodes (31): AdminContentHeader(), AdminBannersPageView(), BannerManagementPanel(), LessonsMonitor(), LessonsMonitorPageView(), GrammarTable(), AdminLanguagesPageView(), LessonsTable() (+23 more)
+### Community 41 - "[language]/page.tsx"
+Cohesion: 0.25
+Nodes (8): PageProps, BandExamCard, BandExamsSection(), ComingSoonLanguage(), CourseLevelAccordion(), LearnLanguageView(), CURRICULUM_MESSAGE_KEYS, LocalizedText
 
 ### Community 42 - "blog/[slug]/page.tsx"
-Cohesion: 0.15
-Nodes (24): BlogPostPage(), generateMetadata(), Props, BlogToc(), countWords(), createBlogRenderer(), estimateReadingMinutes(), extractImageUrls() (+16 more)
+Cohesion: 0.31
+Nodes (14): BlogPostPage(), generateMetadata(), Props, extractImageUrls(), BLOG_ID(), blogEntityJsonLd(), blogPostingJsonLd(), BreadcrumbStep (+6 more)
 
 ### Community 43 - "admin.ts"
-Cohesion: 0.06
-Nodes (31): updateEntitlementSettingsAction(), updateSubscriptionPlanAction(), updateSubscriptionTierAction(), bannerSchema, BannerValues, BillingSettingsValues, contentVocabularySchema, ContentVocabularyValues (+23 more)
+Cohesion: 0.07
+Nodes (27): bannerSchema, BannerValues, BillingSettingsValues, contentVocabularySchema, ContentVocabularyValues, entitlementSettingsSchema, EntitlementSettingsValues, GrammarRuleValues (+19 more)
 
-### Community 44 - "admin-schemas.ts"
-Cohesion: 0.12
-Nodes (20): GrammarEditDialog(), onSubmit(), LessonEditDialog(), onSubmit(), AddCurriculumLevelValues, ContentVocabularyValues, createAddCurriculumLevelSchema(), createCurriculumLevelSchema() (+12 more)
+### Community 44 - "markdown.ts"
+Cohesion: 0.19
+Nodes (10): BlogToc(), countWords(), createBlogRenderer(), estimateReadingMinutes(), MarkdownContext, markdownToPlainText(), RenderedPost, renderMarkdown() (+2 more)
 
 ### Community 45 - "quiz-management/types.ts"
-Cohesion: 0.11
-Nodes (27): BandExam, getQuizSectionDescriptionKey(), getQuizSectionTitleKey(), isQuizSectionSlug(), SECTION_SLUGS, EnrichedQuiz, fetchEnrichedQuizzes(), deriveQuizMetadataFromLesson() (+19 more)
+Cohesion: 0.13
+Nodes (20): BandExam, groupLevelExamsByBand(), EnrichedQuiz, deriveQuizMetadataFromLesson(), findPublishedQuizForLevel(), findPublishedQuizzesForLevel(), resolveQuizCreateMetadata(), withQuizDefaults() (+12 more)
 
 ### Community 46 - "002_entitlements.sql"
 Cohesion: 0.18
@@ -397,32 +404,32 @@ Cohesion: 0.21
 Nodes (8): public.fx_rates, public.payment_settings, public.payments, public.refunds, public.subscription_events, public.subscriptions, public.webhook_events, auth.users
 
 ### Community 48 - "data/repository.ts"
-Cohesion: 0.10
-Nodes (10): BlogPostInput, AuthUser, ProfileSummary, QuizAttemptWithRelations, QuizWithLessonTitle, GrammarPage, GrammarPageSummary, Json (+2 more)
+Cohesion: 0.07
+Nodes (28): BlogImage, BlogPostInput, BlogPostStatus, CurriculumLevelOverrideRow, ALLOWED_BANNER_IMAGE_TYPES, BANNER_IMAGE_ROUTE, bannerImageUrl(), MAX_BANNER_IMAGE_BYTES (+20 more)
 
-### Community 49 - "requireSuperAdminAction"
-Cohesion: 0.10
-Nodes (25): recordManualPaymentAction(), refreshFxRateAction(), refundPaymentAction(), updateBillingSettingsAction(), uploadBannerAction(), BlogFormState, BlogImageUploadState, deleteBlogImageAction() (+17 more)
+### Community 49 - "blog.ts"
+Cohesion: 0.11
+Nodes (19): BlogFormState, BlogImageUploadState, deleteBlogImageAction(), deleteBlogPostAction(), optionalText, optionalUrl, postSchema, resolveUploadError() (+11 more)
 
 ### Community 50 - "لندینگ‌پیج و بلاگ — سند تحویل"
 Cohesion: 0.09
 Nodes (22): ابزارهایی که **همین الان** روی دیسک هستند, ~~الف) مایگریشن دیتابیس~~ — انجام شد ۱۴۰۵/۰۶/۲۰, ب) فایل لوگو — بلاک‌کننده, دو تلهٔ فنی که باید بداند, فایل‌های تغییریافته, فایل‌های جدید, لندینگ‌پیج و بلاگ — سند تحویل, مسیر پیشنهادی (ترکیبی) (+14 more)
 
 ### Community 51 - "pricing.ts"
-Cohesion: 0.16
-Nodes (23): SubscriptionPlanCards(), pricingFor(), rialFor(), formatRialAsToman(), BillingCurrency, centsToEur(), computePrice(), convertEurCentsToRial() (+15 more)
+Cohesion: 0.11
+Nodes (27): SubscriptionPlanCards(), pricingFor(), rialFor(), formatPaidAmount(), formatRialAsToman(), LOCALE_TAGS, BillingCurrency, centsToEur() (+19 more)
 
-### Community 52 - "edit-curriculum-level-dialog.tsx"
-Cohesion: 0.31
-Nodes (11): LOCALES, PROVIDER_ICONS, PROVIDER_LABELS, DialogContent, DialogDescription, DialogFooter(), DialogHeader(), DialogOverlay (+3 more)
+### Community 52 - "add-curriculum-level-dialog.tsx"
+Cohesion: 0.16
+Nodes (20): GrantPlanOption, ManagedUser, PROVIDER_ICONS, PROVIDER_LABELS, JalaliParts, DialogContent, DialogDescription, DialogFooter() (+12 more)
 
 ### Community 53 - "final-deployment/manifest.json"
 Cohesion: 0.18
 Nodes (10): background_color, description, display, icons, name, orientation, scope, short_name (+2 more)
 
-### Community 54 - "phone-auth-form.tsx"
-Cohesion: 0.14
-Nodes (24): getAuthChallenge(), localFormat(), ltr(), PhoneAuthForm(), fail(), submitPhone(), useSolvedChallenge(), CHALLENGE_DIFFICULTY (+16 more)
+### Community 54 - "otp-challenge.ts"
+Cohesion: 0.13
+Nodes (22): CHALLENGE_DIFFICULTY, ChallengeVerdict, INVALID, issueChallenge(), redeemChallenge(), secret(), sign(), signatureMatches() (+14 more)
 
 ### Community 55 - "scripts"
 Cohesion: 0.17
@@ -437,28 +444,28 @@ Cohesion: 0.22
 Nodes (7): public.list_my_pending_payments(), public.list_stale_pending_payments(), public.record_quiz_attempt(), public.subscription_tiers, public.payments, public.quizzes, public.subscriptions
 
 ### Community 58 - "quiz-form.tsx"
-Cohesion: 0.15
-Nodes (14): OPTION_KEYS, WizardQuestionFields(), OPTION_LABELS, QuestionFeedback, RadioGroup, RadioGroupItem, SelectContent, SelectItem (+6 more)
+Cohesion: 0.31
+Nodes (6): OPTION_KEYS, OPTION_LABELS, QuestionFeedback, RadioGroup, RadioGroupItem, useReducedMotion()
 
 ### Community 59 - "video-lessons-grid.tsx"
-Cohesion: 0.29
-Nodes (9): VideoCard(), VideoPoster(), isSafeId(), parseAparat(), parseVimeo(), parseYouTube(), toVideoEmbed(), VideoEmbed (+1 more)
+Cohesion: 0.26
+Nodes (10): VideoCard(), VideoLessonsGrid(), VideoPoster(), isSafeId(), parseAparat(), parseVimeo(), parseYouTube(), toVideoEmbed() (+2 more)
 
 ### Community 60 - "sync-local-content.mjs"
 Cohesion: 0.20
 Nodes (8): accounts, DIRECT, EXPORT_FILE, roleByUser, ROOT, store, STORE_FILE, summary
 
-### Community 61 - "admin-accounting-page-view.tsx"
-Cohesion: 0.15
-Nodes (21): AccountingKpis(), Tile(), AdminAccountingPageView(), BreakdownList(), PaymentsLedger(), handleExport(), STATUS_STYLES, toCsv() (+13 more)
+### Community 61 - "useTranslations"
+Cohesion: 0.08
+Nodes (36): AccountingKpis(), Tile(), AdminAccountingPageView(), BreakdownList(), PaymentsLedger(), handleExport(), toCsv(), RevenueChart() (+28 more)
 
 ### Community 62 - "app/layout.tsx"
-Cohesion: 0.12
-Nodes (19): instrumentSerif, inter, RootLayout(), vazirmatn, viewport, applyDocumentLocale(), LocaleProvider(), persistLocaleCookie() (+11 more)
+Cohesion: 0.22
+Nodes (8): instrumentSerif, inter, RootLayout(), vazirmatn, viewport, ServiceWorkerRegister(), Toaster(), ToasterProps
 
 ### Community 63 - "billing-settings-form.tsx"
-Cohesion: 0.26
-Nodes (17): LessonPicker(), Values, FormControl, FormDescription, FormField(), FormFieldContext, FormFieldContextValue, FormItem (+9 more)
+Cohesion: 0.20
+Nodes (23): GrammarEditDialog(), GrammarForm(), LessonPicker(), VocabularyEditDialog(), Values, FormControl, FormDescription, FormField() (+15 more)
 
 ### Community 65 - "vercel.json"
 Cohesion: 0.33
@@ -482,43 +489,43 @@ Nodes (3): public.user_learning_state, public.lessons, public.profiles
 
 ### Community 79 - "sections.tsx"
 Cohesion: 0.10
-Nodes (33): DayMeter(), GoldChip(), GoldTile(), IndexDial(), LiquidCard(), SectionBloom(), StepDisc(), StepTrail() (+25 more)
+Nodes (35): DayMeter(), GoldChip(), GoldTile(), IndexDial(), LiquidCard(), SectionBloom(), StepDisc(), StepTrail() (+27 more)
 
-### Community 83 - "roles.ts"
-Cohesion: 0.10
-Nodes (27): ChangeRoleDialog(), handleSave(), handleSubmit(), PendingActionType, UserRowActions(), ADMIN_ROLE_SLUGS, ALLOWED, canChangeUserRole() (+19 more)
+### Community 83 - "permissions/roles.ts"
+Cohesion: 0.06
+Nodes (57): updateRolePermissionsAction(), countSuperAdmins(), loadTarget(), updateUserAdminStatus(), updateUserAssignedLanguages(), updateUserRole(), updateUserStatus(), ChangeRoleDialog() (+49 more)
 
 ### Community 84 - "my-subscriptions-card.tsx"
-Cohesion: 0.15
-Nodes (14): Achievement, ACHIEVEMENT_ICONS, AchievementsSection(), ContinueLearningCard(), QuizSubmittedBanner(), StatCard(), UserDashboard(), daysRemaining() (+6 more)
+Cohesion: 0.12
+Nodes (17): Achievement, ACHIEVEMENT_ICONS, AchievementsSection(), ContinueLearningCard(), QuizSubmittedBanner(), StatCard(), UserDashboard(), daysRemaining() (+9 more)
 
 ### Community 86 - "send-limit.ts"
 Cohesion: 0.14
-Nodes (19): getTransport(), sendEmail(), claimSend(), countAndClaim(), Counts, decideEmail(), decideSms(), PHONE_LADDER_MS (+11 more)
+Nodes (18): getTransport(), sendEmail(), claimSend(), countAndClaim(), Counts, decideEmail(), decideSms(), PHONE_LADDER_MS (+10 more)
 
 ### Community 87 - "Laparli"
 Cohesion: 0.08
 Nodes (24): App identity (PWA), Build for production, Deploy to Vercel, Environment variables, File map, Laparli — Deployment Guide, Performance, Post-deploy checklist (+16 more)
 
 ### Community 90 - "refresh.ts"
-Cohesion: 0.16
-Nodes (10): FxFetchResult, FxRateProvider, getFxProvider(), navasanProvider, PROVIDERS, TgjuPayload, tgjuProvider, TgjuQuote (+2 more)
+Cohesion: 0.17
+Nodes (9): FxFetchResult, FxRateProvider, getFxProvider(), navasanProvider, PROVIDERS, TgjuPayload, tgjuProvider, TgjuQuote (+1 more)
 
 ### Community 91 - "What You Must Do When Invoked"
 Cohesion: 0.08
 Nodes (24): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, Part A - Structural extraction for code files (+16 more)
 
 ### Community 93 - "actions/auth.ts"
-Cohesion: 0.19
-Nodes (16): ActionResult, completeProfile(), decideAndSend(), describeVerifyFailure(), getClientIpForRateLimit(), padTiming(), refusalKey(), requestPhoneCode() (+8 more)
+Cohesion: 0.10
+Nodes (34): ActionResult, completeProfile(), decideAndSend(), describeVerifyFailure(), destinationFor(), getAuthChallenge(), getClientIpForRateLimit(), padTiming() (+26 more)
 
 ### Community 94 - "app/page.tsx"
-Cohesion: 0.17
-Nodes (15): FLAG_CODE, generateMetadata(), Home(), Landing(), useLocale(), getServerLocale(), getLandingCopy(), getCourseDecks() (+7 more)
+Cohesion: 0.15
+Nodes (18): FLAG_CODE, generateMetadata(), Home(), getServerLocale(), getLandingCopy(), COURSE_ORDER, DECKS, en (+10 more)
 
 ### Community 95 - "lessons-monitor.tsx"
-Cohesion: 0.12
-Nodes (19): LevelRow(), SLOT_META, SlotSquare(), STATE_KEY, add(), BandCoverage, buildContentCoverage(), ContentCoverageInput (+11 more)
+Cohesion: 0.08
+Nodes (32): AdminQuizzesPage(), PageProps, resolveRequestedSlot(), LevelRow(), LessonsMonitorPageView(), SLOT_META, SlotSquare(), STATE_KEY (+24 more)
 
 ### Community 104 - "public.grammar_pages"
 Cohesion: 0.40
@@ -528,17 +535,17 @@ Nodes (5): public.grammar_pages, public.grammar_reading_progress, public.grammar
 Cohesion: 0.22
 Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7a - FalkorDB export (only if --falkordb or --falkordb-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
 
-### Community 124 - "blog/types.ts"
-Cohesion: 0.22
-Nodes (9): BlogCardVariant, BlogPostCard(), Meta(), postHref(), formatBlogDate(), BLOG_PAGE_SIZE, BlogListResult, BlogCategory (+1 more)
+### Community 124 - "blog-post-card.tsx"
+Cohesion: 0.19
+Nodes (13): absolute(), dynamic, GET(), xmlEscape(), BlogPostList(), Pagination(), BlogCardVariant, BlogPostCard() (+5 more)
 
 ### Community 125 - "actions/content.ts"
-Cohesion: 0.12
-Nodes (31): abortGrammarUpload(), deleteContentQuiz(), deleteContentVideo(), finishGrammarUpload(), loadLessonContent(), renderGrammarPages(), startGrammarUpload(), submit() (+23 more)
+Cohesion: 0.10
+Nodes (39): abortGrammarUpload(), createContentVideo(), createContentVocabulary(), deleteContentQuiz(), deleteContentVideo(), finishGrammarUpload(), loadLessonContent(), renderGrammarPages() (+31 more)
 
-### Community 126 - "dashboard-data.ts"
-Cohesion: 0.17
-Nodes (7): buildLearnerEngagementMetrics(), LearnerEngagementMetrics, buildAchievements(), fetchAdminDashboardData(), fetchUserDashboardData(), UserStatus, fetchQuizManagementStats()
+### Community 126 - "availability.ts"
+Cohesion: 0.12
+Nodes (15): DashboardPage(), generateMetadata(), MenuPage(), generateMetadata(), SubscriptionPage(), getLanguagesWithAvailability(), getCurriculumLevelsForLanguage(), mergeLevelOverrides() (+7 more)
 
 ### Community 127 - "graphify reference: query, path, explain"
 Cohesion: 0.33
@@ -564,33 +571,33 @@ Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify refer
 Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
-### Community 146 - "revalidateAppContent"
+### Community 146 - "requireAdminPermission"
 Cohesion: 0.12
-Nodes (34): submitQuizAction(), deleteBannerAction(), reorderBannerAction(), updateBannerStatusAction(), createContentVideo(), createContentVocabulary(), createGrammarRule(), deleteGrammarRule() (+26 more)
+Nodes (38): submitQuizAction(), recordManualPaymentAction(), refreshFxRateAction(), refundPaymentAction(), updateBillingSettingsAction(), deleteBannerAction(), reorderBannerAction(), updateBannerStatusAction() (+30 more)
 
-### Community 149 - "sms.ts"
-Cohesion: 0.27
-Nodes (13): toLocalIranFormat(), assertConsoleAccepted(), assertRestAccepted(), credentials(), isSmsConfigured(), panelUsername(), post(), resolveMode() (+5 more)
+### Community 149 - "lesson-view.tsx"
+Cohesion: 0.23
+Nodes (10): generateMetadata(), LessonPage(), PageProps, GrammarRuleWithPages, LessonView(), LessonViewProps, findLevelByOrderNumber(), findLevelInLanguages() (+2 more)
 
 ### Community 150 - "[quiz_id]/page.tsx"
 Cohesion: 0.07
-Nodes (35): PageProps, QuizPage(), buildInitialFeedback(), QuizForm(), lockAnswer(), onSubmit(), NoQuestionsMessage(), QuizPageIntro() (+27 more)
+Nodes (34): generateMetadata(), PageProps, QuizPage(), buildInitialFeedback(), QuizForm(), lockAnswer(), onSubmit(), NoQuestionsMessage() (+26 more)
 
-### Community 151 - "validations/auth.ts"
-Cohesion: 0.18
-Nodes (10): completeProfileSchema, CompleteProfileValues, isVerifiablePhone(), latinName(), otpCodeSchema, phoneSchema, requestCodeSchema, verifyCodeSchema (+2 more)
+### Community 151 - "edit-curriculum-level-dialog.tsx"
+Cohesion: 0.45
+Nodes (9): AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter(), AlertDialogHeader(), AlertDialogOverlay, AlertDialogTitle (+1 more)
 
-### Community 152 - "[category]/page.tsx"
-Cohesion: 0.18
-Nodes (19): CategoryPage(), generateMetadata(), PageProps, generateMetadata(), LanguageCoursePage(), PageProps, getLanguageWithAvailability(), groupLevelExamsByBand() (+11 more)
+### Community 152 - "getServerTranslator"
+Cohesion: 0.16
+Nodes (20): CategoryPage(), generateMetadata(), PageProps, generateMetadata(), LevelPage(), PageProps, generateMetadata(), LanguageCoursePage() (+12 more)
 
 ### Community 155 - "AdminDashboard"
-Cohesion: 0.38
-Nodes (7): AdminDashboard(), languageLabel(), sectionLabel(), statusLabel(), getInitial(), LevelQuizRowDetails(), scoreBadgeClassName()
+Cohesion: 0.21
+Nodes (12): AdminDashboard(), languageLabel(), sectionLabel(), statusLabel(), getInitial(), LevelQuizRowDetails(), scoreBadgeClassName(), getQuizSectionDescriptionKey() (+4 more)
 
-### Community 160 - "sha256.ts"
-Cohesion: 0.24
-Nodes (8): encoder, h, INITIAL, K, rotr(), sha256(), sha256Hex(), w
+### Community 160 - "UserQuizAttempt"
+Cohesion: 0.18
+Nodes (5): GradedQuizQuestion, OPTION_FIELDS, fetchQuizManagementStats(), QuizQuestion, UserQuizAttempt
 
 ### Community 161 - "Search engine visibility"
 Cohesion: 0.40
@@ -609,32 +616,32 @@ Cohesion: 0.50
 Nodes (3): form(), mode, post()
 
 ### Community 172 - "landing.ts"
-Cohesion: 0.28
-Nodes (7): setLandingLanguageVisibilityAction(), AdminLandingPage(), metadata, LandingLanguagePanel(), toggle(), isLandingLanguageSlug(), getLandingLanguageToggles()
+Cohesion: 0.50
+Nodes (4): setLandingLanguageVisibilityAction(), LandingLanguagePanel(), toggle(), isLandingLanguageSlug()
 
-### Community 174 - "data-source.ts"
+### Community 174 - "isLocalDataMode"
+Cohesion: 0.26
+Nodes (9): WelcomePreviewPage(), DataSource, getDataSource(), isLocalDataMode(), isPostgresDataMode(), isSupabaseDataMode(), raw, loadModule() (+1 more)
+
+### Community 175 - "llms.txt/route.ts"
 Cohesion: 0.31
-Nodes (7): DataSource, getDataSource(), isPostgresDataMode(), isSupabaseDataMode(), raw, loadModule(), getActiveDataSourceLabel()
-
-### Community 175 - "rss.xml/route.ts"
-Cohesion: 0.36
-Nodes (7): absolute(), dynamic, GET(), xmlEscape(), BlogPostList(), remove(), resolveBlogLanguages()
+Nodes (7): generateMetadata(), dynamic, GET(), text(), dynamic, robots(), isSiteIndexable()
 
 ### Community 176 - "blog/languages.ts"
-Cohesion: 0.13
-Nodes (15): generateMetadata(), dynamic, GET(), text(), dynamic, robots(), dynamic, revalidate (+7 more)
+Cohesion: 0.22
+Nodes (8): dynamic, revalidate, sitemap(), BlogCta(), BLOG_LANGUAGES, BlogLanguage, BlogLanguageSlug, BY_SLUG
 
-### Community 177 - "quiz-tab-content.tsx"
-Cohesion: 0.29
-Nodes (6): QuizCard(), QuizTabContent(), CATEGORY_ACCENTS, CATEGORY_ICON_BG, CATEGORY_ICON_TINT, CATEGORY_ICONS
+### Community 177 - "getLocaleDefinition"
+Cohesion: 0.31
+Nodes (7): applyDocumentLocale(), LocaleProvider(), persistLocaleCookie(), readLocaleCookie(), readStoredLocale(), getLocaleDefinition(), localizeDigits()
 
-### Community 179 - "decks.ts"
-Cohesion: 0.33
-Nodes (5): COURSE_ORDER, DECKS, en, fa, it
+### Community 178 - "entitlements/index.ts"
+Cohesion: 0.11
+Nodes (10): ENTITLED_STATUSES, ALL_UNLOCKED, Entitlement, EntitlementGate, TIERS, AccountTier, FREE_TIER, isLiveSubscription() (+2 more)
 
-### Community 180 - "plans.ts"
-Cohesion: 0.50
-Nodes (3): SUBSCRIPTION_PLAN_META, SubscriptionPlanId, SubscriptionPlanMeta
+### Community 179 - "010_roles_rebuild.sql"
+Cohesion: 0.40
+Nodes (4): public.grant_subscription(), public.role_permission_overrides, "user", public.subscription_tiers
 
 ### Community 181 - "BannerUploadForm"
 Cohesion: 0.60
@@ -645,24 +652,24 @@ Cohesion: 0.40
 Nodes (4): public.blog_images, public.blog_post_languages, public.profiles, public.blog_posts
 
 ## Knowledge Gaps
-- **562 isolated node(s):** `next/core-web-vitals`, `next/typescript`, `ActionResult`, `CheckoutResult`, `optionalText` (+557 more)
+- **573 isolated node(s):** `next/core-web-vitals`, `next/typescript`, `ActionResult`, `CheckoutResult`, `optionalText` (+568 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **64 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **66 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getDataRepository()` connect `getDataRepository` to `postgres/repository.ts`, `app-shell.tsx`, `category/[slug]/page.tsx`, `checkout.ts`, `revalidateAppContent`, `isLocalDataMode`, `[quiz_id]/page.tsx`, `[category]/page.tsx`, `curriculum-levels.ts`, `blog/[slug]/page.tsx`, `admin.ts`, `landing.ts`, `data-source.ts`, `rss.xml/route.ts`, `blog/languages.ts`, `requireSuperAdminAction`, `phone-accounts.ts`, `actions/auth.ts`, `app/page.tsx`, `blog/types.ts`, `actions/content.ts`?**
-  _High betweenness centrality (0.073) - this node is a cross-community bridge._
-- **Why does `cn()` connect `cn` to `button.tsx`, `better-auth.ts`, `locale-provider.tsx`, `category/[slug]/page.tsx`, `user-management-panel.tsx`, `[quiz_id]/page.tsx`, `blog-post-editor.tsx`, `create-content-section.tsx`, `utils.ts`, `BannerCarousel`, `blog-shell.tsx`, `useTranslations`, `blog/[slug]/page.tsx`, `quiz-tab-content.tsx`, `pricing.ts`, `edit-curriculum-level-dialog.tsx`, `BannerUploadForm`, `phone-auth-form.tsx`, `quiz-form.tsx`, `admin-accounting-page-view.tsx`, `app/layout.tsx`, `billing-settings-form.tsx`, `sections.tsx`, `my-subscriptions-card.tsx`, `lessons-monitor.tsx`, `blog/types.ts`?**
-  _High betweenness centrality (0.066) - this node is a cross-community bridge._
-- **Why does `useTranslations()` connect `useTranslations` to `button.tsx`, `app-shell.tsx`, `resolveMessage`, `cn`, `locale-provider.tsx`, `user-management-panel.tsx`, `revalidateAppContent`, `[quiz_id]/page.tsx`, `jalali.ts`, `blog-post-editor.tsx`, `AdminDashboard`, `content-form-panels.tsx`, `create-content-section.tsx`, `utils.ts`, `BannerCarousel`, `curriculum-levels.ts`, `middleware.ts`, `admin-schemas.ts`, `quiz-tab-content.tsx`, `pricing.ts`, `edit-curriculum-level-dialog.tsx`, `BannerUploadForm`, `phone-auth-form.tsx`, `quiz-form.tsx`, `video-lessons-grid.tsx`, `admin-accounting-page-view.tsx`, `billing-settings-form.tsx`, `roles.ts`, `my-subscriptions-card.tsx`, `app/page.tsx`, `lessons-monitor.tsx`, `actions/content.ts`?**
-  _High betweenness centrality (0.064) - this node is a cross-community bridge._
+- **Why does `cn()` connect `cn` to `better-auth.ts`, `locale-provider.tsx`, `types/index.ts`, `category/[slug]/page.tsx`, `badge.tsx`, `user-management-panel.tsx`, `[quiz_id]/page.tsx`, `edit-curriculum-level-dialog.tsx`, `button.tsx`, `utils.ts`, `learn-category-hero.tsx`, `blog-shell.tsx`, `[language]/page.tsx`, `markdown.ts`, `blog.ts`, `pricing.ts`, `add-curriculum-level-dialog.tsx`, `BannerUploadForm`, `quiz-form.tsx`, `useTranslations`, `app/layout.tsx`, `billing-settings-form.tsx`, `sections.tsx`, `my-subscriptions-card.tsx`, `actions/auth.ts`, `lessons-monitor.tsx`, `blog-post-card.tsx`?**
+  _High betweenness centrality (0.101) - this node is a cross-community bridge._
+- **Why does `getDataRepository()` connect `getDataRepository` to `postgres/client.ts`, `app-shell.tsx`, `category/[slug]/page.tsx`, `local/repository.ts`, `requireAdminPermission`, `checkout.ts`, `lesson-view.tsx`, `[quiz_id]/page.tsx`, `getServerTranslator`, `fx-rate/route.ts`, `action-guards.ts`, `[language]/page.tsx`, `blog/[slug]/page.tsx`, `landing.ts`, `isLocalDataMode`, `llms.txt/route.ts`, `blog/languages.ts`, `blog.ts`, `phone-accounts.ts`, `permissions/roles.ts`, `actions/auth.ts`, `app/page.tsx`, `lessons-monitor.tsx`, `blog-post-card.tsx`, `actions/content.ts`, `availability.ts`?**
+  _High betweenness centrality (0.065) - this node is a cross-community bridge._
+- **Why does `useTranslations()` connect `useTranslations` to `grammar-rules-list.tsx`, `resolveMessage`, `cn`, `locale-provider.tsx`, `types/index.ts`, `curriculum/types.ts`, `badge.tsx`, `user-management-panel.tsx`, `requireAdminPermission`, `lesson-view.tsx`, `[quiz_id]/page.tsx`, `edit-curriculum-level-dialog.tsx`, `jalali.ts`, `button.tsx`, `AdminDashboard`, `content-form-panels.tsx`, `utils.ts`, `learn-category-hero.tsx`, `middleware.ts`, `[language]/page.tsx`, `pricing.ts`, `add-curriculum-level-dialog.tsx`, `BannerUploadForm`, `quiz-form.tsx`, `video-lessons-grid.tsx`, `billing-settings-form.tsx`, `sections.tsx`, `permissions/roles.ts`, `my-subscriptions-card.tsx`, `actions/auth.ts`, `lessons-monitor.tsx`, `actions/content.ts`?**
+  _High betweenness centrality (0.058) - this node is a cross-community bridge._
 - **What connects `next/core-web-vitals`, `next/typescript`, `ActionResult` to the rest of the system?**
-  _562 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `postgres/repository.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.1126984126984127 - nodes in this community are weakly interconnected._
+  _573 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `postgres/client.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.1349206349206349 - nodes in this community are weakly interconnected._
 - **Should `DataRepository` be split into smaller, more focused modules?**
-  _Cohesion score 0.03279279279279279 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.035897435897435895 - nodes in this community are weakly interconnected._
 - **Should `fa.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.05878084179970972 - nodes in this community are weakly interconnected._

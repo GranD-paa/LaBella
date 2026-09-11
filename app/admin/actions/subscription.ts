@@ -1,6 +1,6 @@
 "use server";
 
-import { requireSuperAdminAction } from "@/lib/auth/action-guards";
+import { requireAdminPermission } from "@/lib/auth/action-guards";
 import { getDataRepository } from "@/lib/data";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
@@ -19,7 +19,7 @@ export async function updateSubscriptionPlanAction(
   languageSlug: string,
   values: unknown
 ): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageSubscriptions");
   if (!guard.ok) return { error: guard.error };
 
   const parsed = subscriptionPlanSchema.safeParse(values);
@@ -48,7 +48,7 @@ export async function updateSubscriptionTierAction(
   planSlug: string,
   values: unknown
 ): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageSubscriptions");
   if (!guard.ok) return { error: guard.error };
 
   const parsed = subscriptionTierSchema.safeParse(values);
@@ -77,7 +77,7 @@ export async function updateSubscriptionTierAction(
 export async function updateEntitlementSettingsAction(
   values: unknown
 ): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageSubscriptions");
   if (!guard.ok) return { error: guard.error };
 
   const parsed = entitlementSettingsSchema.safeParse(values);

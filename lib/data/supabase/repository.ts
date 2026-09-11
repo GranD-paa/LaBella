@@ -38,7 +38,9 @@ export function createSupabaseRepository(): DataRepository {
       const supabase = await createClient();
       const { data } = await supabase
         .from("profiles")
-        .select("id, full_name, avatar_url, email, is_admin, role, status, created_at")
+        .select(
+          "id, full_name, avatar_url, email, is_admin, role, status, assigned_languages, created_at"
+        )
         .eq("id", userId)
         .single();
       return data;
@@ -48,7 +50,9 @@ export function createSupabaseRepository(): DataRepository {
       const supabase = await createClient();
       const { data } = await supabase
         .from("profiles")
-        .select("id, full_name, avatar_url, email, is_admin, role, status, created_at")
+        .select(
+          "id, full_name, avatar_url, email, is_admin, role, status, assigned_languages, created_at"
+        )
         .order("created_at", { ascending: false });
       return data ?? [];
     },
@@ -128,6 +132,50 @@ export function createSupabaseRepository(): DataRepository {
         .update({ status })
         .eq("id", userId);
 
+      return error ? { error: error.message } : {};
+    },
+
+    async updateUserAssignedLanguages(userId, languages) {
+      const supabase = await createClient();
+      const authUser = await this.getAuthUser();
+      if (!authUser) return { error: "You must be signed in." };
+
+      const currentProfile = await this.getProfileById(authUser.id);
+      if (!currentProfile?.is_admin) {
+        return { error: "Only admins can manage language assignments." };
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({ assigned_languages: languages })
+        .eq("id", userId);
+      return error ? { error: error.message } : {};
+    },
+
+    async getRolePermissionOverrides() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("role_permission_overrides")
+        .select("role_slug, permissions");
+
+      return Object.fromEntries(
+        (data ?? []).map((row) => [
+          row.role_slug,
+          (row.permissions ?? {}) as Record<string, boolean>,
+        ])
+      );
+    },
+
+    async setRolePermissionOverride(roleSlug, permissions, updatedBy) {
+      const supabase = await createClient();
+      const { error } = await supabase
+        .from("role_permission_overrides")
+        .upsert({
+          role_slug: roleSlug,
+          permissions,
+          updated_at: new Date().toISOString(),
+          updated_by: updatedBy,
+        });
       return error ? { error: error.message } : {};
     },
 
@@ -315,6 +363,37 @@ export function createSupabaseRepository(): DataRepository {
         .eq("id", id)
         .single();
       return data;
+    },
+
+    async getContentLanguage(kind, id) {
+      const supabase = await createClient();
+
+      if (kind === "quiz" || kind === "video") {
+        const { data } = await supabase
+          .from(kind === "quiz" ? "quizzes" : "video_lessons")
+          .select("language_slug")
+          .eq("id", id)
+          .maybeSingle();
+        return data?.language_slug ?? null;
+      }
+
+      let lessonId = id;
+      if (kind !== "lesson") {
+        const { data } = await supabase
+          .from(kind === "vocabulary" ? "vocabulary" : "grammar_rules")
+          .select("lesson_id")
+          .eq("id", id)
+          .maybeSingle();
+        if (!data) return null;
+        lessonId = data.lesson_id;
+      }
+
+      const { data: lesson } = await supabase
+        .from("lessons")
+        .select("language_slug")
+        .eq("id", lessonId)
+        .maybeSingle();
+      return lesson?.language_slug ?? null;
     },
 
     async getLessonByOrderNumber(orderNumber) {
@@ -507,11 +586,12 @@ export function createSupabaseRepository(): DataRepository {
       };
     },
 
-    async createLesson({ title, description, orderNumber }) {
+    async createLesson({ title, description, languageSlug, orderNumber }) {
       const supabase = await createClient();
       const { error } = await supabase.from("lessons").insert({
         title,
         description,
+        language_slug: languageSlug,
         order_number: orderNumber,
       });
       return error ? { error: error.message } : {};
@@ -1068,6 +1148,61 @@ export function createSupabaseRepository(): DataRepository {
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
       return data ?? [];
+    },
+
+    async getLiveSubscriptionSummaries() {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("subscriptions")
+        .select(
+          "user_id, plan_slug, language_slug, status, current_period_end, granted_by, granted_at"
+        )
+        .in("status", ["active", "past_due"])
+        .order("current_period_end", { ascending: false });
+
+      const rows = data ?? [];
+      const granterIds = Array.from(
+        new Set(
+          rows
+            .map((row) => row.granted_by)
+            .filter((id): id is string => Boolean(id))
+        )
+      );
+
+      const names = new Map<string, string | null>();
+      if (granterIds.length > 0) {
+        const { data: granters } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", granterIds);
+        for (const granter of granters ?? []) {
+          names.set(granter.id, granter.full_name);
+        }
+      }
+
+      return rows.map((row) => ({
+        userId: row.user_id,
+        planSlug: row.plan_slug,
+        languageSlug: row.language_slug,
+        status: row.status,
+        currentPeriodEnd: row.current_period_end,
+        grantedBy: row.granted_by,
+        grantedByName: row.granted_by ? names.get(row.granted_by) ?? null : null,
+        grantedAt: row.granted_at,
+      }));
+    },
+
+    async grantSubscription(input) {
+      const supabase = await createClient();
+      const { error } = await supabase.rpc("grant_subscription", {
+        p_user_id: input.userId,
+        p_plan_slug: input.planSlug,
+        p_language_slug: input.languageSlug,
+        p_period_months: input.periodMonths,
+        p_granted_by: input.grantedBy,
+        p_note: input.note ?? null,
+      });
+      return error ? { error: error.message } : {};
     },
 
     async getEntitlingSubscription(userId, languageSlug) {

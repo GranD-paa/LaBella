@@ -16,6 +16,7 @@ import {
 import { ContentFormPanel } from "@/components/admin/content/content-form-panels";
 import { ExistingContentList } from "@/components/admin/content/existing-content-list";
 import { LessonForm } from "@/components/admin/lessons/lesson-form";
+import type { LessonValues } from "@/lib/validations/i18n/admin-schemas";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -87,6 +88,28 @@ const CONTENT_TYPES: Array<{
  * yet, in which case there is nothing to attach content to and the lesson step
  * comes first.
  */
+/**
+ * The lesson backing one level of one curriculum.
+ *
+ * Matched on order number, as every other lookup in the app does, and then on
+ * language — which rules out a lesson belonging to a curriculum the admin is
+ * not standing in. Lessons written before `language_slug` existed all read
+ * back as Italian's, which is what they are.
+ */
+function findLessonForLevel(
+  lessons: Lesson[],
+  languageSlug: string,
+  orderNumber: number
+): Lesson | null {
+  return (
+    lessons.find(
+      (lesson) =>
+        lesson.order_number === orderNumber &&
+        lesson.language_slug === languageSlug
+    ) ?? null
+  );
+}
+
 function stepForJump(
   target: ContentWizardTarget,
   languages: CurriculumLanguage[],
@@ -95,7 +118,7 @@ function stepForJump(
   const language = languages.find((entry) => entry.slug === target.languageSlug);
   const level = language?.levels.find((entry) => entry.slug === target.levelSlug);
   const lesson = level
-    ? lessons.find((entry) => entry.order_number === level.orderNumber)
+    ? findLessonForLevel(lessons, target.languageSlug, level.orderNumber)
     : undefined;
 
   return lesson ? 4 : 2;
@@ -124,8 +147,11 @@ export function CreateContentSection({
   const [step, setStep] = useState(() =>
     jumpTarget ? stepForJump(jumpTarget, languages, lessons) : 1
   );
+  // Defaults to the first curriculum this admin may open rather than to
+  // Italian: a teacher scoped to German must not land on a language they are
+  // not allowed to touch.
   const [languageSlug, setLanguageSlug] = useState(
-    jumpTarget?.languageSlug ?? "italian"
+    jumpTarget?.languageSlug ?? languages[0]?.slug ?? "italian"
   );
   const [levelSlug, setLevelSlug] = useState(jumpTarget?.levelSlug ?? "a1-1");
   const [contentType, setContentType] = useState<ContentCategorySlug | null>(
@@ -152,11 +178,8 @@ export function CreateContentSection({
 
   const lessonForLevel = useMemo(() => {
     if (!selectedLevel) return null;
-    return (
-      lessons.find((lesson) => lesson.order_number === selectedLevel.orderNumber) ??
-      null
-    );
-  }, [lessons, selectedLevel]);
+    return findLessonForLevel(lessons, languageSlug, selectedLevel.orderNumber);
+  }, [lessons, languageSlug, selectedLevel]);
 
   // Later jumps — the admin comes back from the monitor without this component
   // being remounted — arrive as a new nonce and are applied here.
@@ -335,9 +358,10 @@ export function CreateContentSection({
                     {t("admin.content.noLessonMapped")}
                   </p>
                   <LessonForm
-                    key={selectedLevel.slug}
+                    key={`${languageSlug}-${selectedLevel.slug}`}
                     defaultTitle={selectedLevel.title}
                     defaultOrderNumber={selectedLevel.orderNumber}
+                    languageSlug={languageSlug as LessonValues["languageSlug"]}
                     onSuccess={onSuccess}
                   />
                 </div>

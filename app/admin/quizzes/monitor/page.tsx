@@ -4,19 +4,20 @@ import { LessonsMonitorPageView } from "@/components/admin/content/lessons-monit
 import { getLanguagesWithAvailability } from "@/lib/curriculum/availability";
 import { getDataRepository } from "@/lib/data";
 import { createPageMetadata } from "@/lib/i18n/metadata";
-import { requireAdmin } from "@/lib/supabase/admin-guard";
+import { requireAdminPage } from "@/lib/supabase/admin-guard";
+import { scopeLanguageList } from "@/lib/permissions/roles";
 
 export async function generateMetadata(): Promise<Metadata> {
   return createPageMetadata("meta.adminLessonsMonitor");
 }
 
 export default async function AdminLessonsMonitorPage() {
-  await requireAdmin();
+  const { role, assignedLanguages } = await requireAdminPage("manageContent");
   const repo = getDataRepository();
 
   const [
     lessons,
-    languages,
+    allLanguages,
     quizzes,
     quizQuestions,
     grammarRules,
@@ -31,6 +32,8 @@ export default async function AdminLessonsMonitorPage() {
     repo.getAllVocabulary(),
     repo.getAllVideoLessons(),
   ]);
+
+  const languages = scopeLanguageList(allLanguages, role, assignedLanguages);
 
   return (
     <LessonsMonitorPageView

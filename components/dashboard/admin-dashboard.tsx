@@ -38,15 +38,22 @@ import {
 } from "@/components/ui/table";
 import type { AdminDashboardData } from "@/lib/dashboard-data";
 import { getQuizSectionTitleKey } from "@/lib/i18n/quiz-sections";
+import { LANGUAGE_LABEL_KEYS } from "@/lib/i18n/language-labels";
+import type { AdminNavItem } from "@/lib/permissions/admin-nav";
+import type { RolePermissions } from "@/lib/permissions/roles";
+
+const NAV_ICONS = {
+  ListChecks,
+  Users,
+  Languages,
+  ImageIcon,
+  CreditCard,
+  Receipt,
+  FileText,
+  Landmark,
+} as const;
 
 type LevelQuizRow = AdminDashboardData["levelQuizOverview"][number];
-
-const LANGUAGE_LABEL_KEYS: Record<string, string> = {
-  italian: "dashboard.admin.languageItalian",
-  english: "dashboard.admin.languageEnglish",
-  german: "dashboard.admin.languageGerman",
-  turkish: "dashboard.admin.languageTurkish",
-};
 
 function scoreBadgeClassName(score: number) {
   if (score >= 80) {
@@ -169,16 +176,29 @@ export function AdminDashboard({
   data,
   displayName,
   showFullManagement = false,
-  isSuperAdmin = false,
+  navItems = [],
+  permissions,
 }: {
   data: AdminDashboardData;
   displayName: string;
   currentUserId?: string;
   showFullManagement?: boolean;
-  isSuperAdmin?: boolean;
+  /** The admin pages this role may open, already filtered server-side. */
+  navItems?: AdminNavItem[];
+  /** Decides which panels below the links are worth rendering at all. */
+  permissions: RolePermissions;
 }) {
   const { t, formatDate } = useTranslations();
   const [expandedLevel, setExpandedLevel] = useState<string | null>(null);
+
+  // The panels below the links follow the same rule the links do: a role is
+  // shown what it may act on, and nothing else. A writer has no business
+  // reading learner names and quiz scores on their way to the blog.
+  const canSeeLearners = permissions.fullAccess || permissions.viewUsers;
+  const canSeeContent =
+    permissions.fullAccess ||
+    permissions.manageContent ||
+    permissions.manageQuizzes;
 
   function languageLabel(slug: string) {
     const key = LANGUAGE_LABEL_KEYS[slug];
@@ -226,75 +246,28 @@ export function AdminDashboard({
             </Button>
           ) : (
             <div className="flex w-full flex-col gap-2 sm:w-64">
-              <Button asChild variant="outline" className="w-full justify-start border-white/20">
-                <Link href="/admin/quizzes">
-                  <ListChecks className="h-4 w-4" />
-                  {t("dashboard.admin.manageQuizzes")}
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="w-full justify-start border-white/20">
-                <Link href="/admin">
-                  <Users className="h-4 w-4" />
-                  {t("dashboard.admin.manageUsers")}
-                </Link>
-              </Button>
-              {isSuperAdmin ? (
-                <Button asChild variant="outline" className="w-full justify-start border-white/20">
-                  <Link href="/admin/languages">
-                    <Languages className="h-4 w-4" />
-                    {t("dashboard.admin.manageLanguages")}
-                  </Link>
-                </Button>
-              ) : null}
-              {isSuperAdmin ? (
-                <Button asChild variant="outline" className="w-full justify-start border-white/20">
-                  <Link href="/admin/banners">
-                    <ImageIcon className="h-4 w-4" />
-                    {t("dashboard.admin.manageBanners")}
-                  </Link>
-                </Button>
-              ) : null}
-              {isSuperAdmin ? (
-                <Button asChild variant="outline" className="w-full justify-start border-white/20">
-                  <Link href="/admin/subscription">
-                    <CreditCard className="h-4 w-4" />
-                    {t("dashboard.admin.manageSubscription")}
-                  </Link>
-                </Button>
-              ) : null}
-              {isSuperAdmin ? (
-                <Button asChild variant="outline" className="w-full justify-start border-white/20">
-                  <Link href="/admin/accounting">
-                    <Receipt className="h-4 w-4" />
-                    {t("dashboard.admin.manageAccounting")}
-                  </Link>
-                </Button>
-              ) : null}
-              {/* The blog and the landing showcase are Persian-only surfaces
-                  (see components/admin/blog), so their labels are literal
-                  rather than translation keys. */}
-              {isSuperAdmin ? (
-                <Button asChild variant="outline" className="w-full justify-start border-white/20">
-                  <Link href="/admin/blog">
-                    <FileText className="h-4 w-4" />
-                    مدیریت وبلاگ
-                  </Link>
-                </Button>
-              ) : null}
-              {isSuperAdmin ? (
-                <Button asChild variant="outline" className="w-full justify-start border-white/20">
-                  <Link href="/admin/landing">
-                    <Landmark className="h-4 w-4" />
-                    صفحهٔ اصلی
-                  </Link>
-                </Button>
-              ) : null}
+              {navItems.map((item) => {
+                const Icon = NAV_ICONS[item.icon];
+                return (
+                  <Button
+                    key={item.href}
+                    asChild
+                    variant="outline"
+                    className="w-full justify-start border-white/20"
+                  >
+                    <Link href={item.href}>
+                      <Icon className="h-4 w-4" />
+                      {item.labelKey ? t(item.labelKey) : item.label}
+                    </Link>
+                  </Button>
+                );
+              })}
             </div>
           )}
         </div>
       </section>
 
-      {!showFullManagement ? (
+      {!showFullManagement && (canSeeLearners || canSeeContent) ? (
         <section>
           <Card className="brand-surface">
             <CardHeader>
@@ -306,12 +279,16 @@ export function AdminDashboard({
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <StatCard
-                  title={t("dashboard.admin.totalUsers")}
-                  value={data.stats.totalUsers}
-                  description={t("dashboard.admin.registeredLearners")}
-                  icon={Users}
-                />
+                {canSeeLearners ? (
+                  <StatCard
+                    title={t("dashboard.admin.totalUsers")}
+                    value={data.stats.totalUsers}
+                    description={t("dashboard.admin.registeredLearners")}
+                    icon={Users}
+                  />
+                ) : null}
+                {canSeeContent ? (
+                  <>
                 <StatCard
                   title={t("dashboard.admin.totalQuizzes")}
                   value={data.stats.totalQuizzes}
@@ -336,13 +313,15 @@ export function AdminDashboard({
                   })}
                   icon={CheckCircle2}
                 />
+                  </>
+                ) : null}
               </div>
             </CardContent>
           </Card>
         </section>
       ) : null}
 
-      {!showFullManagement ? (
+      {!showFullManagement && canSeeContent ? (
         <section>
           <Card className="brand-surface">
             <CardHeader>
@@ -410,7 +389,7 @@ export function AdminDashboard({
         </section>
       ) : null}
 
-      {!showFullManagement ? (
+      {!showFullManagement && canSeeContent ? (
         <section className="mx-auto w-full max-w-6xl">
           <Card className="brand-surface">
             <CardHeader className="items-center space-y-2 text-center">

@@ -11,7 +11,8 @@ import type { CurriculumLanguage } from "@/lib/curriculum/types";
 import { getDataRepository } from "@/lib/data";
 import { createPageMetadata } from "@/lib/i18n/metadata";
 import { getServerTranslator } from "@/lib/i18n/server-locale";
-import { requireAdmin } from "@/lib/supabase/admin-guard";
+import { requireAdminPage } from "@/lib/supabase/admin-guard";
+import { scopeLanguageList } from "@/lib/permissions/roles";
 
 type PageProps = {
   searchParams: Promise<{ language?: string; level?: string; type?: string }>;
@@ -50,14 +51,19 @@ function resolveRequestedSlot(
 }
 
 export default async function AdminQuizzesPage({ searchParams }: PageProps) {
-  const { profile, user } = await requireAdmin();
+  const { profile, user, role, assignedLanguages } =
+    await requireAdminPage("manageContent");
   const repo = getDataRepository();
 
-  const [params, lessons, languages] = await Promise.all([
+  const [params, lessons, allLanguages] = await Promise.all([
     searchParams,
     repo.getLessons(),
     getLanguagesWithAvailability(repo),
   ]);
+
+  // A language-scoped role is shown its own curricula and nothing else, so the
+  // wizard never opens on a language whose save would be refused.
+  const languages = scopeLanguageList(allLanguages, role, assignedLanguages);
 
   const { t } = await getServerTranslator();
   const displayName =

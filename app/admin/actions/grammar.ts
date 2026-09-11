@@ -1,6 +1,9 @@
 "use server";
 
-import { requireAdminPermission } from "@/lib/auth/action-guards";
+import {
+  enforceLanguageScope,
+  requireAdminPermission,
+} from "@/lib/auth/action-guards";
 import { getDataRepository } from "@/lib/data";
 import { grammarRuleSchema } from "@/lib/validations/admin";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
@@ -17,6 +20,11 @@ export async function createGrammarRule(values: unknown): Promise<ActionResult> 
   }
 
   const repo = getDataRepository();
+  const outOfScope = await enforceLanguageScope(guard, () =>
+    repo.getContentLanguage("lesson", parsed.data.lessonId)
+  );
+  if (outOfScope) return { error: outOfScope };
+
   const result = await repo.createGrammarRule({
     lesson_id: parsed.data.lessonId,
     title: parsed.data.title,
@@ -46,6 +54,15 @@ export async function updateGrammarRule(
   }
 
   const repo = getDataRepository();
+  const outOfScope =
+    (await enforceLanguageScope(guard, () =>
+      repo.getContentLanguage("grammar", id)
+    )) ??
+    (await enforceLanguageScope(guard, () =>
+      repo.getContentLanguage("lesson", parsed.data.lessonId)
+    ));
+  if (outOfScope) return { error: outOfScope };
+
   const result = await repo.updateGrammarRule(id, {
     lesson_id: parsed.data.lessonId,
     title: parsed.data.title,
@@ -66,6 +83,11 @@ export async function deleteGrammarRule(id: string): Promise<ActionResult> {
   if (!guard.ok) return { error: guard.error };
 
   const repo = getDataRepository();
+  const outOfScope = await enforceLanguageScope(guard, () =>
+    repo.getContentLanguage("grammar", id)
+  );
+  if (outOfScope) return { error: outOfScope };
+
   const row = (await repo.getAllGrammarRules()).find((item) => item.id === id);
 
   // The page rows go with the title on their own — the foreign key cascades —

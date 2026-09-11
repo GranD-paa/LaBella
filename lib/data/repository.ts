@@ -58,8 +58,27 @@ export type ProfileSummary = Pick<
   | "is_admin"
   | "role"
   | "status"
+  | "assigned_languages"
   | "created_at"
 >;
+
+/**
+ * A live subscription as the admin panel sees it, including who gifted it.
+ *
+ * The grant attribution is admin-facing only. Nothing on the learner's own
+ * subscription card reads these fields, so a gifted plan looks like any other
+ * subscription to the person holding it.
+ */
+export type AdminSubscriptionSummary = {
+  userId: string;
+  planSlug: string;
+  languageSlug: string;
+  status: Subscription["status"];
+  currentPeriodEnd: string;
+  grantedBy: string | null;
+  grantedByName: string | null;
+  grantedAt: string | null;
+};
 
 export type QuizAttemptWithRelations = UserQuizAttempt & {
   quizTitle?: string;
@@ -84,6 +103,26 @@ export interface DataRepository {
   updateUserStatus(
     userId: string,
     status: Profile["status"]
+  ): Promise<{ error?: string }>;
+  /**
+   * The languages a language-scoped role may edit. Replaces the whole list;
+   * an empty array revokes every language rather than meaning "all of them".
+   */
+  updateUserAssignedLanguages(
+    userId: string,
+    languages: string[]
+  ): Promise<{ error?: string }>;
+
+  // Role permissions — what a head admin changed about an editable role.
+  // Returned as a sparse map keyed by role slug; a missing key means the role
+  // runs on the defaults compiled into lib/permissions/roles.ts.
+  getRolePermissionOverrides(): Promise<
+    Record<string, Record<string, boolean>>
+  >;
+  setRolePermissionOverride(
+    roleSlug: string,
+    permissions: Record<string, boolean>,
+    updatedBy: string
   ): Promise<{ error?: string }>;
 
   // Language availability — super-admin overrides for which languages are
@@ -178,6 +217,18 @@ export interface DataRepository {
 
   // Lessons & content
   getLessons(): Promise<Lesson[]>;
+  /**
+   * The curriculum language a content row belongs to, resolved through its
+   * lesson (or, for quizzes and videos, from the row's own column).
+   *
+   * `null` means the row is not there. A language-scoped role has to read that
+   * as "not mine" rather than as "no restriction", or deleting a row twice
+   * would be a way around the scope.
+   */
+  getContentLanguage(
+    kind: "lesson" | "vocabulary" | "grammar" | "video" | "quiz",
+    id: string
+  ): Promise<string | null>;
   getLessonById(id: string): Promise<Lesson | null>;
   getLessonByOrderNumber(orderNumber: number): Promise<Lesson | null>;
   getVocabularyByLessonId(lessonId: string): Promise<Vocabulary[]>;
@@ -230,6 +281,8 @@ export interface DataRepository {
   createLesson(input: {
     title: string;
     description: string | null;
+    /** The curriculum this lesson belongs to. Decides who may edit it. */
+    languageSlug: string;
     orderNumber: number;
   }): Promise<{ error?: string }>;
   updateLesson(
@@ -434,6 +487,23 @@ export interface DataRepository {
 
   /** Every live or historical subscription belonging to one learner. */
   getSubscriptionsForUser(userId: string): Promise<Subscription[]>;
+  /**
+   * Every subscription that currently entitles somebody, across all learners.
+   * One query for the whole admin user list, rather than one per row.
+   */
+  getLiveSubscriptionSummaries(): Promise<AdminSubscriptionSummary[]>;
+  /**
+   * Puts a learner on a plan with no payment attached, and records who did it.
+   * Super-admin only — the guard lives in the server action.
+   */
+  grantSubscription(input: {
+    userId: string;
+    planSlug: string;
+    languageSlug: string;
+    periodMonths: number;
+    grantedBy: string;
+    note?: string;
+  }): Promise<{ error?: string }>;
   /**
    * The subscription that currently entitles a learner to a language, or null.
    * Used on the learn/lesson routes to gate paid content.

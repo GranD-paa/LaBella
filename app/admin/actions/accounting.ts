@@ -1,6 +1,6 @@
 "use server";
 
-import { requireSuperAdminAction } from "@/lib/auth/action-guards";
+import { requireAdminPermission } from "@/lib/auth/action-guards";
 import { refreshFxRate } from "@/lib/billing/fx/refresh";
 import { getDataRepository } from "@/lib/data";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
@@ -14,7 +14,7 @@ import {
 export async function updateBillingSettingsAction(
   values: unknown
 ): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBilling");
   if (!guard.ok) return { error: guard.error };
 
   const parsed = billingSettingsSchema.safeParse(values);
@@ -39,7 +39,7 @@ export async function updateBillingSettingsAction(
 export async function refreshFxRateAction(): Promise<
   ActionResult & { rate?: number; reason?: string }
 > {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBilling");
   if (!guard.ok) return { error: guard.error };
 
   const outcome = await refreshFxRate(getDataRepository());
@@ -63,7 +63,7 @@ export async function refreshFxRateAction(): Promise<
 export async function recordManualPaymentAction(
   values: unknown
 ): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBilling");
   if (!guard.ok) return { error: guard.error };
 
   const parsed = manualPaymentSchema.safeParse(values);
@@ -78,7 +78,7 @@ export async function recordManualPaymentAction(
 }
 
 export async function refundPaymentAction(values: unknown): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBilling");
   if (!guard.ok) return { error: guard.error };
 
   const parsed = refundSchema.safeParse(values);

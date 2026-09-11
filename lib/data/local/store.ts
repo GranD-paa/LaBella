@@ -73,7 +73,36 @@ function backfillMissingCollections(parsed: LocalDatabase): void {
  * migration would read `is_active` as `undefined` and every plan would quietly
  * become unbuyable.
  */
+const RETIRED_ROLES = ["content_manager", "quiz_manager", "limited_admin"];
+const CURRICULUM_LANGUAGE_SLUGS = [
+  "italian",
+  "english",
+  "german",
+  "turkish",
+];
+
 function backfillNewRowFields(parsed: LocalDatabase): void {
+  for (const profile of parsed.profiles) {
+    // Added with the role rebuild. Absent means "no language", never "all".
+    profile.assigned_languages ??= [];
+
+    // The same migration db/010_roles_rebuild.sql runs against Postgres. A dev
+    // store written before the rebuild still holds a retired tier, and every
+    // lookup keyed by role would read `undefined` and throw on the first badge.
+    if (RETIRED_ROLES.includes(profile.role as string)) {
+      profile.role = "teacher";
+      if (profile.assigned_languages.length === 0) {
+        profile.assigned_languages = [...CURRICULUM_LANGUAGE_SLUGS];
+      }
+    }
+  }
+
+  for (const lesson of parsed.lessons) {
+    // Every lesson written before the column existed is one of Italian's —
+    // the other three curricula have no static levels to have written one.
+    lesson.language_slug ??= "italian";
+  }
+
   for (const plan of parsed.subscriptionPlans) {
     plan.is_active ??= true;
     plan.quarterly_enabled ??= true;

@@ -1,6 +1,9 @@
 "use server";
 
-import { requireAdminPermission } from "@/lib/auth/action-guards";
+import {
+  enforceLanguageScope,
+  requireAdminPermission,
+} from "@/lib/auth/action-guards";
 import { getDataRepository } from "@/lib/data";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
@@ -58,6 +61,13 @@ export async function startGrammarUpload(
   const lessonId = formData.get("lessonId");
   const title = formData.get("title");
   const file = formData.get("document");
+
+  if (typeof lessonId === "string") {
+    const outOfScope = await enforceLanguageScope(guard, () =>
+      getDataRepository().getContentLanguage("lesson", lessonId)
+    );
+    if (outOfScope) return { error: outOfScope };
+  }
 
   if (
     typeof lessonId !== "string" ||
@@ -133,6 +143,11 @@ export async function renderGrammarPages(input: {
 }): Promise<RenderGrammarPagesResult> {
   const guard = await requireAdminPermission("manageContent");
   if (!guard.ok) return { error: guard.error };
+
+  const renderScope = await enforceLanguageScope(guard, () =>
+    getDataRepository().getContentLanguage("grammar", input.ruleId)
+  );
+  if (renderScope) return { error: renderScope };
 
   if (
     !UPLOAD_KEY_PATTERN.test(input.uploadKey) ||
@@ -214,6 +229,11 @@ export async function finishGrammarUpload(input: {
   const guard = await requireAdminPermission("manageContent");
   if (!guard.ok) return { error: guard.error };
 
+  const finishScope = await enforceLanguageScope(guard, () =>
+    getDataRepository().getContentLanguage("grammar", input.ruleId)
+  );
+  if (finishScope) return { error: finishScope };
+
   if (UPLOAD_KEY_PATTERN.test(input.uploadKey)) {
     await deleteObjects([input.uploadKey]).catch(() => {});
   }
@@ -244,6 +264,10 @@ export async function abortGrammarUpload(input: {
   if (!guard.ok) return { error: guard.error };
 
   const repo = getDataRepository();
+  const outOfScope = await enforceLanguageScope(guard, () =>
+    repo.getContentLanguage("grammar", input.ruleId)
+  );
+  if (outOfScope) return { error: outOfScope };
   const keys: string[] = await repo
     .getGrammarPageKeys(input.ruleId)
     .catch(() => []);
@@ -267,6 +291,11 @@ export async function createContentVocabulary(
   }
 
   const repo = getDataRepository();
+  const outOfScope = await enforceLanguageScope(guard, () =>
+    repo.getContentLanguage("lesson", parsed.data.lessonId)
+  );
+  if (outOfScope) return { error: outOfScope };
+
   const result = await repo.createVocabulary({
     lesson_id: parsed.data.lessonId,
     word: parsed.data.word,
@@ -293,6 +322,11 @@ export async function createContentVideo(values: unknown): Promise<ActionResult>
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
   }
+
+  const outOfScope = await enforceLanguageScope(guard, async () =>
+    parsed.data.languageSlug
+  );
+  if (outOfScope) return { error: outOfScope };
 
   const repo = getDataRepository();
   const result = await repo.createVideoLesson({
@@ -328,6 +362,10 @@ export async function loadLessonContent(
   if (!guard.ok) return { error: guard.error };
 
   const repo = getDataRepository();
+  const outOfScope = await enforceLanguageScope(guard, () =>
+    repo.getContentLanguage("lesson", lessonId)
+  );
+  if (outOfScope) return { error: outOfScope };
   const [grammarRules, vocabulary, videoLessons, quizzes, questions] =
     await Promise.all([
       repo.getGrammarRulesByLessonId(lessonId),
@@ -419,6 +457,11 @@ export async function deleteContentVideo(id: string): Promise<ActionResult> {
   if (!guard.ok) return { error: guard.error };
 
   const repo = getDataRepository();
+  const outOfScope = await enforceLanguageScope(guard, () =>
+    repo.getContentLanguage("video", id)
+  );
+  if (outOfScope) return { error: outOfScope };
+
   const row = (await repo.getAllVideoLessons()).find((item) => item.id === id);
 
   // Once videos come from SpotPlayer rather than a plain URL, revoking
@@ -439,6 +482,11 @@ export async function deleteContentQuiz(id: string): Promise<ActionResult> {
   if (!guard.ok) return { error: guard.error };
 
   const repo = getDataRepository();
+  const outOfScope = await enforceLanguageScope(guard, () =>
+    repo.getContentLanguage("quiz", id)
+  );
+  if (outOfScope) return { error: outOfScope };
+
   const quiz = await repo.getQuizById(id);
   const result = await repo.deleteQuiz(id);
 

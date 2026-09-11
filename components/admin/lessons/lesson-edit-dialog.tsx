@@ -47,6 +47,7 @@ export function LessonEditDialog({ lesson }: { lesson: Lesson }) {
     defaultValues: {
       title: lesson.title,
       description: lesson.description ?? "",
+      languageSlug: lesson.language_slug as LessonValues["languageSlug"],
       orderNumber: lesson.order_number,
     },
   });
@@ -72,6 +73,7 @@ export function LessonEditDialog({ lesson }: { lesson: Lesson }) {
           form.reset({
             title: lesson.title,
             description: lesson.description ?? "",
+            languageSlug: lesson.language_slug as LessonValues["languageSlug"],
             orderNumber: lesson.order_number,
           });
         }

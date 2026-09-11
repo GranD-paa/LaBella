@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 import { BlogPostList } from "@/components/admin/blog/blog-post-list";
 import { ErrorState } from "@/components/errors/error-state";
 import { getDataRepository } from "@/lib/data";
-import { requireAdmin } from "@/lib/supabase/admin-guard";
+import { requireAdminPage } from "@/lib/supabase/admin-guard";
 
 export const metadata: Metadata = { title: "وبلاگ — مدیریت" };
 
 export default async function AdminBlogPage() {
-  const { profile } = await requireAdmin();
-  if (profile.role !== "super_admin") redirect("/admin");
+  await requireAdminPage("manageBlog");
 
   const repo = getDataRepository();
 
@@ -20,9 +18,8 @@ export default async function AdminBlogPage() {
   // which is how that missing migration showed up: as a 500 on a link in the
   // admin dashboard rather than as anything naming a migration.
   //
-  // The guards sit on the reads only. `requireAdmin()` and the super-admin
-  // check above redirect by throwing, and catching those would turn a bounce
-  // into a blank page.
+  // The guards sit on the reads only. `requireAdminPage()` above redirects by
+  // throwing, and catching that would turn a bounce into a blank page.
   const [posts, categories] = await Promise.all([
     repo.getBlogPostsForAdmin().catch((error) => {
       console.error("[admin/blog] failed to load posts", error);

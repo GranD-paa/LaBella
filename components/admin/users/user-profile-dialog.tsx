@@ -13,17 +13,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { ROLE_DEFINITIONS } from "@/lib/permissions/roles";
+import { useRolePermissions } from "@/components/admin/users/role-permissions-context";
+import { LANGUAGE_LABEL_KEYS } from "@/lib/i18n/language-labels";
+import {
+  PERMISSION_KEYS,
+  PERMISSION_LABEL_KEYS,
+  ROLE_DEFINITIONS,
+} from "@/lib/permissions/roles";
 import { UserQuizAttemptsPanel } from "@/components/admin/users/user-quiz-attempts-panel";
 import type { ManagedUser } from "@/components/admin/users/types";
 
-const PERMISSION_ROWS = [
-  { key: "manageContent", labelKey: "admin.users.profileDialog.permissionContent" },
-  { key: "manageQuizzes", labelKey: "admin.users.profileDialog.permissionQuizzes" },
-  { key: "manageUsers", labelKey: "admin.users.profileDialog.permissionUsers" },
-  { key: "manageRoles", labelKey: "admin.users.profileDialog.permissionRoles" },
-  { key: "fullAccess", labelKey: "admin.users.profileDialog.permissionFull" },
-] as const;
 
 export function UserProfileDialog({
   open,
@@ -36,6 +35,9 @@ export function UserProfileDialog({
 }) {
   const { t, formatDate } = useTranslations();
   const definition = ROLE_DEFINITIONS[user.role];
+  // Effective, not the compiled default: a head admin may have changed what
+  // this role does, and a profile that says otherwise is worse than useless.
+  const permissions = useRolePermissions(user.role);
   const displayName = user.fullName || t("admin.users.unnamed");
 
   return (
@@ -104,11 +106,11 @@ export function UserProfileDialog({
               {t(definition.descriptionKey)}
             </p>
             <ul className="grid grid-cols-2 gap-2 text-sm">
-              {PERMISSION_ROWS.map((row) => {
-                const granted = definition.permissions[row.key];
+              {PERMISSION_KEYS.map((key) => {
+                const granted = permissions[key];
                 return (
                   <li
-                    key={row.key}
+                    key={key}
                     className="flex items-center gap-2 rounded-md border border-white/10 px-2 py-1.5"
                   >
                     {granted ? (
@@ -117,12 +119,27 @@ export function UserProfileDialog({
                       <Minus className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
                     )}
                     <span className={granted ? "" : "text-muted-foreground"}>
-                      {t(row.labelKey)}
+                      {t(PERMISSION_LABEL_KEYS[key])}
                     </span>
                   </li>
                 );
               })}
             </ul>
+            {definition.languageScoped ? (
+              <p className="text-xs text-muted-foreground">
+                {user.assignedLanguages.length > 0
+                  ? t("admin.users.profileDialog.assignedLanguages", {
+                      languages: user.assignedLanguages
+                        .map((slug) =>
+                          LANGUAGE_LABEL_KEYS[slug]
+                            ? t(LANGUAGE_LABEL_KEYS[slug])
+                            : slug
+                        )
+                        .join("، "),
+                    })
+                  : t("admin.users.profileDialog.noAssignedLanguages")}
+              </p>
+            ) : null}
           </div>
 
           <Separator />

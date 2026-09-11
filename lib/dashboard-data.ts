@@ -96,6 +96,8 @@ export type AdminDashboardData = {
     isAdmin: boolean;
     role: RoleSlug;
     status: UserStatus;
+    /** Only ever populated for a language-scoped role; empty otherwise. */
+    assignedLanguages: string[];
     createdAt: string;
   }>;
 };
@@ -329,6 +331,7 @@ export async function fetchAdminDashboardData(
       isAdmin: profile.is_admin,
       role: profile.role,
       status: profile.status,
+      assignedLanguages: profile.assigned_languages ?? [],
       createdAt: profile.created_at,
     })),
   };

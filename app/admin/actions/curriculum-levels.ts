@@ -10,7 +10,7 @@ import { isLanguageSlug } from "@/lib/curriculum/languages";
 import { CEFR_BANDS, type CefrBand } from "@/lib/curriculum/types";
 import { getDataRepository } from "@/lib/data";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
-import { requireSuperAdminAction } from "@/lib/auth/action-guards";
+import { requireAdminPermission } from "@/lib/auth/action-guards";
 
 function isCefrBand(value: string): value is CefrBand {
   return (CEFR_BANDS as readonly string[]).includes(value);
@@ -31,7 +31,7 @@ export async function addCurriculumLevelAction(
   title: string,
   description: string
 ): Promise<AddCurriculumLevelResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageLanguages");
   if (!guard.ok) return { error: guard.error };
 
   if (!isLanguageSlug(languageSlug)) {
@@ -67,6 +67,7 @@ export async function addCurriculumLevelAction(
   const lessonResult = await repo.createLesson({
     title: trimmedTitle,
     description: trimmedDescription || null,
+    languageSlug,
     orderNumber: nextOrderNumber,
   });
   if (lessonResult.error) {
@@ -98,7 +99,7 @@ export async function renameCurriculumLevelAction(
   title: string,
   description: string
 ): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageLanguages");
   if (!guard.ok) return { error: guard.error };
 
   if (!isLanguageSlug(languageSlug)) {
@@ -143,7 +144,7 @@ export async function deleteCurriculumLevelAction(
   languageSlug: string,
   levelSlug: string
 ): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageLanguages");
   if (!guard.ok) return { error: guard.error };
 
   if (!isLanguageSlug(languageSlug)) {
@@ -175,7 +176,7 @@ export async function resetCurriculumLevelAction(
   languageSlug: string,
   levelSlug: string
 ): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageLanguages");
   if (!guard.ok) return { error: guard.error };
 
   if (!isLanguageSlug(languageSlug)) {

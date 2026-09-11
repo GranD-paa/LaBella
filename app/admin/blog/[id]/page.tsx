@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { BlogPostEditor } from "@/components/admin/blog/blog-post-editor";
 import { ErrorState } from "@/components/errors/error-state";
 import { getDataRepository } from "@/lib/data";
-import { requireAdmin } from "@/lib/supabase/admin-guard";
+import { requireAdminPage } from "@/lib/supabase/admin-guard";
 
 export const metadata: Metadata = { title: "ویرایش مطلب — مدیریت" };
 
@@ -14,8 +14,7 @@ export default async function AdminBlogEditorPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { profile } = await requireAdmin();
-  if (profile.role !== "super_admin") redirect("/admin");
+  await requireAdminPage("manageBlog");
 
   const { id } = await params;
   const repo = getDataRepository();

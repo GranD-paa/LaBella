@@ -21,12 +21,13 @@ export interface Database {
           is_admin: boolean;
           role:
             | "learner"
-            | "limited_admin"
-            | "quiz_manager"
-            | "content_manager"
+            | "writer"
+            | "teacher"
             | "admin"
+            | "head_admin"
             | "super_admin";
           status: "active" | "suspended";
+          assigned_languages: string[];
           created_at: string;
         };
         Insert: {
@@ -37,12 +38,13 @@ export interface Database {
           is_admin?: boolean;
           role?:
             | "learner"
-            | "limited_admin"
-            | "quiz_manager"
-            | "content_manager"
+            | "writer"
+            | "teacher"
             | "admin"
+            | "head_admin"
             | "super_admin";
           status?: "active" | "suspended";
+          assigned_languages?: string[];
           created_at?: string;
         };
         Update: {
@@ -53,12 +55,13 @@ export interface Database {
           is_admin?: boolean;
           role?:
             | "learner"
-            | "limited_admin"
-            | "quiz_manager"
-            | "content_manager"
+            | "writer"
+            | "teacher"
             | "admin"
+            | "head_admin"
             | "super_admin";
           status?: "active" | "suspended";
+          assigned_languages?: string[];
           created_at?: string;
         };
         Relationships: [];
@@ -68,6 +71,7 @@ export interface Database {
           id: string;
           title: string;
           description: string | null;
+          language_slug: string;
           order_number: number;
           created_at: string;
         };
@@ -75,6 +79,7 @@ export interface Database {
           id?: string;
           title: string;
           description?: string | null;
+          language_slug?: string;
           order_number?: number;
           created_at?: string;
         };
@@ -82,6 +87,7 @@ export interface Database {
           id?: string;
           title?: string;
           description?: string | null;
+          language_slug?: string;
           order_number?: number;
           created_at?: string;
         };
@@ -676,6 +682,27 @@ export interface Database {
         };
         Relationships: [];
       };
+      role_permission_overrides: {
+        Row: {
+          role_slug: string;
+          permissions: Json;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          role_slug: string;
+          permissions?: Json;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          role_slug?: string;
+          permissions?: Json;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [];
+      };
       subscriptions: {
         Row: {
           id: string;
@@ -691,6 +718,9 @@ export interface Database {
           started_at: string;
           canceled_at: string | null;
           ended_at: string | null;
+          granted_by: string | null;
+          granted_at: string | null;
+          grant_note: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -708,6 +738,9 @@ export interface Database {
           started_at?: string;
           canceled_at?: string | null;
           ended_at?: string | null;
+          granted_by?: string | null;
+          granted_at?: string | null;
+          grant_note?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -725,6 +758,9 @@ export interface Database {
           started_at?: string;
           canceled_at?: string | null;
           ended_at?: string | null;
+          granted_by?: string | null;
+          granted_at?: string | null;
+          grant_note?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -834,7 +870,8 @@ export interface Database {
             | "expired"
             | "reactivated"
             | "refunded"
-            | "plan_changed";
+            | "plan_changed"
+            | "granted";
           payload: Json;
           created_at: string;
         };
@@ -851,7 +888,8 @@ export interface Database {
             | "expired"
             | "reactivated"
             | "refunded"
-            | "plan_changed";
+            | "plan_changed"
+            | "granted";
           payload?: Json;
           created_at?: string;
         };
@@ -893,6 +931,18 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
+      grant_subscription: {
+        Args: {
+          p_user_id: string;
+          p_plan_slug: string;
+          p_language_slug: string;
+          p_period_months: number;
+          p_granted_by: string;
+          p_note?: string | null;
+        };
+        /** The id of the granted (or extended) subscription. */
+        Returns: string;
+      };
       swap_banner_order: {
         Args: { banner_id_a: string; banner_id_b: string };
         Returns: void;

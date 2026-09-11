@@ -1,6 +1,6 @@
 "use server";
 
-import { requireSuperAdminAction } from "@/lib/auth/action-guards";
+import { requireAdminPermission } from "@/lib/auth/action-guards";
 import { getDataRepository } from "@/lib/data";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
 import type { ActionResult } from "@/lib/action-result";
@@ -11,7 +11,7 @@ import { bannerSchema } from "@/lib/validations/admin";
  * levels and language availability, only super admins may manage them.
  */
 export async function uploadBannerAction(formData: FormData): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBanners");
   if (!guard.ok) return { error: guard.error };
 
   const file = formData.get("image");
@@ -53,7 +53,7 @@ export async function updateBannerStatusAction(
   id: string,
   status: "draft" | "published"
 ): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBanners");
   if (!guard.ok) return { error: guard.error };
 
   const result = await getDataRepository().updateBanner(id, { status });
@@ -64,7 +64,7 @@ export async function updateBannerStatusAction(
 }
 
 export async function deleteBannerAction(id: string): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBanners");
   if (!guard.ok) return { error: guard.error };
 
   const result = await getDataRepository().deleteBanner(id);
@@ -78,7 +78,7 @@ export async function reorderBannerAction(
   id: string,
   direction: "up" | "down"
 ): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBanners");
   if (!guard.ok) return { error: guard.error };
 
   const result = await getDataRepository().reorderBanner(id, direction);

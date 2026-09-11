@@ -70,6 +70,8 @@ export type LocalDatabase = {
   payments: Payment[];
   refunds: Refund[];
   subscriptionEvents: SubscriptionEvent[];
+  // Head-admin edits to what an editable role may do, keyed by role slug.
+  rolePermissionOverrides: Record<string, Record<string, boolean>>;
 };
 
 const now = "2026-07-15T08:00:00.000Z";
@@ -127,6 +129,7 @@ export const LOCAL_SEED: LocalDatabase = {
       is_admin: true,
       role: "super_admin",
       status: "active",
+      assigned_languages: [],
       created_at: now,
     },
     {
@@ -137,6 +140,7 @@ export const LOCAL_SEED: LocalDatabase = {
       is_admin: false,
       role: "learner",
       status: "active",
+      assigned_languages: [],
       created_at: now,
     },
     {
@@ -145,8 +149,9 @@ export const LOCAL_SEED: LocalDatabase = {
       avatar_url: null,
       email: "giulia.rossi@laparli.app",
       is_admin: true,
-      role: "content_manager",
+      role: "head_admin",
       status: "active",
+      assigned_languages: [],
       created_at: "2026-06-02T09:15:00.000Z",
     },
     {
@@ -155,8 +160,9 @@ export const LOCAL_SEED: LocalDatabase = {
       avatar_url: null,
       email: "marco.bianchi@laparli.app",
       is_admin: true,
-      role: "quiz_manager",
+      role: "admin",
       status: "suspended",
+      assigned_languages: [],
       created_at: "2026-06-10T14:40:00.000Z",
     },
     {
@@ -165,9 +171,23 @@ export const LOCAL_SEED: LocalDatabase = {
       avatar_url: null,
       email: "sara.verdi@laparli.app",
       is_admin: true,
-      role: "limited_admin",
+      role: "teacher",
       status: "active",
+      // Scoped to Italian only, so the language guard is exercised locally
+      // rather than first meeting a real teacher in production.
+      assigned_languages: ["italian"],
       created_at: "2026-06-18T11:05:00.000Z",
+    },
+    {
+      id: "80000000-0000-4000-8000-000000000006",
+      full_name: "Pietro Neri",
+      avatar_url: null,
+      email: "pietro.neri@laparli.app",
+      is_admin: true,
+      role: "writer",
+      status: "active",
+      assigned_languages: [],
+      created_at: "2026-06-20T10:00:00.000Z",
     },
     {
       id: "80000000-0000-4000-8000-000000000004",
@@ -177,6 +197,7 @@ export const LOCAL_SEED: LocalDatabase = {
       is_admin: false,
       role: "learner",
       status: "active",
+      assigned_languages: [],
       created_at: "2026-06-25T08:30:00.000Z",
     },
     {
@@ -187,6 +208,7 @@ export const LOCAL_SEED: LocalDatabase = {
       is_admin: false,
       role: "learner",
       status: "suspended",
+      assigned_languages: [],
       created_at: "2026-07-01T16:20:00.000Z",
     },
   ],
@@ -195,6 +217,7 @@ export const LOCAL_SEED: LocalDatabase = {
       id: lessonIds[0],
       title: "A1-1 Foundations & Greetings",
       description: "Alphabet, pronunciation, and essential greetings.",
+      language_slug: "italian",
       order_number: 1,
       created_at: now,
     },
@@ -202,6 +225,7 @@ export const LOCAL_SEED: LocalDatabase = {
       id: lessonIds[1],
       title: "A1-2 Introducing Yourself",
       description: "Personal details, countries, and nationalities.",
+      language_slug: "italian",
       order_number: 2,
       created_at: now,
     },
@@ -209,6 +233,7 @@ export const LOCAL_SEED: LocalDatabase = {
       id: lessonIds[2],
       title: "A1-3 Daily Routines",
       description: "Common verbs, time expressions, and habits.",
+      language_slug: "italian",
       order_number: 3,
       created_at: now,
     },
@@ -216,6 +241,7 @@ export const LOCAL_SEED: LocalDatabase = {
       id: lessonIds[index + 3],
       title: `A1-${index + 4} Italian Module`,
       description: `Structured Italian learning module A1-${index + 4}.`,
+      language_slug: "italian",
       order_number: index + 4,
       created_at: now,
     })),
@@ -411,4 +437,5 @@ export const LOCAL_SEED: LocalDatabase = {
   payments: [],
   refunds: [],
   subscriptionEvents: [],
+  rolePermissionOverrides: {},
 };

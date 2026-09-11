@@ -10,6 +10,9 @@ import {
   fetchAdminDashboardData,
   fetchUserDashboardData,
 } from "@/lib/dashboard-data";
+import { getRolePermissions } from "@/lib/auth/action-guards";
+import { visibleAdminNav } from "@/lib/permissions/admin-nav";
+import type { RoleSlug } from "@/lib/permissions/roles";
 import { createPageMetadata } from "@/lib/i18n/metadata";
 import { getServerTranslator } from "@/lib/i18n/server-locale";
 
@@ -31,13 +34,17 @@ export default async function DashboardPage() {
     profile?.full_name || user.email || t("common.guestName");
 
   if (profile?.is_admin) {
+    // The one place the whole panel is laid out, so it is also the place that
+    // decides what this role gets to see of it.
+    const permissions = await getRolePermissions(profile.role as RoleSlug);
     const adminData = await fetchAdminDashboardData(repo);
     return (
       <AdminDashboard
         data={adminData}
         displayName={displayName}
         currentUserId={user.id}
-        isSuperAdmin={profile.role === "super_admin"}
+        navItems={visibleAdminNav(permissions)}
+        permissions={permissions}
       />
     );
   }

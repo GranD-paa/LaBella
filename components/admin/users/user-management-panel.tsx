@@ -3,6 +3,11 @@
 import { useMemo, useState } from "react";
 import { Search, Users } from "lucide-react";
 
+import {
+  AccountTierCell,
+  type AccountTierCellData,
+} from "@/components/admin/users/account-tier-cell";
+import type { GrantPlanOption } from "@/components/admin/users/grant-subscription-dialog";
 import { RoleBadge } from "@/components/admin/users/role-badge";
 import { StatusBadge } from "@/components/admin/users/status-badge";
 import type { ManagedUser } from "@/components/admin/users/types";
@@ -34,7 +39,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ROLE_DEFINITIONS, ROLE_SLUGS, type RoleSlug } from "@/lib/permissions/roles";
-import type { UserStatus } from "@/lib/permissions/roles";
+import type { RolePermissions, UserStatus } from "@/lib/permissions/roles";
+import type { AdminSubscriptionSummary } from "@/lib/data/repository";
 
 function getInitials(name: string | null, email: string | null) {
   const source = name?.trim() || email?.trim() || "?";
@@ -49,10 +55,19 @@ export function UserManagementPanel({
   users,
   currentUserId,
   currentUserRole,
+  currentUserPermissions,
+  subscriptions,
+  plans,
+  languageSlugs,
 }: {
   users: ManagedUser[];
   currentUserId: string;
   currentUserRole: RoleSlug;
+  currentUserPermissions: RolePermissions;
+  /** Every live subscription, so the tier column costs one pass, not one query per row. */
+  subscriptions: AdminSubscriptionSummary[];
+  plans: GrantPlanOption[];
+  languageSlugs: string[];
 }) {
   const { t, formatDate } = useTranslations();
   const [search, setSearch] = useState("");
@@ -63,6 +78,42 @@ export function UserManagementPanel({
     () => users.filter((user) => user.role === "super_admin").length,
     [users]
   );
+
+  // The biggest plan each learner holds, plus the languages it covers. Ranked
+  // by the plan's own tier_rank so "what is this customer on at their best" is
+  // answered the same way the entitlement code answers it.
+  const tierByUser = useMemo(() => {
+    const rankOf = (planSlug: string) =>
+      plans.find((plan) => plan.planSlug === planSlug)?.tierRank ?? 0;
+    const titleOf = (planSlug: string) =>
+      plans.find((plan) => plan.planSlug === planSlug)?.title ?? null;
+
+    const map = new Map<string, AccountTierCellData>();
+    for (const entry of subscriptions) {
+      const current = map.get(entry.userId);
+      const languages = current
+        ? Array.from(new Set([...current.languages, entry.languageSlug])).sort()
+        : [entry.languageSlug];
+
+      const better =
+        !current || rankOf(entry.planSlug) > rankOf(current.planSlug);
+      const best = better ? entry.planSlug : current!.planSlug;
+
+      map.set(entry.userId, {
+        planSlug: best,
+        title: titleOf(best),
+        languages,
+        gift:
+          // Any gifted subscription is worth flagging, even when a bought one
+          // on another language is the bigger plan.
+          current?.gift ??
+          (entry.grantedBy
+            ? { byName: entry.grantedByName, note: null }
+            : null),
+      });
+    }
+    return map;
+  }, [subscriptions, plans]);
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -159,6 +210,9 @@ export function UserManagementPanel({
                     {t("admin.users.columnStatus")}
                   </TableHead>
                   <TableHead>{t("admin.users.columnRole")}</TableHead>
+                  <TableHead className="hidden lg:table-cell">
+                    {t("admin.users.columnTier")}
+                  </TableHead>
                   <TableHead className="hidden md:table-cell">
                     {t("admin.users.columnJoined")}
                   </TableHead>
@@ -208,6 +262,9 @@ export function UserManagementPanel({
                       <TableCell>
                         <RoleBadge role={user.role} />
                       </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <AccountTierCell tier={tierByUser.get(user.id) ?? null} />
+                      </TableCell>
                       <TableCell className="hidden text-muted-foreground md:table-cell">
                         {formatDate(user.createdAt, { dateStyle: "medium" })}
                       </TableCell>
@@ -217,7 +274,10 @@ export function UserManagementPanel({
                             user={user}
                             currentUserId={currentUserId}
                             currentUserRole={currentUserRole}
+                            currentUserPermissions={currentUserPermissions}
                             superAdminCount={superAdminCount}
+                            plans={plans}
+                            languageSlugs={languageSlugs}
                           />
                         </div>
                       </TableCell>

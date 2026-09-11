@@ -12,6 +12,7 @@ function buildLesson(overrides: Partial<Lesson> = {}): Lesson {
     id: "lesson-1",
     title: "A1-1 Foundations",
     description: null,
+    language_slug: "italian",
     order_number: 1,
     created_at: new Date().toISOString(),
     ...overrides,

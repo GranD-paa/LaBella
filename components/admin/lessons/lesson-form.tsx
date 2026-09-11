@@ -35,10 +35,13 @@ import { useTranslations } from "@/components/providers/locale-provider";
 export function LessonForm({
   defaultTitle = "",
   defaultOrderNumber = 0,
+  languageSlug,
   onSuccess,
 }: {
   defaultTitle?: string;
   defaultOrderNumber?: number;
+  /** The curriculum the wizard is standing in. Not editable here. */
+  languageSlug: LessonValues["languageSlug"];
   onSuccess?: () => void;
 }) {
   const { t } = useTranslations();
@@ -51,6 +54,7 @@ export function LessonForm({
     defaultValues: {
       title: defaultTitle,
       description: "",
+      languageSlug,
       orderNumber: defaultOrderNumber,
     },
   });
@@ -63,7 +67,12 @@ export function LessonForm({
         return;
       }
       toast.success(t("admin.lessons.created"));
-      form.reset({ title: defaultTitle, description: "", orderNumber: defaultOrderNumber });
+      form.reset({
+        title: defaultTitle,
+        description: "",
+        languageSlug,
+        orderNumber: defaultOrderNumber,
+      });
       onSuccess?.();
     });
   }

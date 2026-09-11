@@ -128,6 +128,42 @@ export function createLocalRepository(): DataRepository {
       return {};
     },
 
+    async updateUserAssignedLanguages(userId, languages) {
+      const authUser = await this.getAuthUser();
+      if (!authUser) return { error: "You must be signed in." };
+
+      const currentProfile = await this.getProfileById(authUser.id);
+      if (!currentProfile?.is_admin) {
+        return { error: "Only admins can manage language assignments." };
+      }
+
+      const store = getLocalStore();
+      const profile = store.profiles.find((entry) => entry.id === userId);
+      if (!profile) return { error: "User not found." };
+      profile.assigned_languages = [...languages];
+      commitStore();
+      return {};
+    },
+
+    async getRolePermissionOverrides() {
+      return { ...getLocalStore().rolePermissionOverrides };
+    },
+
+    async setRolePermissionOverride(roleSlug, permissions) {
+      const authUser = await this.getAuthUser();
+      if (!authUser) return { error: "You must be signed in." };
+
+      const currentProfile = await this.getProfileById(authUser.id);
+      if (!currentProfile?.is_admin) {
+        return { error: "Only admins can manage role permissions." };
+      }
+
+      const store = getLocalStore();
+      store.rolePermissionOverrides[roleSlug] = { ...permissions };
+      commitStore();
+      return {};
+    },
+
     async getLanguageAvailability() {
       return { ...getLocalStore().languageSettings };
     },
@@ -455,6 +491,35 @@ export function createLocalRepository(): DataRepository {
       return getLocalStore().lessons.find((lesson) => lesson.id === id) ?? null;
     },
 
+    async getContentLanguage(kind, id) {
+      const store = getLocalStore();
+      const languageOfLesson = (lessonId: string | undefined) =>
+        store.lessons.find((lesson) => lesson.id === lessonId)?.language_slug ??
+        null;
+
+      switch (kind) {
+        case "lesson":
+          return languageOfLesson(id);
+        case "vocabulary":
+          return languageOfLesson(
+            store.vocabulary.find((entry) => entry.id === id)?.lesson_id
+          );
+        case "grammar":
+          return languageOfLesson(
+            store.grammarRules.find((entry) => entry.id === id)?.lesson_id
+          );
+        case "video":
+          return (
+            store.videoLessons.find((entry) => entry.id === id)
+              ?.language_slug ?? null
+          );
+        case "quiz":
+          return (
+            store.quizzes.find((entry) => entry.id === id)?.language_slug ?? null
+          );
+      }
+    },
+
     async getLessonByOrderNumber(orderNumber) {
       return (
         getLocalStore().lessons.find(
@@ -615,12 +680,13 @@ export function createLocalRepository(): DataRepository {
       return { attemptNumber, retakeLimit };
     },
 
-    async createLesson({ title, description, orderNumber }) {
+    async createLesson({ title, description, languageSlug, orderNumber }) {
       const store = getLocalStore();
       store.lessons.push({
         id: createLocalId("lesson"),
         title,
         description,
+        language_slug: languageSlug,
         order_number: orderNumber,
         created_at: new Date().toISOString(),
       });
@@ -1125,6 +1191,114 @@ export function createLocalRepository(): DataRepository {
         );
     },
 
+    async getLiveSubscriptionSummaries() {
+      const store = getLocalStore();
+      const nameById = new Map(
+        store.profiles.map((profile) => [profile.id, profile.full_name])
+      );
+
+      return store.subscriptions
+        .filter((entry) => isEntitled(entry.status))
+        .map((entry) => ({
+          userId: entry.user_id,
+          planSlug: entry.plan_slug,
+          languageSlug: entry.language_slug,
+          status: entry.status,
+          currentPeriodEnd: entry.current_period_end,
+          grantedBy: entry.granted_by ?? null,
+          grantedByName: entry.granted_by
+            ? nameById.get(entry.granted_by) ?? null
+            : null,
+          grantedAt: entry.granted_at ?? null,
+        }))
+        .sort((a, b) => b.currentPeriodEnd.localeCompare(a.currentPeriodEnd));
+    },
+
+    // Mirrors the `grant_subscription` SQL function: a plan with no payment
+    // behind it, so a gift never lands in the accounting totals.
+    async grantSubscription(input) {
+      const store = getLocalStore();
+      if (
+        !store.subscriptionTiers.some(
+          (tier) => tier.plan_slug === input.planSlug
+        )
+      ) {
+        return { error: "Subscription plan not found." };
+      }
+
+      const now = new Date();
+      const nowIso = now.toISOString();
+      const existing = store.subscriptions.find(
+        (entry) =>
+          entry.user_id === input.userId &&
+          entry.language_slug === input.languageSlug &&
+          isEntitled(entry.status)
+      );
+
+      const anchorDay = existing?.anchor_day ?? now.getUTCDate();
+      const period = computeRenewalPeriod({
+        currentPeriodEnd: existing
+          ? new Date(existing.current_period_end)
+          : null,
+        months: input.periodMonths,
+        anchorDay,
+        now,
+      });
+
+      let subscription = existing;
+      if (subscription) {
+        subscription.plan_slug = input.planSlug;
+        subscription.status = "active";
+        subscription.current_period_start = period.start.toISOString();
+        subscription.current_period_end = period.end.toISOString();
+        subscription.period_months = input.periodMonths;
+        subscription.cancel_at_period_end = false;
+        subscription.granted_by = input.grantedBy;
+        subscription.granted_at = nowIso;
+        subscription.grant_note = input.note ?? null;
+        subscription.updated_at = nowIso;
+      } else {
+        subscription = {
+          id: createLocalId("sub"),
+          user_id: input.userId,
+          plan_slug: input.planSlug,
+          language_slug: input.languageSlug,
+          status: "active",
+          current_period_start: period.start.toISOString(),
+          current_period_end: period.end.toISOString(),
+          anchor_day: anchorDay,
+          period_months: input.periodMonths,
+          cancel_at_period_end: false,
+          started_at: nowIso,
+          canceled_at: null,
+          ended_at: null,
+          granted_by: input.grantedBy,
+          granted_at: nowIso,
+          grant_note: input.note ?? null,
+          created_at: nowIso,
+          updated_at: nowIso,
+        };
+        store.subscriptions.push(subscription);
+      }
+
+      store.subscriptionEvents.push({
+        id: createLocalId("evt"),
+        subscription_id: subscription.id,
+        user_id: input.userId,
+        type: "granted",
+        payload: {
+          plan_slug: input.planSlug,
+          granted_by: input.grantedBy,
+          period_months: input.periodMonths,
+          note: input.note ?? null,
+        },
+        created_at: nowIso,
+      });
+
+      commitStore();
+      return {};
+    },
+
     async getEntitlingSubscription(userId, languageSlug) {
       return (
         getLocalStore().subscriptions.find(
@@ -1464,6 +1638,9 @@ export function settleLocalPayment(paymentId: string): { error?: string } {
       started_at: nowIso,
       canceled_at: null,
       ended_at: null,
+      granted_by: null,
+      granted_at: null,
+      grant_note: null,
       created_at: nowIso,
       updated_at: nowIso,
     };

@@ -16,6 +16,7 @@ import {
   withTransaction,
 } from "@/lib/data/postgres/client";
 import type {
+  AdminSubscriptionSummary,
   AuthUser,
   DataRepository,
   ProfileSummary,
@@ -43,8 +44,13 @@ import type {
   Vocabulary,
 } from "@/types";
 
+// `assigned_languages` and `lessons.language_slug` below arrive with migration
+// 010 and are both NOT NULL DEFAULT, so they are read plainly. A database that
+// has not run 010 will fail these reads loudly, which is the right failure: the
+// alternative is an admin panel quietly deciding nobody is scoped to anything.
 const PROFILE_COLUMNS =
-  "id, full_name, avatar_url, email, is_admin, role, status, created_at";
+  "id, full_name, avatar_url, email, is_admin, role, status, " +
+  "assigned_languages, created_at";
 
 type BlogPostRow = {
   id: string;
@@ -240,6 +246,52 @@ export function createPostgresRepository(): DataRepository {
           userId,
           status,
         ])
+      ),
+
+    updateUserAssignedLanguages: (userId, languages) =>
+      mutate(() =>
+        execute("update profiles set assigned_languages = $2 where id = $1", [
+          userId,
+          languages,
+        ])
+      ),
+
+    // ------------------------------------------------------ role permissions
+    // The one read here that is allowed to fail quietly. An absent table means
+    // "nobody has changed anything", which is exactly what an empty map says —
+    // and every role then runs on the defaults compiled into the app, which is
+    // the safe answer rather than a convenient one.
+    async getRolePermissionOverrides() {
+      try {
+        const rows = await query<{
+          role_slug: string;
+          permissions: Record<string, boolean> | null;
+        }>("select role_slug, permissions from role_permission_overrides");
+
+        return Object.fromEntries(
+          rows.map((row) => [row.role_slug, row.permissions ?? {}])
+        );
+      } catch (error) {
+        console.error(
+          "[roles] role_permission_overrides unavailable, using defaults",
+          error
+        );
+        return {};
+      }
+    },
+
+    setRolePermissionOverride: (roleSlug, permissions, updatedBy) =>
+      mutate(() =>
+        execute(
+          `insert into role_permission_overrides
+             (role_slug, permissions, updated_at, updated_by)
+           values ($1, $2::jsonb, now(), $3)
+           on conflict (role_slug) do update
+             set permissions = excluded.permissions,
+                 updated_at = excluded.updated_at,
+                 updated_by = excluded.updated_by`,
+          [roleSlug, JSON.stringify(permissions), updatedBy]
+        )
       ),
 
     // ------------------------------------------------- language & curriculum
@@ -637,6 +689,26 @@ export function createPostgresRepository(): DataRepository {
     getLessonById: (id) =>
       queryOne<Lesson>("select * from lessons where id = $1", [id]),
 
+    async getContentLanguage(kind, id) {
+      const sql = {
+        lesson: "select language_slug as slug from lessons where id = $1",
+        vocabulary: `select l.language_slug as slug
+                       from vocabulary v
+                       join lessons l on l.id = v.lesson_id
+                      where v.id = $1`,
+        grammar: `select l.language_slug as slug
+                    from grammar_rules g
+                    join lessons l on l.id = g.lesson_id
+                   where g.id = $1`,
+        video:
+          "select language_slug as slug from video_lessons where id = $1",
+        quiz: "select language_slug as slug from quizzes where id = $1",
+      }[kind];
+
+      const row = await queryOne<{ slug: string }>(sql, [id]);
+      return row?.slug ?? null;
+    },
+
     getLessonByOrderNumber: (orderNumber) =>
       queryOne<Lesson>("select * from lessons where order_number = $1", [
         orderNumber,
@@ -758,8 +830,9 @@ export function createPostgresRepository(): DataRepository {
     createLesson: (input) =>
       mutate(() =>
         execute(
-          "insert into lessons (title, description, order_number) values ($1, $2, $3)",
-          [input.title, input.description, input.orderNumber]
+          `insert into lessons (title, description, language_slug, order_number)
+           values ($1, $2, $3, $4)`,
+          [input.title, input.description, input.languageSlug, input.orderNumber]
         )
       ),
 
@@ -1320,6 +1393,34 @@ export function createPostgresRepository(): DataRepository {
       query<Subscription>(
         "select * from subscriptions where user_id = $1 order by created_at desc",
         [userId]
+      ),
+
+    getLiveSubscriptionSummaries: () =>
+      query<AdminSubscriptionSummary>(
+        `select s.user_id             as "userId",
+                s.plan_slug           as "planSlug",
+                s.language_slug       as "languageSlug",
+                s.status              as "status",
+                s.current_period_end  as "currentPeriodEnd",
+                s.granted_by          as "grantedBy",
+                p.full_name           as "grantedByName",
+                s.granted_at          as "grantedAt"
+           from subscriptions s
+           left join profiles p on p.id = s.granted_by
+          where s.status in ('active', 'past_due')
+          order by s.current_period_end desc`
+      ),
+
+    grantSubscription: (input) =>
+      mutate(() =>
+        execute("select public.grant_subscription($1, $2, $3, $4, $5, $6)", [
+          input.userId,
+          input.planSlug,
+          input.languageSlug,
+          input.periodMonths,
+          input.grantedBy,
+          input.note ?? null,
+        ])
       ),
 
     // "Entitling" means live *now*: active, covering today, and for this

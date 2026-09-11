@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { requireSuperAdminAction } from "@/lib/auth/action-guards";
+import { requireAdminPermission } from "@/lib/auth/action-guards";
 import {
   estimateReadingMinutes,
   markdownToPlainText,
@@ -71,7 +71,7 @@ export async function saveBlogPostAction(
   _previous: BlogFormState,
   formData: FormData
 ): Promise<BlogFormState> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBlog");
   if (!guard.ok) return { error: "دسترسی ندارید." };
 
   const rawId = String(formData.get("id") ?? "").trim();
@@ -143,7 +143,7 @@ export async function saveBlogPostAction(
 }
 
 export async function deleteBlogPostAction(id: string): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBlog");
   if (!guard.ok) return { error: guard.error };
 
   const result = await getDataRepository().deleteBlogPost(id);
@@ -204,7 +204,7 @@ export type BlogImageUploadState = {
 export async function uploadBlogImageAction(
   formData: FormData
 ): Promise<BlogImageUploadState> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBlog");
   if (!guard.ok) return { error: "دسترسی ندارید." };
 
   const file = formData.get("image");
@@ -231,7 +231,7 @@ export async function updateBlogImageAltAction(
   id: string,
   altText: string
 ): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBlog");
   if (!guard.ok) return { error: guard.error };
 
   const trimmed = altText.trim();
@@ -253,7 +253,7 @@ export async function updateBlogImageAltAction(
  * and a mistake costs a broken image, not a broken page.
  */
 export async function deleteBlogImageAction(id: string): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageBlog");
   if (!guard.ok) return { error: guard.error };
 
   const result = await getDataRepository().deleteBlogImage(id);

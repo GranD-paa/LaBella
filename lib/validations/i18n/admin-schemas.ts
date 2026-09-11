@@ -20,6 +20,9 @@ export function createLessonSchema(t: Translator) {
       .min(2, t("validation.admin.titleMin"))
       .max(150, t("validation.admin.titleMax")),
     description: optionalText(t, 2000),
+    // Not a field anybody types: the wizard already knows which curriculum the
+    // admin is standing in, and a teacher may only be standing in their own.
+    languageSlug: z.enum(["italian", "english", "german", "turkish"]),
     orderNumber: z
       .number({ error: t("validation.admin.orderNumber") })
       .int(t("validation.admin.orderInt"))

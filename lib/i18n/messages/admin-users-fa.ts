@@ -15,6 +15,7 @@ export const adminUsersFa = {
   columnEmail: "ایمیل",
   columnStatus: "وضعیت",
   columnRole: "نقش",
+  columnTier: "اشتراک",
   columnJoined: "تاریخ ثبت‌نام",
   columnActions: "اقدامات",
   unnamed: "کاربر بدون نام",
@@ -32,7 +33,7 @@ export const adminUsersFa = {
   you: "شما",
   promoteConfirmTitle: "این کاربر به مدیر ارتقا یابد؟",
   promoteConfirmDescription:
-    "«{name}» دسترسی کامل مدیریت محتوا، آزمون‌ها و کاربران را دریافت می‌کند.",
+    "«{name}» به نقش ادمین (پشتیبانی) درمی‌آید و به پنل مدیریت دسترسی پیدا می‌کند. برای نقش دقیق‌تر از «تغییر نقش» استفاده کن.",
   demoteConfirmTitle: "دسترسی مدیر حذف شود؟",
   demoteConfirmDescription:
     "«{name}» تمام مجوزهای مدیریتی خود را از دست می‌دهد و به کاربر عادی تبدیل می‌شود.",
@@ -52,6 +53,52 @@ export const adminUsersFa = {
   statusUpdated: "وضعیت حساب به‌روزرسانی شد",
   confirm: "تأیید",
   cannotModifySelf: "شما نمی‌توانید این عملیات را روی حساب خود انجام دهید.",
+  permissions: {
+    viewUsers: "دیدن کاربران",
+    answerSupport: "پاسخ به پشتیبانی",
+    suspendUsers: "تعلیق حساب",
+    manageRoles: "مدیریت نقش‌ها",
+    manageAdminPermissions: "ویرایش دسترسی ادمین‌ها",
+    manageContent: "محتوا",
+    manageQuizzes: "آزمون‌ها",
+    manageBlog: "وبلاگ",
+    manageLanguages: "زبان‌ها و سطوح",
+    manageBanners: "بنرها",
+    manageLanding: "صفحهٔ اصلی",
+    manageSubscriptions: "اشتراک‌ها",
+    manageBilling: "حسابداری",
+    fullAccess: "دسترسی کامل",
+  },
+  tier: {
+    free: "بدون اشتراک",
+    paid: "کاربر {plan}",
+    gifted: "اشتراک هدیه",
+    giftedBy: "هدیه از {name}",
+  },
+  assignLanguages: "تعیین زبان‌ها",
+  languagesUpdated: "زبان‌های این مدرس به‌روزرسانی شد",
+  grantSubscription: "اهدای اشتراک",
+  assignLanguagesDialog: {
+    title: "زبان‌های {name}",
+    description:
+      "مدرس فقط روی زبان‌هایی که اینجا انتخاب می‌کنی می‌تواند محتوا بسازد یا حذف کند.",
+    save: "ذخیرهٔ زبان‌ها",
+    emptyWarning: "با هیچ زبانی، این مدرس به هیچ محتوایی دسترسی نخواهد داشت.",
+  },
+  grantDialog: {
+    title: "اهدای اشتراک به {name}",
+    description:
+      "اشتراک بدون پرداخت فعال می‌شود و در آمار درآمد ثبت نمی‌گردد. کاربر آن را مثل هر اشتراک دیگری می‌بیند.",
+    planLabel: "اشتراک",
+    languageLabel: "زبان",
+    periodLabel: "مدت",
+    months: "{count} ماه",
+    noteLabel: "یادداشت",
+    notePlaceholder: "مثلاً: جبران قطعی سرویس",
+    noteHint: "این یادداشت فقط برای مدیران دیده می‌شود.",
+    save: "اهدای اشتراک",
+    granted: "اشتراک اهدا شد",
+  },
   profileDialog: {
     title: "پروفایل کاربر",
     accountInfo: "اطلاعات حساب",
@@ -62,11 +109,8 @@ export const adminUsersFa = {
     joined: "تاریخ ثبت‌نام",
     userId: "شناسه کاربر",
     permissions: "دسترسی‌های فعلی",
-    permissionContent: "مدیریت محتوا",
-    permissionQuizzes: "مدیریت آزمون‌ها",
-    permissionUsers: "مدیریت کاربران",
-    permissionRoles: "مدیریت نقش‌ها",
-    permissionFull: "دسترسی کامل به پلتفرم",
+    assignedLanguages: "زبان‌های سپرده‌شده: {languages}",
+    noAssignedLanguages: "هنوز هیچ زبانی به این مدرس سپرده نشده است.",
     close: "بستن",
     quizAttempts: "نتایج آزمون",
     quizAttemptsLoading: "در حال بارگذاری تاریخچه آزمون…",
@@ -98,48 +142,74 @@ export const adminUsersFa = {
     superAdminProtected:
       "حساب مدیر کل محافظت‌شده است. هیچ‌کس از این پنل نمی‌تواند یک مدیر کل را تنزل، تعلیق یا نقشش را عوض کند.",
     superAdminOnly: "فقط مدیر کل می‌تواند نقش کاربران را تغییر دهد.",
-    adminTargetSuperAdminOnly:
-      "فقط مدیر کل می‌تواند حساب یک مدیر دیگر را مدیریت کند.",
     superAdminLimit:
       "سقف مدیران کل پر شده است و مدیر کل جدیدی نمی‌توان اضافه کرد.",
+    suspendForbidden:
+      "نقش تو اجازهٔ تعلیق حساب ندارد. این کار با مدیر کل و هد ادمین است.",
+    headAdminPeer:
+      "هد ادمین‌ها هم‌رتبه‌اند؛ تعلیق یک هد ادمین یا مدیر کل فقط از مدیر کل برمی‌آید.",
+    permissionsForbidden:
+      "فقط مدیر کل و هد ادمین می‌توانند دسترسی‌های یک نقش را تغییر دهند.",
+    roleNotEditable: "دسترسی‌های این نقش در کد ثابت است و قابل ویرایش نیست.",
+    languageForbidden: "این محتوا مربوط به زبانی است که به تو سپرده نشده است.",
+    languageNotScoped:
+      "این نقش محدود به زبان نیست، پس تعیین زبان برایش معنا ندارد.",
   },
   roles: {
     superAdmin: {
       label: "مدیر کل",
       description: "دسترسی کامل به تمام امکانات، از جمله مدیریت نقش‌ها و مجوزها.",
     },
-    admin: {
-      label: "مدیر",
+    headAdmin: {
+      label: "هد ادمین",
       description:
-        "مدیریت محتوا، آزمون‌ها و حساب کاربران عادی. بدون امکان تغییر نقش‌ها یا دست‌زدن به حساب مدیران دیگر.",
+        "ناظر ادمین‌ها: همهٔ حساب‌ها را می‌بیند، می‌تواند حسابی را معلق کند و تعیین کند ادمین‌ها به چه چیزهایی دسترسی داشته باشند — ولی نقش هیچ‌کس را عوض نمی‌کند.",
     },
-    contentManager: {
-      label: "مدیر محتوا",
-      description: "ایجاد و انتشار درس‌ها، واژگان و محتوای گرامری.",
+    admin: {
+      label: "ادمین",
+      description:
+        "پشتیبانی مشتریان: پاسخ به تیکت‌ها و سؤال‌های کاربران. امکان تعلیق حساب ندارد.",
     },
-    quizManager: {
-      label: "مدیر آزمون",
-      description: "ایجاد، ویرایش و انتشار آزمون‌ها و سؤالات.",
+    teacher: {
+      label: "مدرس",
+      description:
+        "بارگذاری و حذف محتوا و آزمون، فقط برای زبان‌هایی که به او سپرده شده است.",
     },
-    limitedAdmin: {
-      label: "مدیر محدود",
-      description: "دسترسی مدیریتی محدود برای وظایف خاص.",
+    writer: {
+      label: "نویسنده",
+      description: "فقط پنل وبلاگ: نوشتن، ویرایش و انتشار مطلب.",
     },
     learner: {
       label: "کاربر عادی",
-      description: "حساب کاربری استاندارد بدون دسترسی مدیریتی.",
+      description:
+        "حسابی که ثبت‌نام کرده اما نه نقشی دارد و نه اشتراکی. اشتراک پولی نقش نیست و از بخش اشتراک‌ها می‌آید.",
     },
   },
   permissionsPanel: {
     title: "نقش‌ها و مجوزها",
     description:
-      "مرجع سطوح دسترسی مدیریتی فعلی و آینده. اعمال دقیق مجوزها به‌زودی ارائه می‌شود.",
-    comingSoon: "ویرایش دقیق مجوزها به‌زودی ارائه می‌شود.",
-    manageAccess: "مدیریت دسترسی",
-    permissionContent: "محتوا",
-    permissionQuizzes: "آزمون‌ها",
-    permissionUsers: "کاربران",
-    permissionRoles: "نقش‌ها",
-    permissionFull: "دسترسی کامل",
+      "مرجع کامل سطوح دسترسی: نقش‌های مدیریتی در بالا، و اشتراک‌های پولی در پایین که از پنل اشتراک‌ها خوانده می‌شوند.",
+    languageScoped: "محدود به زبان",
+    editorHint: "ویرایش دسترسی‌های ادمین‌ها با مدیر کل و هد ادمین است.",
+    editorTitle: "ویرایش دسترسی‌های «{role}»",
+    editorDescription:
+      "هر قابلیتی که بعداً به پنل اضافه شود، خودکار در همین فهرست قابل واگذاری می‌شود.",
+    save: "ذخیرهٔ دسترسی‌ها",
+    saved: "دسترسی‌های نقش به‌روزرسانی شد",
+    lockedHint:
+      "موارد قفل‌شده قابل واگذاری نیستند: تعلیق حساب، مدیریت نقش‌ها و دسترسی‌ها، اشتراک‌ها و حسابداری فقط با مدیر کل می‌مانند.",
+    lockedPermission: "قفل‌شده — قابل واگذاری نیست",
+    tiersTitle: "اشتراک‌های پولی",
+    tiersDescription:
+      "این‌ها نقش نیستند: از اشتراک زندهٔ کاربر می‌آیند و داشبوردشان همان داشبورد کاربر عادی است. برای تغییر دسترسی‌ها به پنل اشتراک‌ها بروید.",
+    tierColumn: "اشتراک",
+    tierVocabulary: "واژگان",
+    tierGrammar: "گرامر",
+    tierVideo: "ویدئو",
+    tierLevelExam: "آزمون سطح",
+    tierFree: "بدون اشتراک",
+    tierFreeHint: "کاربر عادی؛ فقط بخش‌های رایگان.",
+    tierUser: "کاربر {plan}",
+    tierUserHint: "دسترسی‌ها از پنل اشتراک‌ها تعیین می‌شود.",
   },
 } as const;

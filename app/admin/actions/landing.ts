@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireSuperAdminAction } from "@/lib/auth/action-guards";
+import { requireAdminPermission } from "@/lib/auth/action-guards";
 import { isLandingLanguageSlug } from "@/lib/landing/languages";
 import { getDataRepository } from "@/lib/data";
 import type { ActionResult } from "@/lib/action-result";
@@ -19,7 +19,7 @@ export async function setLandingLanguageVisibilityAction(
   languageSlug: string,
   visible: boolean
 ): Promise<ActionResult> {
-  const guard = await requireSuperAdminAction();
+  const guard = await requireAdminPermission("manageLanding");
   if (!guard.ok) return { error: guard.error };
 
   if (!isLandingLanguageSlug(languageSlug)) {

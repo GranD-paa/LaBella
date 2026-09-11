@@ -15,6 +15,7 @@ export const lessonSchema = z.object({
     .min(2, "Title must be at least 2 characters")
     .max(150, "Title is too long"),
   description: optionalText(2000),
+  languageSlug: z.enum(["italian", "english", "german", "turkish"]),
   orderNumber: z
     .number({ error: "Order must be a number" })
     .int("Order must be a whole number")

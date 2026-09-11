@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireAdminPermission } from "@/lib/auth/action-guards";
+import {
+  enforceLanguageScope,
+  requireAdminPermission,
+} from "@/lib/auth/action-guards";
 import { getDataRepository } from "@/lib/data";
 import { structuredQuizSchema } from "@/lib/validations/admin";
 import { revalidateAppContent } from "@/lib/revalidate-paths";
@@ -18,6 +21,11 @@ export async function createStructuredQuiz(
   if (!parsed.success) {
     return { error: "actions.errors.invalidInput" };
   }
+
+  const outOfScope = await enforceLanguageScope(guard, async () =>
+    parsed.data.languageSlug
+  );
+  if (outOfScope) return { error: outOfScope };
 
   const repo = getDataRepository();
   const result = await repo.createQuizWithQuestions({
