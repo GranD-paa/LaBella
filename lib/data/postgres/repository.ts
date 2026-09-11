@@ -210,17 +210,28 @@ export function createPostgresRepository(): DataRepository {
         `select ${PROFILE_COLUMNS} from profiles order by created_at desc`
       ),
 
+    // `is_admin` and `role` have to move together, otherwise a promoted user
+    // reaches the admin UI holding a learner role, which grants no permissions.
     updateUserAdminStatus: (userId, isAdmin) =>
       mutate(() =>
-        execute("update profiles set is_admin = $2 where id = $1", [
-          userId,
-          isAdmin,
-        ])
+        execute(
+          `update profiles
+              set is_admin = $2,
+                  role = case
+                           when $2 then case when role = 'learner' then 'admin' else role end
+                           else 'learner'
+                         end
+            where id = $1`,
+          [userId, isAdmin]
+        )
       ),
 
     updateUserRole: (userId, role) =>
       mutate(() =>
-        execute("update profiles set role = $2 where id = $1", [userId, role])
+        execute(
+          "update profiles set role = $2, is_admin = ($2 <> 'learner') where id = $1",
+          [userId, role]
+        )
       ),
 
     updateUserStatus: (userId, status) =>

@@ -124,3 +124,103 @@ export function isRoleSlug(value: string): value is RoleSlug {
 export function roleImpliesAdmin(role: RoleSlug): boolean {
   return role !== "learner";
 }
+
+// --------------------------------------------------------------- admin guards
+// One admin must never be able to remove, demote, or lock out another admin.
+// Everything that touches an admin-tier account is reserved for a super admin,
+// and a super admin account itself is untouchable through the panel.
+
+/** Hard cap on how many super admins the platform can ever have. */
+export const MAX_SUPER_ADMINS = 3;
+
+export type ManagedAccount = {
+  id: string;
+  role: RoleSlug;
+};
+
+export const USER_GUARD_MESSAGES = {
+  self: "admin.users.guard.self",
+  superAdminProtected: "admin.users.guard.superAdminProtected",
+  superAdminOnly: "admin.users.guard.superAdminOnly",
+  adminTargetSuperAdminOnly: "admin.users.guard.adminTargetSuperAdminOnly",
+  superAdminLimit: "admin.users.guard.superAdminLimit",
+} as const;
+
+export type UserGuardMessage =
+  (typeof USER_GUARD_MESSAGES)[keyof typeof USER_GUARD_MESSAGES];
+
+export type UserGuardVerdict =
+  | { allowed: true }
+  | { allowed: false; reason: UserGuardMessage };
+
+const ALLOWED: UserGuardVerdict = { allowed: true };
+
+function deny(reason: UserGuardMessage): UserGuardVerdict {
+  return { allowed: false, reason };
+}
+
+export function isProtectedAccount(role: RoleSlug): boolean {
+  return role === "super_admin";
+}
+
+/**
+ * Role changes — including promote/demote, which are role changes in disguise.
+ * Only a super admin may run them, never against another super admin, and
+ * never past the super-admin cap.
+ */
+export function canChangeUserRole(
+  actor: ManagedAccount,
+  target: ManagedAccount,
+  nextRole: RoleSlug,
+  superAdminCount: number
+): UserGuardVerdict {
+  if (actor.id === target.id) {
+    return deny(USER_GUARD_MESSAGES.self);
+  }
+
+  if (isProtectedAccount(target.role)) {
+    return deny(USER_GUARD_MESSAGES.superAdminProtected);
+  }
+
+  if (actor.role !== "super_admin") {
+    return deny(USER_GUARD_MESSAGES.superAdminOnly);
+  }
+
+  if (nextRole === "super_admin" && superAdminCount >= MAX_SUPER_ADMINS) {
+    return deny(USER_GUARD_MESSAGES.superAdminLimit);
+  }
+
+  return ALLOWED;
+}
+
+/** Suspending or reactivating an account. */
+export function canChangeUserStatus(
+  actor: ManagedAccount,
+  target: ManagedAccount,
+  nextStatus: UserStatus
+): UserGuardVerdict {
+  if (actor.id === target.id && nextStatus === "suspended") {
+    return deny(USER_GUARD_MESSAGES.self);
+  }
+
+  // A super admin can never be locked out; reactivating one stays possible so a
+  // legacy suspension is recoverable, and the rule below keeps that with them.
+  if (isProtectedAccount(target.role) && nextStatus === "suspended") {
+    return deny(USER_GUARD_MESSAGES.superAdminProtected);
+  }
+
+  if (roleImpliesAdmin(target.role) && actor.role !== "super_admin") {
+    return deny(USER_GUARD_MESSAGES.adminTargetSuperAdminOnly);
+  }
+
+  return ALLOWED;
+}
+
+/** The role a promote/demote toggle lands on, without downgrading a tier. */
+export function resolveAdminToggleRole(
+  currentRole: RoleSlug,
+  isAdmin: boolean
+): RoleSlug {
+  if (!isAdmin) return "learner";
+  return currentRole === "learner" ? "admin" : currentRole;
+}

@@ -33,7 +33,11 @@ export default async function AdminPage() {
       />
 
       <div className="space-y-6">
-        <UserManagementPanel users={adminData.users} currentUserId={user.id} />
+        <UserManagementPanel
+          users={adminData.users}
+          currentUserId={user.id}
+          currentUserRole={profile.role}
+        />
         <RolesPermissionsPanel />
       </div>
     </div>

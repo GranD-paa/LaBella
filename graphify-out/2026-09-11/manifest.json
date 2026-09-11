@@ -1002,9 +1002,9 @@
     "semantic_hash": ""
   },
   "components/menu/banner-carousel.tsx": {
-    "mtime": 1787404091.2375998,
-    "seen": 1788154327.476039,
-    "ast_hash": "8a52a4b6be5700173ef53fae1fb6e141",
+    "mtime": 1789130382.2966826,
+    "seen": 1789130495.1080077,
+    "ast_hash": "f56c8f2b4bba5d42a069e28647fd9e01",
     "semantic_hash": ""
   },
   "components/menu/flag-icon.test.ts": {

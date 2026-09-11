@@ -8747,7 +8747,7 @@
       "file_type": "code",
       "norm_label": "enddrag()",
       "source_file": "components/menu/banner-carousel.tsx",
-      "source_location": "L168"
+      "source_location": "L215"
     },
     {
       "id": "components_menu_banner_carousel_bannercarousel_handlepointerdown",
@@ -8759,7 +8759,7 @@
       "file_type": "code",
       "norm_label": "handlepointerdown()",
       "source_file": "components/menu/banner-carousel.tsx",
-      "source_location": "L138"
+      "source_location": "L185"
     },
     {
       "id": "components_menu_banner_carousel_bannercarousel_handlepointermove",
@@ -8771,7 +8771,7 @@
       "file_type": "code",
       "norm_label": "handlepointermove()",
       "source_file": "components/menu/banner-carousel.tsx",
-      "source_location": "L150"
+      "source_location": "L197"
     },
     {
       "id": "components_menu_banner_carousel_bannercarousel_handletransitionend",
@@ -8783,7 +8783,7 @@
       "file_type": "code",
       "norm_label": "handletransitionend()",
       "source_file": "components/menu/banner-carousel.tsx",
-      "source_location": "L118"
+      "source_location": "L178"
     },
     {
       "id": "components_menu_flag_icon_flagicon",
@@ -37703,7 +37703,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/menu/banner-carousel.tsx",
-      "source_location": "L303",
+      "source_location": "L350",
       "weight": 1.0
     },
     {
@@ -95961,7 +95961,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/menu/banner-carousel.tsx",
-      "source_location": "L118",
+      "source_location": "L178",
       "weight": 1.0
     },
     {
@@ -95972,7 +95972,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/menu/banner-carousel.tsx",
-      "source_location": "L138",
+      "source_location": "L185",
       "weight": 1.0
     },
     {
@@ -95983,7 +95983,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/menu/banner-carousel.tsx",
-      "source_location": "L150",
+      "source_location": "L197",
       "weight": 1.0
     },
     {
@@ -95994,7 +95994,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/menu/banner-carousel.tsx",
-      "source_location": "L168",
+      "source_location": "L215",
       "weight": 1.0
     },
     {
@@ -112147,5 +112147,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "34ac9d4c028bfc22539473668b129240a3613ae8"
+  "built_at_commit": "61efac57cecd8a40adf7457224ae190f04959529"
 }

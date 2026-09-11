@@ -877,7 +877,19 @@
         "title": "Change role for {name}",
         "description": "Select a new role. Changes take effect immediately.",
         "selectLabel": "Role",
-        "save": "Save role"
+        "save": "Save role",
+        "superAdminSeats": "Super Admin seats in use: {used} of {max}.",
+        "superAdminSeatsFull": "All {max} Super Admin seats are taken. Free one up before granting another.",
+        "superAdminConfirmTitle": "Promote to Super Admin?",
+        "superAdminConfirmDescription": "Are you sure you want to make \"{name}\" a Super Admin? They will get full access, no other admin will be able to demote, suspend, or edit them, and the platform allows at most {max} Super Admins.",
+        "superAdminConfirmAction": "Yes, make Super Admin"
+      },
+      "guard": {
+        "self": "You cannot perform this action on your own account.",
+        "superAdminProtected": "Super Admin accounts are protected. No one can demote, suspend, or change the role of a Super Admin from this panel.",
+        "superAdminOnly": "Only a Super Admin can change roles.",
+        "adminTargetSuperAdminOnly": "Only a Super Admin can manage another admin's account.",
+        "superAdminLimit": "The Super Admin limit has been reached. No further Super Admins can be added."
       },
       "roles": {
         "superAdmin": {
@@ -886,7 +898,7 @@
         },
         "admin": {
           "label": "Admin",
-          "description": "Manage content, quizzes, and users. Cannot manage other admins' roles."
+          "description": "Manage content, quizzes, and learner accounts. Cannot change roles or touch other admins' accounts."
         },
         "contentManager": {
           "label": "Content Manager",

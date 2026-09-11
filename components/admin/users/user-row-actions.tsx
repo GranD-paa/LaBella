@@ -32,20 +32,55 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { ActionResult } from "@/lib/action-result";
+import {
+  canChangeUserRole,
+  canChangeUserStatus,
+  resolveAdminToggleRole,
+  type ManagedAccount,
+  type RoleSlug,
+} from "@/lib/permissions/roles";
 
 type PendingActionType = "promote" | "demote" | "suspend" | "activate";
 
 export function UserRowActions({
   user,
   currentUserId,
+  currentUserRole,
+  superAdminCount,
 }: {
   user: ManagedUser;
   currentUserId: string;
+  currentUserRole: RoleSlug;
+  superAdminCount: number;
 }) {
   const { t } = useTranslations();
   const router = useRouter();
-  const isSelf = user.id === currentUserId;
   const displayName = user.fullName || t("admin.users.unnamed");
+
+  // The server refuses these anyway; the menu just stops offering what an
+  // admin is not allowed to do to a fellow admin.
+  const actor: ManagedAccount = { id: currentUserId, role: currentUserRole };
+  const target: ManagedAccount = { id: user.id, role: user.role };
+  const canEditRole = canChangeUserRole(
+    actor,
+    target,
+    target.role,
+    superAdminCount
+  ).allowed;
+  const canPromote = canChangeUserRole(
+    actor,
+    target,
+    resolveAdminToggleRole(target.role, true),
+    superAdminCount
+  ).allowed;
+  const canDemote = canChangeUserRole(
+    actor,
+    target,
+    "learner",
+    superAdminCount
+  ).allowed;
+  const canSuspend = canChangeUserStatus(actor, target, "suspended").allowed;
+  const canActivate = canChangeUserStatus(actor, target, "active").allowed;
 
   const [profileOpen, setProfileOpen] = useState(false);
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
@@ -142,7 +177,7 @@ export function UserRowActions({
             {t("admin.users.copyId")}
           </DropdownMenuItem>
           <DropdownMenuItem
-            disabled={isSelf}
+            disabled={!canEditRole}
             onClick={() => setRoleDialogOpen(true)}
           >
             <PenSquare className="h-4 w-4" />
@@ -153,27 +188,33 @@ export function UserRowActions({
 
           {user.isAdmin ? (
             <DropdownMenuItem
-              disabled={isSelf}
+              disabled={!canDemote}
               onClick={() => setPendingAction("demote")}
             >
               <ShieldOff className="h-4 w-4" />
               {t("admin.users.demote")}
             </DropdownMenuItem>
           ) : (
-            <DropdownMenuItem onClick={() => setPendingAction("promote")}>
+            <DropdownMenuItem
+              disabled={!canPromote}
+              onClick={() => setPendingAction("promote")}
+            >
               <ShieldCheck className="h-4 w-4" />
               {t("admin.users.promote")}
             </DropdownMenuItem>
           )}
 
           {user.status === "suspended" ? (
-            <DropdownMenuItem onClick={() => setPendingAction("activate")}>
+            <DropdownMenuItem
+              disabled={!canActivate}
+              onClick={() => setPendingAction("activate")}
+            >
               <PlayCircle className="h-4 w-4" />
               {t("admin.users.activate")}
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem
-              disabled={isSelf}
+              disabled={!canSuspend}
               onClick={() => setPendingAction("suspend")}
             >
               <Ban className="h-4 w-4" />
@@ -193,6 +234,7 @@ export function UserRowActions({
         open={roleDialogOpen}
         onOpenChange={setRoleDialogOpen}
         user={user}
+        superAdminCount={superAdminCount}
       />
       {pendingConfig ? (
         <ConfirmActionDialog

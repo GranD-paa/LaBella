@@ -48,14 +48,21 @@ function getInitials(name: string | null, email: string | null) {
 export function UserManagementPanel({
   users,
   currentUserId,
+  currentUserRole,
 }: {
   users: ManagedUser[];
   currentUserId: string;
+  currentUserRole: RoleSlug;
 }) {
   const { t, formatDate } = useTranslations();
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<RoleSlug | "all">("all");
   const [statusFilter, setStatusFilter] = useState<UserStatus | "all">("all");
+
+  const superAdminCount = useMemo(
+    () => users.filter((user) => user.role === "super_admin").length,
+    [users]
+  );
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -206,7 +213,12 @@ export function UserManagementPanel({
                       </TableCell>
                       <TableCell>
                         <div className="flex justify-end">
-                          <UserRowActions user={user} currentUserId={currentUserId} />
+                          <UserRowActions
+                            user={user}
+                            currentUserId={currentUserId}
+                            currentUserRole={currentUserRole}
+                            superAdminCount={superAdminCount}
+                          />
                         </div>
                       </TableCell>
                     </TableRow>

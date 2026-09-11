@@ -86,6 +86,23 @@ export const adminUsersIt = {
     description: "Seleziona un nuovo ruolo. Le modifiche hanno effetto immediato.",
     selectLabel: "Ruolo",
     save: "Salva ruolo",
+    superAdminSeats: "Posti da Super Admin occupati: {used} di {max}.",
+    superAdminSeatsFull:
+      "Tutti i {max} posti da Super Admin sono occupati. Liberane uno prima di assegnarne un altro.",
+    superAdminConfirmTitle: "Promuovere a Super Admin?",
+    superAdminConfirmDescription:
+      "Vuoi davvero rendere \"{name}\" un Super Admin? Otterrà accesso completo, nessun altro admin potrà retrocederlo, sospenderlo o modificarlo, e la piattaforma consente al massimo {max} Super Admin.",
+    superAdminConfirmAction: "Sì, rendilo Super Admin",
+  },
+  guard: {
+    self: "Non puoi eseguire questa azione sul tuo account.",
+    superAdminProtected:
+      "Gli account Super Admin sono protetti. Da questo pannello nessuno può retrocedere, sospendere o cambiare il ruolo di un Super Admin.",
+    superAdminOnly: "Solo un Super Admin può cambiare i ruoli.",
+    adminTargetSuperAdminOnly:
+      "Solo un Super Admin può gestire l'account di un altro admin.",
+    superAdminLimit:
+      "Limite di Super Admin raggiunto. Non è possibile aggiungerne altri.",
   },
   roles: {
     superAdmin: {
@@ -96,7 +113,7 @@ export const adminUsersIt = {
     admin: {
       label: "Admin",
       description:
-        "Gestisce contenuti, quiz e utenti. Non può modificare i ruoli di altri admin.",
+        "Gestisce contenuti, quiz e account degli studenti. Non può cambiare i ruoli né toccare gli account di altri admin.",
     },
     contentManager: {
       label: "Content Manager",
