@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
 import { BlogPostEditor } from "@/components/admin/blog/blog-post-editor";
+import { ErrorState } from "@/components/errors/error-state";
 import { getDataRepository } from "@/lib/data";
 import { requireAdmin } from "@/lib/supabase/admin-guard";
 
@@ -18,13 +19,34 @@ export default async function AdminBlogEditorPage({
 
   const { id } = await params;
   const repo = getDataRepository();
-  const categories = await repo.getBlogCategories();
+
+  // Same guard as the list at `/admin/blog`: a database without
+  // db/004_landing_and_blog.sql has no blog tables, and the editor should say
+  // so rather than answer a link in the panel with a 500.
+  const categories = await repo.getBlogCategories().catch((error) => {
+    console.error("[admin/blog] failed to load categories", error);
+    return null;
+  });
+
+  if (!categories) {
+    return (
+      <ErrorState
+        title="ویرایشگر باز نشد"
+        description="جدول‌های وبلاگ روی این دیتابیس در دسترس نیستند. اگر مایگریشن db/004_landing_and_blog.sql هنوز روی این دیتابیس اجرا نشده، اجرایش کن؛ در غیر این صورت متن خطا در لاگ کانتینر هست."
+      />
+    );
+  }
 
   if (id === "new") {
     return <BlogPostEditor post={null} categories={categories} />;
   }
 
-  const post = await repo.getBlogPostById(id);
+  // `notFound()` below stays outside the guard: a post that does not exist is
+  // a 404, not a broken page, and catching it would turn one into the other.
+  const post = await repo.getBlogPostById(id).catch((error) => {
+    console.error("[admin/blog] failed to load post", error);
+    return null;
+  });
   if (!post) notFound();
 
   return <BlogPostEditor post={post} categories={categories} />;

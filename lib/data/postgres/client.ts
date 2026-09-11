@@ -106,11 +106,83 @@ function serialize<T>(row: T): T {
   return out as T;
 }
 
+/**
+ * Failures that mean the connection died, not that the query was wrong.
+ *
+ * The pool keeps connections open across requests and the path to the cluster
+ * drops them — a socket reset, a cluster-side restart, a DNS blip. The client
+ * finds out only when it writes to a connection the other end already closed,
+ * so the query never reached Postgres and nothing ran. These all surface
+ * immediately rather than after a wait.
+ *
+ * Deliberately absent: the three timeouts in `POOL_OPTIONS`. A query that has
+ * already spent twenty seconds may well have executed, and waiting another
+ * twenty to find out turns a slow page into a broken one.
+ */
+const TRANSIENT_ERROR_CODES = new Set([
+  "ECONNRESET",
+  "ECONNREFUSED",
+  "EPIPE",
+  "ENOTFOUND",
+  "EAI_AGAIN",
+  "08000", // connection_exception
+  "08001", // sqlclient_unable_to_establish_sqlconnection
+  "08003", // connection_does_not_exist
+  "08006", // connection_failure
+  "57P01", // admin_shutdown
+  "57P02", // crash_shutdown
+  "57P03", // cannot_connect_now
+]);
+
+function isTransientConnectionError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+
+  const { code, message } = error as { code?: unknown; message?: unknown };
+  if (typeof code === "string" && TRANSIENT_ERROR_CODES.has(code)) return true;
+
+  // `pg` reports a socket that closed under an idle pooled client with a
+  // message and no code, so there is nothing else to match on.
+  return (
+    typeof message === "string" &&
+    /connection terminated|connection ended|socket hang up|client has encountered a connection error/i.test(
+      message
+    )
+  );
+}
+
+/**
+ * True only for a statement that cannot change anything.
+ *
+ * The retry below re-runs a statement that may already have been sent, so it
+ * must never see a write. Matching on the leading keyword rather than on the
+ * caller is the part that makes that guarantee hold: `queryOne` is used for
+ * two `insert ... returning id` statements (a grammar rule, a banner image),
+ * and a retried insert would quietly create the row twice.
+ */
+function isReadOnlyStatement(text: string): boolean {
+  return /^\s*select\b/i.test(text);
+}
+
 export async function query<T = Record<string, unknown>>(
   text: string,
   values: unknown[] = []
 ): Promise<T[]> {
-  const result = await getPool().query(text, values);
+  let result;
+  try {
+    result = await getPool().query(text, values);
+  } catch (error) {
+    if (!isReadOnlyStatement(text) || !isTransientConnectionError(error)) {
+      throw error;
+    }
+    // The dead connection has been discarded by now, so the second attempt
+    // gets a fresh one. One retry only: past that the cluster is genuinely
+    // unreachable and the caller should hear about it rather than wait.
+    console.warn(
+      "[db] read failed on a dropped connection, retrying once:",
+      error instanceof Error ? error.message : error
+    );
+    result = await getPool().query(text, values);
+  }
   return (result.rows as T[]).map(serialize);
 }
 

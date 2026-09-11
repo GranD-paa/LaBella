@@ -16,9 +16,17 @@ function xmlEscape(value: string): string {
 
 export async function GET() {
   const site = await getSiteUrl();
-  const { posts } = await getDataRepository().getPublishedBlogPosts({
-    limit: 50,
-  });
+
+  // Feed readers and crawlers poll this on their own schedule, so a database
+  // without the blog tables should answer with an empty but valid feed rather
+  // than a 500 — the same call at `/blog` already degrades this way, and a
+  // feed that errors can get dropped from a reader for good.
+  const { posts } = await getDataRepository()
+    .getPublishedBlogPosts({ limit: 50 })
+    .catch((error) => {
+      console.error("[blog] failed to load posts for the feed", error);
+      return { posts: [], total: 0 };
+    });
 
   const items = posts
     .filter((post) => !post.noindex)
