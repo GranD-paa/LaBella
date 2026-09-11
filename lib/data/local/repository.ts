@@ -1,4 +1,4 @@
-import type { BlogPost } from "@/lib/blog/types";
+import type { BlogImage, BlogPost } from "@/lib/blog/types";
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -17,9 +17,11 @@ import {
 import { computeRenewalPeriod, isEntitled } from "@/lib/billing/period";
 import { createLocalId, getLocalStore, persistLocalStore } from "@/lib/data/local/store";
 import { validateBannerImage } from "@/lib/data/banner-image";
+import { validateBlogImage } from "@/lib/data/blog-image";
 import { deriveQuizMetadataFromLesson } from "@/lib/quiz-management/helpers";
 
 const BANNER_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "banners");
+const BLOG_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "blog");
 
 export function createLocalRepository(): DataRepository {
   function commitStore() {
@@ -172,7 +174,14 @@ export function createLocalRepository(): DataRepository {
     },
 
     async getPublishedBlogPosts(options) {
-      const { categorySlug, limit = 12, offset = 0 } = options ?? {};
+      const {
+        categorySlug,
+        languageSlug,
+        excludeId,
+        featuredFirst = false,
+        limit = 12,
+        offset = 0,
+      } = options ?? {};
 
       const matching = getLocalStore()
         .blogPosts.filter(
@@ -182,8 +191,16 @@ export function createLocalRepository(): DataRepository {
           (post) =>
             !categorySlug || post.categorySlugs.includes(categorySlug)
         )
-        .sort((a, b) =>
-          (b.publishedAt ?? "").localeCompare(a.publishedAt ?? "")
+        .filter(
+          (post) =>
+            !languageSlug || post.languageSlugs.includes(languageSlug)
+        )
+        .filter((post) => post.id !== excludeId)
+        .sort(
+          (a, b) =>
+            // Mirrors the SQL's `featured desc, published_at desc`.
+            (featuredFirst ? Number(b.featured) - Number(a.featured) : 0) ||
+            (b.publishedAt ?? "").localeCompare(a.publishedAt ?? "")
         );
 
       return {
@@ -244,8 +261,11 @@ export function createLocalRepository(): DataRepository {
         slug: input.slug,
         title: input.title,
         excerpt: input.excerpt,
+        summary: input.summary,
         content: input.content,
         coverImageUrl: input.coverImageUrl,
+        coverImageAlt: input.coverImageAlt,
+        featured: input.featured,
         status: input.status,
         publishedAt,
         authorId: input.authorId ?? existing?.authorId ?? authUser.id,
@@ -259,6 +279,7 @@ export function createLocalRepository(): DataRepository {
         createdAt: existing?.createdAt ?? now,
         updatedAt: now,
         categorySlugs: input.categorySlugs,
+        languageSlugs: input.languageSlugs,
       };
 
       if (existing) {
@@ -283,6 +304,75 @@ export function createLocalRepository(): DataRepository {
       const store = getLocalStore();
       store.blogPosts = store.blogPosts.filter((post) => post.id !== id);
       commitStore();
+      return {};
+    },
+
+    // ----------------------------------------------------------- blog images
+    //
+    // Local mode has a writable filesystem and no database, which is the exact
+    // reverse of the container, so images go to `public/uploads/blog` and are
+    // served as static files — the same split `uploadBannerImage` already
+    // makes. The URL differs between modes and that is fine: it is stored with
+    // the post, so whatever wrote it is what serves it back.
+    async listBlogImages(limit = 60) {
+      return [...getLocalStore().blogImages]
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, limit);
+    },
+
+    async getBlogImagesByIds(ids) {
+      const wanted = new Set(ids);
+      return getLocalStore().blogImages.filter((image) => wanted.has(image.id));
+    },
+
+    async uploadBlogImage(file, altText) {
+      const validated = await validateBlogImage(file);
+      if (!validated.ok) return { error: validated.error };
+
+      const id = crypto.randomUUID();
+      const filename = `${id}.${validated.extension}`;
+      await mkdir(BLOG_UPLOAD_DIR, { recursive: true });
+      await writeFile(path.join(BLOG_UPLOAD_DIR, filename), validated.bytes);
+
+      const image: BlogImage = {
+        id,
+        url: `/uploads/blog/${filename}`,
+        contentType: file.type,
+        byteSize: validated.bytes.length,
+        width: validated.dimensions?.width ?? null,
+        height: validated.dimensions?.height ?? null,
+        altText,
+        originalName: file.name.slice(0, 200) || null,
+        createdAt: new Date().toISOString(),
+      };
+
+      const store = getLocalStore();
+      store.blogImages.push(image);
+      commitStore();
+      return { image };
+    },
+
+    async updateBlogImageAlt(id, altText) {
+      const image = getLocalStore().blogImages.find((entry) => entry.id === id);
+      if (!image) return { error: "actions.errors.generic" };
+      image.altText = altText;
+      commitStore();
+      return {};
+    },
+
+    async deleteBlogImage(id) {
+      const store = getLocalStore();
+      const image = store.blogImages.find((entry) => entry.id === id);
+      store.blogImages = store.blogImages.filter((entry) => entry.id !== id);
+      commitStore();
+
+      // The row is gone either way; a file that outlives it is loose bytes in
+      // a gitignored folder, not a failure worth reporting to the admin.
+      if (image) {
+        await unlink(path.join(process.cwd(), "public", image.url)).catch(
+          () => {}
+        );
+      }
       return {};
     },
 

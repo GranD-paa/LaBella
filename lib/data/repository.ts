@@ -29,6 +29,7 @@ import type { Json } from "@/types/database.types";
 import type { CurriculumLevelOverrideRow } from "@/lib/curriculum/level-overrides";
 import type {
   BlogCategory,
+  BlogImage,
   BlogPost,
   BlogPostInput,
 } from "@/lib/blog/types";
@@ -111,6 +112,12 @@ export interface DataRepository {
   getBlogCategories(): Promise<BlogCategory[]>;
   getPublishedBlogPosts(options?: {
     categorySlug?: string;
+    /** A slug from `lib/blog/languages.ts`, for the per-language hubs. */
+    languageSlug?: string;
+    /** Keeps a post out of its own "related" list. */
+    excludeId?: string;
+    /** Pins featured posts to the front. Off by default so feeds stay chronological. */
+    featuredFirst?: boolean;
     limit?: number;
     offset?: number;
   }): Promise<{ posts: BlogPost[]; total: number }>;
@@ -119,6 +126,29 @@ export interface DataRepository {
   getBlogPostById(id: string): Promise<BlogPost | null>;
   upsertBlogPost(input: BlogPostInput): Promise<{ error?: string; id?: string }>;
   deleteBlogPost(id: string): Promise<{ error?: string }>;
+
+  // Blog images. Uploaded by super admins, stored as bytes, and served from
+  // `/api/blog-images/[id]` — see db/009_blog_refactor.sql for why they are
+  // not on the container's filesystem.
+  listBlogImages(limit?: number): Promise<BlogImage[]>;
+  /**
+   * Metadata for a known handful of images, never their bytes.
+   *
+   * The article page calls this with the ids its markdown references, to learn
+   * the pixel dimensions it needs to stamp on each `<img>` so the page does not
+   * shift as pictures arrive.
+   */
+  getBlogImagesByIds(ids: string[]): Promise<BlogImage[]>;
+  uploadBlogImage(
+    file: File,
+    altText: string | null,
+    uploadedBy: string | null
+  ): Promise<{ image?: BlogImage; error?: string }>;
+  updateBlogImageAlt(
+    id: string,
+    altText: string | null
+  ): Promise<{ error?: string }>;
+  deleteBlogImage(id: string): Promise<{ error?: string }>;
 
   // Curriculum level customization — super-admin renames of default levels
   // and brand-new levels (e.g. A2/B1/B2) added on top of the static

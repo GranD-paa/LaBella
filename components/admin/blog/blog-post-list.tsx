@@ -9,6 +9,7 @@ import {
   FileText,
   Pencil,
   Plus,
+  Star,
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatBlogDate } from "@/lib/blog/format";
+import { resolveBlogLanguages } from "@/lib/blog/languages";
 import type { BlogCategory, BlogPost } from "@/lib/blog/types";
 
 export function BlogPostList({
@@ -105,11 +107,18 @@ export function BlogPostList({
           ) : (
             <ul className="divide-y divide-white/10 overflow-hidden rounded-lg border border-white/10">
               {posts.map((post) => {
-                const postCategories = categories
-                  .filter((category) =>
-                    post.categorySlugs.includes(category.slug)
-                  )
-                  .map((category) => category.name);
+                // Both taxonomies on one line, so the list answers "which
+                // posts cover German?" without opening each one.
+                const labels = [
+                  ...categories
+                    .filter((category) =>
+                      post.categorySlugs.includes(category.slug)
+                    )
+                    .map((category) => category.name),
+                  ...resolveBlogLanguages(post.languageSlugs).map(
+                    (language) => language.name
+                  ),
+                ];
 
                 return (
                   <li key={post.id} className="px-4 py-4">
@@ -124,6 +133,12 @@ export function BlogPostList({
                           ) : (
                             <Badge variant="secondary">پیش‌نویس</Badge>
                           )}
+                          {post.featured ? (
+                            <Badge variant="secondary" className="text-xs">
+                              <Star className="me-1 h-3 w-3" />
+                              شاخص
+                            </Badge>
+                          ) : null}
                           {post.noindex ? (
                             <Badge variant="secondary" className="text-xs">
                               بدون ایندکس
@@ -139,9 +154,7 @@ export function BlogPostList({
                           {post.publishedAt
                             ? formatBlogDate(post.publishedAt)
                             : `آخرین ویرایش ${formatBlogDate(post.updatedAt)}`}
-                          {postCategories.length > 0
-                            ? ` · ${postCategories.join("، ")}`
-                            : ""}
+                          {labels.length > 0 ? ` · ${labels.join("، ")}` : ""}
                         </p>
                       </div>
 

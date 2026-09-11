@@ -117,15 +117,128 @@
 }
 
 /* -------------------------------------------------------------------------
-   Blog article body.
-   Written as plain CSS rather than @apply so the rules can target elements
+   The blog.
+
+   Two jobs in one section. First, the reading surface: the article body is
+   written as plain CSS rather than @apply because its rules target elements
    that only exist inside `dangerouslySetInnerHTML` output, where Tailwind's
    class scanner never sees them.
+
+   Second, the light theme. The rest of the app is dark and only dark — look at
+   `:root` above and you will find the dark palette sitting where a light one
+   would normally be. The blog is the one surface a stranger lands on from a
+   search result, often on a phone in daylight, and long-form reading is
+   exactly where a forced dark page loses people. So the blog carries its own
+   palette, scoped to `.blog-root`: the tokens are redefined on that container
+   and inherit down through everything inside it, including the shared Button
+   and Badge components, without a single rule that could leak into /learn.
+
+   Dark stays the default — no attribute on <html> means the site's own colours
+   — and `data-blog-theme="light"` is what a reader opts into.
    ------------------------------------------------------------------------- */
+
+.blog-root {
+  /*
+   * Accent for *text*: links, eyebrows, list markers, the rule beside a pull
+   * quote. Separate from --primary because --primary is the brand yellow, and
+   * that is the right colour for a filled button in either theme and the wrong
+   * colour for a word on a white page — #FBBF24 on white is about a 1.7:1
+   * contrast ratio, which is not a link, it is a suggestion of one.
+   */
+  --blog-accent: 43 96% 56%;
+  /* Tint behind code, table headers and quiet panels. */
+  --blog-wash: 0 0% 100% / 0.05;
+  --blog-wash-strong: 0 0% 100% / 0.08;
+  --blog-hairline: 0 0% 100% / 0.1;
+
+  position: relative;
+  min-height: 100vh;
+  /* Opaque on purpose: <body> paints a fixed radial behind every page, and
+     covering it is what lets the light theme actually be light. */
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+:root[data-blog-theme="light"] .blog-root {
+  --background: 280 40% 99%;
+  --foreground: 266 55% 11%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 266 55% 11%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 266 55% 11%;
+
+  /* The yellow survives as a button fill — dark text on yellow reads well on
+     white too, and it is the piece of the brand a returning reader knows. */
+  --primary: 43 96% 52%;
+  --primary-foreground: 266 100% 8%;
+
+  --secondary: 277 91% 38%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 280 30% 96%;
+  --muted-foreground: 266 16% 38%;
+
+  --accent: 280 35% 95%;
+  --accent-foreground: 266 55% 11%;
+
+  --border: 275 22% 89%;
+  --input: 275 22% 89%;
+  --ring: 277 91% 45%;
+
+  /* Purple, not yellow: the brand's other colour, and a real link on white. */
+  --blog-accent: 277 85% 40%;
+  --blog-wash: 277 40% 14% / 0.04;
+  --blog-wash-strong: 277 40% 14% / 0.07;
+  --blog-hairline: 277 40% 14% / 0.1;
+}
+
+/* The theme toggle's two icons. Both are rendered; CSS picks. The sun means
+   "switch to light" and so shows while the blog is dark, which is the default
+   and therefore the state with no attribute on <html>. */
+.blog-theme-moon {
+  display: none;
+}
+
+:root[data-blog-theme="light"] .blog-theme-sun {
+  display: none;
+}
+
+:root[data-blog-theme="light"] .blog-theme-moon {
+  display: block;
+}
+
+.blog-hairline {
+  border-color: hsl(var(--blog-hairline));
+}
+
+.blog-accent {
+  color: hsl(var(--blog-accent));
+}
+
+/* Theme changes are instant everywhere except the big flat areas, where a hard
+   cut reads as a flicker. Nothing else transitions, so the switch still feels
+   immediate rather than laggy. */
+@media (prefers-reduced-motion: no-preference) {
+  .blog-root,
+  .blog-root header,
+  .blog-root footer {
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease;
+  }
+}
+
+/* --------------------------------------------------------------- article body
+   The measure is the point. Persian at this size wants roughly 62–70
+   characters to a line; much wider and the eye loses its place on the return
+   sweep, which is the most common reason a long post goes unfinished. */
+
 .blog-prose {
-  color: hsl(var(--muted-foreground));
+  color: hsl(var(--foreground) / 0.86);
   font-size: 1.0625rem;
-  line-height: 1.9;
+  line-height: 2;
 }
 
 .blog-prose > * + * {
@@ -136,36 +249,70 @@
 .blog-prose h3,
 .blog-prose h4 {
   color: hsl(var(--foreground));
-  font-weight: 600;
-  line-height: 1.35;
-  margin-top: 2.2em;
+  font-weight: 700;
+  line-height: 1.45;
+  margin-top: 2.4em;
   margin-bottom: 0.7em;
-  scroll-margin-top: 5rem;
+  /* Clears the sticky header when a table-of-contents link jumps here. */
+  scroll-margin-top: 6rem;
+  position: relative;
 }
 
 .blog-prose h2 {
-  font-size: 1.6rem;
+  font-size: 1.55rem;
+  letter-spacing: -0.01em;
 }
 .blog-prose h3 {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
 }
 .blog-prose h4 {
-  font-size: 1.1rem;
+  font-size: 1.08rem;
+}
+
+/*
+ * The link that copies a section's address, in the margin beside its heading.
+ * Hidden until the heading is hovered or the link itself is focused, so it
+ * never competes with the heading — but reachable by keyboard, which is why it
+ * is a real anchor rather than a ::before.
+ */
+.blog-anchor {
+  position: absolute;
+  inset-inline-end: 100%;
+  padding-inline-end: 0.4rem;
+  color: hsl(var(--blog-accent));
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+  font-weight: 400;
+}
+
+.blog-prose :is(h2, h3, h4):hover .blog-anchor,
+.blog-anchor:focus-visible {
+  opacity: 1;
+}
+
+/* On a narrow screen there is no margin for it to sit in, so it stops being
+   offered rather than overlapping the heading. */
+@media (max-width: 48rem) {
+  .blog-anchor {
+    display: none;
+  }
 }
 
 .blog-prose a {
-  color: hsl(var(--primary));
+  color: hsl(var(--blog-accent));
   text-underline-offset: 3px;
   text-decoration: underline;
+  text-decoration-thickness: 1px;
 }
 
 .blog-prose a:hover {
-  color: hsl(var(--foreground));
+  text-decoration-thickness: 2px;
 }
 
 .blog-prose strong {
   color: hsl(var(--foreground));
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .blog-prose ul,
@@ -185,14 +332,16 @@
 }
 
 .blog-prose li::marker {
-  color: hsl(var(--primary));
+  color: hsl(var(--blog-accent));
 }
 
 .blog-prose blockquote {
-  border-inline-start: 2px solid hsl(var(--primary));
+  border-inline-start: 3px solid hsl(var(--blog-accent));
   padding-inline-start: 1.25rem;
   color: hsl(var(--foreground));
   font-style: normal;
+  font-size: 1.15em;
+  line-height: 1.8;
 }
 
 .blog-prose img {
@@ -200,10 +349,24 @@
   border: 1px solid hsl(var(--border));
   width: 100%;
   height: auto;
+  /* Paired with the width/height the renderer stamps on each <img>: the
+     attributes reserve the right box, these two keep it responsive. */
+  display: block;
+}
+
+.blog-prose figure {
+  margin-top: 2em;
+}
+
+.blog-prose figcaption {
+  margin-top: 0.7rem;
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+  text-align: center;
 }
 
 .blog-prose code {
-  background: rgb(255 255 255 / 0.07);
+  background: hsl(var(--blog-wash-strong));
   border-radius: 0.35rem;
   padding: 0.15em 0.4em;
   font-size: 0.9em;
@@ -213,7 +376,7 @@
 }
 
 .blog-prose pre {
-  background: rgb(255 255 255 / 0.05);
+  background: hsl(var(--blog-wash));
   border: 1px solid hsl(var(--border));
   border-radius: 0.9rem;
   padding: 1.1rem 1.3rem;
@@ -233,6 +396,7 @@
   margin-block: 2.5em;
 }
 
+/* A wide table scrolls inside its own box rather than widening the page. */
 .blog-prose table {
   width: 100%;
   border-collapse: collapse;
@@ -250,7 +414,42 @@
 .blog-prose th {
   color: hsl(var(--foreground));
   font-weight: 600;
-  background: rgb(255 255 255 / 0.04);
+  background: hsl(var(--blog-wash));
+}
+
+/* ------------------------------------------------------------ reading gauge
+   A hairline across the top of the viewport that fills as the article is read.
+   Driven by `animation-timeline: scroll()` where the browser has it, which
+   means the bar tracks the scroll on the compositor and never runs a scroll
+   handler on the main thread. Browsers without it show no bar at all — the
+   article is unaffected, and no JavaScript is shipped to emulate one. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .blog-progress {
+      position: fixed;
+      inset-block-start: 0;
+      inset-inline: 0;
+      height: 2px;
+      z-index: 50;
+      background: hsl(var(--blog-accent));
+      transform-origin: 0 50%;
+      animation: blog-progress-fill linear;
+      animation-timeline: scroll();
+    }
+
+    [dir="rtl"] .blog-progress {
+      transform-origin: 100% 50%;
+    }
+  }
+}
+
+@keyframes blog-progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
 /* -------------------------------------------------------------------------

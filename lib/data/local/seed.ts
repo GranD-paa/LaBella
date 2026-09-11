@@ -1,4 +1,4 @@
-import type { BlogCategory, BlogPost } from "@/lib/blog/types";
+import type { BlogCategory, BlogImage, BlogPost } from "@/lib/blog/types";
 import type {
   Banner,
   FxRate,
@@ -50,6 +50,7 @@ export type LocalDatabase = {
   landingLanguageSettings: Record<string, boolean>;
   blogCategories: BlogCategory[];
   blogPosts: BlogPost[];
+  blogImages: BlogImage[];
   // Super-admin renames of default curriculum levels and brand-new levels
   // (e.g. A2/B1/B2) added from the Language Management page.
   curriculumLevelOverrides: CurriculumLevelOverrideRow[];
@@ -380,6 +381,7 @@ export const LOCAL_SEED: LocalDatabase = {
   landingLanguageSettings: {},
   blogCategories: [],
   blogPosts: [],
+  blogImages: [],
   curriculumLevelOverrides: [],
   banners: [],
   subscriptionPlans: DEFAULT_SUBSCRIPTION_PLANS.map((plan) => ({ ...plan })),

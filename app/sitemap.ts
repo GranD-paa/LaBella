@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { BLOG_LANGUAGES } from "@/lib/blog/languages";
 import { getDataRepository } from "@/lib/data";
 import { getStaticSiteUrl } from "@/lib/seo/site-url";
 
@@ -27,11 +28,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // anyone without a session, so listing them here only ever offered a
   // crawler a door it is told not to open.
 
+  // The language hubs are listed whether or not they have posts yet. They are
+  // real pages with real copy — each one describes learning that language —
+  // and a hub that has been known and crawled for months before its first post
+  // lands is a hub with history behind it when the posts arrive.
+  const languageRoutes: MetadataRoute.Sitemap = BLOG_LANGUAGES.map(
+    (language) => ({
+      url: `${site}/blog/language/${language.slug}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })
+  );
+
+  let categoryRoutes: MetadataRoute.Sitemap = [];
   let postRoutes: MetadataRoute.Sitemap = [];
+
   try {
-    const { posts } = await getDataRepository().getPublishedBlogPosts({
-      limit: 1000,
-    });
+    const repo = getDataRepository();
+    const [{ posts }, categories] = await Promise.all([
+      repo.getPublishedBlogPosts({ limit: 1000 }),
+      repo.getBlogCategories(),
+    ]);
+
+    categoryRoutes = categories.map((category) => ({
+      url: `${site}/blog/category/${encodeURIComponent(category.slug)}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
+
     postRoutes = posts
       .filter((post) => !post.noindex)
       .map((post) => ({
@@ -42,8 +66,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }));
   } catch {
     // A database hiccup shouldn't take the whole sitemap down; the static
-    // routes are still worth serving.
+    // routes and the hubs are still worth serving.
   }
 
-  return [...staticRoutes, ...postRoutes];
+  return [...staticRoutes, ...languageRoutes, ...categoryRoutes, ...postRoutes];
 }

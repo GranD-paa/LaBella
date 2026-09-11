@@ -21,7 +21,8 @@ import type {
   ProfileSummary,
 } from "@/lib/data/repository";
 import type { CurriculumLevelOverrideRow } from "@/lib/curriculum/level-overrides";
-import type { BlogCategory, BlogPost } from "@/lib/blog/types";
+import type { BlogCategory, BlogImage, BlogPost } from "@/lib/blog/types";
+import { blogImageUrl, validateBlogImage } from "@/lib/data/blog-image";
 import type {
   Banner,
   FxRate,
@@ -50,8 +51,11 @@ type BlogPostRow = {
   slug: string;
   title: string;
   excerpt: string | null;
+  summary: string | null;
   content: string;
   coverImageUrl: string | null;
+  coverImageAlt: string | null;
+  featured: boolean;
   status: string;
   publishedAt: Date | string | null;
   authorId: string | null;
@@ -65,6 +69,7 @@ type BlogPostRow = {
   createdAt: Date | string;
   updatedAt: Date | string;
   categorySlugs: string[] | null;
+  languageSlugs: string[] | null;
 };
 
 /**
@@ -74,8 +79,9 @@ type BlogPostRow = {
  * however many categories it carries.
  */
 const BLOG_POST_SELECT = `
-  select p.id, p.slug, p.title, p.excerpt, p.content,
-         p.cover_image_url as "coverImageUrl", p.status,
+  select p.id, p.slug, p.title, p.excerpt, p.summary, p.content,
+         p.cover_image_url as "coverImageUrl",
+         p.cover_image_alt as "coverImageAlt", p.featured, p.status,
          p.published_at as "publishedAt", p.author_id as "authorId",
          pr.full_name as "authorName",
          p.meta_title as "metaTitle", p.meta_description as "metaDescription",
@@ -86,9 +92,32 @@ const BLOG_POST_SELECT = `
            array(select pc.category_slug from blog_post_categories pc
                  where pc.post_id = p.id order by pc.category_slug),
            '{}'
-         ) as "categorySlugs"
+         ) as "categorySlugs",
+         coalesce(
+           array(select pl.language_slug from blog_post_languages pl
+                 where pl.post_id = p.id order by pl.language_slug),
+           '{}'
+         ) as "languageSlugs"
   from blog_posts p
   left join profiles pr on pr.id = p.author_id`;
+
+type BlogImageRow = {
+  id: string;
+  contentType: string;
+  byteSize: number;
+  width: number | null;
+  height: number | null;
+  altText: string | null;
+  originalName: string | null;
+  createdAt: Date | string;
+};
+
+/** Everything about an image except the one column that is expensive to read. */
+const BLOG_IMAGE_SELECT = `
+  select id, content_type as "contentType", byte_size as "byteSize",
+         width, height, alt_text as "altText",
+         original_name as "originalName", created_at as "createdAt"
+  from blog_images`;
 
 function toIso(value: Date | string | null): string | null {
   if (!value) return null;
@@ -103,9 +132,18 @@ function mapBlogPost(row: BlogPostRow): BlogPost {
     createdAt: toIso(row.createdAt) ?? new Date().toISOString(),
     updatedAt: toIso(row.updatedAt) ?? new Date().toISOString(),
     categorySlugs: row.categorySlugs ?? [],
+    languageSlugs: row.languageSlugs ?? [],
   };
 }
 
+
+function mapBlogImage(row: BlogImageRow): BlogImage {
+  return {
+    ...row,
+    url: blogImageUrl(row.id),
+    createdAt: toIso(row.createdAt) ?? new Date().toISOString(),
+  };
+}
 
 /** Turns a thrown database error into the `{ error }` shape callers expect. */
 function failure(error: unknown): { error: string } {
@@ -250,9 +288,16 @@ export function createPostgresRepository(): DataRepository {
       ),
 
     async getPublishedBlogPosts(options) {
-      const { categorySlug, limit = 12, offset = 0 } = options ?? {};
+      const {
+        categorySlug,
+        languageSlug,
+        excludeId,
+        featuredFirst = false,
+        limit = 12,
+        offset = 0,
+      } = options ?? {};
 
-      // The category filter is an EXISTS rather than a join: joining the
+      // The taxonomy filters are EXISTS rather than joins: joining the
       // category table would return one row per category per post, so a post
       // in three categories would appear three times in the list.
       const filters = ["p.status = 'published'", "p.published_at is not null"];
@@ -266,6 +311,21 @@ export function createPostgresRepository(): DataRepository {
         );
       }
 
+      if (languageSlug) {
+        values.push(languageSlug);
+        filters.push(
+          `exists (select 1 from blog_post_languages pl
+                   where pl.post_id = p.id and pl.language_slug = $${values.length})`
+        );
+      }
+
+      // Used by the "related posts" strip, which asks for the current post's
+      // neighbours and must not offer the reader the page they are already on.
+      if (excludeId) {
+        values.push(excludeId);
+        filters.push(`p.id <> $${values.length}`);
+      }
+
       const where = filters.join(" and ");
 
       const totalRow = await queryOne<{ total: string }>(
@@ -273,11 +333,18 @@ export function createPostgresRepository(): DataRepository {
         values
       );
 
+      // Featured posts lead the index but keep their real dates, so pinning
+      // one does not backdate or bump what search engines were told about it.
+      // Feeds and hubs stay strictly chronological.
+      const order = featuredFirst
+        ? "p.featured desc, p.published_at desc"
+        : "p.published_at desc";
+
       values.push(limit, offset);
       const posts = await query<BlogPostRow>(
         `${BLOG_POST_SELECT}
          where ${where}
-         order by p.published_at desc
+         order by ${order}
          limit $${values.length - 1} offset $${values.length}`,
         values
       );
@@ -321,19 +388,24 @@ export function createPostgresRepository(): DataRepository {
           // or change the date shown in search results. Unpublishing clears it.
           const rows = (await run(
             `insert into blog_posts
-               (id, slug, title, excerpt, content, cover_image_url, status,
+               (id, slug, title, excerpt, summary, content, cover_image_url,
+                cover_image_alt, featured, status,
                 published_at, author_id, meta_title, meta_description,
                 canonical_url, og_image_url, noindex, reading_minutes, updated_at)
              values
                (coalesce($1::uuid, gen_random_uuid()), $2, $3, $4, $5, $6, $7,
-                case when $7 = 'published' then now() else null end,
-                $8, $9, $10, $11, $12, $13, $14, now())
+                $8, $9, $10,
+                case when $10 = 'published' then now() else null end,
+                $11, $12, $13, $14, $15, $16, $17, now())
              on conflict (id) do update set
                slug = excluded.slug,
                title = excluded.title,
                excerpt = excluded.excerpt,
+               summary = excluded.summary,
                content = excluded.content,
                cover_image_url = excluded.cover_image_url,
+               cover_image_alt = excluded.cover_image_alt,
+               featured = excluded.featured,
                status = excluded.status,
                published_at = case
                  when excluded.status <> 'published' then null
@@ -352,8 +424,11 @@ export function createPostgresRepository(): DataRepository {
               input.slug,
               input.title,
               input.excerpt,
+              input.summary,
               input.content,
               input.coverImageUrl,
+              input.coverImageAlt,
+              input.featured,
               input.status,
               input.authorId ?? null,
               input.metaTitle,
@@ -379,6 +454,21 @@ export function createPostgresRepository(): DataRepository {
             );
           }
 
+          // Same delete-then-insert as the categories above: the form always
+          // posts the complete set, so replacing it wholesale is what makes
+          // unticking a language actually remove it.
+          await run("delete from blog_post_languages where post_id = $1", [
+            postId,
+          ]);
+
+          for (const languageSlug of input.languageSlugs) {
+            await run(
+              `insert into blog_post_languages (post_id, language_slug)
+               values ($1, $2) on conflict do nothing`,
+              [postId, languageSlug]
+            );
+          }
+
           return postId;
         });
 
@@ -390,6 +480,75 @@ export function createPostgresRepository(): DataRepository {
 
     deleteBlogPost: (id) =>
       mutate(() => execute("delete from blog_posts where id = $1", [id])),
+
+    // ----------------------------------------------------------- blog images
+    //
+    // Every read here excludes `bytes`. The picker in the editor lists dozens
+    // of images and needs none of their contents — pulling megabytes of bytea
+    // through the pool to render a grid of thumbnails would make the editor
+    // slower the more pictures the blog owns. The bytes are fetched exactly
+    // once per image, by `/api/blog-images/[id]`, and cached forever after.
+    listBlogImages: (limit = 60) =>
+      query<BlogImageRow>(
+        `${BLOG_IMAGE_SELECT}
+         order by created_at desc
+         limit $1`,
+        [limit]
+      ).then((rows) => rows.map(mapBlogImage)),
+
+    async getBlogImagesByIds(ids) {
+      if (ids.length === 0) return [];
+      const rows = await query<BlogImageRow>(
+        `${BLOG_IMAGE_SELECT} where id = any($1::uuid[])`,
+        [ids]
+      );
+      return rows.map(mapBlogImage);
+    },
+
+    async uploadBlogImage(file, altText, uploadedBy) {
+      const validated = await validateBlogImage(file);
+      if (!validated.ok) return { error: validated.error };
+
+      try {
+        const row = await queryOne<BlogImageRow>(
+          `insert into blog_images
+             (content_type, bytes, byte_size, width, height, alt_text,
+              original_name, uploaded_by)
+           values ($1, $2, $3, $4, $5, $6, $7, $8)
+           returning id, content_type as "contentType",
+                     byte_size as "byteSize", width, height,
+                     alt_text as "altText", original_name as "originalName",
+                     created_at as "createdAt"`,
+          [
+            file.type,
+            validated.bytes,
+            validated.bytes.length,
+            validated.dimensions?.width ?? null,
+            validated.dimensions?.height ?? null,
+            altText,
+            // Only for the admin's own recognition in the picker. Never used
+            // to build a path, so a hostile filename has nowhere to go.
+            file.name.slice(0, 200) || null,
+            uploadedBy,
+          ]
+        );
+        if (!row) return { error: "actions.errors.generic" };
+        return { image: mapBlogImage(row) };
+      } catch (error) {
+        return failure(error);
+      }
+    },
+
+    updateBlogImageAlt: (id, altText) =>
+      mutate(() =>
+        execute("update blog_images set alt_text = $1 where id = $2", [
+          altText,
+          id,
+        ])
+      ),
+
+    deleteBlogImage: (id) =>
+      mutate(() => execute("delete from blog_images where id = $1", [id])),
 
     getCurriculumLevelOverrides: () =>
       query<CurriculumLevelOverrideRow>(

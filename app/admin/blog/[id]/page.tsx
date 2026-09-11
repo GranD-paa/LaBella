@@ -23,10 +23,22 @@ export default async function AdminBlogEditorPage({
   // Same guard as the list at `/admin/blog`: a database without
   // db/004_landing_and_blog.sql has no blog tables, and the editor should say
   // so rather than answer a link in the panel with a 500.
-  const categories = await repo.getBlogCategories().catch((error) => {
-    console.error("[admin/blog] failed to load categories", error);
-    return null;
-  });
+  //
+  // The image library is read alongside but guarded separately, and less
+  // strictly: `blog_images` arrived in db/009_blog_refactor.sql, so a database
+  // with the posts but not that migration should still open the editor and
+  // simply have nothing in the picker. Failing the whole screen over it would
+  // take away the ability to write while the migration is pending.
+  const [categories, images] = await Promise.all([
+    repo.getBlogCategories().catch((error) => {
+      console.error("[admin/blog] failed to load categories", error);
+      return null;
+    }),
+    repo.listBlogImages().catch((error) => {
+      console.error("[admin/blog] failed to load images", error);
+      return [];
+    }),
+  ]);
 
   if (!categories) {
     return (
@@ -38,7 +50,9 @@ export default async function AdminBlogEditorPage({
   }
 
   if (id === "new") {
-    return <BlogPostEditor post={null} categories={categories} />;
+    return (
+      <BlogPostEditor post={null} categories={categories} images={images} />
+    );
   }
 
   // `notFound()` below stays outside the guard: a post that does not exist is
@@ -49,5 +63,7 @@ export default async function AdminBlogEditorPage({
   });
   if (!post) notFound();
 
-  return <BlogPostEditor post={post} categories={categories} />;
+  return (
+    <BlogPostEditor post={post} categories={categories} images={images} />
+  );
 }

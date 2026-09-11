@@ -1,3 +1,4 @@
+import { resolveBlogLanguages } from "@/lib/blog/languages";
 import { markdownToPlainText } from "@/lib/blog/markdown";
 import { getDataRepository } from "@/lib/data";
 import { getSiteUrl } from "@/lib/seo/site-url";
@@ -14,6 +15,16 @@ function xmlEscape(value: string): string {
     .replace(/'/g, "&apos;");
 }
 
+/**
+ * Absolute, because a feed is read somewhere else by definition.
+ *
+ * Covers are stored as site-relative paths (`/api/blog-images/…`), and a reader
+ * app resolving that against its own origin gets nothing.
+ */
+function absolute(site: string, url: string): string {
+  return url.startsWith("/") ? `${site}${url}` : url;
+}
+
 export async function GET() {
   const site = await getSiteUrl();
 
@@ -28,32 +39,60 @@ export async function GET() {
       return { posts: [], total: 0 };
     });
 
-  const items = posts
-    .filter((post) => !post.noindex)
+  const visible = posts.filter((post) => !post.noindex);
+
+  const items = visible
     .map((post) => {
       const url = `${site}/blog/${encodeURIComponent(post.slug)}`;
       const description =
-        post.excerpt ?? markdownToPlainText(post.content, 300);
+        post.summary ?? post.excerpt ?? markdownToPlainText(post.content, 300);
+
+      // Both taxonomies become <category> elements. A reader that groups by
+      // category, and a crawler reading the feed as a discovery surface, both
+      // learn what the post is about without opening it.
+      const categories = [
+        ...post.categorySlugs,
+        ...resolveBlogLanguages(post.languageSlugs).map(
+          (language) => language.name
+        ),
+      ]
+        .map((name) => `      <category>${xmlEscape(name)}</category>`)
+        .join("\n");
+
+      const cover = post.ogImageUrl ?? post.coverImageUrl;
 
       return `    <item>
       <title>${xmlEscape(post.title)}</title>
       <link>${xmlEscape(url)}</link>
       <guid isPermaLink="true">${xmlEscape(url)}</guid>
       <description>${xmlEscape(description)}</description>
-      ${post.publishedAt ? `<pubDate>${new Date(post.publishedAt).toUTCString()}</pubDate>` : ""}
-      ${post.authorName ? `<dc:creator>${xmlEscape(post.authorName)}</dc:creator>` : ""}
-    </item>`;
+${post.publishedAt ? `      <pubDate>${new Date(post.publishedAt).toUTCString()}</pubDate>\n` : ""}${
+        post.authorName
+          ? `      <dc:creator>${xmlEscape(post.authorName)}</dc:creator>\n`
+          : ""
+      }${
+        cover
+          ? `      <media:content url="${xmlEscape(
+              absolute(site, cover)
+            )}" medium="image" />\n`
+          : ""
+      }${categories}${categories ? "\n" : ""}    </item>`;
     })
     .join("\n");
 
+  // `lastBuildDate` is the newest post's date rather than "now": a feed that
+  // claims to have changed every time it is fetched teaches every reader
+  // polling it to stop trusting the field.
+  const newest = visible.find((post) => post.publishedAt)?.publishedAt;
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
     <title>وبلاگ لاپارلی</title>
     <link>${xmlEscape(`${site}/blog`)}</link>
     <description>مقاله‌های کاربردی دربارهٔ یادگیری زبان.</description>
     <language>fa-IR</language>
-    <atom:link href="${xmlEscape(`${site}/blog/rss.xml`)}" rel="self" type="application/rss+xml" />
+${newest ? `    <lastBuildDate>${new Date(newest).toUTCString()}</lastBuildDate>\n` : ""}    <atom:link href="${xmlEscape(`${site}/blog/rss.xml`)}" rel="self" type="application/rss+xml" />
 ${items}
   </channel>
 </rss>`;

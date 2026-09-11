@@ -12,6 +12,17 @@ const PUBLIC_ROUTES = [
   "/blog",
   "/sitemap.xml",
   "/robots.txt",
+  // Same class of file as the two above: a map of the site, written for the
+  // models that read one. It is fetched by something with no session by
+  // definition, and answering it with a login page would be answering it with
+  // a description of the login page.
+  "/llms.txt",
+  // Blog pictures. Fetched by crawlers, by link-preview bots, and by Next's
+  // own image optimizer — none of which carries a session cookie. Exactly the
+  // reasoning `/api/banner-images` is excluded from the matcher for, and safe
+  // for the same reason: the route returns image bytes and nothing else, only
+  // to someone who already knows an unguessable UUID.
+  "/api/blog-images",
 ];
 
 /**

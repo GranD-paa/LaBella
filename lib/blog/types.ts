@@ -12,9 +12,19 @@ export type BlogPost = {
   slug: string;
   title: string;
   excerpt: string | null;
+  /**
+   * The answer, before the article starts arguing for it. Shown as a box above
+   * the prose and published as `abstract` in the post's structured data, which
+   * is the field an AI answer lifts verbatim rather than paraphrasing.
+   */
+  summary: string | null;
   /** Markdown source. Render with `renderMarkdown` — never inject directly. */
   content: string;
   coverImageUrl: string | null;
+  /** Describes the cover for anyone who cannot see it. Null renders empty. */
+  coverImageAlt: string | null;
+  /** Pinned above the rest of the index without moving its date. */
+  featured: boolean;
   status: BlogPostStatus;
   publishedAt: string | null;
   authorId: string | null;
@@ -30,6 +40,8 @@ export type BlogPost = {
   createdAt: string;
   updatedAt: string;
   categorySlugs: string[];
+  /** Slugs from `lib/blog/languages.ts`. Empty means "not about one language". */
+  languageSlugs: string[];
 };
 
 /**
@@ -43,8 +55,11 @@ export type BlogPostInput = {
   slug: string;
   title: string;
   excerpt: string | null;
+  summary: string | null;
   content: string;
   coverImageUrl: string | null;
+  coverImageAlt: string | null;
+  featured: boolean;
   status: BlogPostStatus;
   metaTitle: string | null;
   metaDescription: string | null;
@@ -52,6 +67,7 @@ export type BlogPostInput = {
   ogImageUrl: string | null;
   noindex: boolean;
   categorySlugs: string[];
+  languageSlugs: string[];
   authorId?: string | null;
   readingMinutes?: number | null;
 };
@@ -73,3 +89,23 @@ export function slugifyTitle(title: string): string {
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
 }
+
+/**
+ * An image the blog owns, rather than one it borrows from another site.
+ *
+ * The bytes live in the database and are served from `/api/blog-images/<id>`;
+ * see `lib/data/blog-image.ts` for the URL shape and `db/009_blog_refactor.sql`
+ * for why they are not on disk.
+ */
+export type BlogImage = {
+  id: string;
+  url: string;
+  contentType: string;
+  byteSize: number;
+  /** Null when the dimensions could not be read out of the file's header. */
+  width: number | null;
+  height: number | null;
+  altText: string | null;
+  originalName: string | null;
+  createdAt: string;
+};

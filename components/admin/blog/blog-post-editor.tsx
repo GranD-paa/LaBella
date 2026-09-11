@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Eye, PenLine } from "lucide-react";
+import { ArrowRight, Eye, PenLine, Star } from "lucide-react";
 import { toast } from "sonner";
 
 import { saveBlogPostAction } from "@/app/admin/actions/blog";
+import { BlogImageLibrary } from "@/components/admin/blog/blog-image-library";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +21,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { BLOG_LANGUAGES } from "@/lib/blog/languages";
 import { renderMarkdown } from "@/lib/blog/markdown";
-import { slugifyTitle, type BlogCategory, type BlogPost } from "@/lib/blog/types";
+import {
+  slugifyTitle,
+  type BlogCategory,
+  type BlogImage,
+  type BlogPost,
+} from "@/lib/blog/types";
 import { cn } from "@/lib/utils";
+
+/** What Google shows before it truncates. Advisory, never enforced. */
+const META_TITLE_LIMIT = 60;
+const META_DESCRIPTION_LIMIT = 160;
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -41,9 +52,11 @@ function FieldError({ message }: { message?: string }) {
 export function BlogPostEditor({
   post,
   categories,
+  images,
 }: {
   post: BlogPost | null;
   categories: BlogCategory[];
+  images: BlogImage[];
 }) {
   const router = useRouter();
   const [state, formAction] = useFormState(saveBlogPostAction, {});
@@ -53,6 +66,15 @@ export function BlogPostEditor({
   const [slugTouched, setSlugTouched] = useState(Boolean(post?.slug));
   const [content, setContent] = useState(post?.content ?? "");
   const [showPreview, setShowPreview] = useState(false);
+  const [coverUrl, setCoverUrl] = useState(post?.coverImageUrl ?? "");
+  const [coverAlt, setCoverAlt] = useState(post?.coverImageAlt ?? "");
+  const [metaTitle, setMetaTitle] = useState(post?.metaTitle ?? "");
+  const [metaDescription, setMetaDescription] = useState(
+    post?.metaDescription ?? ""
+  );
+  const [summary, setSummary] = useState(post?.summary ?? "");
+
+  const contentRef = useRef<HTMLTextAreaElement>(null);
 
   // The slug follows the title until the author edits it by hand, at which
   // point it stops moving — changing a published URL silently would drop its
@@ -75,6 +97,51 @@ export function BlogPostEditor({
     () => (showPreview ? renderMarkdown(content) : ""),
     [showPreview, content]
   );
+
+  /**
+   * Drops an image's markdown where the cursor is.
+   *
+   * Appending to the end would be simpler and wrong: an author inserts a
+   * picture at the paragraph they just finished, and having every one land
+   * after the closing line means moving each of them by hand afterwards.
+   */
+  function insertImage(image: BlogImage) {
+    const snippet = `\n\n![${image.altText ?? ""}](${image.url})\n\n`;
+    const field = contentRef.current;
+
+    if (!field) {
+      setContent((current) => current + snippet);
+      return;
+    }
+
+    const start = field.selectionStart;
+    const end = field.selectionEnd;
+    const next = content.slice(0, start) + snippet + content.slice(end);
+    setContent(next);
+
+    // After React re-renders with the new value the caret would otherwise jump
+    // to the end, which puts the next thing typed a long way from the picture.
+    requestAnimationFrame(() => {
+      field.focus();
+      const caret = start + snippet.length;
+      field.setSelectionRange(caret, caret);
+    });
+  }
+
+  function useAsCover(image: BlogImage) {
+    setCoverUrl(image.url);
+    if (image.altText) setCoverAlt(image.altText);
+    toast.success("به‌عنوان تصویر شاخص انتخاب شد.");
+  }
+
+  // What the search result will read like. Shown rather than described because
+  // "about 60 characters" is abstract and a truncated headline is not.
+  const previewTitle = (metaTitle || title || "عنوان مطلب").trim();
+  const previewDescription = (
+    metaDescription ||
+    summary ||
+    "توضیحی برای این مطلب نوشته نشده؛ گوگل خودش از متن برمی‌دارد."
+  ).trim();
 
   return (
     <form action={formAction} className="space-y-8" dir="rtl">
@@ -102,7 +169,7 @@ export function BlogPostEditor({
         </div>
       </section>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
+      <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
         <div className="space-y-8">
           <Card className="brand-surface">
             <CardHeader>
@@ -146,15 +213,36 @@ export function BlogPostEditor({
               </div>
 
               <div>
-                <Label htmlFor="excerpt">خلاصه</Label>
+                <Label htmlFor="summary">خلاصهٔ کوتاه</Label>
+                <Textarea
+                  id="summary"
+                  name="summary"
+                  value={summary}
+                  onChange={(event) => setSummary(event.target.value)}
+                  rows={3}
+                  className="mt-1.5"
+                  placeholder="جواب سؤال مطلب، در دو سه جمله."
+                />
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                  بالای مطلب توی یک کادر نشان داده می‌شود و همین متن است که
+                  موتورهای جست‌وجو و دستیارهای هوش مصنوعی مستقیم نقل می‌کنند.
+                  جوری بنویسیدش که بیرون از مطلب هم معنی بدهد.
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="excerpt">لید</Label>
                 <Textarea
                   id="excerpt"
                   name="excerpt"
                   defaultValue={post?.excerpt ?? ""}
-                  rows={3}
+                  rows={2}
                   className="mt-1.5"
                   placeholder="اگر خالی بگذارید، از ابتدای متن ساخته می‌شود."
                 />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  زیر تیتر و روی کارت مطلب می‌آید.
+                </p>
               </div>
 
               <div>
@@ -180,9 +268,10 @@ export function BlogPostEditor({
                   <Textarea
                     id="content"
                     name="content"
+                    ref={contentRef}
                     value={content}
                     onChange={(event) => setContent(event.target.value)}
-                    rows={22}
+                    rows={24}
                     required
                     className="mt-1.5 font-mono text-sm leading-relaxed"
                   />
@@ -194,6 +283,11 @@ export function BlogPostEditor({
                   <input type="hidden" name="content" value={content} />
                 ) : null}
                 <FieldError message={state.fieldErrors?.content} />
+
+                <p className="mt-2 text-xs text-muted-foreground">
+                  تیترهای «## » و «### » خودشان فهرست مطالب بالای صفحه را
+                  می‌سازند — از سه تیتر به بالا.
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -209,25 +303,55 @@ export function BlogPostEditor({
             </CardHeader>
 
             <CardContent className="space-y-5">
+              {/* A mock search result. The counters next to each field say how
+                  many characters are left before Google cuts the line off —
+                  advisory, because the limit is measured in pixels and varies,
+                  so enforcing it would block legitimate titles. */}
+              <div className="rounded-lg border border-white/10 bg-background/40 p-4">
+                <p className="text-xs text-muted-foreground">
+                  پیش‌نمایش نتیجهٔ جست‌وجو
+                </p>
+                <p className="mt-2 text-xs text-muted-foreground" dir="ltr">
+                  laparli.com › blog › {slug || "…"}
+                </p>
+                <p className="mt-1 line-clamp-1 text-base text-[#8ab4f8]">
+                  {previewTitle}
+                </p>
+                <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                  {previewDescription}
+                </p>
+              </div>
+
               <div>
-                <Label htmlFor="metaTitle">عنوان سئو</Label>
+                <div className="flex items-baseline justify-between gap-2">
+                  <Label htmlFor="metaTitle">عنوان سئو</Label>
+                  <Counter value={metaTitle} limit={META_TITLE_LIMIT} />
+                </div>
                 <Input
                   id="metaTitle"
                   name="metaTitle"
-                  defaultValue={post?.metaTitle ?? ""}
+                  value={metaTitle}
+                  onChange={(event) => setMetaTitle(event.target.value)}
                   className="mt-1.5"
                 />
               </div>
 
               <div>
-                <Label htmlFor="metaDescription">توضیح متا</Label>
+                <div className="flex items-baseline justify-between gap-2">
+                  <Label htmlFor="metaDescription">توضیح متا</Label>
+                  <Counter
+                    value={metaDescription}
+                    limit={META_DESCRIPTION_LIMIT}
+                  />
+                </div>
                 <Textarea
                   id="metaDescription"
                   name="metaDescription"
-                  defaultValue={post?.metaDescription ?? ""}
+                  value={metaDescription}
+                  onChange={(event) => setMetaDescription(event.target.value)}
                   rows={2}
                   className="mt-1.5"
-                  placeholder="حدود ۱۵۰ تا ۱۶۰ نویسه بهترین نتیجه را می‌دهد."
+                  placeholder="خالی = از خلاصهٔ کوتاه یا لید ساخته می‌شود."
                 />
               </div>
 
@@ -267,11 +391,28 @@ export function BlogPostEditor({
                 <span className="text-sm">
                   <span className="font-medium">از ایندکس گوگل خارج شود</span>
                   <span className="mt-1 block text-muted-foreground">
-                    مطلب روی سایت می‌ماند ولی در نتایج جست‌وجو و نقشهٔ سایت
-                    نمی‌آید.
+                    مطلب روی سایت می‌ماند ولی در نتایج جست‌وجو، نقشهٔ سایت و
+                    خوراک RSS نمی‌آید.
                   </span>
                 </span>
               </label>
+            </CardContent>
+          </Card>
+
+          <Card className="brand-surface">
+            <CardHeader>
+              <CardTitle>عکس‌ها</CardTitle>
+              <CardDescription>
+                عکس‌ها روی سرور خودمان ذخیره می‌شوند. «درج در متن» مارک‌داونش را
+                همان‌جا که نشانگر است می‌گذارد.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <BlogImageLibrary
+                initialImages={images}
+                onInsert={insertImage}
+                onUseAsCover={useAsCover}
+              />
             </CardContent>
           </Card>
         </div>
@@ -299,17 +440,65 @@ export function BlogPostEditor({
                 </p>
               </div>
 
+              <label className="flex items-start gap-3 rounded-lg border border-white/10 p-3">
+                <input
+                  type="checkbox"
+                  name="featured"
+                  defaultChecked={post?.featured ?? false}
+                  className="mt-1 h-4 w-4 accent-[hsl(var(--primary))]"
+                />
+                <span className="text-sm">
+                  <span className="flex items-center gap-1.5 font-medium">
+                    <Star className="h-3.5 w-3.5 text-brand-accent" />
+                    مطلب شاخص
+                  </span>
+                  <span className="mt-1 block text-muted-foreground">
+                    بالای فهرست وبلاگ می‌نشیند، بدون اینکه تاریخش عوض شود.
+                  </span>
+                </span>
+              </label>
+            </CardContent>
+          </Card>
+
+          <Card className="brand-surface">
+            <CardHeader>
+              <CardTitle>تصویر شاخص</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {coverUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={coverUrl}
+                  alt=""
+                  className="aspect-[16/9] w-full rounded-lg border border-white/10 object-cover"
+                />
+              ) : null}
+
               <div>
-                <Label htmlFor="coverImageUrl">تصویر شاخص</Label>
+                <Label htmlFor="coverImageUrl">نشانی تصویر</Label>
                 <Input
                   id="coverImageUrl"
                   name="coverImageUrl"
-                  defaultValue={post?.coverImageUrl ?? ""}
+                  value={coverUrl}
+                  onChange={(event) => setCoverUrl(event.target.value)}
                   dir="ltr"
                   className="mt-1.5 text-start"
-                  placeholder="https://…"
+                  placeholder="از بخش عکس‌ها انتخاب کنید یا نشانی بگذارید"
                 />
                 <FieldError message={state.fieldErrors?.coverImageUrl} />
+              </div>
+
+              <div>
+                <Label htmlFor="coverImageAlt">متن جایگزین</Label>
+                <Input
+                  id="coverImageAlt"
+                  name="coverImageAlt"
+                  value={coverAlt}
+                  onChange={(event) => setCoverAlt(event.target.value)}
+                  className="mt-1.5"
+                  placeholder="برای تصویر تزئینی خالی بگذارید"
+                  maxLength={300}
+                />
               </div>
             </CardContent>
           </Card>
@@ -318,30 +507,57 @@ export function BlogPostEditor({
             <CardHeader>
               <CardTitle>دسته‌بندی</CardTitle>
               <CardDescription>
-                دستهٔ اول روی کارت مطلب نشان داده می‌شود.
+                دستهٔ اول روی کارت مطلب و در مسیر بالای صفحه نشان داده می‌شود.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
                 {categories.map((category) => (
                   <li key={category.slug}>
-                    <label
-                      className={cn(
-                        "flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 p-3 text-sm transition-colors",
-                        "hover:border-primary/40"
+                    <CheckRow
+                      name="categorySlugs"
+                      value={category.slug}
+                      defaultChecked={post?.categorySlugs.includes(
+                        category.slug
                       )}
                     >
-                      <input
-                        type="checkbox"
-                        name="categorySlugs"
-                        value={category.slug}
-                        defaultChecked={post?.categorySlugs.includes(
-                          category.slug
-                        )}
-                        className="h-4 w-4 accent-[hsl(var(--primary))]"
-                      />
                       {category.name}
-                    </label>
+                    </CheckRow>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card className="brand-surface">
+            <CardHeader>
+              <CardTitle>زبان مطلب</CardTitle>
+              <CardDescription>
+                مطلب در صفحهٔ همان زبان هم نشان داده می‌شود. اگر دربارهٔ زبان
+                خاصی نیست، خالی بگذارید.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {BLOG_LANGUAGES.map((language) => (
+                  <li key={language.slug}>
+                    <CheckRow
+                      name="languageSlugs"
+                      value={language.slug}
+                      defaultChecked={post?.languageSlugs.includes(
+                        language.slug
+                      )}
+                    >
+                      <span className="flex w-full items-center justify-between gap-2">
+                        {language.name}
+                        <span
+                          dir="ltr"
+                          className="text-xs text-muted-foreground"
+                        >
+                          {language.nativeName}
+                        </span>
+                      </span>
+                    </CheckRow>
                   </li>
                 ))}
               </ul>
@@ -350,5 +566,51 @@ export function BlogPostEditor({
         </aside>
       </div>
     </form>
+  );
+}
+
+function CheckRow({
+  name,
+  value,
+  defaultChecked,
+  children,
+}: {
+  name: string;
+  value: string;
+  defaultChecked?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <label
+      className={cn(
+        "flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 p-3 text-sm transition-colors",
+        "hover:border-primary/40"
+      )}
+    >
+      <input
+        type="checkbox"
+        name={name}
+        value={value}
+        defaultChecked={defaultChecked}
+        className="h-4 w-4 shrink-0 accent-[hsl(var(--primary))]"
+      />
+      {children}
+    </label>
+  );
+}
+
+function Counter({ value, limit }: { value: string; limit: number }) {
+  const length = value.trim().length;
+  if (length === 0) return null;
+
+  return (
+    <span
+      className={cn(
+        "text-xs tabular-nums",
+        length > limit ? "text-destructive" : "text-muted-foreground"
+      )}
+    >
+      {length.toLocaleString("fa-IR")}/{limit.toLocaleString("fa-IR")}
+    </span>
   );
 }

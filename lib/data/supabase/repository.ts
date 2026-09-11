@@ -187,6 +187,27 @@ export function createSupabaseRepository(): DataRepository {
       return { error: "The blog requires the Postgres data source." };
     },
 
+    // Blog images live in a table this data source never had either.
+    async listBlogImages() {
+      return [];
+    },
+
+    async getBlogImagesByIds() {
+      return [];
+    },
+
+    async uploadBlogImage() {
+      return { error: "The blog requires the Postgres data source." };
+    },
+
+    async updateBlogImageAlt() {
+      return { error: "The blog requires the Postgres data source." };
+    },
+
+    async deleteBlogImage() {
+      return { error: "The blog requires the Postgres data source." };
+    },
+
     async setLanguageAvailability(languageSlug, enabled) {
       const supabase = await createClient();
       const { error } = await supabase
