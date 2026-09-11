@@ -12342,7 +12342,7 @@
       "file_type": "code",
       "norm_label": "usernav()",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L30"
+      "source_location": "L31"
     },
     {
       "id": "lib_auth_profile_gate_clearprofileflag",
@@ -12750,7 +12750,7 @@
       "file_type": "code",
       "norm_label": "globeslot()",
       "source_file": "components/landing/hero.tsx",
-      "source_location": "L660"
+      "source_location": "L675"
     },
     {
       "id": "components_landing_hero_landinghero",
@@ -22998,17 +22998,17 @@
       "node_kind": "heading",
       "norm_label": "\u0627\u0628\u0632\u0627\u0631\u0647\u0627\u06cc\u06cc \u06a9\u0647 **\u0647\u0645\u06cc\u0646 \u0627\u0644\u0627\u0646** \u0631\u0648\u06cc \u062f\u06cc\u0633\u06a9 \u0647\u0633\u062a\u0646\u062f",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L104"
+      "source_location": "L107"
     },
     {
-      "id": "docs_landing_and_blog_handoff_\u0627\u0644\u0641_\u0645\u0627\u06cc\u06af\u0631\u06cc\u0634\u0646_\u062f\u06cc\u062a\u0627\u0628\u06cc\u0633_\u0628\u0644\u0627\u06a9_\u06a9\u0646\u0646\u062f\u0647",
-      "label": "\u0627\u0644\u0641) \u0645\u0627\u06cc\u06af\u0631\u06cc\u0634\u0646 \u062f\u06cc\u062a\u0627\u0628\u06cc\u0633 \u2014 \u0628\u0644\u0627\u06a9\u200c\u06a9\u0646\u0646\u062f\u0647",
+      "id": "docs_landing_and_blog_handoff_\u0627\u0644\u0641_\u0645\u0627\u06cc\u06af\u0631\u06cc\u0634\u0646_\u062f\u06cc\u062a\u0627\u0628\u06cc\u0633_\u0627\u0646\u062c\u0627\u0645_\u0634\u062f_\u06f1\u06f4\u06f0\u06f5_\u06f0\u06f6_\u06f2\u06f0",
+      "label": "~~\u0627\u0644\u0641) \u0645\u0627\u06cc\u06af\u0631\u06cc\u0634\u0646 \u062f\u06cc\u062a\u0627\u0628\u06cc\u0633~~ \u2014 \u0627\u0646\u062c\u0627\u0645 \u0634\u062f \u06f1\u06f4\u06f0\u06f5/\u06f0\u06f6/\u06f2\u06f0",
       "_origin": "ast",
       "community": 50,
       "community_name": "\u0644\u0646\u062f\u06cc\u0646\u06af\u200c\u067e\u06cc\u062c \u0648 \u0628\u0644\u0627\u06af \u2014 \u0633\u0646\u062f \u062a\u062d\u0648\u06cc\u0644",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "\u0627\u0644\u0641) \u0645\u0627\u06cc\u06af\u0631\u06cc\u0634\u0646 \u062f\u06cc\u062a\u0627\u0628\u06cc\u0633 \u2014 \u0628\u0644\u0627\u06a9\u200c\u06a9\u0646\u0646\u062f\u0647",
+      "norm_label": "~~\u0627\u0644\u0641) \u0645\u0627\u06cc\u06af\u0631\u06cc\u0634\u0646 \u062f\u06cc\u062a\u0627\u0628\u06cc\u0633~~ \u2014 \u0627\u0646\u062c\u0627\u0645 \u0634\u062f \u06f1\u06f4\u06f0\u06f5/\u06f0\u06f6/\u06f2\u06f0",
       "source_file": "docs/landing-and-blog-handoff.md",
       "source_location": "L68"
     },
@@ -23022,7 +23022,7 @@
       "node_kind": "heading",
       "norm_label": "\u0628) \u0641\u0627\u06cc\u0644 \u0644\u0648\u06af\u0648 \u2014 \u0628\u0644\u0627\u06a9\u200c\u06a9\u0646\u0646\u062f\u0647",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L75"
+      "source_location": "L78"
     },
     {
       "id": "docs_landing_and_blog_handoff_\u062f\u0648_\u062a\u0644\u0647_\u0641\u0646\u06cc_\u06a9\u0647_\u0628\u0627\u06cc\u062f_\u0628\u062f\u0627\u0646\u062f",
@@ -23034,7 +23034,7 @@
       "node_kind": "heading",
       "norm_label": "\u062f\u0648 \u062a\u0644\u0647 \u0641\u0646\u06cc \u06a9\u0647 \u0628\u0627\u06cc\u062f \u0628\u062f\u0627\u0646\u062f",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L135"
+      "source_location": "L138"
     },
     {
       "id": "docs_landing_and_blog_handoff_\u0641\u0627\u06cc\u0644_\u0647\u0627\u06cc_\u062a\u063a\u06cc\u06cc\u0631\u06cc\u0627\u0641\u062a\u0647",
@@ -23082,7 +23082,7 @@
       "node_kind": "heading",
       "norm_label": "\u0645\u0633\u06cc\u0631 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f\u06cc (\u062a\u0631\u06a9\u06cc\u0628\u06cc)",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L139"
+      "source_location": "L142"
     },
     {
       "id": "docs_landing_and_blog_handoff_\u0645\u0646\u0627\u0628\u0639_\u067e\u06cc\u062f\u0627_\u0634\u062f\u0647",
@@ -23094,7 +23094,7 @@
       "node_kind": "heading",
       "norm_label": "\u0645\u0646\u0627\u0628\u0639 \u067e\u06cc\u062f\u0627 \u0634\u062f\u0647",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L108"
+      "source_location": "L111"
     },
     {
       "id": "docs_landing_and_blog_handoff_\u0647\u0632\u06cc\u0646\u0647_\u0647\u0627",
@@ -23106,7 +23106,7 @@
       "node_kind": "heading",
       "norm_label": "\u0647\u0632\u06cc\u0646\u0647\u200c\u0647\u0627",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L131"
+      "source_location": "L134"
     },
     {
       "id": "docs_landing_and_blog_handoff_\u0648\u0627\u0628\u0633\u062a\u06af\u06cc_\u0647\u0627\u06cc_\u062c\u062f\u06cc\u062f",
@@ -23130,7 +23130,7 @@
       "node_kind": "heading",
       "norm_label": "\u067e\u06cc\u0634\u200c\u0646\u06cc\u0627\u0632",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L151"
+      "source_location": "L154"
     },
     {
       "id": "docs_landing_and_blog_handoff_\u06cc\u0627\u0641\u062a\u0647_\u0647\u0627\u06cc_\u0647\u06cc\u06af\u0633\u0641\u06cc\u0644\u062f_\u0686\u06a9_\u0634\u062f\u0647",
@@ -23142,7 +23142,7 @@
       "node_kind": "heading",
       "norm_label": "\u06cc\u0627\u0641\u062a\u0647\u200c\u0647\u0627\u06cc \u0647\u06cc\u06af\u0633\u0641\u06cc\u0644\u062f (\u0686\u06a9\u200c\u0634\u062f\u0647)",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L126"
+      "source_location": "L129"
     },
     {
       "id": "docs_landing_and_blog_handoff_\u06f1_\u0648\u0636\u0639\u06cc\u062a_\u0642\u0628\u0644_\u0627\u0632_\u0627\u06cc\u0646_\u062c\u0644\u0633\u0647",
@@ -23202,7 +23202,7 @@
       "node_kind": "heading",
       "norm_label": "\u06f5. \u0628\u0627\u0632\u062e\u0648\u0631\u062f \u06a9\u0627\u0631\u0628\u0631 \u2014 \u0645\u0647\u0645",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L85"
+      "source_location": "L88"
     },
     {
       "id": "docs_landing_and_blog_handoff_\u06f6_\u062a\u062d\u0642\u06cc\u0642_\u0627\u0646\u062c\u0627\u0645_\u0634\u062f\u0647_\u0628\u0631\u0627\u06cc_\u062d\u0644_\u0645\u0634\u06a9\u0644",
@@ -23214,7 +23214,7 @@
       "node_kind": "heading",
       "norm_label": "\u06f6. \u062a\u062d\u0642\u06cc\u0642 \u0627\u0646\u062c\u0627\u0645\u200c\u0634\u062f\u0647 \u0628\u0631\u0627\u06cc \u062d\u0644 \u0645\u0634\u06a9\u0644",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L102"
+      "source_location": "L105"
     },
     {
       "id": "docs_landing_and_blog_handoff_\u06f7_\u0622\u062e\u0631\u06cc\u0646_\u062c\u0647\u062a_\u0628\u062d\u062b_\u0648\u06cc\u062f\u06cc\u0648\u06cc_\u0627\u0633\u06a9\u0631\u0648\u0644_\u0645\u062d\u0648\u0631",
@@ -23226,7 +23226,7 @@
       "node_kind": "heading",
       "norm_label": "\u06f7. \u0627\u062e\u0631\u06cc\u0646 \u062c\u0647\u062a \u0628\u062d\u062b \u2014 \u0648\u06cc\u062f\u06cc\u0648\u06cc \u0627\u0633\u06a9\u0631\u0648\u0644\u200c\u0645\u062d\u0648\u0631",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L122"
+      "source_location": "L125"
     },
     {
       "id": "docs_landing_and_blog_handoff_\u06f8_\u0648\u0636\u0639\u06cc\u062a_\u06a9\u06cc\u0641\u06cc\u062a",
@@ -23238,7 +23238,7 @@
       "node_kind": "heading",
       "norm_label": "\u06f8. \u0648\u0636\u0639\u06cc\u062a \u06a9\u06cc\u0641\u06cc\u062a",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L159"
+      "source_location": "L162"
     },
     {
       "id": "docs_landing_and_blog_handoff_\u06f9_\u0633\u0631\u0648\u0631_\u062a\u0648\u0633\u0639\u0647",
@@ -23250,7 +23250,7 @@
       "node_kind": "heading",
       "norm_label": "\u06f9. \u0633\u0631\u0648\u0631 \u062a\u0648\u0633\u0639\u0647",
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L162"
+      "source_location": "L165"
     },
     {
       "id": "lib_billing_fx_providers",
@@ -34589,7 +34589,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L132",
+      "source_location": "L139",
       "weight": 1.0
     },
     {
@@ -34601,7 +34601,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L48",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -34697,7 +34697,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landing/hero.tsx",
-      "source_location": "L599",
+      "source_location": "L614",
       "weight": 1.0
     },
     {
@@ -56487,7 +56487,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -56499,7 +56499,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L19",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -56511,7 +56511,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -56523,7 +56523,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -56535,7 +56535,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -56547,7 +56547,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -56559,7 +56559,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -78547,7 +78547,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -78559,7 +78559,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L19",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -78571,7 +78571,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -78583,7 +78583,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -90080,7 +90080,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/dashboard/user-nav.tsx",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0
     },
     {
@@ -90256,7 +90256,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landing/hero.tsx",
-      "source_location": "L660",
+      "source_location": "L675",
       "weight": 1.0
     },
     {
@@ -92929,7 +92929,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L102",
+      "source_location": "L105",
       "weight": 1.0
     },
     {
@@ -92940,7 +92940,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L122",
+      "source_location": "L125",
       "weight": 1.0
     },
     {
@@ -92962,7 +92962,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L159",
+      "source_location": "L162",
       "weight": 1.0
     },
     {
@@ -92973,7 +92973,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L162",
+      "source_location": "L165",
       "weight": 1.0
     },
     {
@@ -93017,7 +93017,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L85",
+      "source_location": "L88",
       "weight": 1.0
     },
     {
@@ -93055,7 +93055,7 @@
     },
     {
       "source": "docs_landing_and_blog_handoff_\u06f4_\u06a9\u0627\u0631\u0647\u0627\u06cc_\u0628\u0627\u0642\u06cc_\u0645\u0627\u0646\u062f\u0647",
-      "target": "docs_landing_and_blog_handoff_\u0627\u0644\u0641_\u0645\u0627\u06cc\u06af\u0631\u06cc\u0634\u0646_\u062f\u06cc\u062a\u0627\u0628\u06cc\u0633_\u0628\u0644\u0627\u06a9_\u06a9\u0646\u0646\u062f\u0647",
+      "target": "docs_landing_and_blog_handoff_\u0627\u0644\u0641_\u0645\u0627\u06cc\u06af\u0631\u06cc\u0634\u0646_\u062f\u06cc\u062a\u0627\u0628\u06cc\u0633_\u0627\u0646\u062c\u0627\u0645_\u0634\u062f_\u06f1\u06f4\u06f0\u06f5_\u06f0\u06f6_\u06f2\u06f0",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -93072,7 +93072,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L75",
+      "source_location": "L78",
       "weight": 1.0
     },
     {
@@ -93083,7 +93083,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L104",
+      "source_location": "L107",
       "weight": 1.0
     },
     {
@@ -93094,7 +93094,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L108",
+      "source_location": "L111",
       "weight": 1.0
     },
     {
@@ -93105,7 +93105,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L126",
+      "source_location": "L129",
       "weight": 1.0
     },
     {
@@ -93116,7 +93116,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L131",
+      "source_location": "L134",
       "weight": 1.0
     },
     {
@@ -93127,7 +93127,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L135",
+      "source_location": "L138",
       "weight": 1.0
     },
     {
@@ -93138,7 +93138,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L139",
+      "source_location": "L142",
       "weight": 1.0
     },
     {
@@ -93149,7 +93149,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/landing-and-blog-handoff.md",
-      "source_location": "L151",
+      "source_location": "L154",
       "weight": 1.0
     },
     {
@@ -106506,5 +106506,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "832859bb1e581c81b6546edeee0e4c06f4746af9"
+  "built_at_commit": "8ca69c312e68e91bca472ad7bd97086203145335"
 }

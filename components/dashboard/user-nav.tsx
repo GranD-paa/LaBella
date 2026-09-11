@@ -10,6 +10,7 @@ import {
   LogIn,
   LogOut,
   Mail,
+  Newspaper,
   ShieldCheck,
   User as UserIcon,
   UserCircle,
@@ -108,6 +109,12 @@ export function UserNav({
           <Link href="/subscription">
             <Crown className="me-2 h-4 w-4" />
             {t("nav.subscription")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/blog">
+            <Newspaper className="me-2 h-4 w-4" />
+            {t("nav.blog")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

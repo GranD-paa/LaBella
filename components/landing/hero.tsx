@@ -476,6 +476,21 @@ export function LandingHero({
             </Link>
 
             <nav className={styles.links} id="landing-nav">
+              {/*
+                First in the row, and a real navigation rather than a jump —
+                the only thing in this bar that leaves the page.
+
+                One position serves all three locales because the row is a
+                plain flex line that follows the document's direction, which
+                the switcher below flips. First in source means outermost in
+                the reading order either way: to the right of "اشتراک" in
+                Persian, to the left of "Pricing" in English and Italian.
+
+                `copy.nav.blog` has existed in all three locales since the
+                blog shipped; only the markup that renders it was missing.
+              */}
+              <Link href="/blog">{copy.nav.blog}</Link>
+
               <a href="#pricing" onClick={(event) => jump(event, "pricing")}>
                 {copy.nav.pricing}
               </a>

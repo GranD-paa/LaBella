@@ -52,6 +52,7 @@ export const it: Messages = {
     dashboard: "Dashboard",
     profile: "Profilo",
     subscription: "Abbonamento",
+    blog: "Blog",
     aboutUs: "Chi siamo",
     contactUs: "Contattaci",
     signOut: "Esci",

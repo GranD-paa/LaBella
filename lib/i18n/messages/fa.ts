@@ -52,6 +52,7 @@ export const fa: Messages = {
     dashboard: "داشبورد",
     profile: "پروفایل",
     subscription: "خرید اشتراک",
+    blog: "وبلاگ",
     aboutUs: "درباره ما",
     contactUs: "تماس با ما",
     signOut: "خروج",

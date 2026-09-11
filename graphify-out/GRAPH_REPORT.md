@@ -1,7 +1,7 @@
 # Graph Report - cursor P  (2026-09-11)
 
 ## Corpus Check
-- 467 files · ~347,392 words
+- 467 files · ~347,556 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `832859bb`
+- Built from commit: `8ca69c31`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -398,7 +398,7 @@ Nodes (13): saveGrammarReadingProgress(), submitQuizAction(), BlogFormState, del
 
 ### Community 50 - "لندینگ‌پیج و بلاگ — سند تحویل"
 Cohesion: 0.09
-Nodes (22): ابزارهایی که **همین الان** روی دیسک هستند, الف) مایگریشن دیتابیس — بلاک‌کننده, ب) فایل لوگو — بلاک‌کننده, دو تلهٔ فنی که باید بداند, فایل‌های تغییریافته, فایل‌های جدید, لندینگ‌پیج و بلاگ — سند تحویل, مسیر پیشنهادی (ترکیبی) (+14 more)
+Nodes (22): ابزارهایی که **همین الان** روی دیسک هستند, ~~الف) مایگریشن دیتابیس~~ — انجام شد ۱۴۰۵/۰۶/۲۰, ب) فایل لوگو — بلاک‌کننده, دو تلهٔ فنی که باید بداند, فایل‌های تغییریافته, فایل‌های جدید, لندینگ‌پیج و بلاگ — سند تحویل, مسیر پیشنهادی (ترکیبی) (+14 more)
 
 ### Community 51 - "pricing.ts"
 Cohesion: 0.07

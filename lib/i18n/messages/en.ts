@@ -51,6 +51,7 @@ export const en = {
     dashboard: "Dashboard",
     profile: "Profile",
     subscription: "Subscription",
+    blog: "Blog",
     aboutUs: "About us",
     contactUs: "Contact us",
     signOut: "Sign out",
