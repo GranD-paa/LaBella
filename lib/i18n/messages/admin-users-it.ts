@@ -196,6 +196,13 @@ export const adminUsersIt = {
     description:
       "Il riferimento completo degli accessi: sopra i ruoli admin, sotto gli abbonamenti a pagamento, letti dal pannello abbonamenti.",
     languageScoped: "Limitato per lingua",
+    matrixTitle: "Cosa può fare ogni ruolo",
+    permissionColumn: "Permesso",
+    granted: "concesso",
+    notGranted: "non concesso",
+    groupPeople: "Persone e accessi",
+    groupContent: "Contenuti",
+    groupPlatform: "Piattaforma e denaro",
     editorHint:
       "Modificare cosa possono fare gli admin spetta al Super Admin e all'Head Admin.",
     editorTitle: "Modifica cosa può fare {role}",
@@ -205,7 +212,6 @@ export const adminUsersIt = {
     saved: "Permessi del ruolo aggiornati",
     lockedHint:
       "Le voci bloccate non sono mai assegnabili: sospensione, gestione di ruoli e permessi, abbonamenti e contabilità restano al Super Admin.",
-    lockedPermission: "Bloccato - non assegnabile",
     tiersTitle: "Abbonamenti a pagamento",
     tiersDescription:
       "Non sono ruoli: derivano dall'abbonamento attivo dello studente e mantengono la normale dashboard studente. Cosa sbloccano si decide nel pannello abbonamenti.",

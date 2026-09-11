@@ -4,6 +4,7 @@ import {
   EDITABLE_ROLE_SLUGS,
   LOCKED_PERMISSIONS,
   MAX_SUPER_ADMINS,
+  PERMISSION_GROUPS,
   PERMISSION_KEYS,
   PERMISSION_LABEL_KEYS,
   ROLE_DEFINITIONS,
@@ -114,6 +115,14 @@ describe("ROLE_DEFINITIONS permissions", () => {
     for (const key of PERMISSION_KEYS) {
       expect(PERMISSION_LABEL_KEYS[key]).toBeTruthy();
     }
+  });
+
+  // The reference table renders from the groups, so a permission missing from
+  // them is a permission the panel silently stops telling anybody about.
+  it("files every permission under exactly one group", () => {
+    const grouped = PERMISSION_GROUPS.flatMap((group) => [...group.permissions]);
+    expect([...grouped].sort()).toEqual([...PERMISSION_KEYS].sort());
+    expect(new Set(grouped).size).toBe(grouped.length);
   });
 
   it("defines every role in the slug list", () => {

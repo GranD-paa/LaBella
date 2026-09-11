@@ -216,7 +216,7 @@ export function UserManagementPanel({
                   <TableHead className="hidden md:table-cell">
                     {t("admin.users.columnJoined")}
                   </TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-end">
                     {t("admin.users.columnActions")}
                   </TableHead>
                 </TableRow>

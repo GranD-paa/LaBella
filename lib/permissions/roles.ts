@@ -82,6 +82,54 @@ export const PERMISSION_LABEL_KEYS: Record<PermissionKey, string> = {
   fullAccess: "admin.users.permissions.fullAccess",
 };
 
+/**
+ * The permissions in three readable chunks.
+ *
+ * Fourteen rows of Persian permission names is a wall; three groups of four or
+ * five is a list somebody can actually scan. The grouping is presentational
+ * only — nothing in the guards reads it — but a test keeps it covering every
+ * key exactly once, so a permission added later cannot go missing from the
+ * reference table by being forgotten here.
+ */
+export const PERMISSION_GROUPS = [
+  {
+    key: "people",
+    labelKey: "admin.users.permissionsPanel.groupPeople",
+    permissions: [
+      "viewUsers",
+      "answerSupport",
+      "suspendUsers",
+      "manageRoles",
+      "manageAdminPermissions",
+    ],
+  },
+  {
+    key: "content",
+    labelKey: "admin.users.permissionsPanel.groupContent",
+    permissions: [
+      "manageContent",
+      "manageQuizzes",
+      "manageBlog",
+      "manageLanguages",
+    ],
+  },
+  {
+    key: "platform",
+    labelKey: "admin.users.permissionsPanel.groupPlatform",
+    permissions: [
+      "manageBanners",
+      "manageLanding",
+      "manageSubscriptions",
+      "manageBilling",
+      "fullAccess",
+    ],
+  },
+] as const satisfies ReadonlyArray<{
+  key: string;
+  labelKey: string;
+  permissions: readonly PermissionKey[];
+}>;
+
 const NO_PERMISSIONS: RolePermissions = {
   viewUsers: false,
   answerSupport: false,

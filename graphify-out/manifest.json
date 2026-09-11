@@ -714,9 +714,9 @@
     "semantic_hash": ""
   },
   "components/admin/users/roles-permissions-panel.tsx": {
-    "mtime": 1789143612.6833408,
-    "seen": 1789144266.8842533,
-    "ast_hash": "a5c873788177f6f55b47b78dc808ab8f",
+    "mtime": 1789156838.8195102,
+    "seen": 1789157800.4990299,
+    "ast_hash": "a949ab8723f2091539f3d8b977b16608",
     "semantic_hash": ""
   },
   "components/admin/users/status-badge.tsx": {
@@ -732,9 +732,9 @@
     "semantic_hash": ""
   },
   "components/admin/users/user-management-panel.tsx": {
-    "mtime": 1789142737.4681313,
-    "seen": 1789144266.8842533,
-    "ast_hash": "ab764e3d3a93b2bdeec5edca3d1d838e",
+    "mtime": 1789156754.4874067,
+    "seen": 1789157800.4990299,
+    "ast_hash": "8eba86b86eefaf52468ebb2be021898b",
     "semantic_hash": ""
   },
   "components/admin/users/user-profile-dialog.tsx": {
@@ -1194,9 +1194,9 @@
     "semantic_hash": ""
   },
   "components/ui/table.tsx": {
-    "mtime": 1783463205.8468223,
-    "seen": 1788154327.476039,
-    "ast_hash": "0ae7dbae059df3f7e3faa6a93e81267f",
+    "mtime": 1789156754.4154513,
+    "seen": 1789157800.4995303,
+    "ast_hash": "7b1e560c821690c828e63ccea0543c51",
     "semantic_hash": ""
   },
   "components/ui/tabs.tsx": {
@@ -1794,21 +1794,21 @@
     "semantic_hash": ""
   },
   "lib/i18n/messages/admin-users-en.ts": {
-    "mtime": 1789143499.6853578,
-    "seen": 1789144266.8847535,
-    "ast_hash": "2e33476f06bfbdc7e9c40c2dcc2d2bbf",
+    "mtime": 1789156975.3521385,
+    "seen": 1789157800.4995303,
+    "ast_hash": "3a4d0250023a362615eaa5f9e4dcf37d",
     "semantic_hash": ""
   },
   "lib/i18n/messages/admin-users-fa.ts": {
-    "mtime": 1789143499.684857,
-    "seen": 1789144266.8847535,
-    "ast_hash": "d94a8f49a1550a5b4e1d4dbb3d7a0e03",
+    "mtime": 1789156975.33814,
+    "seen": 1789157800.4995303,
+    "ast_hash": "5126f3684a9e57bfbc64164b9fa563b2",
     "semantic_hash": ""
   },
   "lib/i18n/messages/admin-users-it.ts": {
-    "mtime": 1789143499.6858635,
-    "seen": 1789144266.8847535,
-    "ast_hash": "3008d345d2c62650f0364bdca1e5c7ab",
+    "mtime": 1789156975.3646374,
+    "seen": 1789157800.4995303,
+    "ast_hash": "fd95289c1f3e79af993d00c412926d0b",
     "semantic_hash": ""
   },
   "lib/i18n/messages/en.ts": {
@@ -1920,15 +1920,15 @@
     "semantic_hash": ""
   },
   "lib/permissions/roles.test.ts": {
-    "mtime": 1789142886.5626583,
-    "seen": 1789144266.8847535,
-    "ast_hash": "8f01bf33d601053498748691e9d8bdec",
+    "mtime": 1789156992.5275333,
+    "seen": 1789157800.4995303,
+    "ast_hash": "3d7df24862fc18d9c38c7c34e0b9087c",
     "semantic_hash": ""
   },
   "lib/permissions/roles.ts": {
-    "mtime": 1789143499.6843572,
-    "seen": 1789144266.8847535,
-    "ast_hash": "995933e96e56bfa45d73903cbe05fbdb",
+    "mtime": 1789156764.0039103,
+    "seen": 1789157800.4995303,
+    "ast_hash": "104ba83a4810a248145248e351d1b055",
     "semantic_hash": ""
   },
   "lib/quiz-management/data.ts": {
@@ -2106,21 +2106,21 @@
     "semantic_hash": ""
   },
   "locales/en/translation.json": {
-    "mtime": 1789143502.7321267,
-    "seen": 1789144266.8847535,
-    "ast_hash": "7c12e31d279cfe56949b34c1acdd0b24",
+    "mtime": 1789156980.8364215,
+    "seen": 1789157800.4995303,
+    "ast_hash": "c3bae1c803c2887add7d8817c92e17b6",
     "semantic_hash": ""
   },
   "locales/fa/translation.json": {
-    "mtime": 1789143502.7341342,
-    "seen": 1789144266.8847535,
-    "ast_hash": "f12207fd6d20e5456598b8b11aed713a",
+    "mtime": 1789156980.8384206,
+    "seen": 1789157800.4995303,
+    "ast_hash": "dc3152fbd00dfdc1894542f75a5c75ff",
     "semantic_hash": ""
   },
   "locales/it/translation.json": {
-    "mtime": 1789143502.7351344,
-    "seen": 1789144266.8847535,
-    "ast_hash": "2e38b611edb44243d7841c92b60817d5",
+    "mtime": 1789156980.839944,
+    "seen": 1789157800.4995303,
+    "ast_hash": "b1f1ef808e582523309f8db3576c4775",
     "semantic_hash": ""
   },
   "middleware.ts": {
@@ -3042,9 +3042,9 @@
     "semantic_hash": ""
   },
   "components/admin/users/account-tier-cell.tsx": {
-    "mtime": 1789142695.2187634,
-    "seen": 1789144266.8842533,
-    "ast_hash": "6fdcca3fe81a000621ede5b35b9ade46",
+    "mtime": 1789144292.3577864,
+    "seen": 1789157800.4990299,
+    "ast_hash": "27a6672479349c1a5ea965272abaca2f",
     "semantic_hash": ""
   },
   "components/admin/users/assign-languages-dialog.tsx": {
@@ -3077,12 +3077,6 @@
     "ast_hash": "4d1311f96ad6e4840cff181bf5095060",
     "semantic_hash": ""
   },
-  "lib/permissions/account-tier.ts": {
-    "mtime": 1789141494.7599082,
-    "seen": 1789144266.8847535,
-    "ast_hash": "b99d24e4567e7bb70d5edc3ecd3ed105",
-    "semantic_hash": ""
-  },
   "lib/permissions/admin-nav.test.ts": {
     "mtime": 1789144043.2697873,
     "seen": 1789144266.8847535,
@@ -3093,6 +3087,12 @@
     "mtime": 1789141629.8221104,
     "seen": 1789144266.8847535,
     "ast_hash": "08ba7315fa9a59dadeaa2b39c1603ec8",
+    "semantic_hash": ""
+  },
+  "scripts/run-migration.mjs": {
+    "mtime": 1789156018.5154433,
+    "seen": 1789157800.4995303,
+    "ast_hash": "7bf25cdff7a6857ae57d650e3ea53ef7",
     "semantic_hash": ""
   }
 }

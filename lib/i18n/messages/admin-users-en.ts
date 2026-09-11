@@ -195,6 +195,13 @@ export const adminUsersEn = {
     description:
       "The full access reference: admin roles above, and the paid subscriptions below, read from the subscription panel.",
     languageScoped: "Language-scoped",
+    matrixTitle: "Which role can do what",
+    permissionColumn: "Permission",
+    granted: "granted",
+    notGranted: "not granted",
+    groupPeople: "People & access",
+    groupContent: "Content",
+    groupPlatform: "Platform & money",
     editorHint:
       "Editing what admins may do belongs to the Super Admin and the Head Admin.",
     editorTitle: "Edit what {role} may do",
@@ -204,7 +211,6 @@ export const adminUsersEn = {
     saved: "Role permissions updated",
     lockedHint:
       "Locked entries can never be handed out: suspension, role and permission management, subscriptions and accounting stay with the Super Admin.",
-    lockedPermission: "Locked - cannot be granted",
     tiersTitle: "Paid subscriptions",
     tiersDescription:
       "These are not roles: they come from a learner's live subscription and keep the ordinary learner dashboard. Change what they unlock in the subscription panel.",
