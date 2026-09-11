@@ -24,6 +24,15 @@ export type LandingCopy = {
     blog: string;
     signIn: string;
     signUp: string;
+    /**
+     * Accessible name for the one control that carries both of the above.
+     *
+     * The bar shows "ورود" and "ثبت‌نام" either side of a hairline, which a
+     * screen reader would otherwise read as two words with nothing between
+     * them. This is the same pair said as one phrase — and it contains both
+     * visible labels verbatim, which is what WCAG's Label in Name asks for.
+     */
+    authGate: string;
     dashboard: string;
     menuOpen: string;
     menuClose: string;
@@ -120,6 +129,7 @@ const fa: LandingCopy = {
     blog: "وبلاگ",
     signIn: "ورود",
     signUp: "ثبت‌نام",
+    authGate: "ورود یا ثبت‌نام",
     dashboard: "داشبورد من",
     menuOpen: "باز کردن منو",
     menuClose: "بستن منو",
@@ -304,6 +314,7 @@ const en: LandingCopy = {
     blog: "Blog",
     signIn: "Sign in",
     signUp: "Sign up",
+    authGate: "Sign in or sign up",
     dashboard: "My dashboard",
     menuOpen: "Open navigation",
     menuClose: "Close navigation",
@@ -488,6 +499,7 @@ const it: LandingCopy = {
     blog: "Blog",
     signIn: "Accedi",
     signUp: "Iscriviti",
+    authGate: "Accedi o iscriviti",
     dashboard: "La mia dashboard",
     menuOpen: "Apri il menu",
     menuClose: "Chiudi il menu",

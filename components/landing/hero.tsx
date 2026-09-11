@@ -546,27 +546,49 @@ export function LandingHero({
               </span>
 
               {/*
-                Two doors, not one. A visitor who already has an account was
-                being offered nothing but "sign up", and the honest reading of
-                that bar is that this is the only way through — so they either
-                make a second account or go looking for the link.
+                One door, both names.
 
-                They are a pair and are spaced as one: the outlined pill takes
-                the bar's separation from the switcher, and only eight units
-                sit between the two of them, so they read as one decision with
-                two answers rather than two unrelated controls. The filled one
-                stays the loud one, because signing up is still what we want
-                from someone who has no account.
+                This was a pair — a quiet "ورود" pill beside the loud
+                "ثبت‌نام" one — and the pair was asking the visitor to make a
+                choice that does not exist. `/sign-up` is a redirect to
+                `/login`; both pills have always landed on the same screen. And
+                what decides whether someone is signing in or joining is not
+                which pill they pressed, it is whether `phoneHasAccount()`
+                finds the number they type on the next screen. The form works
+                that out; the bar was making them guess it first.
+
+                So the two labels sit either side of a hairline inside a single
+                link. One destination, one control, one target — which also
+                retires the eight units of separation the old pair needed to
+                stay independently tappable.
+
+                Signed in, it is a different control entirely: one name, one
+                place, and that place is the dashboard.
               */}
-              {!isSignedIn && (
-                <Link className={styles.signin} href="/login">
-                  {copy.nav.signIn}
+              {isSignedIn ? (
+                <Link className={styles.enroll} href={href}>
+                  {copy.nav.dashboard}
+                </Link>
+              ) : (
+                <Link
+                  className={styles.gate}
+                  // `/login`, not the `/sign-up` the section CTAs use. Those
+                  // are sign-up calls to action and that URL is the one every
+                  // campaign and old bookmark points at, so it stays. This is
+                  // not a sign-up call to action any more — it is the auth
+                  // door wearing both its names — and `/sign-up` is a 307 to
+                  // `/login`, so sending it there is a redirect the header can
+                  // simply not make.
+                  href="/login"
+                  // Without this a screen reader reads the two labels as one
+                  // run with nothing between them. See `nav.authGate`.
+                  aria-label={copy.nav.authGate}
+                >
+                  <span>{copy.nav.signIn}</span>
+                  <span className={styles.gateSplit} aria-hidden />
+                  <span>{copy.nav.signUp}</span>
                 </Link>
               )}
-
-              <Link className={styles.enroll} href={href}>
-                {isSignedIn ? copy.nav.dashboard : copy.nav.signUp}
-              </Link>
             </nav>
 
             <button

@@ -724,54 +724,91 @@
 
 /* The only filled object on the bar, and the only gold. Everything else was
    given a quieter treatment so this one does not have to compete. */
+
 /*
- * The quiet half of the pair.
+ * One door, both names.
  *
- * It borrows the filled pill's geometry — same height, same radius — so the
- * two read as one control with two answers, and differs only in weight: a
- * hairline and a breath of white instead of amber and a glow. The bar already
- * runs three tiers of emphasis (bare text, the switcher's track, the amber
- * pill) and this sits on the second, where an account action belongs: louder
- * than a link you might read, quieter than the thing we are asking for.
+ * There used to be two pills here, a quiet outlined "ورود" and this filled
+ * one, and they pointed at the same screen — `/sign-up` is a redirect to
+ * `/login`. Nothing downstream cares which was pressed either: the form asks
+ * for a phone number and `phoneHasAccount()` decides from that whether the
+ * visitor is returning or new. Two controls for one destination is a decision
+ * offered to someone who has no way to answer it and no reason to.
+ *
+ * So both labels live inside one link, either side of a hairline. It keeps the
+ * filled pill's whole treatment — the gradient, the amber glow, the lift on
+ * hover — because this is still the one thing being asked for; it is simply
+ * asked once now. Being a single link also makes it a single target, which is
+ * why the pair's eight units of separation are gone rather than tightened:
+ * there are no longer two adjacent targets to keep apart.
  */
-.links a.signin {
+.links a.gate {
   margin-inline-start: calc(10 * var(--u));
   height: calc(42 * var(--u));
   border-radius: calc(21 * var(--u));
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  /* Symmetrical around the hairline, so neither name reads as the real one. */
+  gap: calc(13 * var(--u));
   font-size: calc(16.5 * var(--u));
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: calc(-0.4 * var(--u));
-  color: rgba(255, 255, 255, 0.92);
-  padding: 0 calc(17 * var(--u));
-  background: rgba(255, 255, 255, 0.07);
-  border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.24);
-  box-shadow: inset 0 calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.1);
+  color: var(--brand-ink);
+  padding: 0 calc(20 * var(--u));
+  background: linear-gradient(180deg, #ffdc78 0%, #fbbf24 48%, #eda50a 100%);
+  box-shadow:
+    0 calc(4 * var(--u)) calc(16 * var(--u)) rgba(251, 191, 36, 0.34),
+    inset 0 calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.55);
   flex: none;
-  transition: background 0.24s ease, border-color 0.24s ease, color 0.24s ease,
+  white-space: nowrap;
+  transition: box-shadow 0.24s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
     height 0.36s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.36s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* The underline belongs to the text links; this one is a button. */
-.links a.signin::after {
+/*
+ * The rule between the names.
+ *
+ * A typed "|" was the obvious thing and the wrong one: it sits on the Latin
+ * baseline, carries the font's own weight, and next to Persian at button size
+ * it reads as a stray glyph rather than a divider. This is the same faded
+ * hairline the bar already uses to separate its reading half from its pressing
+ * half (`.navsplit`), in ink instead of white because it is drawn on gold.
+ */
+.gateSplit {
+  width: calc(1 * var(--u));
+  height: calc(16 * var(--u));
+  border-radius: calc(1 * var(--u));
+  background: linear-gradient(
+    180deg,
+    rgba(26, 7, 53, 0),
+    rgba(26, 7, 53, 0.4),
+    rgba(26, 7, 53, 0)
+  );
+  flex: none;
+}
+
+/* The underline belongs to the text links; the button has its own language. */
+.links a.gate::after {
   content: none;
 }
 
-/* No lift on hover. The amber pill rises, and one thing rising is what makes
-   it the primary; two would make the pair a tie. */
-.links a.signin:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.13);
-  border-color: rgba(255, 255, 255, 0.42);
+.links a.gate:hover {
+  color: var(--brand-ink);
+  transform: translateY(calc(-1 * var(--u)));
+  box-shadow:
+    0 calc(7 * var(--u)) calc(22 * var(--u)) rgba(251, 191, 36, 0.42),
+    inset 0 calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.6);
 }
 
 /* Persian sits low in this face at button weight, as on the filled pill. */
-.stage[data-fa="true"] .links a.signin {
+.stage[data-fa="true"] .links a.gate {
   letter-spacing: 0;
   padding-bottom: calc(3 * var(--u));
 }
 
 .links a.enroll {
+
   margin-inline-start: calc(10 * var(--u));
   min-width: calc(104 * var(--u));
   height: calc(42 * var(--u));
@@ -789,13 +826,6 @@
   flex: none;
   transition: box-shadow 0.24s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
     height 0.36s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.36s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* The pair's own spacing. The 10 above separates the group from the switcher;
-   between the two pills 8 is enough to keep them independent targets and
-   close enough that they read as one thing. */
-.links a.signin + a.enroll {
-  margin-inline-start: calc(8 * var(--u));
 }
 
 /* The underline belongs to the text links; the button has its own language. */
@@ -1138,7 +1168,7 @@
     letter-spacing: 0;
   }
 
-  .links a + a:not(.enroll):not(.signin) {
+  .links a + a:not(.enroll):not(.gate) {
     border-top: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.08);
   }
 
@@ -1148,10 +1178,11 @@
     content: none;
   }
 
-  /* Both halves of the pair stretch in the sheet, stacked, with the filled
-     one underneath: the sheet is read top to bottom, and the thing we are
-     asking for should be the last thing under the thumb. */
-  .links a.signin,
+  /* Full width at the foot of the sheet, which is read top to bottom — so the
+     thing being asked for is the last thing under the thumb. One row now
+     rather than the stacked pair, and the row is taller than it is on the bar
+     because a thumb is a blunter instrument than a cursor. */
+  .links a.gate,
   .links a.enroll {
     width: 100%;
     height: calc(46 * var(--u));
@@ -1160,16 +1191,13 @@
     font-size: calc(18 * var(--u));
     letter-spacing: calc(-0.4 * var(--u));
     border-top: 0;
+    margin: calc(14 * var(--u)) 0 calc(2 * var(--u));
   }
 
-  .links a.signin {
-    margin: calc(14 * var(--u)) 0 0;
-    border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.24);
-  }
-
-  .links a.signin + a.enroll,
-  .links a.enroll {
-    margin: calc(8 * var(--u)) 0 calc(2 * var(--u));
+  /* A little more air around the rule at sheet size, where the two names have
+     the whole width to sit in and would otherwise drift apart from it. */
+  .links a.gate {
+    gap: calc(15 * var(--u));
   }
 
   /* Full width in the sheet: the control is a single row of three equal
@@ -1568,11 +1596,9 @@
   animation: entFade 0.5s var(--e-quint) 0.38s both;
 }
 
-.stage[data-anim="play"] .links a.signin {
-  --rise: 8px;
-  animation: entSettle 0.6s var(--e-quint) 0.47s both;
-}
-
+/* One object arrives now, not two in sequence — so it takes the later of the
+   pair's two delays and the burger keeps its place beside it. */
+.stage[data-anim="play"] .links a.gate,
 .stage[data-anim="play"] .links a.enroll,
 .stage[data-anim="play"] .burger {
   --rise: 8px;
