@@ -1,14 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import {
   Activity,
   ArrowLeft,
   BarChart3,
-  BookOpen,
   CheckCircle2,
-  ChevronDown,
   CreditCard,
   FileText,
   Gauge,
@@ -32,13 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  TableCell,
-  TableRow,
-} from "@/components/ui/table";
 import type { AdminDashboardData } from "@/lib/dashboard-data";
-import { getQuizSectionTitleKey } from "@/lib/i18n/quiz-sections";
-import { LANGUAGE_LABEL_KEYS } from "@/lib/i18n/language-labels";
 import type { AdminNavItem } from "@/lib/permissions/admin-nav";
 import type { RolePermissions } from "@/lib/permissions/roles";
 
@@ -53,8 +44,6 @@ const NAV_ICONS = {
   Landmark,
 } as const;
 
-type LevelQuizRow = AdminDashboardData["levelQuizOverview"][number];
-
 function scoreBadgeClassName(score: number) {
   if (score >= 80) {
     return "border-emerald-400/30 bg-emerald-500/15 text-emerald-300";
@@ -67,109 +56,6 @@ function scoreBadgeClassName(score: number) {
 
 function getInitial(name: string) {
   return name.trim().charAt(0).toUpperCase() || "?";
-}
-
-function LevelQuizRowDetails({
-  entry,
-  expanded,
-  onToggle,
-  t,
-  languageLabel,
-  sectionLabel,
-  statusLabel,
-}: {
-  entry: LevelQuizRow;
-  expanded: boolean;
-  onToggle: () => void;
-  t: ReturnType<typeof useTranslations>["t"];
-  languageLabel: (slug: string) => string;
-  sectionLabel: (slug: string) => string;
-  statusLabel: (status: LevelQuizRow["status"]) => string;
-}) {
-  const hasQuiz = Boolean(entry.quizId);
-
-  return (
-    <>
-      <TableRow>
-        <TableCell className="px-3 !text-center font-medium">{entry.lessonName}</TableCell>
-        <TableCell className="px-3 !text-center">
-          {languageLabel(entry.languageSlug)}
-        </TableCell>
-        <TableCell className="px-3 !text-center">{entry.levelCode}</TableCell>
-        <TableCell className="px-3 !text-center">
-          {entry.sectionSlug ? sectionLabel(entry.sectionSlug) : t("common.noValue")}
-        </TableCell>
-        <TableCell className="px-3 !text-center">
-          <div className="flex justify-center">
-            <Badge
-              variant={
-                entry.status === "published"
-                  ? "default"
-                  : entry.status === "draft"
-                    ? "secondary"
-                    : "outline"
-              }
-            >
-              {statusLabel(entry.status)}
-            </Badge>
-          </div>
-        </TableCell>
-        <TableCell className="px-3 !text-center">
-          {hasQuiz ? (
-            <div className="flex justify-center">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={onToggle}
-                aria-expanded={expanded}
-                aria-label={
-                  expanded
-                    ? t("dashboard.admin.hideQuizDetails")
-                    : t("dashboard.admin.showQuizDetails")
-                }
-              >
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform ${
-                    expanded ? "rotate-180" : ""
-                  }`}
-                />
-              </Button>
-            </div>
-          ) : null}
-        </TableCell>
-      </TableRow>
-      {hasQuiz && expanded ? (
-        <TableRow className="bg-muted/20 hover:bg-muted/20">
-          <TableCell colSpan={6} className="px-3 py-3 !text-center">
-            <div className="flex flex-wrap justify-center gap-3">
-              <div className="rounded-lg border border-white/10 bg-background/40 px-3 py-2 text-center text-sm">
-                <p className="text-xs text-muted-foreground">
-                  {t("dashboard.admin.multipleChoiceQuestions")}
-                </p>
-                <p className="font-medium">
-                  {t("dashboard.admin.questionCountValue", {
-                    count: entry.multipleChoiceCount,
-                  })}
-                </p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-background/40 px-3 py-2 text-center text-sm">
-                <p className="text-xs text-muted-foreground">
-                  {t("dashboard.admin.writtenQuestions")}
-                </p>
-                <p className="font-medium">
-                  {t("dashboard.admin.questionCountValue", {
-                    count: entry.writtenCount,
-                  })}
-                </p>
-              </div>
-            </div>
-          </TableCell>
-        </TableRow>
-      ) : null}
-    </>
-  );
 }
 
 export function AdminDashboard({
@@ -189,7 +75,6 @@ export function AdminDashboard({
   permissions: RolePermissions;
 }) {
   const { t, formatDate } = useTranslations();
-  const [expandedLevel, setExpandedLevel] = useState<string | null>(null);
 
   // The panels below the links follow the same rule the links do: a role is
   // shown what it may act on, and nothing else. A writer has no business
@@ -199,26 +84,6 @@ export function AdminDashboard({
     permissions.fullAccess ||
     permissions.manageContent ||
     permissions.manageQuizzes;
-
-  function languageLabel(slug: string) {
-    const key = LANGUAGE_LABEL_KEYS[slug];
-    return key ? t(key) : slug;
-  }
-
-  function sectionLabel(slug: string) {
-    const key = getQuizSectionTitleKey(slug);
-    return key ? t(key) : slug;
-  }
-
-  function statusLabel(status: LevelQuizRow["status"]) {
-    if (status === "published") {
-      return t("admin.quizzes.statusPublished");
-    }
-    if (status === "draft") {
-      return t("admin.quizzes.statusDraft");
-    }
-    return t("dashboard.admin.statusNoQuiz");
-  }
 
   return (
     <div className="space-y-8">
@@ -384,68 +249,6 @@ export function AdminDashboard({
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </section>
-      ) : null}
-
-      {!showFullManagement && canSeeContent ? (
-        <section className="mx-auto w-full max-w-6xl">
-          <Card className="brand-surface">
-            <CardHeader className="items-center space-y-2 text-center">
-              <CardTitle className="flex w-full items-center justify-center gap-2">
-                <BookOpen className="h-5 w-5 shrink-0 text-brand-accent" />
-                {t("dashboard.admin.assignedQuizzes")}
-              </CardTitle>
-              <CardDescription className="max-w-3xl text-center">
-                {t("dashboard.admin.assignedQuizzesHint")}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex justify-center px-6 pt-0">
-              <div className="w-full max-w-5xl overflow-x-auto rounded-lg border border-white/10">
-                <table className="w-full table-fixed caption-bottom text-sm [&_td]:!text-center [&_th]:!text-center">
-                  <thead className="border-b [&_tr]:border-b">
-                    <tr className="border-b transition-colors">
-                      <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
-                        {t("dashboard.admin.columnLesson")}
-                      </th>
-                      <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
-                        {t("dashboard.admin.columnLanguage")}
-                      </th>
-                      <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
-                        {t("dashboard.admin.columnLevel")}
-                      </th>
-                      <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
-                        {t("dashboard.admin.columnSection")}
-                      </th>
-                      <th className="h-10 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
-                        {t("dashboard.admin.columnStatus")}
-                      </th>
-                      <th className="h-10 w-16 px-3 align-middle text-sm font-medium !text-center text-muted-foreground">
-                        {t("dashboard.admin.columnDetails")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="[&_tr:last-child]:border-0">
-                    {data.levelQuizOverview.map((entry) => (
-                      <LevelQuizRowDetails
-                        key={entry.levelCode}
-                        entry={entry}
-                        expanded={expandedLevel === entry.levelCode}
-                        onToggle={() =>
-                          setExpandedLevel((current) =>
-                            current === entry.levelCode ? null : entry.levelCode
-                          )
-                        }
-                        t={t}
-                        languageLabel={languageLabel}
-                        sectionLabel={sectionLabel}
-                        statusLabel={statusLabel}
-                      />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
             </CardContent>
           </Card>
         </section>

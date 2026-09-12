@@ -1,6 +1,5 @@
 import { getLanguagesWithAvailability } from "@/lib/curriculum/availability";
 import type { DataRepository } from "@/lib/data/repository";
-import { ITALIAN_LEVELS } from "@/lib/curriculum/italian";
 import {
   buildContinueLearningSnapshot,
   buildLearnerEngagementMetrics,
@@ -72,16 +71,6 @@ export type AdminDashboardData = {
     averageScore: number;
     totalLessons: number;
   };
-  levelQuizOverview: Array<{
-    levelCode: string;
-    lessonName: string;
-    languageSlug: string;
-    sectionSlug: string | null;
-    quizId: string | null;
-    status: "none" | "draft" | "published";
-    multipleChoiceCount: number;
-    writtenCount: number;
-  }>;
   recentActivity: Array<{
     id: string;
     userName: string;
@@ -217,14 +206,12 @@ export async function fetchUserDashboardData(
 export async function fetchAdminDashboardData(
   repo: DataRepository
 ): Promise<AdminDashboardData> {
-  const [profiles, quizzes, lessons, allAttempts, allQuestions] =
-    await Promise.all([
-      repo.getAllProfiles(),
-      repo.getQuizzes(),
-      repo.getLessons(),
-      repo.getAllAttempts(),
-      repo.getAllQuizQuestions(),
-    ]);
+  const [profiles, quizzes, lessons, allAttempts] = await Promise.all([
+    repo.getAllProfiles(),
+    repo.getQuizzes(),
+    repo.getLessons(),
+    repo.getAllAttempts(),
+  ]);
 
   const profileMap = new Map(
     profiles.map((profile) => [profile.id, profile.full_name])
@@ -259,45 +246,6 @@ export async function fetchAdminDashboardData(
       ? Math.round((uniqueCompletions / quizzes.length) * 100)
       : 0;
 
-  const quizByLessonId = new Map(quizzes.map((quiz) => [quiz.lesson_id, quiz]));
-  const lessonByOrder = new Map(
-    lessons.map((lesson) => [lesson.order_number, lesson])
-  );
-  const questionsByQuizId = allQuestions.reduce<
-    Record<string, { multipleChoice: number; written: number }>
-  >((acc, question) => {
-    if (!acc[question.quiz_id]) {
-      acc[question.quiz_id] = { multipleChoice: 0, written: 0 };
-    }
-    if (question.question_type === "written") {
-      acc[question.quiz_id].written += 1;
-    } else {
-      acc[question.quiz_id].multipleChoice += 1;
-    }
-    return acc;
-  }, {});
-
-  const levelQuizOverview = ITALIAN_LEVELS.map((level) => {
-    const lesson = lessonByOrder.get(level.orderNumber);
-    const quiz = lesson ? quizByLessonId.get(lesson.id) : undefined;
-    const questionCounts = quiz ? questionsByQuizId[quiz.id] : undefined;
-
-    return {
-      levelCode: level.code,
-      lessonName: lesson?.title ?? level.title,
-      languageSlug: "italian",
-      sectionSlug: quiz?.section_slug ?? null,
-      quizId: quiz?.id ?? null,
-      status: !quiz
-        ? ("none" as const)
-        : quiz.status === "published"
-          ? ("published" as const)
-          : ("draft" as const),
-      multipleChoiceCount: questionCounts?.multipleChoice ?? 0,
-      writtenCount: questionCounts?.written ?? 0,
-    };
-  });
-
   const recentActivity = [...studentAttempts]
     .sort((a, b) => b.created_at.localeCompare(a.created_at))
     .slice(0, 20)
@@ -322,7 +270,6 @@ export async function fetchAdminDashboardData(
       averageScore,
       totalLessons: lessons.length,
     },
-    levelQuizOverview,
     recentActivity,
     users: profiles.map((profile) => ({
       id: profile.id,
