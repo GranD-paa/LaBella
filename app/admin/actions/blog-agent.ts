@@ -368,6 +368,15 @@ export async function saveSwitchesAction(
   });
 }
 
+/**
+ * The Arvan panel shows a machine user's key as `apikey <uuid>`, and the
+ * owner pastes what the panel shows. The gateway wants the bare key after
+ * `Bearer`, so the word is dropped here — `Bearer apikey <uuid>` is a 401.
+ */
+function normaliseApiKey(value: string): string {
+  return value.trim().replace(/^(apikey|bearer)\s+/i, "").trim();
+}
+
 function isHttpUrl(value: string): boolean {
   try {
     const url = new URL(value);
@@ -382,7 +391,10 @@ const connectionFields = z.object({
     .string()
     .trim()
     .refine(isHttpUrl, "آدرس سرویس معتبر نیست. آدرس کامل را از پنل سرویس کپی کنید."),
-  apiKey: z.string().trim().max(500, "کلید بیش از حد بلند است."),
+  apiKey: z
+    .string()
+    .max(500, "کلید بیش از حد بلند است.")
+    .transform(normaliseApiKey),
   clearApiKey: z.boolean(),
   writerModel: z
     .string()
@@ -459,7 +471,7 @@ export async function testConnectionAction(
     const model = input.writerModel.trim();
     if (!model) return { error: "نام مدل نویسنده را وارد کنید." };
 
-    let apiKey = input.apiKey.trim();
+    let apiKey = normaliseApiKey(input.apiKey);
     if (!apiKey) {
       const saved = await loadAgentConfig().catch(() => null);
       const stored = saved?.connection;
