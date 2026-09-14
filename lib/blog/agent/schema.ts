@@ -22,8 +22,9 @@ export const articleSchema = z.object({
    * chopped mid-word reads worse than one two characters over. */
   title: z.string().trim().min(10).max(120),
 
-  /** Persian slug. Run through `slugifyTitle` before use — the model is good
-   * at picking words and unreliable at punctuation. */
+  /** English slug. Run through `slugifyTitle` before use — the model is good
+   * at picking words and unreliable at punctuation, and a Persian slug it
+   * sends anyway is dropped there rather than published. */
   slug: z.string().trim().min(3),
 
   /** The answer, in two or three sentences, before the article argues for
@@ -129,7 +130,7 @@ export function buildArticleJsonSchema(
       slug: {
         type: "string",
         description:
-          "نشانی فارسی مقاله با خط تیره بین کلمات. بدون علائم نگارشی. مثال: بهترین-روش-یادگیری-ایتالیایی",
+          "نشانی انگلیسی مقاله برای آدرس صفحه: سه تا شش کلمه‌ی کلیدی به انگلیسی، فقط حروف کوچک انگلیسی و عدد، با خط تیره بین کلمات. هیچ حرف فارسی نگذار. مثال: italian-definite-articles-il-lo-la",
       },
       summary: {
         type: "string",
@@ -139,7 +140,7 @@ export function buildArticleJsonSchema(
       content: {
         type: "string",
         description:
-          "متن کامل مقاله در قالب مارک‌داون. با ## برای بخش‌ها و ### برای زیربخش‌ها. بدون تکرار عنوان اصلی در ابتدای متن.",
+          "متن کامل مقاله در قالب مارک‌داون. حداکثر ۶ بخش با ## و زیربخش‌ها با ###. بدون تکرار عنوان اصلی در ابتدای متن.",
       },
       metaTitle: {
         type: ["string", "null"],

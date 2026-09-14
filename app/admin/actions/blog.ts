@@ -81,8 +81,9 @@ export async function saveBlogPostAction(
   const parsed = postSchema.safeParse({
     id: rawId.length > 0 ? rawId : undefined,
     title,
-    // An empty slug field derives one from the title, so publishing never
-    // blocks on remembering to fill it in.
+    // An empty slug field derives one from the title. Slugs are Latin only,
+    // so that works for a title with English words in it; a Persian title
+    // derives nothing and the check below asks for the slug by hand.
     slug: rawSlug.length > 0 ? slugifyTitle(rawSlug) : slugifyTitle(title),
     excerpt: String(formData.get("excerpt") ?? ""),
     summary: String(formData.get("summary") ?? ""),
@@ -114,7 +115,9 @@ export async function saveBlogPostAction(
   if (input.slug.length === 0) {
     return {
       error: "فرم را کامل کنید.",
-      fieldErrors: { slug: "نشانی مطلب قابل ساخت نیست؛ دستی واردش کنید." },
+      fieldErrors: {
+        slug: "نشانی مطلب را با حروف انگلیسی، عدد و خط تیره بنویسید.",
+      },
     };
   }
 

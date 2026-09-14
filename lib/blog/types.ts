@@ -73,19 +73,21 @@ export type BlogPostInput = {
 };
 
 /**
- * Builds a URL-safe slug.
+ * Builds a URL-safe slug: lowercase English letters, digits and hyphens.
  *
- * Persian letters are kept as-is rather than transliterated: Google indexes
- * percent-encoded UTF-8 paths fine, and a Persian slug is far more meaningful
- * in a search result than a romanised approximation of it.
+ * Persian letters are dropped, not kept. A Persian slug is percent-encoded
+ * the moment anyone copies the link, so the address a reader shares turns
+ * into a wall of `%D8%B1%D8%A7…` — unreadable in a chat, cut off in a search
+ * result. A Persian title therefore derives no slug at all, and the editor
+ * and the agent each ask for an English one instead.
  */
 export function slugifyTitle(title: string): string {
   return title
-    .trim()
     .toLowerCase()
-    // Persian/Arabic block, latin alphanumerics, spaces and hyphens survive.
-    .replace(/[^؀-ۿ‌a-z0-9\s-]/g, "")
-    .replace(/[\s‌]+/g, "-")
+    .replace(/[_\s‌]+/g, " ")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
 }

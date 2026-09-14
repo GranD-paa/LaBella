@@ -238,7 +238,10 @@
 .blog-prose {
   color: hsl(var(--foreground) / 0.86);
   font-size: 1.0625rem;
-  line-height: 2;
+  /* 1.8, down from 2. Persian needs more room between lines than Latin does,
+     for the dots above and below the letters, but at 2 a paragraph read as a
+     list of separate lines rather than as one block of text. */
+  line-height: 1.8;
 }
 
 .blog-prose > * + * {

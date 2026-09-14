@@ -56,7 +56,10 @@ export function BlogListView({
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[hsl(var(--blog-accent))]">
           {eyebrow}
         </p>
-        <h1 className="mt-4 text-3xl font-bold leading-tight text-foreground sm:text-4xl lg:text-[2.75rem]">
+        {/* `sm:leading-*` repeats the leading on purpose: `sm:text-4xl` brings
+            a fixed 2.5rem line-height that would otherwise win from the small
+            breakpoint up, and a wrapped 2.75rem title would overlap itself. */}
+        <h1 className="mt-4 text-3xl font-bold leading-[1.35] text-foreground sm:text-4xl sm:leading-[1.35] lg:text-[2.75rem]">
           {title}
         </h1>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">

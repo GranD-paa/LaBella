@@ -236,9 +236,14 @@ export default async function BlogPostPage({ params }: Props) {
               </div>
             ) : null}
 
+            {/* `sm:leading-*` is not redundant. `sm:text-4xl` carries its own
+                fixed 2.5rem line-height, which beat the unprefixed `leading-`
+                from the small breakpoint up — so at 2.9rem a wrapped title
+                sat on a line shorter than its own letters, and the two lines
+                ran into each other. */}
             <h1
               id="post-title"
-              className="text-3xl font-bold leading-[1.25] tracking-tight text-foreground sm:text-4xl lg:text-[2.9rem]"
+              className="text-3xl font-bold leading-[1.4] tracking-tight text-foreground sm:text-4xl sm:leading-[1.4] lg:text-[2.9rem]"
             >
               {post.title}
             </h1>

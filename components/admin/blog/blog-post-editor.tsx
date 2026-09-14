@@ -209,6 +209,10 @@ export function BlogPostEditor({
                 <p className="mt-1 text-xs text-muted-foreground" dir="ltr">
                   /blog/{slug || "…"}
                 </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  فقط حروف کوچک انگلیسی، عدد و خط تیره. حروف فارسی از نشانی
+                  حذف می‌شوند.
+                </p>
                 <FieldError message={state.fieldErrors?.slug} />
               </div>
 

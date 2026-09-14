@@ -1,5 +1,4 @@
 import type { TocEntry } from "@/lib/blog/markdown";
-import { cn } from "@/lib/utils";
 
 /**
  * The article's sections, linked.
@@ -31,10 +30,7 @@ export function BlogToc({ entries }: { entries: TocEntry[] }) {
       </h2>
       <ol className="mt-4 space-y-2.5 text-sm">
         {entries.map((entry) => (
-          <li
-            key={entry.id}
-            className={cn(entry.level === 3 && "ps-5 text-muted-foreground")}
-          >
+          <li key={entry.id}>
             <a
               href={`#${entry.id}`}
               className="text-foreground/85 underline-offset-4 transition-colors hover:text-[hsl(var(--blog-accent))] hover:underline"

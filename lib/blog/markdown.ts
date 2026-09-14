@@ -40,28 +40,18 @@ function escapeHtml(value: string): string {
 }
 
 /**
- * What a heading becomes in a URL fragment.
+ * One entry in the contents list above an article: a top-level section.
  *
- * Persian letters survive rather than being transliterated, for the same
- * reason post slugs keep them: `#زمان-گذشته` is a fragment a reader can look
- * at and understand, and browsers percent-encode it correctly on their own.
+ * Headings are addressed as `section-1`, `section-2`, … in the order they
+ * appear, rather than by their words. A Persian heading turned into a
+ * fragment is percent-encoded the moment anyone copies the link, and a
+ * section link three hundred characters long is what readers ended up
+ * pasting. A search engine reads the heading itself, not its id, so the
+ * short form costs nothing there.
  */
-function slugifyHeading(text: string): string {
-  return (
-    text
-      .trim()
-      .toLowerCase()
-      .replace(/[^؀-ۿ‌a-z0-9\s-]/g, "")
-      .replace(/[\s‌]+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "") || "بخش"
-  );
-}
-
 export type TocEntry = {
   id: string;
   text: string;
-  level: 2 | 3;
 };
 
 /** What the renderer needs to know that the markdown source cannot tell it. */
@@ -103,7 +93,7 @@ export type MarkdownContext = {
  */
 function createBlogRenderer(context: MarkdownContext) {
   const headings: TocEntry[] = [];
-  const usedIds = new Set<string>();
+  let headingCount = 0;
 
   const renderer = {
     html(): string {
@@ -120,19 +110,16 @@ function createBlogRenderer(context: MarkdownContext) {
       const text = this.parser.parseInline(tokens);
       const plain = text.replace(/<[^>]*>/g, "");
 
-      let id = slugifyHeading(plain);
-      // Two sections can legitimately be called the same thing. The first one
-      // to appear keeps the clean id; the rest get a suffix, so no fragment
-      // ever points at two places.
-      if (usedIds.has(id)) {
-        let suffix = 2;
-        while (usedIds.has(`${id}-${suffix}`)) suffix += 1;
-        id = `${id}-${suffix}`;
-      }
-      usedIds.add(id);
+      // Every level is numbered in one sequence, so no two headings can ever
+      // share an id however they are titled.
+      headingCount += 1;
+      const id = `section-${headingCount}`;
 
-      if (depth === 2 || depth === 3) {
-        headings.push({ id, text: plain, level: depth });
+      // Only `##` goes into the contents list. A reader scanning it wants the
+      // article's handful of questions, not its outline, and the writer is
+      // held to six of them so the list stays short enough to take in.
+      if (depth === 2) {
+        headings.push({ id, text: plain });
       }
 
       return `<h${depth} id="${escapeHtml(

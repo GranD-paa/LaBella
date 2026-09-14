@@ -140,7 +140,18 @@ export function stripLeadingHeading(content: string): string {
   return content.replace(/^\s*#\s+.+\n+/, "");
 }
 
-/** Builds a URL-safe slug from whatever the caller offered. */
+/**
+ * Builds the post's address from whatever the caller offered.
+ *
+ * Latin only, like every slug on the blog (see `slugifyTitle`). The writer is
+ * asked for an English slug; if it sends Persian anyway, that reduces to
+ * nothing, then so does a Persian title, and the post gets a placeholder
+ * instead of an empty address — which the owner can rename in the editor.
+ */
 export function deriveSlug(proposed: string | null, title: string): string {
-  return slugifyTitle(proposed ?? "") || slugifyTitle(title);
+  return (
+    slugifyTitle(proposed ?? "") ||
+    slugifyTitle(title) ||
+    `post-${Date.now().toString(36)}`
+  );
 }

@@ -35,35 +35,36 @@ describe("renderPost — safety", () => {
 });
 
 describe("renderPost — headings and contents", () => {
-  it("gives every heading an id and reports h2s and h3s", () => {
+  it("numbers every heading and lists only the h2s", () => {
     const { html, toc } = renderPost(
-      "## زمان گذشته\n\nمتن\n\n### مثال‌ها\n\nمتن\n\n#### ریز\n\nمتن"
+      "## زمان گذشته\n\nمتن\n\n### مثال‌ها\n\nمتن\n\n#### ریز\n\nمتن\n\n## تمرین"
     );
 
-    expect(html).toContain('id="زمان-گذشته"');
-    // h4 and below are rendered with ids but stay out of the contents list —
-    // a table of contents that descends four levels is an outline, not a map.
+    expect(html).toContain('<h2 id="section-1"');
+    expect(html).toContain('<h3 id="section-2"');
+    expect(html).toContain('<h4 id="section-3"');
+    // Subsections keep an id a reader can link to, but stay out of the
+    // contents list: it is the article's handful of questions, not an outline.
     expect(toc).toEqual([
-      { id: "زمان-گذشته", text: "زمان گذشته", level: 2 },
-      { id: "مثال-ها", text: "مثال‌ها", level: 3 },
+      { id: "section-1", text: "زمان گذشته" },
+      { id: "section-4", text: "تمرین" },
     ]);
   });
 
-  it("turns a zero-width non-joiner into a hyphen", () => {
-    // ZWNJ is invisible. Left in a fragment it produces two ids that look
-    // identical and are not, so it becomes a hyphen — which is also what
-    // `slugifyTitle` does to post URLs, so headings and slugs agree.
-    const { toc } = renderPost("## می‌روم");
-    expect(toc[0].id).toBe("می-روم");
-    expect(toc[0].text).toBe("می‌روم");
+  it("keeps the fragment short and Latin whatever the heading says", () => {
+    // A Persian fragment is percent-encoded the moment a link is copied, which
+    // is how three-hundred-character section links ended up being shared.
+    const { toc } = renderPost("## چرا s در studente باعث استفاده از lo می‌شود؟");
+    expect(toc[0].id).toBe("section-1");
+    expect(toc[0].text).toBe("چرا s در studente باعث استفاده از lo می‌شود؟");
   });
 
   it("keeps duplicate headings pointing at different places", () => {
     const { toc } = renderPost("## مثال\n\nیک\n\n## مثال\n\nدو\n\n## مثال\n\nسه");
     expect(toc.map((entry) => entry.id)).toEqual([
-      "مثال",
-      "مثال-2",
-      "مثال-3",
+      "section-1",
+      "section-2",
+      "section-3",
     ]);
   });
 
@@ -77,7 +78,7 @@ describe("renderPost — headings and contents", () => {
   it("does not let two renders share their heading ids", () => {
     // The renderer accumulates state as it walks a document. If it were shared
     // between calls, the second post's first heading would come back as
-    // "مثال-2" because the first post had already claimed "مثال".
+    // "section-2" because the first post had already counted one.
     const first = renderPost("## مثال");
     const second = renderPost("## مثال");
     expect(second.toc[0].id).toBe(first.toc[0].id);
