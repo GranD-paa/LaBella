@@ -56,6 +56,7 @@ export function UserManagementPanel({
   currentUserId,
   currentUserRole,
   currentUserPermissions,
+  phoneNumbers,
   subscriptions,
   plans,
   languageSlugs,
@@ -64,6 +65,8 @@ export function UserManagementPanel({
   currentUserId: string;
   currentUserRole: RoleSlug;
   currentUserPermissions: RolePermissions;
+  /** Phone numbers by user id. Absent unless the viewer may see them. */
+  phoneNumbers?: Record<string, string>;
   /** Every live subscription, so the tier column costs one pass, not one query per row. */
   subscriptions: AdminSubscriptionSummary[];
   plans: GrantPlanOption[];
@@ -275,6 +278,11 @@ export function UserManagementPanel({
                             currentUserId={currentUserId}
                             currentUserRole={currentUserRole}
                             currentUserPermissions={currentUserPermissions}
+                            phoneNumber={
+                              phoneNumbers
+                                ? (phoneNumbers[user.id] ?? null)
+                                : undefined
+                            }
                             superAdminCount={superAdminCount}
                             plans={plans}
                             languageSlugs={languageSlugs}

@@ -493,6 +493,18 @@ export function canEditRolePermissions(
   return ALLOWED;
 }
 
+/**
+ * Whether this role may see members' phone numbers.
+ *
+ * A phone number is how people sign in here, not just a way to reach them,
+ * so it stays with the two tiers that answer for accounts. Support admins,
+ * teachers and writers never receive it: the admin page leaves the numbers
+ * out on the server rather than hiding them in the browser.
+ */
+export function canViewPhoneNumbers(role: RoleSlug): boolean {
+  return role === "super_admin" || role === "head_admin";
+}
+
 /** The role a promote/demote toggle lands on, without downgrading a tier. */
 export function resolveAdminToggleRole(
   currentRole: RoleSlug,

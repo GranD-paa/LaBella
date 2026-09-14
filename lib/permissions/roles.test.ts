@@ -13,6 +13,7 @@ import {
   canChangeUserRole,
   canChangeUserStatus,
   canEditRolePermissions,
+  canViewPhoneNumbers,
   coversLanguage,
   isRoleSlug,
   normalizeAssignedLanguages,
@@ -218,6 +219,22 @@ describe("canEditRolePermissions", () => {
   it("only lists roles that exist", () => {
     for (const slug of EDITABLE_ROLE_SLUGS) {
       expect(ROLE_SLUGS).toContain(slug);
+    }
+  });
+});
+
+describe("canViewPhoneNumbers", () => {
+  it("shows phone numbers to the super admin and the head admin", () => {
+    expect(canViewPhoneNumbers("super_admin")).toBe(true);
+    expect(canViewPhoneNumbers("head_admin")).toBe(true);
+  });
+
+  it("keeps them from every other role", () => {
+    // Listed from ROLE_SLUGS rather than by hand, so a role added later is
+    // refused until someone decides otherwise.
+    for (const role of ROLE_SLUGS) {
+      if (role === "super_admin" || role === "head_admin") continue;
+      expect(canViewPhoneNumbers(role)).toBe(false);
     }
   });
 });

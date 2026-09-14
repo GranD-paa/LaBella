@@ -104,6 +104,8 @@ export const adminUsersFa = {
     accountInfo: "اطلاعات حساب",
     fullName: "نام کامل",
     email: "ایمیل",
+    phone: "شماره موبایل",
+    noPhone: "ثبت نشده",
     role: "نقش",
     status: "وضعیت",
     joined: "تاریخ ثبت‌نام",

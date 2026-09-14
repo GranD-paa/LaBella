@@ -1,4 +1,4 @@
-import { queryOne, withTransaction } from "@/lib/data/postgres/client";
+import { query, queryOne, withTransaction } from "@/lib/data/postgres/client";
 
 /**
  * The few reads and writes the phone flow needs that no repository method
@@ -17,6 +17,20 @@ export async function phoneHasAccount(e164: string): Promise<boolean> {
     [e164]
   );
   return row !== null;
+}
+
+/**
+ * Every account's phone number, keyed by user id, for the admin user list.
+ *
+ * Nothing in here checks who is asking. The caller gates it with
+ * `canViewPhoneNumbers`, and a viewer who fails that check is never handed
+ * the map at all.
+ */
+export async function readPhoneNumbers(): Promise<Record<string, string>> {
+  const rows = await query<{ id: string; phoneNumber: string }>(
+    `select id, "phoneNumber" from public."user" where "phoneNumber" is not null`
+  );
+  return Object.fromEntries(rows.map((row) => [row.id, row.phoneNumber]));
 }
 
 export type ProfileState = {

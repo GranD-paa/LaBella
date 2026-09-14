@@ -106,6 +106,8 @@ export const adminUsersEn = {
     accountInfo: "Account information",
     fullName: "Full name",
     email: "Email",
+    phone: "Mobile number",
+    noPhone: "Not on file",
     role: "Role",
     status: "Status",
     joined: "Registered on",

@@ -8,11 +8,16 @@ import {
 } from "@/components/admin/users/roles-permissions-panel";
 import { UserManagementPanel } from "@/components/admin/users/user-management-panel";
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
+import { readPhoneNumbers } from "@/lib/auth/phone-accounts";
+import { isLocalDataMode } from "@/lib/config/data-source";
 import { getDataRepository } from "@/lib/data";
 import { fetchAdminDashboardData } from "@/lib/dashboard-data";
 import { LANGUAGES } from "@/lib/curriculum/languages";
 import { hasPermission, visibleAdminNav } from "@/lib/permissions/admin-nav";
-import type { RolePermissionOverrides } from "@/lib/permissions/roles";
+import {
+  canViewPhoneNumbers,
+  type RolePermissionOverrides,
+} from "@/lib/permissions/roles";
 
 import { createPageMetadata } from "@/lib/i18n/metadata";
 import { getServerTranslator } from "@/lib/i18n/server-locale";
@@ -33,6 +38,18 @@ export default async function AdminPage() {
     repo.getSubscriptionTiers(),
     repo.getRolePermissionOverrides(),
   ]);
+
+  // A phone number is the login on this site, so it reaches the page only for
+  // the two tiers allowed to see it. Every other viewer gets no map at all,
+  // rather than a map the browser is trusted to hide. A failed read leaves the
+  // row out instead of showing every account as having no number.
+  const phoneNumbers =
+    canViewPhoneNumbers(role) && !isLocalDataMode()
+      ? await readPhoneNumbers().catch((error) => {
+          console.error("[admin] failed to load phone numbers", error);
+          return undefined;
+        })
+      : undefined;
 
   const { t } = await getServerTranslator();
   const displayName =
@@ -92,6 +109,7 @@ export default async function AdminPage() {
             currentUserId={user.id}
             currentUserRole={role}
             currentUserPermissions={permissions}
+            phoneNumbers={phoneNumbers}
             subscriptions={subscriptions}
             plans={planOptions}
             languageSlugs={LANGUAGES.map((language) => language.slug)}

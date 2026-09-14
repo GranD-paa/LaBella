@@ -210,9 +210,9 @@
     "semantic_hash": ""
   },
   "app/admin/page.tsx": {
-    "mtime": 1789142776.931967,
-    "seen": 1789144266.8842533,
-    "ast_hash": "fdb394607063fcb213259ba83abb3386",
+    "mtime": 1789396924.7120636,
+    "seen": 1789397056.133502,
+    "ast_hash": "92fc23eb7ebba412fdfe4da9f3a30c0b",
     "semantic_hash": ""
   },
   "app/admin/quizzes/page.tsx": {
@@ -732,15 +732,15 @@
     "semantic_hash": ""
   },
   "components/admin/users/user-management-panel.tsx": {
-    "mtime": 1789156754.4874067,
-    "seen": 1789157800.4990299,
-    "ast_hash": "8eba86b86eefaf52468ebb2be021898b",
+    "mtime": 1789396929.7092297,
+    "seen": 1789397056.1340036,
+    "ast_hash": "bda1fb15512dad10f337d0971896ba2b",
     "semantic_hash": ""
   },
   "components/admin/users/user-profile-dialog.tsx": {
-    "mtime": 1789142753.6065617,
-    "seen": 1789144266.8842533,
-    "ast_hash": "d98ee84e54e802e970d60b89d7b898ec",
+    "mtime": 1789396941.3984077,
+    "seen": 1789397056.1340036,
+    "ast_hash": "9f82961f8f87d8f8542a208320b53927",
     "semantic_hash": ""
   },
   "components/admin/users/user-quiz-attempts-panel.tsx": {
@@ -750,9 +750,9 @@
     "semantic_hash": ""
   },
   "components/admin/users/user-row-actions.tsx": {
-    "mtime": 1789142717.4126043,
-    "seen": 1789144266.8842533,
-    "ast_hash": "aea63e8e2dff9144268d39dd6ccabc23",
+    "mtime": 1789396934.9031584,
+    "seen": 1789397056.1340036,
+    "ast_hash": "3edf2126f99493d4888e9a148a3c444a",
     "semantic_hash": ""
   },
   "components/admin/vocabulary/vocabulary-edit-dialog.tsx": {
@@ -1794,21 +1794,21 @@
     "semantic_hash": ""
   },
   "lib/i18n/messages/admin-users-en.ts": {
-    "mtime": 1789156975.3521385,
-    "seen": 1789157800.4995303,
-    "ast_hash": "3a4d0250023a362615eaa5f9e4dcf37d",
+    "mtime": 1789396945.2122114,
+    "seen": 1789397056.134504,
+    "ast_hash": "423fd3edaacf39ee40400f5b036c2c23",
     "semantic_hash": ""
   },
   "lib/i18n/messages/admin-users-fa.ts": {
-    "mtime": 1789156975.33814,
-    "seen": 1789157800.4995303,
-    "ast_hash": "5126f3684a9e57bfbc64164b9fa563b2",
+    "mtime": 1789396943.5249403,
+    "seen": 1789397056.134504,
+    "ast_hash": "0dd1ec572e373d62713e7cbab83c2bf1",
     "semantic_hash": ""
   },
   "lib/i18n/messages/admin-users-it.ts": {
-    "mtime": 1789156975.3646374,
-    "seen": 1789157800.4995303,
-    "ast_hash": "fd95289c1f3e79af993d00c412926d0b",
+    "mtime": 1789396947.1040816,
+    "seen": 1789397056.134504,
+    "ast_hash": "0a87d5ca373fad997bdfa7810bf27c14",
     "semantic_hash": ""
   },
   "lib/i18n/messages/en.ts": {
@@ -1920,15 +1920,15 @@
     "semantic_hash": ""
   },
   "lib/permissions/roles.test.ts": {
-    "mtime": 1789156992.5275333,
-    "seen": 1789157800.4995303,
-    "ast_hash": "3d7df24862fc18d9c38c7c34e0b9087c",
+    "mtime": 1789396985.2518353,
+    "seen": 1789397056.134504,
+    "ast_hash": "084585f12d6aa12adc32134d0ddd03e4",
     "semantic_hash": ""
   },
   "lib/permissions/roles.ts": {
-    "mtime": 1789156764.0039103,
-    "seen": 1789157800.4995303,
-    "ast_hash": "104ba83a4810a248145248e351d1b055",
+    "mtime": 1789396964.1898196,
+    "seen": 1789397056.134504,
+    "ast_hash": "85daa000ba89b53b936a26a480281eeb",
     "semantic_hash": ""
   },
   "lib/quiz-management/data.ts": {
@@ -2106,21 +2106,21 @@
     "semantic_hash": ""
   },
   "locales/en/translation.json": {
-    "mtime": 1789194112.309068,
-    "seen": 1789213091.1026704,
-    "ast_hash": "a8477a95695cc3d9d9d4cb1edfb0f0c6",
+    "mtime": 1789396973.2980096,
+    "seen": 1789397056.134504,
+    "ast_hash": "48d4739c9270c24b132f53d27444b0ee",
     "semantic_hash": ""
   },
   "locales/fa/translation.json": {
-    "mtime": 1789194112.3110695,
-    "seen": 1789213091.1026704,
-    "ast_hash": "f5eee4f9142c9b1b5f9f22c44ba5c4ef",
+    "mtime": 1789396973.3000145,
+    "seen": 1789397056.134504,
+    "ast_hash": "f490c45ff4edc38841410779c39ba829",
     "semantic_hash": ""
   },
   "locales/it/translation.json": {
-    "mtime": 1789194112.3130991,
-    "seen": 1789213091.1026704,
-    "ast_hash": "a547daa65dab2bbfcea8557ac56d9f3d",
+    "mtime": 1789396973.3014274,
+    "seen": 1789397056.134504,
+    "ast_hash": "ec8bd87031bac14edbc6529c15cd1447",
     "semantic_hash": ""
   },
   "middleware.ts": {
@@ -2778,9 +2778,9 @@
     "semantic_hash": ""
   },
   "lib/auth/phone-accounts.ts": {
-    "mtime": 1788804345.9423952,
-    "seen": 1788805206.9421842,
-    "ast_hash": "06e8c228c4fba0935658afa81324af6b",
+    "mtime": 1789396916.3276575,
+    "seen": 1789397056.1340036,
+    "ast_hash": "d0333cca7c5150920404e792621da2a6",
     "semantic_hash": ""
   },
   "lib/auth/phone-auth-types.ts": {

@@ -57,6 +57,7 @@ export function UserRowActions({
   currentUserId,
   currentUserRole,
   currentUserPermissions,
+  phoneNumber,
   superAdminCount,
   plans,
   languageSlugs,
@@ -66,6 +67,8 @@ export function UserRowActions({
   currentUserRole: RoleSlug;
   /** The viewer's own effective permissions, overrides already merged. */
   currentUserPermissions: RolePermissions;
+  /** Undefined: the viewer may not see phone numbers. Null: none on file. */
+  phoneNumber?: string | null;
   superAdminCount: number;
   plans: GrantPlanOption[];
   languageSlugs: string[];
@@ -273,6 +276,7 @@ export function UserRowActions({
         open={profileOpen}
         onOpenChange={setProfileOpen}
         user={user}
+        phoneNumber={phoneNumber}
       />
       <ChangeRoleDialog
         open={roleDialogOpen}

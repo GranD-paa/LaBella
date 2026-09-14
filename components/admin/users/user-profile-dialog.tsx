@@ -28,10 +28,16 @@ export function UserProfileDialog({
   open,
   onOpenChange,
   user,
+  phoneNumber,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   user: ManagedUser;
+  /**
+   * Undefined when the viewer may not see phone numbers: the row is left out
+   * entirely. Null when they may, and this account has none on file.
+   */
+  phoneNumber?: string | null;
 }) {
   const { t, formatDate } = useTranslations();
   const definition = ROLE_DEFINITIONS[user.role];
@@ -65,6 +71,26 @@ export function UserProfileDialog({
               <dd className="break-all font-medium">
                 {user.email || t("admin.users.noEmail")}
               </dd>
+
+              {phoneNumber !== undefined ? (
+                <>
+                  <dt className="text-muted-foreground">
+                    {t("admin.users.profileDialog.phone")}
+                  </dt>
+                  <dd className="font-medium">
+                    {phoneNumber ? (
+                      // Stored as +98…; shown the way an Iranian number is
+                      // written and read aloud, 0912…, and kept left-to-right
+                      // so the digits do not reorder inside a Persian line.
+                      <span dir="ltr" className="tabular-nums">
+                        {phoneNumber.replace(/^\+98/, "0")}
+                      </span>
+                    ) : (
+                      t("admin.users.profileDialog.noPhone")
+                    )}
+                  </dd>
+                </>
+              ) : null}
 
               <dt className="text-muted-foreground">
                 {t("admin.users.profileDialog.role")}
