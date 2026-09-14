@@ -55,6 +55,9 @@ export const config = {
      *
      * Each carries its own authentication instead of the session cookie:
      * - api/cron      -> CRON_SECRET bearer token (isAuthorizedCronRequest)
+     * - api/agent     -> the same CRON_SECRET bearer; it is the blog agent's
+     *                    scheduled tick, called by an ArvanCloud CronJob that
+     *                    has no more of a session than Vercel's cron did
      * - api/webhooks  -> provider HMAC signature (verifyStripeWebhook)
      * - api/payments  -> the gateway is re-asked server-to-server whether the
      *                    payment succeeded, quoting the amount from our own
@@ -70,6 +73,6 @@ export const config = {
      * to someone who already knows an unguessable UUID, exactly as the public
      * Supabase Storage bucket it replaced did.
      */
-    "/((?!_next/static|_next/image|favicon.ico|api/cron|api/webhooks|api/payments|api/banner-images|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/cron|api/agent|api/webhooks|api/payments|api/banner-images|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

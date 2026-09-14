@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { BlogPostList } from "@/components/admin/blog/blog-post-list";
 import { ErrorState } from "@/components/errors/error-state";
 import { getDataRepository } from "@/lib/data";
+import { hasPermission } from "@/lib/permissions/admin-nav";
 import { requireAdminPage } from "@/lib/supabase/admin-guard";
 
 export const metadata: Metadata = { title: "وبلاگ — مدیریت" };
 
 export default async function AdminBlogPage() {
-  await requireAdminPage("manageBlog");
+  const { permissions } = await requireAdminPage("manageBlog");
 
   const repo = getDataRepository();
 
@@ -42,5 +43,15 @@ export default async function AdminBlogPage() {
     );
   }
 
-  return <BlogPostList posts={posts} categories={categories} />;
+  return (
+    <BlogPostList
+      posts={posts}
+      categories={categories}
+      // The agent is a super-admin surface; writers get the list without the
+      // door to it.
+      agentHref={
+        hasPermission(permissions, "fullAccess") ? "/admin/blog/agent" : undefined
+      }
+    />
+  );
 }

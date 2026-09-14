@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { requireAdminPermission } from "@/lib/auth/action-guards";
@@ -9,6 +8,7 @@ import {
   markdownToPlainText,
 } from "@/lib/blog/markdown";
 import { getBlogLanguage } from "@/lib/blog/languages";
+import { revalidateBlog } from "@/lib/blog/revalidate";
 import { slugifyTitle, type BlogImage } from "@/lib/blog/types";
 import { getDataRepository } from "@/lib/data";
 import type { ActionResult } from "@/lib/action-result";
@@ -151,39 +151,6 @@ export async function deleteBlogPostAction(id: string): Promise<ActionResult> {
 
   revalidateBlog();
   return { success: true };
-}
-
-/**
- * Clears the cached copy of every page a post appears on.
- *
- * A post is not one page. It is the post itself, the index, the category page
- * for each of its categories, the hub for each of its languages, the feed, and
- * the sitemap — and the blog refactor turned the categories and hubs into real
- * routes, so revalidating `/blog` alone now leaves six stale pages behind
- * instead of none. Editing a post used to be the only way to notice.
- *
- * Called with no arguments when a post is deleted: the slug is gone, and
- * everything a deletion could affect is in the list below anyway.
- */
-function revalidateBlog(
-  slug?: string,
-  categorySlugs: string[] = [],
-  languageSlugs: string[] = []
-) {
-  revalidatePath("/blog");
-  revalidatePath("/admin/blog");
-  revalidatePath("/sitemap.xml");
-  revalidatePath("/blog/rss.xml");
-  revalidatePath("/llms.txt");
-
-  if (slug) revalidatePath(`/blog/${slug}`);
-
-  for (const categorySlug of categorySlugs) {
-    revalidatePath(`/blog/category/${categorySlug}`);
-  }
-  for (const languageSlug of languageSlugs) {
-    revalidatePath(`/blog/language/${languageSlug}`);
-  }
 }
 
 export type BlogImageUploadState = {

@@ -9,7 +9,9 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "messages:export": "node scripts/export-locales.mjs"
+    "messages:export": "node scripts/export-locales.mjs",
+    "agent:topics": "node scripts/blog-agent.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1127.0",

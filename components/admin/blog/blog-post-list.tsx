@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
+  Bot,
   ExternalLink,
   FileText,
   Pencil,
@@ -31,9 +32,12 @@ import type { BlogCategory, BlogPost } from "@/lib/blog/types";
 export function BlogPostList({
   posts,
   categories,
+  agentHref,
 }: {
   posts: BlogPost[];
   categories: BlogCategory[];
+  /** Set only for roles allowed to open the blog agent. */
+  agentHref?: string;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -72,13 +76,21 @@ export function BlogPostList({
               {posts.length.toLocaleString("fa-IR")} مطلب، که{" "}
               {published.toLocaleString("fa-IR")} تای آن منتشر شده است.
             </p>
-            <div>
+            <div className="flex flex-wrap gap-2">
               <Button asChild>
                 <Link href="/admin/blog/new">
                   <Plus className="me-1 h-4 w-4" />
                   مطلب جدید
                 </Link>
               </Button>
+              {agentHref ? (
+                <Button variant="outline" className="border-white/20" asChild>
+                  <Link href={agentHref}>
+                    <Bot className="me-1 h-4 w-4" />
+                    ایجنت وبلاگ
+                  </Link>
+                </Button>
+              ) : null}
             </div>
           </div>
 
