@@ -11,6 +11,8 @@ export const adminUsersFa = {
   statusSuspended: "معلق",
   noUsers: "هنوز کاربری ثبت‌نام نکرده است.",
   noResults: "کاربری مطابق با جست‌وجو یا فیلترهای شما یافت نشد.",
+  listCapped: "نمایش {shown} نفر از {total} نفر؛ بقیه را جست‌وجو کنید.",
+  listCappedFiltered: "نمایش {shown} نتیجه از {total} نتیجه؛ جست‌وجو را دقیق‌تر کنید.",
   columnUser: "کاربر",
   columnEmail: "ایمیل",
   columnStatus: "وضعیت",

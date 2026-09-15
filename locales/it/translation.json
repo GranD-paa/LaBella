@@ -793,6 +793,8 @@
       "statusSuspended": "Sospeso",
       "noUsers": "Nessun utente registrato ancora.",
       "noResults": "Nessun utente corrisponde alla ricerca o ai filtri.",
+      "listCapped": "Mostrati {shown} di {total} utenti. Cerca per trovare gli altri.",
+      "listCappedFiltered": "Mostrati {shown} di {total} risultati. Affina la ricerca per vedere gli altri.",
       "columnUser": "Utente",
       "columnEmail": "Email",
       "columnStatus": "Stato",

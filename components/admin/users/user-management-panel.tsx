@@ -11,6 +11,10 @@ import type { GrantPlanOption } from "@/components/admin/users/grant-subscriptio
 import { RoleBadge } from "@/components/admin/users/role-badge";
 import { StatusBadge } from "@/components/admin/users/status-badge";
 import type { ManagedUser } from "@/components/admin/users/types";
+import {
+  VISIBLE_USER_LIMIT,
+  orderUsersForTable,
+} from "@/components/admin/users/user-list-order";
 import { UserRowActions } from "@/components/admin/users/user-row-actions";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -72,7 +76,7 @@ export function UserManagementPanel({
   plans: GrantPlanOption[];
   languageSlugs: string[];
 }) {
-  const { t, formatDate } = useTranslations();
+  const { t, formatDate, locale } = useTranslations();
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<RoleSlug | "all">("all");
   const [statusFilter, setStatusFilter] = useState<UserStatus | "all">("all");
@@ -120,7 +124,7 @@ export function UserManagementPanel({
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return users.filter((user) => {
+    const matches = users.filter((user) => {
       if (roleFilter !== "all" && user.role !== roleFilter) return false;
       if (statusFilter !== "all" && user.status !== statusFilter) return false;
       if (!query) return true;
@@ -130,7 +134,16 @@ export function UserManagementPanel({
         user.id.toLowerCase().includes(query)
       );
     });
+    return orderUsersForTable(matches);
   }, [users, search, roleFilter, statusFilter]);
+
+  // A dozen rows keeps the page short. Everyone past them is still one search
+  // away, and the line under the table says how many are waiting there.
+  const visibleUsers = filtered.slice(0, VISIBLE_USER_LIMIT);
+  const isNarrowed =
+    search.trim() !== "" || roleFilter !== "all" || statusFilter !== "all";
+  const formatCount = (value: number) =>
+    new Intl.NumberFormat(locale).format(value);
 
   return (
     <Card className="brand-surface">
@@ -144,7 +157,7 @@ export function UserManagementPanel({
             <CardDescription>{t("admin.users.description")}</CardDescription>
           </div>
           <Badge variant="outline" className="font-normal">
-            {t("admin.users.totalUsers", { count: users.length })}
+            {t("admin.users.totalUsers", { count: formatCount(users.length) })}
           </Badge>
         </div>
 
@@ -225,7 +238,7 @@ export function UserManagementPanel({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((user) => {
+                {visibleUsers.map((user) => {
                   const displayName = user.fullName || t("admin.users.unnamed");
                   const isSelf = user.id === currentUserId;
 
@@ -296,6 +309,19 @@ export function UserManagementPanel({
             </Table>
           </div>
         )}
+        {filtered.length > visibleUsers.length ? (
+          <p className="mt-3 text-center text-xs text-muted-foreground">
+            {t(
+              isNarrowed
+                ? "admin.users.listCappedFiltered"
+                : "admin.users.listCapped",
+              {
+                shown: formatCount(visibleUsers.length),
+                total: formatCount(filtered.length),
+              }
+            )}
+          </p>
+        ) : null}
       </CardContent>
     </Card>
   );

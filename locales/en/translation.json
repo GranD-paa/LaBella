@@ -793,6 +793,8 @@
       "statusSuspended": "Suspended",
       "noUsers": "No users registered yet.",
       "noResults": "No users match your search or filters.",
+      "listCapped": "Showing {shown} of {total} users. Search to find the rest.",
+      "listCappedFiltered": "Showing {shown} of {total} matches. Narrow your search to see the rest.",
       "columnUser": "User",
       "columnEmail": "Email",
       "columnStatus": "Status",
