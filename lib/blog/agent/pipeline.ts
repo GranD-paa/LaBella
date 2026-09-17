@@ -6,6 +6,12 @@ import {
 } from "@/lib/ai/arvan";
 import { costToman } from "@/lib/ai/pricing";
 import {
+  describeVerdict,
+  failsRun,
+  holdsPublication,
+  reviewArticle,
+} from "@/lib/blog/agent/gate";
+import {
   loadAgentConfig,
   type ResolvedAgentConfig,
 } from "@/lib/blog/agent/config";
@@ -257,6 +263,35 @@ async function runTopic(
     const article = normalise(parsed.data, context, notes);
     const slug = await uniqueSlug(article.slug, notes);
 
+    // ----------------------------------------------------------------- gate
+    // Before the cover, not after it. The image is about half what a run
+    // costs, and an article that is not going out does not need one drawn.
+    const gateStarted = Date.now();
+    const verdict = await reviewArticle({
+      queuedTopic: topic.topic,
+      title: article.title,
+      summary: article.summary,
+      body: article.content,
+      imagePrompt: article.imagePrompt,
+      existingPosts: context.existingPosts,
+    });
+    steps.push({
+      name: "gate",
+      durationMs: Date.now() - gateStarted,
+      promptTokens: verdict.inputTokens,
+      note: describeVerdict(verdict),
+    });
+    for (const reason of verdict.reasons) notes.push(reason);
+
+    if (failsRun(verdict)) {
+      throw new Error(`بازبینی مقاله را رد کرد: ${verdict.reasons.join(" ")}`);
+    }
+
+    const heldBack = holdsPublication(verdict);
+    if (heldBack) {
+      notes.push("مقاله به‌جای انتشار، پیش‌نویس ماند تا خودتان ببینید.");
+    }
+
     // ---------------------------------------------------------------- cover
     let coverUrl: string | null = null;
     if (imageModel) {
@@ -290,7 +325,7 @@ async function runTopic(
       article,
       slug,
       coverUrl,
-      status: config.autoPublish ? "published" : "draft",
+      status: config.autoPublish && !heldBack ? "published" : "draft",
       noindex: config.noindex,
       authorId: config.authorProfileId,
     });
