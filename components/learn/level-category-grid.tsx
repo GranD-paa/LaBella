@@ -122,7 +122,7 @@ export function LevelCategoryGrid({ language, level }: LevelCategoryGridProps) {
                   <span className="inline-flex items-center gap-1 text-sm font-semibold text-brand-accent transition-transform group-hover:gap-2">
                     {t("common.openModule")}
                     <span aria-hidden className="transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5">
-                      ←
+                      →
                     </span>
                   </span>
                 </CardContent>

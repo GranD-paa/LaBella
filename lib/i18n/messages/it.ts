@@ -24,7 +24,7 @@ export const it: Messages = {
     new: "Nuovo",
     admin: "Admin",
     learner: "Studente",
-    openModule: "Apri modulo →",
+    openModule: "Apri modulo",
     saving: "Salvataggio...",
     saveChanges: "Salva modifiche",
     deleting: "Eliminazione...",

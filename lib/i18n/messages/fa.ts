@@ -24,7 +24,7 @@ export const fa: Messages = {
     new: "جدید",
     admin: "مدیر",
     learner: "یادگیرنده",
-    openModule: "باز کردن بخش ←",
+    openModule: "باز کردن بخش",
     saving: "در حال ذخیره...",
     saveChanges: "ذخیره تغییرات",
     deleting: "در حال حذف...",

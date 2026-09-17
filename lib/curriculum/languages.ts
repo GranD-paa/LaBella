@@ -61,16 +61,16 @@ export const LANGUAGES: CurriculumLanguage[] = [
 
 export const CATEGORY_DEFINITIONS: CategoryDefinition[] = [
   {
-    slug: "grammar",
-    title: "Grammar",
-    description: "Structured grammar lessons with clear explanations and examples.",
-    href: (language, level) => `/learn/${language}/${level}/grammar`,
-  },
-  {
     slug: "vocabulary",
     title: "Important Vocabulary",
     description: "Essential words and phrases organized by topic.",
     href: (language, level) => `/learn/${language}/${level}/vocabulary`,
+  },
+  {
+    slug: "grammar",
+    title: "Grammar",
+    description: "Structured grammar lessons with clear explanations and examples.",
+    href: (language, level) => `/learn/${language}/${level}/grammar`,
   },
   {
     slug: "visual",

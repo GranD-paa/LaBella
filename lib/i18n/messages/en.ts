@@ -23,7 +23,7 @@ export const en = {
     new: "New",
     admin: "Admin",
     learner: "Learner",
-    openModule: "Open module →",
+    openModule: "Open module",
     saving: "Saving...",
     saveChanges: "Save changes",
     deleting: "Deleting...",
