@@ -16,6 +16,11 @@ const nextConfig = {
   output: "standalone",
   poweredByHeader: false,
   compress: true,
+  experimental: {
+    // Lets `instrumentation.ts` run on server boot, which is what starts the
+    // scheduled exchange-rate refresh.
+    instrumentationHook: true,
+  },
   images: {
     remotePatterns: [
       ...(supabaseHostname
