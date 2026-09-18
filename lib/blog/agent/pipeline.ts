@@ -28,6 +28,7 @@ import {
 import {
   articleSchema,
   buildArticleJsonSchema,
+  fitMetaDescription,
   TITLE_ONLY_JSON_SCHEMA,
   type Article,
 } from "@/lib/blog/agent/schema";
@@ -511,11 +512,15 @@ async function loadContext() {
  * top of the body, a category slug that is not one of ours, a link to a post
  * that does not exist.
  */
+/** An article with every repairable field repaired, so `metaDescription` is
+ *  a string from here on rather than something the model may have omitted. */
+type NormalisedArticle = Article & { metaDescription: string };
+
 function normalise(
   article: Article,
   context: { categories: { slug: string }[]; existingPosts: ExistingPost[] },
   notes: string[]
-): Article {
+): NormalisedArticle {
   const taxonomies = resolveTaxonomies(
     article.categorySlugs,
     article.languageSlugs,
@@ -544,6 +549,11 @@ function normalise(
   return {
     ...article,
     content,
+    metaDescription: fitMetaDescription(
+      article.metaDescription,
+      article.summary,
+      notes
+    ),
     categorySlugs: taxonomies.categorySlugs,
     languageSlugs: taxonomies.languageSlugs,
     slug: deriveSlug(article.slug, article.title),

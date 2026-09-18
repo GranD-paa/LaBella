@@ -42,7 +42,7 @@ export const articleSchema = z.object({
    * space it was given. The ceiling used to be 200 and the model wrote to it;
    * a range in the description is a suggestion, a `max` is the only number a
    * model actually respects. */
-  metaDescription: z.string().trim().min(80).max(158),
+  metaDescription: z.string().trim().max(400).nullish(),
 
   /** Describes the cover for anyone who cannot see it. Persian. */
   coverImageAlt: z.string().trim().min(10).max(200),
@@ -110,6 +110,53 @@ export const articleSchema = z.object({
 });
 
 export type Article = z.infer<typeof articleSchema>;
+
+/**
+ * A meta description that is always inside Google's window.
+ *
+ * The model is asked for one and usually writes a good one, but "usually" was
+ * being enforced by throwing the whole article away: a run that had already
+ * paid for eight thousand prompt tokens and a finished article failed on a
+ * missing field and cost 5,844 toman for nothing. Nothing about the article
+ * was wrong — one field of fourteen was absent.
+ *
+ * So the range is repaired here instead. `summary` is guaranteed by the schema
+ * to be sixty characters or more and is written to be the article's answer in
+ * two or three sentences, which is exactly what a meta description wants, so
+ * it is the fallback. A description that runs long is cut at a word boundary
+ * rather than mid-word.
+ */
+export function fitMetaDescription(
+  proposed: string | null | undefined,
+  summary: string,
+  notes: string[]
+): string {
+  const CEILING = 155;
+  const FLOOR = 80;
+
+  let text = (proposed ?? "").trim();
+  const fellBack = text.length < FLOOR;
+  if (fellBack) {
+    notes.push(
+      text.length === 0
+        ? "مدل توضیح متا ننوشت؛ از خلاصهٔ مقاله ساخته شد."
+        : "توضیح متای مدل کوتاه‌تر از حد لازم بود؛ از خلاصهٔ مقاله ساخته شد."
+    );
+    text = summary.trim();
+  }
+  if (text.length <= CEILING) return text;
+
+  const cut = text.slice(0, CEILING + 1);
+  const lastSpace = cut.lastIndexOf(" ");
+  const trimmed = (lastSpace > FLOOR ? cut.slice(0, lastSpace) : text.slice(0, CEILING))
+    .replace(/[\s،؛:-]+$/, "")
+    .trim();
+  // A summary is written to be longer than a meta description, so shortening
+  // one is the expected path and not worth a line in the run log. Only the
+  // model overrunning its own ceiling is worth saying.
+  if (!fellBack) notes.push("توضیح متا بلندتر از سقف بود و از مرز کلمه کوتاه شد.");
+  return trimmed;
+}
 
 const ARTICLE_TITLE_RULE =
   "عنوان فارسی مقاله، بین ۴۵ تا ۶۵ کاراکتر. موضوعی که به تو داده شده «سفارش» است، نه عنوان؛ آن را عیناً کپی نکن. عنوان باید دو چیز داشته باشد: گیرِ مشخصی که خواننده با آن آمده، و یک جزء مشخص از خود مقاله — کلمه‌ای که یاد می‌دهد یا تفاوتی که نشان می‌دهد. کلیدواژهٔ اصلی باید در عنوان باشد، ولی لازم نیست اول آن بیاید. عدد را فقط وقتی بنویس که در متن شمرده باشی.";
