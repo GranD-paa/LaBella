@@ -955,10 +955,10 @@
   flex: 1;
   min-width: 1.25rem;
   height: 1px;
-  opacity: 0.55;
+  opacity: 0.7;
   background-image: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.5) 0.5px,
+    rgba(255, 255, 255, 0.55) 0.5px,
     transparent 0.5px
   );
   background-size: 7px 1px;

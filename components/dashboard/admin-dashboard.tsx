@@ -59,11 +59,11 @@ function Figure({
 }) {
   return (
     <div className="ac-fig px-6 py-7 sm:px-8 sm:py-9">
-      <p className="text-xs font-medium text-white/45">{label}</p>
+      <p className="text-[0.8125rem] text-muted-foreground">{label}</p>
       {/* Spacing lives with the type in globals.css: the figure carries padding
           the gradient needs, and margins that cancel it out. */}
       <p className="ac-fig-value">{value}</p>
-      <p className="mt-3 text-xs text-white/35">{note}</p>
+      <p className="mt-3 text-[0.8125rem] font-medium text-muted-foreground/70">{note}</p>
     </div>
   );
 }
@@ -105,14 +105,14 @@ export function AdminDashboard({
       <span className="ac-sheen" aria-hidden />
       <div className="ac-zone flex flex-wrap items-end justify-between gap-6 px-6 pb-8 pt-7 sm:px-10 sm:pb-10 sm:pt-9">
         <div className="min-w-0">
-          <p className="flex items-center gap-2.5 text-xs font-medium text-white/55">
+          <p className="flex items-center gap-2.5 text-[0.8125rem] font-medium text-foreground/80">
             <span className="ac-eyebrow-dot" aria-hidden />
             {t("dashboard.admin.badge")}
           </p>
           <h1 className="ac-title mt-4">
             {t("dashboard.admin.hello", { name: displayName })}
           </h1>
-          <p className="mt-3.5 max-w-[46ch] text-[0.9375rem]/[1.9] text-white/45">
+          <p className="mt-3.5 max-w-[46ch] text-[0.9375rem]/[1.9] text-muted-foreground">
             {t("dashboard.admin.subtitle")}
           </p>
         </div>
@@ -174,15 +174,15 @@ export function AdminDashboard({
             return (
               <Link key={item.href} href={item.href} className="ac-row">
                 <Icon
-                  className="ac-row-icon h-[1.05rem] w-[1.05rem] shrink-0 text-white/35"
+                  className="ac-row-icon h-[1.05rem] w-[1.05rem] shrink-0 text-foreground/60"
                   aria-hidden
                 />
-                <span className="min-w-0 truncate text-[0.9375rem] font-medium text-white/85">
+                <span className="min-w-0 truncate text-[0.9375rem] font-medium text-foreground/95">
                   {item.labelKey ? t(item.labelKey) : item.label}
                 </span>
                 <span className="ac-leader" aria-hidden />
                 <ChevronRight
-                  className="ac-chev h-4 w-4 shrink-0 text-white/25 rtl:rotate-180"
+                  className="ac-chev h-4 w-4 shrink-0 text-foreground/45 rtl:rotate-180"
                   aria-hidden
                 />
               </Link>
@@ -194,23 +194,23 @@ export function AdminDashboard({
       {showLedger ? (
         <div className="ac-zone ac-groove">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-6 pb-5 pt-7 sm:px-10 sm:pt-8">
-            <h2 className="text-[0.9375rem] font-semibold text-white/90">
+            <h2 className="text-[0.9375rem] font-semibold text-foreground">
               {t("dashboard.admin.recentActivity")}
             </h2>
             {data.recentActivity.length > 0 ? (
-              <span className="text-xs tabular-nums text-white/40">
+              <span className="text-[0.8125rem] tabular-nums text-muted-foreground">
                 {t("dashboard.admin.activityCount", {
                   count: data.recentActivity.length,
                 })}
               </span>
             ) : null}
-            <p className="text-xs text-white/35">
+            <p className="text-[0.8125rem] font-medium text-muted-foreground/70">
               {t("dashboard.admin.recentActivityHint")}
             </p>
           </div>
 
           {data.recentActivity.length === 0 ? (
-            <p className="px-6 pb-12 pt-5 text-center text-sm text-white/35">
+            <p className="px-6 pb-12 pt-5 text-center text-sm text-muted-foreground">
               {t("dashboard.admin.noActivity")}
             </p>
           ) : (
@@ -220,14 +220,14 @@ export function AdminDashboard({
                   key={activity.id}
                   className="flex items-center gap-3.5 px-6 py-3 sm:px-10"
                 >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-500/[0.18] text-[0.8125rem] font-semibold text-violet-100/85 ring-1 ring-inset ring-white/[0.07]">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-500/[0.18] text-[0.8125rem] font-semibold text-violet-50 ring-1 ring-inset ring-white/[0.09]">
                     {getInitial(activity.userName)}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-white/85">
+                    <p className="truncate text-sm font-medium text-foreground">
                       {activity.userName}
                     </p>
-                    <p className="truncate text-xs text-white/40">
+                    <p className="truncate text-[0.8125rem] font-medium text-muted-foreground/75">
                       {activity.quizTitle}
                     </p>
                   </div>
@@ -240,7 +240,7 @@ export function AdminDashboard({
                     >
                       {activity.score}%
                     </p>
-                    <p className="mt-0.5 text-[0.6875rem] text-white/30">
+                    <p className="mt-0.5 text-xs font-medium text-muted-foreground/70">
                       {formatDate(activity.createdAt, {
                         dateStyle: "short",
                         timeStyle: "short",
