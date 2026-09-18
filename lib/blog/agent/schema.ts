@@ -120,6 +120,16 @@ export type Article = z.infer<typeof articleSchema>;
  * silently drops unknown slugs on the way in, so an invented one would not
  * error — it would just quietly fail to appear, which is worse.
  *
+ * **The order of the fields is part of the prompt.** The model emits them in
+ * the order they are listed, so a field written before `content` can only
+ * draw on the brief, and a field written after it can draw on the article.
+ * That is not a guess: `imagePrompt` has always come after `content` and its
+ * "name one particular from this article" rule works, while `title` came
+ * first and the same rule did nothing — the agent kept handing back the
+ * queued subject as the title because, at that point, it had nothing else.
+ * So `summary` stays ahead of `content` as the plan, and `title` and the meta
+ * fields moved behind it, which is also the order a person would work in.
+ *
  * `strict: true` additionally requires every property to be listed in
  * `required` and `additionalProperties: false` throughout, which is why
  * nullable fields are spelled as a two-member type rather than left optional.
@@ -132,10 +142,10 @@ export function buildArticleJsonSchema(
     type: "object",
     additionalProperties: false,
     required: [
-      "title",
       "slug",
       "summary",
       "content",
+      "title",
       "metaTitle",
       "metaDescription",
       "coverImageAlt",
@@ -148,11 +158,6 @@ export function buildArticleJsonSchema(
       "internalLinks",
     ],
     properties: {
-      title: {
-        type: "string",
-        description:
-          "عنوان فارسی مقاله. بین ۴۵ تا ۶۵ کاراکتر. کلیدواژه اصلی در ابتدای عنوان بیاید.",
-      },
       slug: {
         type: "string",
         description:
@@ -167,6 +172,11 @@ export function buildArticleJsonSchema(
         type: "string",
         description:
           "متن کامل مقاله در قالب مارک‌داون. حداکثر ۶ بخش با ## و زیربخش‌ها با ###. بدون تکرار عنوان اصلی در ابتدای متن.",
+      },
+      title: {
+        type: "string",
+        description:
+          "عنوان فارسی مقاله، بین ۴۵ تا ۶۵ کاراکتر. موضوعی که به تو داده شده «سفارش» است، نه عنوان؛ آن را عیناً کپی نکن. عنوان باید دو چیز داشته باشد: گیرِ مشخصی که خواننده با آن آمده، و یک جزء مشخص از خود مقاله — کلمه‌ای که یاد می‌دهد یا تفاوتی که نشان می‌دهد. کلیدواژهٔ اصلی باید در عنوان باشد، ولی لازم نیست اول آن بیاید. عدد را فقط وقتی بنویس که در متن شمرده باشی.",
       },
       metaTitle: {
         type: ["string", "null"],
