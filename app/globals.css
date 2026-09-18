@@ -615,3 +615,207 @@
     animation: none;
   }
 }
+
+/* -------------------------------------------------------------------------
+   The admin console — the dashboard an admin lands on, and the masthead that
+   opens /admin.
+
+   Everything here is namespaced `ac-` and additive: no rule above is touched,
+   so removing this block returns the console to the shared card styling it
+   used before. Tailwind carries the rest; these are the four things a utility
+   cannot say without changing the config for every page — a light source that
+   knows which way the page reads, dividers that redraw themselves when the
+   grid changes shape, hover gated to real pointers, and one entrance.
+   ------------------------------------------------------------------------- */
+
+.ac-console {
+  --ac-line: rgba(255, 255, 255, 0.07);
+  --ac-ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* A single light source, falling from the corner the reader starts at. Only
+   the position flips for English and Italian; the colour never does. */
+.ac-masthead {
+  --ac-bloom: 86%;
+  position: relative;
+  overflow: hidden;
+}
+
+[dir="ltr"] .ac-masthead {
+  --ac-bloom: 14%;
+}
+
+.ac-masthead::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      115% 150% at var(--ac-bloom) -35%,
+      rgba(114, 9, 183, 0.42) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      80% 120% at calc(100% - var(--ac-bloom)) 135%,
+      rgba(60, 9, 108, 0.4) 0%,
+      transparent 58%
+    );
+}
+
+/* Readings on one instrument, not four cards in a row. The cell count changes
+   with the role, so the dividers are drawn by position rather than spelled out
+   per cell: column flow lets three readings fill the panel as evenly as four. */
+.ac-vitals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ac-vitals > * {
+  border-top: 1px solid var(--ac-line);
+  border-inline-start: 1px solid var(--ac-line);
+}
+
+.ac-vitals > :nth-child(-n + 2) {
+  border-top: 0;
+}
+
+.ac-vitals > :nth-child(odd) {
+  border-inline-start: 0;
+}
+
+@media (min-width: 1024px) {
+  .ac-vitals {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+
+  .ac-vitals > * {
+    border-top: 0;
+    border-inline-start: 1px solid var(--ac-line);
+  }
+
+  .ac-vitals > :first-child {
+    border-inline-start: 0;
+  }
+}
+
+.ac-display {
+  font-size: clamp(1.75rem, 1.15rem + 2.1vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1.22;
+}
+
+/* Tabular figures so the four readings share a baseline grid and a 9 is
+   exactly as wide as a 1. The tight tracking is safe here and nowhere near
+   the Persian text: these strings are only ever digits and a percent sign. */
+.ac-figure {
+  font-size: clamp(1.9rem, 1.4rem + 1.5vw, 2.55rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The console's only entrance: the readings arrive as one short wave, once,
+   and nothing else on the page moves on load. An admin opens this screen
+   several times a day, so it is deliberately small and nearly over before it
+   is noticed. */
+@keyframes ac-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ac-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ac-wave > * {
+  animation: ac-rise 260ms var(--ac-ease) both;
+}
+
+.ac-wave > :nth-child(2) {
+  animation-delay: 45ms;
+}
+
+.ac-wave > :nth-child(3) {
+  animation-delay: 90ms;
+}
+
+.ac-wave > :nth-child(4) {
+  animation-delay: 135ms;
+}
+
+.ac-tile {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 140ms var(--ac-ease);
+}
+
+.ac-tile:active {
+  transform: scale(0.985);
+}
+
+.ac-tile:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+.ac-tile-chip,
+.ac-chev {
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms var(--ac-ease);
+}
+
+/* Gold is the colour of the thing you are about to do, and hover only ever
+   reaches one tile — so the accent stays rare while every destination can
+   still claim it. Gated, because a tap on a phone fires a hover that sticks. */
+@media (hover: hover) and (pointer: fine) {
+  .ac-tile:hover {
+    background-color: rgba(255, 255, 255, 0.055);
+    border-color: rgba(251, 191, 36, 0.3);
+  }
+
+  .ac-tile:hover .ac-tile-chip {
+    background-color: rgba(251, 191, 36, 0.14);
+    color: #fbbf24;
+  }
+
+  [dir="rtl"] .ac-tile:hover .ac-chev {
+    transform: translateX(-3px);
+  }
+
+  [dir="ltr"] .ac-tile:hover .ac-chev {
+    transform: translateX(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ac-wave > * {
+    animation: ac-appear 200ms ease both;
+  }
+
+  .ac-tile,
+  .ac-tile:active,
+  .ac-tile-chip,
+  .ac-chev {
+    transform: none;
+  }
+}

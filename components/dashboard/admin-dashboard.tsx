@@ -1,34 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
 import {
-  Activity,
   ArrowLeft,
-  BarChart3,
-  CheckCircle2,
+  ChevronRight,
   CreditCard,
   FileText,
-  Gauge,
   ImageIcon,
   Landmark,
   Languages,
   ListChecks,
   Receipt,
-  ShieldCheck,
   Users,
 } from "lucide-react";
 
-import { StatCard } from "@/components/dashboard/stat-card";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import type { AdminDashboardData } from "@/lib/dashboard-data";
 import type { AdminNavItem } from "@/lib/permissions/admin-nav";
 import type { RolePermissions } from "@/lib/permissions/roles";
@@ -44,6 +34,10 @@ const NAV_ICONS = {
   Landmark,
 } as const;
 
+/** The console's panels all sit on the same surface, one step above the page. */
+const PANEL =
+  "rounded-2xl border border-white/10 bg-[#12002a]/75 shadow-brand backdrop-blur-sm";
+
 function scoreBadgeClassName(score: number) {
   if (score >= 80) {
     return "border-emerald-400/30 bg-emerald-500/15 text-emerald-300";
@@ -56,6 +50,64 @@ function scoreBadgeClassName(score: number) {
 
 function getInitial(name: string) {
   return name.trim().charAt(0).toUpperCase() || "?";
+}
+
+/**
+ * One reading on the instrument panel.
+ *
+ * A number nobody has produced yet is dimmed rather than dressed up. On a
+ * platform with three learners and no attempts, that leaves exactly one figure
+ * at full contrast — which is the honest picture, and a more useful one than
+ * four identical zeros shouting at the same volume.
+ */
+function Vital({
+  label,
+  value,
+  hint,
+  quiet,
+}: {
+  label: string;
+  value: string | number;
+  hint: string;
+  quiet: boolean;
+}) {
+  return (
+    <div className="px-5 py-5 sm:px-6">
+      <p className="text-[0.8125rem] text-muted-foreground">{label}</p>
+      <p
+        className={cn(
+          "ac-figure mt-2",
+          quiet ? "text-foreground/40" : "text-foreground"
+        )}
+      >
+        {value}
+      </p>
+      <p className="mt-1.5 text-xs text-muted-foreground/70">{hint}</p>
+    </div>
+  );
+}
+
+/**
+ * The sentence under a panel title qualifies the title, so it sits beside it
+ * rather than pinned to the far end of a 1200px bar, where it reads as an
+ * unrelated caption that happened to land in the same row.
+ */
+function PanelHeader({
+  title,
+  hint,
+  aside,
+}: {
+  title: string;
+  hint: string;
+  aside?: React.ReactNode;
+}) {
+  return (
+    <header className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-white/[0.07] px-5 py-4 sm:px-6">
+      <h2 className="text-[0.9375rem] font-semibold">{title}</h2>
+      {aside}
+      <p className="text-xs text-muted-foreground/70">{hint}</p>
+    </header>
+  );
 }
 
 export function AdminDashboard({
@@ -85,20 +137,25 @@ export function AdminDashboard({
     permissions.manageContent ||
     permissions.manageQuizzes;
 
+  // Destinations and the activity feed share the bottom row, and either one can
+  // be absent for a role — so each takes the whole row when the other is gone
+  // rather than leaving a column of empty page behind it.
+  const showDestinations = !showFullManagement && navItems.length > 0;
+  const showActivity = !showFullManagement && canSeeContent;
+
   return (
-    <div className="space-y-8">
-      <section className="brand-surface relative overflow-hidden p-6 sm:p-8">
-        <div className="absolute inset-0 bg-brand-gradient opacity-25" />
-        <div className="relative flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-3">
-            <Badge className="border-brand-accent/30 bg-brand-accent/10 text-brand-accent hover:bg-brand-accent/15">
-              <ShieldCheck className="me-1 h-3 w-3" />
+    <div className="ac-console space-y-4 sm:space-y-5">
+      <section className={cn("ac-masthead", PANEL)}>
+        <div className="relative flex flex-wrap items-end justify-between gap-6 p-6 sm:px-8 sm:py-7">
+          <div className="min-w-0 space-y-3">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-foreground/85">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-accent" />
               {t("dashboard.admin.badge")}
-            </Badge>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            </span>
+            <h1 className="ac-display">
               {t("dashboard.admin.hello", { name: displayName })}
             </h1>
-            <p className="max-w-2xl text-muted-foreground">
+            <p className="max-w-[48ch] text-[0.9375rem]/[1.85] text-muted-foreground">
               {t("dashboard.admin.subtitle")}
             </p>
           </div>
@@ -109,125 +166,129 @@ export function AdminDashboard({
                 {t("profile.backToDashboard")}
               </Link>
             </Button>
-          ) : (
-            <div className="flex w-full flex-col gap-2 sm:w-64">
-              {navItems.map((item) => {
-                const Icon = NAV_ICONS[item.icon];
-                return (
-                  <Button
-                    key={item.href}
-                    asChild
-                    variant="outline"
-                    className="w-full justify-start border-white/20"
-                  >
-                    <Link href={item.href}>
-                      <Icon className="h-4 w-4" />
-                      {item.labelKey ? t(item.labelKey) : item.label}
-                    </Link>
-                  </Button>
-                );
-              })}
-            </div>
-          )}
+          ) : null}
         </div>
       </section>
 
       {!showFullManagement && (canSeeLearners || canSeeContent) ? (
-        <section>
-          <Card className="brand-surface">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Gauge className="h-5 w-5 text-brand-accent" />
-                {t("dashboard.admin.monitoring")}
-              </CardTitle>
-              <CardDescription>{t("dashboard.admin.monitoringHint")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {canSeeLearners ? (
-                  <StatCard
-                    title={t("dashboard.admin.totalUsers")}
-                    value={data.stats.totalUsers}
-                    description={t("dashboard.admin.registeredLearners")}
-                    icon={Users}
-                  />
-                ) : null}
-                {canSeeContent ? (
-                  <>
-                <StatCard
-                  title={t("dashboard.admin.totalQuizzes")}
+        <section className={PANEL}>
+          <PanelHeader
+            title={t("dashboard.admin.monitoring")}
+            hint={t("dashboard.admin.monitoringHint")}
+          />
+          <div className="ac-vitals ac-wave">
+            {canSeeLearners ? (
+              <Vital
+                label={t("dashboard.admin.totalUsers")}
+                value={data.stats.totalUsers}
+                hint={t("dashboard.admin.registeredLearners")}
+                quiet={data.stats.totalUsers === 0}
+              />
+            ) : null}
+            {canSeeContent ? (
+              <>
+                <Vital
+                  label={t("dashboard.admin.totalQuizzes")}
                   value={data.stats.totalQuizzes}
-                  description={t("dashboard.admin.acrossLessons", {
+                  hint={t("dashboard.admin.acrossLessons", {
                     count: data.stats.totalLessons,
                   })}
-                  icon={ListChecks}
+                  quiet={data.stats.totalQuizzes === 0}
                 />
-                <StatCard
-                  title={t("dashboard.admin.avgScore")}
+                <Vital
+                  label={t("dashboard.admin.avgScore")}
                   value={`${data.stats.averageScore}%`}
-                  description={t("dashboard.admin.totalAttempts", {
+                  hint={t("dashboard.admin.totalAttempts", {
                     count: data.stats.totalAttempts,
                   })}
-                  icon={BarChart3}
+                  quiet={data.stats.averageScore === 0}
                 />
-                <StatCard
-                  title={t("dashboard.admin.quizzesWithAttempts")}
+                <Vital
+                  label={t("dashboard.admin.quizzesWithAttempts")}
                   value={data.stats.quizzesWithAttempts}
-                  description={t("dashboard.admin.outOfTotalQuizzes", {
+                  hint={t("dashboard.admin.outOfTotalQuizzes", {
                     count: data.stats.totalQuizzes,
                   })}
-                  icon={CheckCircle2}
+                  quiet={data.stats.quizzesWithAttempts === 0}
                 />
-                  </>
-                ) : null}
-              </div>
-            </CardContent>
-          </Card>
+              </>
+            ) : null}
+          </div>
         </section>
       ) : null}
 
-      {!showFullManagement && canSeeContent ? (
-        <section>
-          <Card className="brand-surface">
-            <CardHeader>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-brand-accent" />
-                  {t("dashboard.admin.recentActivity")}
-                </CardTitle>
-                {data.recentActivity.length > 0 ? (
-                  <Badge
-                    variant="outline"
-                    className="border-white/15 bg-white/5 text-muted-foreground"
+      {showDestinations || showActivity ? (
+        <div className="grid gap-4 sm:gap-5 lg:grid-cols-12 lg:items-start">
+          {showDestinations ? (
+            <nav
+              className={cn(
+                "grid gap-2.5 sm:grid-cols-2",
+                showActivity ? "lg:col-span-7" : "lg:col-span-12"
+              )}
+            >
+              {navItems.map((item) => {
+                const Icon: LucideIcon = NAV_ICONS[item.icon];
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="ac-tile flex min-h-[3.75rem] items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.025] px-3.5 py-3"
                   >
-                    {t("dashboard.admin.activityCount", {
-                      count: data.recentActivity.length,
-                    })}
-                  </Badge>
-                ) : null}
-              </div>
-              <CardDescription>{t("dashboard.admin.recentActivityHint")}</CardDescription>
-            </CardHeader>
-            <CardContent>
+                    <span className="ac-tile-chip flex h-9 w-9 shrink-0 items-center justify-center rounded-[0.625rem] bg-white/[0.06] text-violet-100/70">
+                      <Icon className="h-[1.05rem] w-[1.05rem]" />
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-[0.9375rem] font-medium text-foreground/90">
+                      {item.labelKey ? t(item.labelKey) : item.label}
+                    </span>
+                    <ChevronRight className="ac-chev h-4 w-4 shrink-0 text-white/25 rtl:rotate-180" />
+                  </Link>
+                );
+              })}
+            </nav>
+          ) : null}
+
+          {showActivity ? (
+            <section
+              className={cn(
+                PANEL,
+                showDestinations ? "lg:col-span-5" : "lg:col-span-12"
+              )}
+            >
+              <PanelHeader
+                title={t("dashboard.admin.recentActivity")}
+                hint={t("dashboard.admin.recentActivityHint")}
+                aside={
+                  data.recentActivity.length > 0 ? (
+                    <Badge
+                      variant="outline"
+                      className="border-white/10 bg-white/[0.04] px-2 py-0 text-[0.6875rem] font-medium text-muted-foreground"
+                    >
+                      {t("dashboard.admin.activityCount", {
+                        count: data.recentActivity.length,
+                      })}
+                    </Badge>
+                  ) : null
+                }
+              />
               {data.recentActivity.length === 0 ? (
-                <p className="py-8 text-center text-sm text-muted-foreground">
+                <p className="px-6 py-16 text-center text-sm text-muted-foreground/70">
                   {t("dashboard.admin.noActivity")}
                 </p>
               ) : (
-                <div className="max-h-96 space-y-2 overflow-y-auto pe-1">
+                <div className="max-h-[26rem] divide-y divide-white/[0.05] overflow-y-auto">
                   {data.recentActivity.map((activity) => (
                     <div
                       key={activity.id}
-                      className="flex items-center gap-3 rounded-lg border border-white/10 bg-muted/30 px-3 py-2"
+                      className="flex items-center gap-3 px-5 py-3 sm:px-6"
                     >
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-accent/15 text-sm font-semibold text-brand-accent">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-500/15 text-[0.8125rem] font-semibold text-violet-100/85">
                         {getInitial(activity.userName)}
-                      </div>
+                      </span>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">
                           {activity.userName}
                         </p>
-                        <p className="truncate text-xs text-muted-foreground">
+                        <p className="truncate text-xs text-muted-foreground/80">
                           {activity.quizTitle}
                         </p>
                       </div>
@@ -238,7 +299,7 @@ export function AdminDashboard({
                         >
                           {activity.score}%
                         </Badge>
-                        <p className="mt-1 text-xs text-muted-foreground">
+                        <p className="mt-1 text-[0.6875rem] text-muted-foreground/70">
                           {formatDate(activity.createdAt, {
                             dateStyle: "short",
                             timeStyle: "short",
@@ -249,9 +310,9 @@ export function AdminDashboard({
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </section>
+            </section>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );
