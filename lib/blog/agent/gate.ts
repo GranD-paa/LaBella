@@ -109,13 +109,23 @@ function questionFor(name: CheckName) {
         ]
       );
     case "levelFit":
+      // Judged against the subject's own demands, not against an absolute
+      // beginner. The first version asked the flat question and punished an
+      // article comparing exam certificates for being about exam
+      // certificates: it scored 16, while a piece on food vocabulary scored
+      // 51, and the difference was the topic the owner chose rather than
+      // anything the writer did. What is worth catching is an article that is
+      // harder than it needed to be.
       return score(
-        "Could a Persian speaker at the very start of learning Italian follow `article_body`?",
+        "Given the subject `queued_topic` covers, is `article_body` as easy to follow as that subject allows? " +
+          "An administrative or advanced subject is not penalised for being about one — judge only whether the " +
+          "writing adds difficulty the subject did not require: unexplained terms, unglossed target-language " +
+          "words, assumed knowledge it could have stated in a sentence.",
         [
-          "Assumes grammar vocabulary the beginner does not have",
-          "Mostly followable, with unexplained jargon in places",
-          "Explains its terms as it goes",
-          "A complete beginner could read it start to finish unaided",
+          "Much harder than the subject required; assumes knowledge it never states",
+          "Somewhat harder than it needed to be, with unexplained terms in places",
+          "About as accessible as the subject allows",
+          "Makes a demanding subject genuinely easy, explaining every term it uses",
         ]
       );
     case "grammarCorrect":
@@ -154,7 +164,7 @@ function reasonFor(name: CheckName): string {
     case "seoQuality":
       return "عنوان یا توضیح متا ضعیف است و نتیجهٔ جست‌وجوی خوبی نمی‌سازد.";
     case "levelFit":
-      return "متن برای زبان‌آموز مبتدی سنگین است.";
+      return "متن سخت‌تر از آن چیزی است که موضوعش ایجاب می‌کند.";
     case "grammarCorrect":
       return "دست‌کم یکی از قاعده‌ها یا مثال‌های ایتالیایی اشتباه است.";
     case "linksRelevant":

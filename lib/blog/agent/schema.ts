@@ -68,6 +68,31 @@ export const articleSchema = z.object({
    * badly. Empty for a conceptual cover. */
   imageWords: z.array(z.string().trim()).max(3).default([]),
 
+  /**
+   * Every target-language word the article teaches, with the Persian spelling
+   * a reader would say it by.
+   *
+   * This lives in the schema and not in the prompt because the prompt was
+   * tried first and ignored: told in prose to bracket each word's
+   * pronunciation, the writer produced an article with none at all — zero
+   * Persian-script brackets in twelve hundred words. The same lesson as
+   * `metaDescription`, where a range described in prose was overrun and only
+   * a `max` held. A field the model must fill is the only instruction it has
+   * reliably obeyed here.
+   *
+   * Empty is allowed and correct for an article that teaches no vocabulary —
+   * a piece comparing exam certificates has no words to sound out.
+   */
+  pronunciations: z
+    .array(
+      z.object({
+        word: z.string().trim().min(1),
+        fa: z.string().trim().min(1),
+      })
+    )
+    .max(40)
+    .default([]),
+
   categorySlugs: z.array(z.string()).min(1),
   languageSlugs: z.array(z.string()),
 
@@ -117,6 +142,7 @@ export function buildArticleJsonSchema(
       "imagePrompt",
       "imageMode",
       "imageWords",
+      "pronunciations",
       "categorySlugs",
       "languageSlugs",
       "internalLinks",
@@ -166,6 +192,21 @@ export function buildArticleJsonSchema(
         enum: ["typographic", "conceptual"],
         description:
           "اگر موضوع مقاله یک یا چند کلمه/ساختار مشخص در زبان مقصد است (مثلاً تفاوت دو فعل، یک زمان دستوری، یک حرف اضافه)، «typographic» را انتخاب کن تا همان کلمات لاتین روی تصویر بیایند. اگر موضوع مفهومی و عمومی است (مثلاً روش مطالعه، انگیزه، برنامه‌ریزی)، «conceptual» را انتخاب کن.",
+      },
+      pronunciations: {
+        type: "array",
+        maxItems: 40,
+        items: {
+          type: "object",
+          additionalProperties: false,
+          required: ["word", "fa"],
+          properties: {
+            word: { type: "string", description: "کلمه به همان شکلی که در زبان مقصد نوشته می‌شود، با حروف لاتین." },
+            fa: { type: "string", description: "تلفظ همان کلمه با حروف فارسی، همان‌طور که یک فارسی‌زبان آن را می‌خواند. مثلاً برای Dolce بنویس «دُلچه»." },
+          },
+        },
+        description:
+          "هر کلمه‌ی زبان مقصد که در این مقاله یاد می‌دهی، با تلفظ فارسی‌اش. همین کلمه‌ها باید داخل متن هم، اولین باری که می‌آیند، تلفظشان در پرانتز کنارشان باشد — مثل «**Dolce** (دُلچه) — دسر». اگر مقاله هیچ واژه‌ای از زبان مقصد یاد نمی‌دهد، آرایه را خالی بگذار.",
       },
       imageWords: {
         type: "array",

@@ -109,7 +109,7 @@ export const CHECK_DEFINITIONS: Record<CheckName, CheckDefinition> = {
   },
   levelFit: {
     label: "تناسب سطح زبانی",
-    meaning: "برای زبان‌آموز مبتدی قابل فهم است",
+    meaning: "به اندازه‌ای که موضوعش اجازه می‌دهد ساده نوشته شده",
     invert: false,
     max: 3,
     defaultThreshold: 33,
