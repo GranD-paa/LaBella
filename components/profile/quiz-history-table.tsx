@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Eye, History } from "lucide-react";
+import { Eye } from "lucide-react";
 
 import { useTranslations } from "@/components/providers/locale-provider";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -24,96 +23,99 @@ export type QuizAttemptHistoryRow = {
   lessonName: string;
 };
 
-function getScoreBadgeClass(score: number) {
+function scoreToneClassName(score: number) {
   if (score >= 80) {
-    return "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
+    return "text-emerald-300";
   }
   if (score >= 50) {
-    return "border-amber-500/30 bg-amber-500/10 text-amber-300";
+    return "text-amber-300";
   }
-  return "border-rose-500/30 bg-rose-500/10 text-rose-300";
+  return "text-rose-300";
 }
 
-export function QuizHistoryTable({ attempts }: { attempts: QuizAttemptHistoryRow[] }) {
+export function QuizHistoryTable({
+  attempts,
+}: {
+  attempts: QuizAttemptHistoryRow[];
+}) {
   const { t, formatDate } = useTranslations();
 
   if (attempts.length === 0) {
     return (
-      <div className="brand-surface flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/15 px-6 py-16 text-center text-muted-foreground">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5">
-          <History className="h-7 w-7" />
-        </div>
-        <p className="max-w-sm text-sm leading-relaxed">{t("profile.noAttempts")}</p>
-      </div>
+      <p className="px-6 pb-14 pt-4 text-center text-sm text-muted-foreground sm:px-10">
+        {t("profile.noAttempts")}
+      </p>
     );
   }
 
   return (
-    <div className="brand-surface overflow-hidden rounded-2xl border border-white/10 shadow-brand">
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-white/10 hover:bg-transparent">
-              <TableHead className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t("profile.lessonName")}
-              </TableHead>
-              <TableHead className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t("profile.score")}
-              </TableHead>
-              <TableHead className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t("profile.date")}
-              </TableHead>
-              <TableHead className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t("common.actions")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {attempts.map((attempt) => (
-              <TableRow
-                key={attempt.id}
-                className="border-white/10 hover:bg-white/[0.03]"
+    <div className="overflow-x-auto pb-2">
+      <Table>
+        <TableHeader>
+          <TableRow className="border-white/[0.06] hover:bg-transparent">
+            {[
+              t("profile.lessonName"),
+              t("profile.score"),
+              t("profile.date"),
+              t("common.actions"),
+            ].map((heading, index) => (
+              <TableHead
+                key={heading}
+                className={cn(
+                  "h-auto py-3 text-[0.75rem] font-medium text-muted-foreground/70",
+                  index === 0 ? "ps-6 text-start sm:ps-10" : "text-center",
+                  index === 3 && "pe-6 sm:pe-10"
+                )}
               >
-                <TableCell className="px-4 py-4 text-center align-middle">
-                  <p className="mx-auto max-w-[220px] font-medium leading-snug">
-                    {attempt.lessonName || t("profile.unknownLesson")}
-                  </p>
-                </TableCell>
-                <TableCell className="px-4 py-4 text-center align-middle">
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      "min-w-[4.5rem] justify-center px-3 py-1 text-sm font-semibold",
-                      getScoreBadgeClass(attempt.score)
-                    )}
-                  >
-                    {attempt.score}%
-                  </Badge>
-                </TableCell>
-                <TableCell className="px-4 py-4 text-center align-middle text-sm text-muted-foreground">
-                  {formatDate(attempt.created_at, {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                  })}
-                </TableCell>
-                <TableCell className="px-4 py-4 text-center align-middle">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    asChild
-                    className="gap-2 border-brand-accent/30 bg-brand-accent/5 hover:bg-brand-accent/10"
-                  >
-                    <Link href={`/quiz/${attempt.quizId}`}>
-                      <Eye className="h-4 w-4" />
-                      {t("quiz.reviewAttempt")}
-                    </Link>
-                  </Button>
-                </TableCell>
-              </TableRow>
+                {heading}
+              </TableHead>
             ))}
-          </TableBody>
-        </Table>
-      </div>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {attempts.map((attempt) => (
+            <TableRow
+              key={attempt.id}
+              className="border-white/[0.04] hover:bg-white/[0.025]"
+            >
+              <TableCell className="max-w-[16rem] py-3.5 ps-6 align-middle text-sm font-medium text-foreground sm:ps-10">
+                {attempt.lessonName || t("profile.unknownLesson")}
+              </TableCell>
+              {/* The score is the one number in the row, so it is set as one:
+                  tabular, in the same metal as every other reading. */}
+              <TableCell className="py-3.5 text-center align-middle">
+                <span
+                  className={cn(
+                    "text-[0.9375rem] font-semibold tabular-nums",
+                    scoreToneClassName(attempt.score)
+                  )}
+                >
+                  {attempt.score}%
+                </span>
+              </TableCell>
+              <TableCell className="py-3.5 text-center align-middle text-[0.8125rem] font-medium text-muted-foreground/75">
+                {formatDate(attempt.created_at, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
+              </TableCell>
+              <TableCell className="py-3.5 pe-6 text-center align-middle sm:pe-10">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="gap-2 border-white/10 bg-white/[0.03] text-muted-foreground hover:bg-white/[0.07] hover:text-foreground"
+                >
+                  <Link href={`/quiz/${attempt.quizId}`}>
+                    <Eye className="h-4 w-4" />
+                    {t("quiz.reviewAttempt")}
+                  </Link>
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

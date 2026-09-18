@@ -40,16 +40,22 @@ export function Plate({
 /** The masthead: what this surface is, whose it is, and the way back out. */
 export function PlateHead({
   eyebrow,
+  leading,
   title,
   lede,
   action,
   className,
+  children,
 }: {
   eyebrow?: React.ReactNode;
+  /** An emblem beside the name — an avatar, a flag. */
+  leading?: React.ReactNode;
   title: React.ReactNode;
   lede?: React.ReactNode;
   action?: React.ReactNode;
   className?: string;
+  /** Masthead metadata: what this surface is currently pointed at. */
+  children?: React.ReactNode;
 }) {
   return (
     <div
@@ -58,22 +64,58 @@ export function PlateHead({
         className
       )}
     >
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1 basis-[22rem]">
         {eyebrow ? (
           <p className="flex items-center gap-2.5 text-[0.8125rem] font-medium text-foreground/80">
             <span className="plate-dot" aria-hidden />
             {eyebrow}
           </p>
         ) : null}
-        <h1 className={cn("plate-title", eyebrow && "mt-4")}>{title}</h1>
+        <div className={cn("flex items-center gap-4", eyebrow && "mt-4")}>
+          {leading}
+          <h1 className="plate-title min-w-0">{title}</h1>
+        </div>
         {lede ? (
           <p className="mt-3.5 max-w-[46ch] text-[0.9375rem]/[1.9] text-muted-foreground">
             {lede}
           </p>
         ) : null}
+        {children}
       </div>
-      {action}
+      {action ? <div className="shrink-0">{action}</div> : null}
     </div>
+  );
+}
+
+/**
+ * A row of label/value pairs under a masthead — what the surface is currently
+ * pointed at. Hairlines between them rather than boxes: this is metadata about
+ * the head above it, not a panel of its own.
+ */
+export function PlateFacts({
+  facts,
+}: {
+  facts: Array<{ label: React.ReactNode; value: React.ReactNode }>;
+}) {
+  return (
+    <dl className="mt-6 flex flex-wrap gap-x-7 gap-y-4">
+      {facts.map((fact, index) => (
+        <div
+          key={index}
+          className={cn(
+            "min-w-0",
+            index > 0 && "border-s border-white/[0.09] ps-7"
+          )}
+        >
+          <dt className="text-xs font-medium text-muted-foreground/70">
+            {fact.label}
+          </dt>
+          <dd className="mt-1.5 flex items-center gap-2 text-[0.9375rem] font-semibold text-foreground">
+            {fact.value}
+          </dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -193,7 +235,7 @@ export function IndexRow({
       </span>
       <span className="plate-leader" aria-hidden />
       <ChevronRight
-        className="plate-chev h-4 w-4 shrink-0 text-foreground/45 rtl:rotate-180"
+        className="plate-chev h-4 w-4 shrink-0 text-foreground/45"
         aria-hidden
       />
     </Link>

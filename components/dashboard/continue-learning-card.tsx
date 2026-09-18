@@ -1,11 +1,11 @@
 "use client";
 
-import { useTranslations } from "@/components/providers/locale-provider";
+import { PlateFacts, PlateZone } from "@/components/layout/plate";
 import { FlagIcon } from "@/components/menu/flag-icon";
+import { useTranslations } from "@/components/providers/locale-provider";
 import type { ContinueLearningSnapshot } from "@/lib/dashboard/continue-learning";
 import { getLocalizedLanguageName } from "@/lib/curriculum/localize";
 import type { LanguageSlug } from "@/lib/curriculum/types";
-import { cn } from "@/lib/utils";
 
 export function ContinueLearningCard({
   snapshot,
@@ -32,64 +32,56 @@ export function ContinueLearningCard({
       });
 
   return (
-    <section
-      className={cn(
-        "brand-surface relative overflow-hidden border border-brand-accent/35 p-6 shadow-brand sm:p-8",
-        "ring-1 ring-brand-accent/10"
-      )}
-    >
-      <div className="absolute inset-0 bg-brand-gradient opacity-30" />
-      <div className="relative space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-            {t("dashboard.user.continueLearningTitle")}
-          </h2>
-        </div>
+    <PlateZone groove well className="px-6 py-7 sm:px-10 sm:py-8">
+      <h2 className="text-[0.9375rem] font-semibold text-foreground">
+        {t("dashboard.user.continueLearningTitle")}
+      </h2>
 
-        <div className="min-w-0 space-y-5">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-2xl font-bold tracking-tight sm:text-3xl">
+      <div className="mt-5 flex flex-wrap items-end justify-between gap-x-10 gap-y-7">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xl font-bold sm:text-3xl">
               {languageName}
             </span>
             <FlagIcon
               slug={snapshot.languageSlug as LanguageSlug}
-              className="h-7 w-10 shrink-0 sm:h-8 sm:w-12"
+              className="h-6 w-9 shrink-0"
             />
           </div>
 
-          <dl className="grid gap-4 sm:grid-cols-3">
-            <div className="space-y-1">
-              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {t("dashboard.user.currentLevelLabel")}
-              </dt>
-              <dd className="text-lg font-semibold">{snapshot.levelCode}</dd>
-            </div>
-            <div className="space-y-1 sm:col-span-2">
-              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {t("dashboard.user.lastActivityLabel")}
-              </dt>
-              <dd className="text-lg font-semibold">{lastActivityLabel}</dd>
-            </div>
-          </dl>
+          <PlateFacts
+            facts={[
+              {
+                label: t("dashboard.user.currentLevelLabel"),
+                value: snapshot.levelCode,
+              },
+              {
+                label: t("dashboard.user.lastActivityLabel"),
+                value: lastActivityLabel,
+              },
+            ]}
+          />
+        </div>
 
-          <div className="space-y-2">
-            <div className="flex items-end justify-between gap-3">
-              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {t("dashboard.user.progressLabel")}
-              </span>
-              <span className="text-2xl font-bold text-brand-accent">
-                {snapshot.progressPercent}%
-              </span>
-            </div>
-            <div className="h-2.5 overflow-hidden rounded-full bg-muted/80">
-              <div
-                className="h-full rounded-full bg-primary transition-all duration-700"
-                style={{ width: `${snapshot.progressPercent}%` }}
-              />
-            </div>
+        {/* The one reading on this zone, so it is set in the same metal as the
+            four on the rail above — a number, not a caption on a bar. */}
+        <div className="min-w-[13rem] flex-1">
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="text-xs font-medium text-muted-foreground/70">
+              {t("dashboard.user.progressLabel")}
+            </span>
+            <span className="plate-metal text-2xl font-bold sm:text-3xl">
+              {snapshot.progressPercent}%
+            </span>
+          </div>
+          <div className="plate-track mt-2.5">
+            <div
+              className="plate-track-fill"
+              style={{ width: `${snapshot.progressPercent}%` }}
+            />
           </div>
         </div>
       </div>
-    </section>
+    </PlateZone>
   );
 }

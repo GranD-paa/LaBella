@@ -1,18 +1,13 @@
 "use client";
 
 import { Suspense } from "react";
-import {
-  Award,
-  CheckCircle2,
-  ListChecks,
-  Trophy,
-} from "lucide-react";
 
 import { AchievementsSection } from "@/components/dashboard/achievements-section";
 import { ContinueLearningCard } from "@/components/dashboard/continue-learning-card";
 import { DashboardWelcomeHeader } from "@/components/dashboard/dashboard-welcome-header";
 import { QuizSubmittedBanner } from "@/components/dashboard/quiz-submitted-banner";
-import { StatCard } from "@/components/dashboard/stat-card";
+import { Figure, FigureRail } from "@/components/layout/figure";
+import { Plate, PlateHorizon } from "@/components/layout/plate";
 import { useTranslations } from "@/components/providers/locale-provider";
 import {
   MySubscriptionsCard,
@@ -38,56 +33,60 @@ export function UserDashboard({
         <QuizSubmittedBanner />
       </Suspense>
 
-      <DashboardWelcomeHeader
-        displayName={displayName}
-        avatarUrl={data.profile?.avatar_url}
-        snapshot={data.continueLearning}
-        engagement={data.engagement}
-      />
+      <Plate>
+        <DashboardWelcomeHeader
+          displayName={displayName}
+          avatarUrl={data.profile?.avatar_url}
+          snapshot={data.continueLearning}
+          engagement={data.engagement}
+        />
+
+        <PlateHorizon />
+
+        <FigureRail>
+          <Figure
+            label={t("dashboard.user.quizzesCompleted")}
+            value={data.stats.completedQuizzes}
+            note={t("dashboard.user.ofTotal", {
+              total: data.stats.totalQuizzes,
+            })}
+          />
+          <Figure
+            label={t("dashboard.user.averageScore")}
+            value={data.stats.averageScore}
+            suffix="%"
+            note={t("dashboard.user.acrossAttempts")}
+          />
+          <Figure
+            label={t("dashboard.user.availableQuizzes")}
+            value={data.stats.availableQuizzes}
+            note={t("dashboard.user.readyToTake")}
+          />
+          {/* The count climbs the earned half; the total it is out of holds
+              still, because it is not something the learner is earning. */}
+          <Figure
+            label={t("dashboard.user.achievements")}
+            value={earnedCount}
+            suffix={`/${data.achievements.length}`}
+            note={
+              earnedCount > 0
+                ? t("dashboard.user.keepGoing")
+                : t("dashboard.user.startFirstQuiz")
+            }
+          />
+        </FigureRail>
+
+        <ContinueLearningCard snapshot={data.continueLearning} />
+
+        <AchievementsSection achievements={data.achievements} />
+      </Plate>
 
       {/*
-        Above the stats: what the learner paid for should be one of the first
-        things they see, not something they have to hunt for.
+        What the learner paid for. Still on the older card idiom — the
+        subscription surfaces move to the plate together, so that this and
+        /subscription never disagree about what a plan looks like.
       */}
       <MySubscriptionsCard entries={subscriptions} />
-
-      <ContinueLearningCard snapshot={data.continueLearning} />
-
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          title={t("dashboard.user.quizzesCompleted")}
-          value={data.stats.completedQuizzes}
-          description={t("dashboard.user.ofTotal", {
-            total: data.stats.totalQuizzes,
-          })}
-          icon={CheckCircle2}
-        />
-        <StatCard
-          title={t("dashboard.user.averageScore")}
-          value={`${data.stats.averageScore}%`}
-          description={t("dashboard.user.acrossAttempts")}
-          icon={Trophy}
-        />
-        <StatCard
-          title={t("dashboard.user.availableQuizzes")}
-          value={data.stats.availableQuizzes}
-          description={t("dashboard.user.readyToTake")}
-          icon={ListChecks}
-        />
-        <StatCard
-          title={t("dashboard.user.achievements")}
-          value={`${earnedCount}/${data.achievements.length}`}
-          description={t("dashboard.user.milestonesUnlocked")}
-          icon={Award}
-          trend={
-            earnedCount > 0
-              ? t("dashboard.user.keepGoing")
-              : t("dashboard.user.startFirstQuiz")
-          }
-        />
-      </section>
-
-      <AchievementsSection achievements={data.achievements} />
     </div>
   );
 }
