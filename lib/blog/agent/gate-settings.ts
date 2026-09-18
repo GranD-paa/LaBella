@@ -27,89 +27,106 @@ export const CHECKS = [
 export type CheckName = (typeof CHECKS)[number];
 
 /**
- * Which way a check fails.
+ * Every score the panel shows runs 0–100, and higher is always better.
  *
- * `below` means a low number is bad (the article did not cover its topic);
- * `atOrAbove` means a high number is bad (it duplicates something). Keeping
- * the direction beside the threshold is what lets the panel render one slider
- * per check without a table of special cases.
+ * The service does not answer that way. Some questions come back as a
+ * probability (0–1) and some as a level on a rubric (0–`max`), and two of them
+ * ask about a *fault* — "is this a duplicate?" — where a high answer is bad
+ * news. Left as they arrive, the owner has to remember which way each number
+ * points, which is exactly the thing nobody remembers at a glance.
+ *
+ * So `invert` marks the fault questions, `goodness` does the arithmetic once,
+ * and every threshold in the panel reads the same way: below it is a problem.
+ *
+ * The raw answers are still what gets stored in the run log. This is a display
+ * and comparison scale, not a change to what the service said.
  */
-export type CheckDirection = "below" | "atOrAbove";
-
 export type CheckDefinition = {
-  /** Shown in the panel. */
+  /** Shown in the panel, phrased so that a high score matches the name. */
   label: string;
-  /** What a high number means, in the owner's words. */
+  /** What a high score means, in the owner's words. */
   meaning: string;
-  direction: CheckDirection;
-  defaultThreshold: number;
-  /** Score questions run 0..levels-1; Noul questions run 0..1. */
+  /** True when the underlying question asks about a fault. */
+  invert: boolean;
+  /** The top of the raw range: 1 for a probability, 3 for a four-level rubric. */
   max: number;
+  /** 0–100. */
+  defaultThreshold: number;
 };
+
+/** Raw answer to a 0–100 score where higher is better. */
+export function goodness(name: CheckName, raw: number): number {
+  const { invert, max } = CHECK_DEFINITIONS[name];
+  const share = Math.min(Math.max(raw / max, 0), 1);
+  return Math.round((invert ? 1 - share : share) * 100);
+}
 
 export const CHECK_DEFINITIONS: Record<CheckName, CheckDefinition> = {
   coversTopic: {
     label: "پوشش موضوع",
     meaning: "مقاله واقعاً به موضوعی که در صف بود پرداخته",
-    direction: "below",
-    defaultThreshold: 0.5,
+    invert: false,
     max: 1,
+    defaultThreshold: 50,
   },
+  // The question asked is "is this a duplicate?", so the answer is inverted to
+  // match the name. The key stays `duplicate` because past runs were logged
+  // under it and renaming it would orphan their history.
   duplicate: {
-    label: "تکراری بودن",
-    meaning: "با یکی از مطالب منتشرشده هم‌پوشانی دارد",
-    direction: "atOrAbove",
-    defaultThreshold: 0.7,
+    label: "تازگی مطلب",
+    meaning: "حرف تازه‌ای دارد و مطالب منتشرشده را دوباره نمی‌گوید",
+    invert: true,
     max: 1,
+    defaultThreshold: 30,
   },
   tuRuleViolated: {
-    label: "خطای ترجمهٔ «tu»",
-    meaning: "ضمیر غیررسمی را «شما» ترجمه کرده",
-    direction: "atOrAbove",
-    defaultThreshold: 0.5,
+    label: "درستی ترجمهٔ «tu»",
+    meaning: "تمایز رسمی و غیررسمی را حفظ کرده",
+    invert: true,
     max: 1,
+    defaultThreshold: 50,
   },
   coverMatches: {
     label: "تناسب تصویر",
     meaning: "طرح تصویر شاخص مخصوص همین مقاله است",
-    direction: "below",
-    defaultThreshold: 0.4,
+    invert: false,
     max: 1,
+    defaultThreshold: 40,
   },
   depth: {
     label: "عمق مطلب",
     meaning: "قاعده، مثال واقعی، و اشتباه رایج فارسی‌زبان‌ها را دارد",
-    direction: "below",
-    defaultThreshold: 1.5,
+    invert: false,
     max: 3,
+    defaultThreshold: 50,
   },
   seoQuality: {
     label: "کیفیت عنوان و سئو",
     meaning: "عنوان و توضیح متا هم دقیق‌اند هم کلیک‌گرفتنی",
-    direction: "below",
-    defaultThreshold: 1.5,
+    invert: false,
     max: 3,
+    defaultThreshold: 50,
   },
   levelFit: {
     label: "تناسب سطح زبانی",
     meaning: "برای زبان‌آموز مبتدی قابل فهم است",
-    direction: "below",
-    defaultThreshold: 1.0,
+    invert: false,
     max: 3,
+    defaultThreshold: 33,
   },
   grammarCorrect: {
     label: "درستی گرامر ایتالیایی",
     meaning: "ادعاهای دستوری و مثال‌های ایتالیایی درست‌اند",
-    direction: "below",
-    defaultThreshold: 0.6,
+    invert: false,
     max: 1,
+    defaultThreshold: 60,
   },
   linksRelevant: {
     label: "ربط لینک‌های داخلی",
     meaning: "لینک‌ها به مطلب مرتبط می‌روند، نه هر مطلبی",
-    direction: "below",
-    defaultThreshold: 0.4,
+    invert: false,
     max: 1,
+    defaultThreshold: 40,
   },
 };
 
@@ -117,6 +134,13 @@ export const CHECK_DEFINITIONS: Record<CheckName, CheckDefinition> = {
 export type GateMode = "off" | "log" | "soft" | "hard";
 
 export type GateSettings = {
+  /**
+   * 100 means the thresholds below are on the 0–100 scale. A row saved before
+   * that change has no marker, and its thresholds are still in the raw ranges;
+   * `parseGateSettings` converts those rather than reading 0.5 as "half a
+   * point out of a hundred".
+   */
+  scale: 100;
   mode: GateMode;
   /** Judge the queued subject before paying to write it. */
   preflight: boolean;
@@ -125,6 +149,7 @@ export type GateSettings = {
 };
 
 export const DEFAULT_GATE_SETTINGS: GateSettings = {
+  scale: 100,
   // The owner's choice: hold a doubtful article back as a draft, never fail
   // the run over it.
   mode: "soft",
@@ -153,6 +178,7 @@ export function parseGateSettings(value: unknown): GateSettings {
   }
 
   const raw = value as Record<string, unknown>;
+  const isCurrentScale = raw.scale === 100;
   const rawChecks =
     raw.checks && typeof raw.checks === "object" && !Array.isArray(raw.checks)
       ? (raw.checks as Record<string, unknown>)
@@ -167,25 +193,33 @@ export function parseGateSettings(value: unknown): GateSettings {
       }
 
       const { enabled, threshold } = entry as Record<string, unknown>;
-      const limit = CHECK_DEFINITIONS[name].max;
+
+      let value =
+        typeof threshold === "number" && Number.isFinite(threshold)
+          ? threshold
+          : fallback.threshold;
+
+      if (!isCurrentScale) {
+        // An old row: the number is a raw cut-off, and for a fault question it
+        // pointed the other way. Both are undone here so the owner's tuning
+        // survives the change of scale.
+        const { invert, max } = CHECK_DEFINITIONS[name];
+        const share = Math.min(Math.max(value / max, 0), 1);
+        value = Math.round((invert ? 1 - share : share) * 100);
+      }
 
       return [
         name,
         {
           enabled: typeof enabled === "boolean" ? enabled : fallback.enabled,
-          threshold:
-            typeof threshold === "number" &&
-            Number.isFinite(threshold) &&
-            threshold >= 0 &&
-            threshold <= limit
-              ? threshold
-              : fallback.threshold,
+          threshold: value >= 0 && value <= 100 ? value : fallback.threshold,
         },
       ];
     })
   ) as GateSettings["checks"];
 
   return {
+    scale: 100,
     mode: MODES.includes(raw.mode as GateMode)
       ? (raw.mode as GateMode)
       : DEFAULT_GATE_SETTINGS.mode,

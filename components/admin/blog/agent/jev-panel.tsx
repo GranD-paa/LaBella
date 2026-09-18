@@ -23,6 +23,7 @@ import type { GateVerdict } from "@/lib/blog/agent/gate";
 import {
   CHECKS,
   CHECK_DEFINITIONS,
+  goodness,
   type CheckName,
   type GateMode,
   type GateSettings,
@@ -57,8 +58,20 @@ const OUTCOME_LABELS: Record<string, string> = {
   skipped: "انجام نشد",
 };
 
-function faNumber(value: number, digits = 2) {
-  return value.toFixed(digits).replace(/[0-9]/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+function fa(value: number) {
+  return String(value).replace(/[0-9]/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+}
+
+/**
+ * A raw answer as the owner reads it: out of a hundred, higher is better.
+ *
+ * A name this build does not know — a check that was dropped, read back from an
+ * old run — is shown raw rather than silently rescaled by the wrong rule.
+ */
+function shown(name: string, raw: number): string {
+  return name in CHECK_DEFINITIONS
+    ? fa(goodness(name as CheckName, raw))
+    : raw.toFixed(2);
 }
 
 export function JevPanel({
@@ -201,20 +214,18 @@ export function JevPanel({
 
                     {average ? (
                       <span className="text-xs text-muted-foreground">
-                        میانگین {faNumber(average.value)} از{" "}
+                        میانگین {shown(name, average.value)} از{" "}
                         {average.samples.toLocaleString("fa-IR")} اجرا
                       </span>
                     ) : null}
 
                     <span className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">
-                        {definition.direction === "below" ? "کمتر از" : "بیشتر از"}
-                      </span>
+                      <span className="text-xs text-muted-foreground">کمتر از</span>
                       <Input
                         type="number"
-                        step="0.05"
+                        step="1"
                         min={0}
-                        max={definition.max}
+                        max={100}
                         value={check.threshold}
                         disabled={!check.enabled}
                         onChange={(event) =>
@@ -283,7 +294,7 @@ export function JevPanel({
                           {CHECK_DEFINITIONS[name as CheckName]?.label ?? name}:
                         </dt>
                         <dd className="font-medium text-foreground">
-                          {faNumber(value)}
+                          {shown(name, value)}
                         </dd>
                       </div>
                     ))}
@@ -396,7 +407,7 @@ function ManualReview() {
                     <dt className="text-muted-foreground">
                       {CHECK_DEFINITIONS[name as CheckName]?.label ?? name}
                     </dt>
-                    <dd className="font-medium">{faNumber(value as number)}</dd>
+                    <dd className="font-medium">{shown(name, value as number)}</dd>
                   </div>
                 ))}
               </dl>

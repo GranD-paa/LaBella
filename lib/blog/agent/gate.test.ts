@@ -11,7 +11,9 @@ import {
 } from "@/lib/blog/agent/gate";
 import {
   CHECKS,
+  CHECK_DEFINITIONS,
   DEFAULT_GATE_SETTINGS,
+  goodness,
   parseGateSettings,
 } from "@/lib/blog/agent/gate-settings";
 
@@ -146,15 +148,45 @@ describe("describeVerdict", () => {
   });
 });
 
-describe("trips", () => {
-  it("fails a `below` check when the value is under the threshold", () => {
-    expect(trips("coversTopic", 0.4, 0.5)).toBe(true);
-    expect(trips("coversTopic", 0.5, 0.5)).toBe(false);
+describe("goodness", () => {
+  it("turns a probability into a percentage", () => {
+    expect(goodness("coversTopic", 0.97)).toBe(97);
+    expect(goodness("coversTopic", 0)).toBe(0);
   });
 
-  it("fails an `atOrAbove` check when the value reaches the threshold", () => {
-    expect(trips("duplicate", 0.7, 0.7)).toBe(true);
-    expect(trips("duplicate", 0.69, 0.7)).toBe(false);
+  it("scales a rubric level against its own top", () => {
+    expect(goodness("depth", 3)).toBe(100);
+    expect(goodness("depth", 1.5)).toBe(50);
+  });
+
+  it("flips a fault question, so a duplicate scores low", () => {
+    expect(goodness("duplicate", 0.06)).toBe(94);
+    expect(goodness("duplicate", 0.89)).toBe(11);
+  });
+
+  it("clamps an answer outside its declared range", () => {
+    expect(goodness("depth", 5)).toBe(100);
+    expect(goodness("coversTopic", -1)).toBe(0);
+  });
+
+  it("means the same thing for every check: higher is better", () => {
+    for (const name of CHECKS) {
+      const best = CHECK_DEFINITIONS[name].invert ? 0 : CHECK_DEFINITIONS[name].max;
+      expect(goodness(name, best)).toBe(100);
+    }
+  });
+});
+
+describe("trips", () => {
+  it("uses one rule for every check — below the threshold is a problem", () => {
+    expect(trips("coversTopic", 0.4, 50)).toBe(true);
+    expect(trips("coversTopic", 0.5, 50)).toBe(false);
+  });
+
+  it("reads a fault question through the flipped score", () => {
+    // 0.7 duplicate is 30 for freshness, which is not below 30.
+    expect(trips("duplicate", 0.7, 30)).toBe(false);
+    expect(trips("duplicate", 0.75, 30)).toBe(true);
   });
 });
 
@@ -190,16 +222,39 @@ describe("parseGateSettings", () => {
     }
   });
 
-  it("rejects a threshold outside its own check's range", () => {
+  it("rejects a threshold outside 0–100", () => {
     const parsed = parseGateSettings({
+      scale: 100,
+      checks: { coversTopic: { enabled: true, threshold: 140 } },
+    });
+    expect(parsed.checks.coversTopic.threshold).toBe(
+      DEFAULT_GATE_SETTINGS.checks.coversTopic.threshold
+    );
+  });
+
+  it("converts a row saved before the 0–100 scale", () => {
+    const parsed = parseGateSettings({
+      mode: "soft",
       checks: {
-        coversTopic: { enabled: true, threshold: 2.5 },
-        depth: { enabled: true, threshold: 2.5 },
+        // The old raw cut-offs: "below 0.5" and "at or above 0.7".
+        coversTopic: { enabled: true, threshold: 0.5 },
+        duplicate: { enabled: true, threshold: 0.7 },
+        depth: { enabled: true, threshold: 1.5 },
       },
     });
-    // 2.5 is impossible for a 0..1 question but fine for a 0..3 one.
-    expect(parsed.checks.coversTopic.threshold).toBe(0.5);
-    expect(parsed.checks.depth.threshold).toBe(2.5);
+    expect(parsed.scale).toBe(100);
+    expect(parsed.checks.coversTopic.threshold).toBe(50);
+    // 0.7 duplicate is 30 freshness, and the comparison flips with it.
+    expect(parsed.checks.duplicate.threshold).toBe(30);
+    expect(parsed.checks.depth.threshold).toBe(50);
+  });
+
+  it("leaves a row that already carries the marker alone", () => {
+    const parsed = parseGateSettings({
+      scale: 100,
+      checks: { coversTopic: { enabled: true, threshold: 65 } },
+    });
+    expect(parsed.checks.coversTopic.threshold).toBe(65);
   });
 
   it("ignores a mode it does not know", () => {

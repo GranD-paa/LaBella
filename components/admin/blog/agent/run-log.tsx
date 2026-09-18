@@ -13,24 +13,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatToman } from "@/lib/ai/pricing";
+import {
+  CHECK_DEFINITIONS,
+  goodness,
+  type CheckName,
+} from "@/lib/blog/agent/gate-settings";
 import type { AdminRun } from "@/lib/blog/agent/store";
 
 import { ErrorText, formatTehranDateTime } from "./shared";
 
-/**
- * What each judgment asked, in the owner's words.
- *
- * The keys are the question ids the reviewer uses; anything not listed here
- * still shows, under its own name, so a judgment added later is visible before
- * anyone gets round to naming it in Persian.
- */
-const GATE_LABELS: Record<string, string> = {
-  coversTopic: "پوشش موضوع",
-  duplicate: "تکراری بودن",
-  tuRuleViolated: "خطای ترجمهٔ «tu»",
-  coverMatches: "تناسب تصویر",
-  depth: "عمق مطلب",
-};
+/** What each judgment asked, in the owner's words. */
+function gateLabel(name: string) {
+  return name in CHECK_DEFINITIONS
+    ? CHECK_DEFINITIONS[name as CheckName].label
+    : name;
+}
 
 const GATE_OUTCOME: Record<string, { label: string; className: string }> = {
   pass: {
@@ -51,9 +48,16 @@ const GATE_OUTCOME: Record<string, { label: string; className: string }> = {
   },
 };
 
-/** Two decimals, except the depth score, which is read as a level out of 3. */
+/**
+ * Out of a hundred, higher is better — the same scale the reviewer's own tab
+ * uses. A name this build does not know is left raw rather than rescaled by a
+ * rule that may not apply to it.
+ */
 function formatScore(name: string, value: number) {
-  const text = name === "depth" ? `${value.toFixed(2)} از ۳` : value.toFixed(2);
+  const text =
+    name in CHECK_DEFINITIONS
+      ? String(goodness(name as CheckName, value))
+      : value.toFixed(2);
   return text.replace(/[0-9]/g, (digit) => "۰۱۲۳۴۵۶۷۸۹"[Number(digit)]);
 }
 
@@ -171,7 +175,7 @@ export function RunLog({ runs }: { runs: AdminRun[] }) {
                         <dl className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-muted-foreground">
                           {run.gate.scores.map((entry) => (
                             <div key={entry.name} className="flex gap-1">
-                              <dt>{GATE_LABELS[entry.name] ?? entry.name}:</dt>
+                              <dt>{gateLabel(entry.name)}:</dt>
                               <dd className="font-medium text-foreground">
                                 {formatScore(entry.name, entry.value)}
                               </dd>

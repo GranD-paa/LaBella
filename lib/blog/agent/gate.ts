@@ -27,8 +27,8 @@
 import { noul, score, TypeSafeClient } from "@typesafe-ai/sdk";
 
 import {
-  CHECK_DEFINITIONS,
   DEFAULT_GATE_SETTINGS,
+  goodness,
   type CheckName,
   type GateMode,
   type GateSettings,
@@ -162,11 +162,14 @@ function reasonFor(name: CheckName): string {
   }
 }
 
-/** Whether a measured value trips this check, given the owner's threshold. */
-export function trips(name: CheckName, value: number, threshold: number): boolean {
-  return CHECK_DEFINITIONS[name].direction === "below"
-    ? value < threshold
-    : value >= threshold;
+/**
+ * Whether a raw answer trips this check.
+ *
+ * One comparison for all nine, because `goodness` has already turned every
+ * answer into "higher is better, out of a hundred".
+ */
+export function trips(name: CheckName, raw: number, threshold: number): boolean {
+  return goodness(name, raw) < threshold;
 }
 
 /**
@@ -296,10 +299,11 @@ export async function reviewTopic(
     const value = result.answers.alreadyCovered.noul;
     return {
       alreadyCovered: value,
-      reason:
-        value >= settings.checks.duplicate.threshold
-          ? "این موضوع پیش‌تر پوشش داده شده بود."
-          : null,
+      // Judged against the freshness threshold, through the same helper the
+      // post-write checks use, so one setting governs both.
+      reason: trips("duplicate", value, settings.checks.duplicate.threshold)
+        ? "این موضوع پیش‌تر پوشش داده شده بود."
+        : null,
     };
   } catch {
     // Unreachable means "write it", never "skip it". The agent's job does not
