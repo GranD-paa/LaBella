@@ -111,6 +111,9 @@ export const articleSchema = z.object({
 
 export type Article = z.infer<typeof articleSchema>;
 
+const ARTICLE_TITLE_RULE =
+  "عنوان فارسی مقاله، بین ۴۵ تا ۶۵ کاراکتر. موضوعی که به تو داده شده «سفارش» است، نه عنوان؛ آن را عیناً کپی نکن. عنوان باید دو چیز داشته باشد: گیرِ مشخصی که خواننده با آن آمده، و یک جزء مشخص از خود مقاله — کلمه‌ای که یاد می‌دهد یا تفاوتی که نشان می‌دهد. کلیدواژهٔ اصلی باید در عنوان باشد، ولی لازم نیست اول آن بیاید. عدد را فقط وقتی بنویس که در متن شمرده باشی.";
+
 /**
  * The same shape as JSON Schema, with the site's real category and language
  * slugs baked in as enums.
@@ -124,6 +127,26 @@ export type Article = z.infer<typeof articleSchema>;
  * `required` and `additionalProperties: false` throughout, which is why
  * nullable fields are spelled as a two-member type rather than left optional.
  */
+/**
+ * The retitle pass, which asks for one field and nothing else.
+ *
+ * A title emitted as one field inside the full article generation scores 29
+ * to 41 on `titleGrip`; the same rule asked on its own, with the finished
+ * article in hand, scores 47 to 63. The difference is attention, not
+ * ordering — moving `title` after `content` in this schema changed nothing.
+ */
+export const TITLE_ONLY_JSON_SCHEMA: Record<string, unknown> = {
+  type: "object",
+  additionalProperties: false,
+  required: ["title"],
+  properties: {
+    title: {
+      type: "string",
+      description: ARTICLE_TITLE_RULE,
+    },
+  },
+};
+
 export function buildArticleJsonSchema(
   categorySlugs: string[],
   languageSlugs: string[]
@@ -151,7 +174,7 @@ export function buildArticleJsonSchema(
       title: {
         type: "string",
         description:
-          "عنوان فارسی مقاله. بین ۴۵ تا ۶۵ کاراکتر. کلیدواژه اصلی در ابتدای عنوان بیاید.",
+          ARTICLE_TITLE_RULE,
       },
       slug: {
         type: "string",

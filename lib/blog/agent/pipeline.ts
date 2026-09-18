@@ -19,6 +19,7 @@ import {
 } from "@/lib/blog/agent/config";
 import {
   coverImagePrompt,
+  retitleUserPrompt,
   writerSystemPrompt,
   writerUserPrompt,
   type ExistingPost,
@@ -27,6 +28,7 @@ import {
 import {
   articleSchema,
   buildArticleJsonSchema,
+  TITLE_ONLY_JSON_SCHEMA,
   type Article,
 } from "@/lib/blog/agent/schema";
 import {
@@ -281,7 +283,7 @@ async function runTopic(
       );
     }
 
-    const article = normalise(parsed.data, context, notes);
+    let article = normalise(parsed.data, context, notes);
     const slug = await uniqueSlug(article.slug, notes);
 
     // The schema makes the writer list every word it teaches with a Persian
@@ -297,6 +299,52 @@ async function runTopic(
       durationMs: 0,
       note: `listed=${article.pronunciations.length} inline=${inlinePronunciations}`,
     });
+
+    // ------------------------------------------------------------- retitle
+    // The title the writer returns inside the article JSON is the weakest
+    // thing in the run: it scores 29 to 41 on `titleGrip` while the same rule
+    // asked on its own, with the finished article in hand, scores 47 to 63.
+    // Moving the field after `content` in the schema was tried first and
+    // changed nothing, so it is attention rather than ordering — one field out
+    // of fourteen, written while three thousand tokens of article are the real
+    // task.
+    //
+    // This second call asks for that one field and nothing else. It reads a
+    // couple of thousand prompt tokens and writes about thirty, which is
+    // rounding error next to the ten thousand toman the article itself costs.
+    //
+    // It is an improvement, never a dependency: any failure, any answer that
+    // is not a usable title, and the writer's own title stands.
+    const retitleStarted = Date.now();
+    try {
+      const retitled = await chatJSON<{ title?: unknown }>({
+        model: writerModel,
+        system: writerSystemPrompt(config.prompts),
+        user: retitleUserPrompt(topic.topic, article.content, config.prompts),
+        schemaName: "laparli_blog_title",
+        schema: TITLE_ONLY_JSON_SCHEMA,
+        maxTokens: 400,
+        connection,
+      });
+      const proposed =
+        typeof retitled.data?.title === "string" ? retitled.data.title.trim() : "";
+      const usable = proposed.length >= 10 && proposed.length <= 120;
+      if (usable) article = { ...article, title: proposed };
+      steps.push({
+        name: "retitle",
+        model: writerModel,
+        promptTokens: retitled.usage.promptTokens,
+        completionTokens: retitled.usage.completionTokens,
+        durationMs: Date.now() - retitleStarted,
+        note: usable ? `kept=${proposed}` : "rejected, writer title stands",
+      });
+    } catch (error) {
+      steps.push({
+        name: "retitle",
+        durationMs: Date.now() - retitleStarted,
+        note: `skipped: ${error instanceof Error ? error.message : String(error)}`,
+      });
+    }
 
     // ----------------------------------------------------------------- gate
     // Before the cover, not after it. The image is about half what a run

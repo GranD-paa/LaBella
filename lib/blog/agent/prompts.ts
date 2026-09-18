@@ -151,6 +151,26 @@ const COVER_GUIDANCE = `## تصویر شاخص
 
 \`imagePrompt\` را انگلیسی بنویس. رنگ، نور و سبک را ننویس؛ جداگانه اضافه می‌شوند. هیچ‌وقت کلمه‌ی فارسی برای داخل تصویر پیشنهاد نده.`;
 
+/**
+ * The brief for the retitle pass.
+ *
+ * Deliberately built from the same `seoRules` section as the writer's own
+ * prompt, overrides included, so the owner edits the title rules in one place
+ * and both calls follow them.
+ */
+export function retitleUserPrompt(
+  queuedTopic: string,
+  content: string,
+  overrides?: PromptOverrides
+): string {
+  return [
+    `موضوعی که سفارش داده شده بود: ${queuedTopic}`,
+    "مقاله نوشته شده و متن کاملش پایین آمده است. حالا فقط عنوانش را بنویس.",
+    section("seoRules", overrides),
+    ["متن مقاله:", content].join("\n\n"),
+  ].join("\n\n");
+}
+
 /** The default, or the panel's replacement when it has one. */
 function section(key: PromptSectionKey, overrides?: PromptOverrides): string {
   const custom = overrides?.[key]?.trim();
