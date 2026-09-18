@@ -668,7 +668,19 @@
 
   position: relative;
   isolation: isolate;
+  /*
+   * `clip`, not `hidden`.
+   *
+   * `overflow: hidden` still makes a scroll container, and the light sweep
+   * comes to rest at translateX(-115%) because its animation fills `both` —
+   * which leaves the plate scrollable to more than twice its own width. Any
+   * scrollIntoView inside it, a click on a disclosure or a keyboard focus,
+   * then jogs the entire plate sideways and leaves it there. `clip` cuts the
+   * same overflow without ever creating something to scroll. `hidden` stays
+   * above it for anything too old to know the keyword.
+   */
   overflow: hidden;
+  overflow: clip;
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
   background: linear-gradient(177deg, #190235 0%, #0d001d 48%, #0a0016 100%);

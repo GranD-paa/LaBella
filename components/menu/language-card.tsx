@@ -84,7 +84,7 @@ export function LanguageCard({ language }: { language: CurriculumLanguage }) {
              arrives on one row of an index. */
           <p className="plate-tile-cta flex items-center gap-2 text-sm font-medium text-foreground/70">
             {t("menu.startLearning")}
-            <ArrowRight className="plate-chev h-4 w-4 rtl:rotate-180" aria-hidden />
+            <ArrowRight className="plate-chev h-4 w-4" aria-hidden />
           </p>
         ) : (
           <p className="text-sm font-medium text-muted-foreground/70">

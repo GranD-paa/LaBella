@@ -82,9 +82,12 @@ export function AchievementsSection({
             ? t("dashboard.user.achievementsCollapse")
             : t("dashboard.user.achievementsExpand")}
         </span>
+        {/* Not `.plate-chev`: that class mirrors itself for right-to-left,
+            which is right for an arrow that means "onward" and wrong for one
+            that means "open". Down is down in either direction. */}
         <ChevronDown
           className={cn(
-            "plate-chev h-5 w-5 shrink-0 text-foreground/45",
+            "h-5 w-5 shrink-0 text-foreground/45 transition-transform duration-200",
             open && "rotate-180"
           )}
           aria-hidden
