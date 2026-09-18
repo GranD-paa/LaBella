@@ -617,115 +617,386 @@
 }
 
 /* -------------------------------------------------------------------------
-   The admin console — the dashboard an admin lands on, and the masthead that
-   opens /admin.
+   The admin console.
 
-   Everything here is namespaced `ac-` and additive: no rule above is touched,
-   so removing this block returns the console to the shared card styling it
-   used before. Tailwind carries the rest; these are the four things a utility
-   cannot say without changing the config for every page — a light source that
-   knows which way the page reads, dividers that redraw themselves when the
-   grid changes shape, hover gated to real pointers, and one entrance.
+   The rest of the site is made of cards: separate boxes, each with its own
+   border, floating on the page. The console is made of one — a single milled
+   plate, lit from the corner the reader starts at, with its zones cut into it
+   by engraved grooves rather than stacked as panels. It is opaque where the
+   landing page is glass, and its hierarchy comes from type scale and light
+   instead of from nesting.
+
+   Everything is namespaced `ac-` and appended below every other rule, so
+   deleting this block and the markup that calls it returns the page to the
+   shared card styling with nothing else disturbed.
    ------------------------------------------------------------------------- */
 
-.ac-console {
-  --ac-line: rgba(255, 255, 255, 0.07);
+.ac-plate {
   --ac-ease: cubic-bezier(0.23, 1, 0.32, 1);
-}
+  /* The lamp hangs over the corner the language starts at. */
+  --ac-lamp: 80%;
+  --ac-flow: left;
+  --ac-origin: right;
+  --ac-sweep-from: 115%;
+  --ac-sweep-to: -115%;
 
-/* A single light source, falling from the corner the reader starts at. Only
-   the position flips for English and Italian; the colour never does. */
-.ac-masthead {
-  --ac-bloom: 86%;
   position: relative;
+  isolation: isolate;
   overflow: hidden;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: linear-gradient(177deg, #190235 0%, #0d001d 48%, #0a0016 100%);
+  /* A lit top bevel, a dark seam under the bottom edge, and enough shadow for
+     the plate to sit on the page rather than be painted onto it. */
+  box-shadow:
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.5),
+    0 44px 84px -50px rgba(0, 0, 0, 0.95);
 }
 
-[dir="ltr"] .ac-masthead {
-  --ac-bloom: 14%;
+[dir="ltr"] .ac-plate {
+  --ac-lamp: 20%;
+  --ac-flow: right;
+  --ac-origin: left;
+  --ac-sweep-from: -115%;
+  --ac-sweep-to: 115%;
 }
 
-.ac-masthead::before {
+@media (min-width: 640px) {
+  .ac-plate {
+    border-radius: 1.75rem;
+  }
+}
+
+/* Three things the light does, in one layer: strike the top edge brightest
+   directly under the lamp and fall away along it, pool across the masthead,
+   and bounce back off the far bottom corner. A top edge of one flat value is
+   the tell that a surface was filled rather than lit. */
+.ac-plate::before {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(
-      115% 150% at var(--ac-bloom) -35%,
-      rgba(114, 9, 183, 0.42) 0%,
-      transparent 62%
+  background-image:
+    linear-gradient(
+      to var(--ac-flow),
+      rgba(255, 255, 255, 0.42),
+      rgba(255, 255, 255, 0.05) 52%,
+      transparent 86%
     ),
     radial-gradient(
-      80% 120% at calc(100% - var(--ac-bloom)) 135%,
-      rgba(60, 9, 108, 0.4) 0%,
-      transparent 58%
+      54rem 26rem at var(--ac-lamp) -8rem,
+      rgba(132, 22, 204, 0.62),
+      transparent 70%
+    ),
+    radial-gradient(
+      34rem 22rem at calc(100% - var(--ac-lamp)) 114%,
+      rgba(76, 12, 138, 0.5),
+      transparent 74%
     );
+  background-size:
+    100% 1px,
+    auto,
+    auto;
+  background-position:
+    top,
+    center,
+    center;
+  background-repeat: no-repeat;
 }
 
-/* Readings on one instrument, not four cards in a row. The cell count changes
-   with the role, so the dividers are drawn by position rather than spelled out
-   per cell: column flow lets three readings fill the panel as evenly as four. */
-.ac-vitals {
+/* Grain. Large flat washes of one colour band on cheap panels and read as
+   flat CSS on good ones; a few percent of noise over the whole plate is what
+   gives it a surface. */
+.ac-plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+.ac-zone {
+  position: relative;
+  z-index: 2;
+}
+
+/* An engraved groove: the cut, then the light catching its lower lip. One
+   line would be a divider; two make the plate look milled. */
+.ac-groove {
+  border-top: 1px solid rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.045);
+}
+
+/* The lamp coming on: one pass of light across the plate, the way it would
+   travel over a real surface — from the edge the reading starts at, over the
+   text rather than behind it, gone before it can be stared at. It happens
+   once per load and is the same moment the inlay draws and the readings rise.
+   Everything it touches is already legible without it. */
+.ac-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.055) 47%,
+    rgba(251, 191, 36, 0.05) 53%,
+    transparent 60%
+  );
+  animation: ac-sweep 950ms cubic-bezier(0.77, 0, 0.175, 1) 80ms both;
+}
+
+@keyframes ac-sweep {
+  from {
+    transform: translateX(var(--ac-sweep-from));
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(var(--ac-sweep-to));
+    opacity: 0;
+  }
+}
+
+/* The index sits in a well milled into the plate: a shade below the face
+   around it, with the cut shadowed at the top lip and lit at the bottom one.
+   It is the same move as the groove, at the scale of a whole zone. */
+.ac-well {
+  background-color: rgba(0, 0, 0, 0.26);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
+    inset 0 9px 14px -12px rgba(0, 0, 0, 0.9),
+    inset 0 -9px 14px -12px rgba(0, 0, 0, 0.55);
+}
+
+/* The gold inlay that closes the masthead. It is the only unbroken line on
+   the plate, and it draws itself once, from the edge the reading starts at. */
+.ac-horizon {
+  height: 1px;
+  background: linear-gradient(
+    to var(--ac-flow),
+    rgba(251, 191, 36, 0.6),
+    rgba(114, 9, 183, 0.38) 34%,
+    transparent 84%
+  );
+  transform-origin: var(--ac-origin);
+  animation: ac-draw 620ms var(--ac-ease) both;
+}
+
+@keyframes ac-draw {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+.ac-eyebrow-dot {
+  height: 5px;
+  width: 5px;
+  border-radius: 999px;
+  background: #fbbf24;
+  box-shadow: 0 0 10px 0 rgba(251, 191, 36, 0.85);
+}
+
+.ac-title {
+  font-size: clamp(2rem, 1.35rem + 2.5vw, 3.15rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* The readings. Four cells cut from the same plate, divided by hairlines that
+   fade out before they reach the edge so the cells read as regions of one
+   surface rather than as four boxes pushed together. */
+.ac-figs {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.ac-vitals > * {
-  border-top: 1px solid var(--ac-line);
-  border-inline-start: 1px solid var(--ac-line);
+.ac-fig {
+  position: relative;
 }
 
-.ac-vitals > :nth-child(-n + 2) {
-  border-top: 0;
+.ac-fig::before,
+.ac-fig::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
 }
 
-.ac-vitals > :nth-child(odd) {
-  border-inline-start: 0;
+/* Vertical hairline, at the cell's leading edge. */
+.ac-fig::before {
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 255, 0.09) 24%,
+    rgba(255, 255, 255, 0.09) 76%,
+    transparent
+  );
+}
+
+/* Horizontal one, for the second row of the phone layout. */
+.ac-fig::after {
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    to var(--ac-flow),
+    transparent,
+    rgba(255, 255, 255, 0.08) 18%,
+    rgba(255, 255, 255, 0.08) 82%,
+    transparent
+  );
+}
+
+.ac-figs > :nth-child(odd)::before,
+.ac-figs > :nth-child(-n + 2)::after {
+  display: none;
 }
 
 @media (min-width: 1024px) {
-  .ac-vitals {
+  /* Column flow so three readings fill the plate as evenly as four do — which
+     role is looking decides how many there are. */
+  .ac-figs {
     grid-template-columns: none;
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
   }
 
-  .ac-vitals > * {
-    border-top: 0;
-    border-inline-start: 1px solid var(--ac-line);
+  .ac-fig::after {
+    display: none;
   }
 
-  .ac-vitals > :first-child {
-    border-inline-start: 0;
+  .ac-figs > :nth-child(odd)::before {
+    display: block;
+  }
+
+  .ac-figs > :first-child::before {
+    display: none;
   }
 }
 
-.ac-display {
-  font-size: clamp(1.75rem, 1.15rem + 2.1vw, 2.6rem);
+.ac-fig-value {
+  font-size: clamp(2.6rem, 1.85rem + 3.1vw, 4.25rem);
   font-weight: 700;
-  line-height: 1.22;
-}
-
-/* Tabular figures so the four readings share a baseline grid and a 9 is
-   exactly as wide as a 1. The tight tracking is safe here and nowhere near
-   the Persian text: these strings are only ever digits and a percent sign. */
-.ac-figure {
-  font-size: clamp(1.9rem, 1.4rem + 1.5vw, 2.55rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.03em;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
   font-variant-numeric: tabular-nums;
+  color: #ffffff;
 }
 
-/* The console's only entrance: the readings arrive as one short wave, once,
-   and nothing else on the page moves on load. An admin opens this screen
-   several times a day, so it is deliberately small and nearly over before it
-   is noticed. */
+/* Polished rather than painted: the figure picks up the lamp at its top and
+   cools towards its foot. Guarded, because a browser without background-clip
+   would render the transparent fill and nothing else. */
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+  .ac-fig-value {
+    background: linear-gradient(180deg, #ffffff 0%, #f4eeff 36%, #ab93d6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* The index. A row is a line in a table of contents: the destination, the
+   leader running out of it, and where it goes. */
+.ac-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.25rem;
+  border-radius: 0.75rem;
+  padding-inline: 0.75rem;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    background-image 200ms ease,
+    transform 140ms var(--ac-ease);
+}
+
+.ac-leader {
+  flex: 1;
+  min-width: 1.25rem;
+  height: 1px;
+  opacity: 0.55;
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.5) 0.5px,
+    transparent 0.5px
+  );
+  background-size: 7px 1px;
+  background-repeat: repeat-x;
+  background-position: center;
+  transition: opacity 200ms ease;
+}
+
+.ac-row-icon,
+.ac-chev {
+  transition:
+    color 200ms ease,
+    transform 200ms var(--ac-ease);
+}
+
+.ac-row:active {
+  transform: scale(0.99);
+}
+
+.ac-row:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Gold is what the plate does when you reach for something, and the pointer
+   only ever reaches one row — so the accent stays scarce while every
+   destination can claim it. Gated: a tap leaves a hover stuck behind it. */
+@media (hover: hover) and (pointer: fine) {
+  .ac-row:hover {
+    background-image: linear-gradient(
+      to var(--ac-flow),
+      rgba(251, 191, 36, 0.11),
+      rgba(251, 191, 36, 0) 64%
+    );
+  }
+
+  .ac-row:hover .ac-row-icon,
+  .ac-row:hover .ac-chev {
+    color: #fbbf24;
+  }
+
+  .ac-row:hover .ac-leader {
+    opacity: 1;
+  }
+
+  [dir="rtl"] .ac-row:hover .ac-chev {
+    transform: translateX(-4px);
+  }
+
+  [dir="ltr"] .ac-row:hover .ac-chev {
+    transform: translateX(4px);
+  }
+}
+
+/* One entrance, once: the readings arrive as a short wave under the inlay as
+   it draws. Nothing else on the plate moves on load — an admin opens this
+   several times a day. */
 @keyframes ac-rise {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -743,79 +1014,39 @@
 }
 
 .ac-wave > * {
-  animation: ac-rise 260ms var(--ac-ease) both;
+  animation: ac-rise 300ms var(--ac-ease) both;
+  animation-delay: 120ms;
 }
 
 .ac-wave > :nth-child(2) {
-  animation-delay: 45ms;
+  animation-delay: 175ms;
 }
 
 .ac-wave > :nth-child(3) {
-  animation-delay: 90ms;
+  animation-delay: 230ms;
 }
 
 .ac-wave > :nth-child(4) {
-  animation-delay: 135ms;
-}
-
-.ac-tile {
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  transition:
-    background-color 160ms ease,
-    border-color 160ms ease,
-    transform 140ms var(--ac-ease);
-}
-
-.ac-tile:active {
-  transform: scale(0.985);
-}
-
-.ac-tile:focus-visible {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
-}
-
-.ac-tile-chip,
-.ac-chev {
-  transition:
-    background-color 160ms ease,
-    color 160ms ease,
-    transform 160ms var(--ac-ease);
-}
-
-/* Gold is the colour of the thing you are about to do, and hover only ever
-   reaches one tile — so the accent stays rare while every destination can
-   still claim it. Gated, because a tap on a phone fires a hover that sticks. */
-@media (hover: hover) and (pointer: fine) {
-  .ac-tile:hover {
-    background-color: rgba(255, 255, 255, 0.055);
-    border-color: rgba(251, 191, 36, 0.3);
-  }
-
-  .ac-tile:hover .ac-tile-chip {
-    background-color: rgba(251, 191, 36, 0.14);
-    color: #fbbf24;
-  }
-
-  [dir="rtl"] .ac-tile:hover .ac-chev {
-    transform: translateX(-3px);
-  }
-
-  [dir="ltr"] .ac-tile:hover .ac-chev {
-    transform: translateX(3px);
-  }
+  animation-delay: 285ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .ac-sheen {
+    display: none;
+  }
+
+  .ac-horizon {
+    animation: ac-appear 200ms ease both;
+    transform: none;
+  }
+
   .ac-wave > * {
     animation: ac-appear 200ms ease both;
   }
 
-  .ac-tile,
-  .ac-tile:active,
-  .ac-tile-chip,
-  .ac-chev {
+  .ac-row,
+  .ac-row:active,
+  .ac-row:hover .ac-chev {
     transform: none;
   }
 }
