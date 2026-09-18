@@ -583,11 +583,15 @@ export async function resetPromptAction(
 // ---------------------------------------------------------------------------
 
 const gateFields = z.object({
+  // Carried through deliberately. zod drops anything the schema does not name,
+  // and without the marker `parseGateSettings` would take the payload for a
+  // pre-0-100 row and rescale numbers that are already on the new scale.
+  scale: z.literal(100),
   mode: z.enum(["off", "log", "soft", "hard"]),
   preflight: z.boolean(),
   checks: z.record(
     z.string(),
-    z.object({ enabled: z.boolean(), threshold: z.number().min(0).max(3) })
+    z.object({ enabled: z.boolean(), threshold: z.number().min(0).max(100) })
   ),
 });
 

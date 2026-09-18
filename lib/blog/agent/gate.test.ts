@@ -249,6 +249,32 @@ describe("parseGateSettings", () => {
     expect(parsed.checks.depth.threshold).toBe(50);
   });
 
+  it("survives a save/read round trip without rescaling", () => {
+    // The bug this pins: the save path once dropped `scale`, so a threshold
+    // the owner had just typed was read back as a raw cut-off and converted a
+    // second time. Anything already on the 0–100 scale must come back
+    // unchanged, however many times it goes round.
+    let settings = { ...DEFAULT_GATE_SETTINGS };
+    settings.checks = {
+      ...settings.checks,
+      seoQuality: { enabled: true, threshold: 70 },
+    };
+
+    for (let pass = 0; pass < 3; pass += 1) {
+      settings = parseGateSettings(JSON.parse(JSON.stringify(settings)));
+      expect(settings.checks.seoQuality.threshold).toBe(70);
+      expect(settings.scale).toBe(100);
+    }
+  });
+
+  it("accepts the whole 0–100 range, not just the old raw one", () => {
+    const parsed = parseGateSettings({
+      scale: 100,
+      checks: { seoQuality: { enabled: true, threshold: 100 } },
+    });
+    expect(parsed.checks.seoQuality.threshold).toBe(100);
+  });
+
   it("leaves a row that already carries the marker alone", () => {
     const parsed = parseGateSettings({
       scale: 100,
