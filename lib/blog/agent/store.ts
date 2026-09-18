@@ -455,14 +455,57 @@ export type AdminRun = {
   topic: string | null;
   postId: string | null;
   postSlug: string | null;
+  /** The reviewer's verdict for this run, or null for runs that predate it. */
+  gate: RunGate | null;
 };
+
+/**
+ * The gate step, pulled back out of `steps` for the panel.
+ *
+ * It is stored as one more step rather than in columns of its own, so adding
+ * the reviewer needed no migration. Reading it back is this function's job.
+ */
+export type RunGate = {
+  outcome: string;
+  scores: { name: string; value: number }[];
+  durationMs: number;
+  inputTokens: number;
+};
+
+function readGate(steps: unknown): RunGate | null {
+  if (!Array.isArray(steps)) return null;
+
+  const step = steps.find(
+    (entry): entry is RunStep =>
+      !!entry && typeof entry === "object" && (entry as RunStep).name === "gate"
+  );
+  if (!step?.note) return null;
+
+  // `describeVerdict` writes "outcome name=0.00 name=0.00"; anything else is a
+  // shape this code did not write, and a missing badge beats a crashed page.
+  const [outcome, ...pairs] = step.note.split(" ");
+  const scores = pairs
+    .map((pair) => {
+      const [name, value] = pair.split("=");
+      return { name, value: Number(value) };
+    })
+    .filter((entry) => entry.name && Number.isFinite(entry.value));
+
+  return {
+    outcome,
+    scores,
+    durationMs: step.durationMs ?? 0,
+    inputTokens: step.promptTokens ?? 0,
+  };
+}
 
 export async function listRunsForAdmin(limit = 50): Promise<AdminRun[]> {
   const rows = await query<
-    Omit<AdminRun, "createdAt" | "costToman" | "imageTokens"> & {
+    Omit<AdminRun, "createdAt" | "costToman" | "imageTokens" | "gate"> & {
       createdAt: Date | string;
       costToman: string | number;
       imageTokens: string | number;
+      steps: unknown;
     }
   >(
     `select r.id,
@@ -475,6 +518,7 @@ export async function listRunsForAdmin(limit = 50): Promise<AdminRun[]> {
             r.image_prompt_tokens + r.image_completion_tokens as "imageTokens",
             r.cost_toman as "costToman",
             r.duration_ms as "durationMs",
+            r.steps,
             r.error,
             t.topic,
             r.post_id as "postId",
@@ -493,6 +537,7 @@ export async function listRunsForAdmin(limit = 50): Promise<AdminRun[]> {
     // `numeric` arrives as a string, so the sum is not concatenation.
     costToman: Number(row.costToman),
     imageTokens: Number(row.imageTokens),
+    gate: readGate(row.steps),
   }));
 }
 
@@ -505,4 +550,79 @@ export async function costSince(days = 30): Promise<number> {
     [days]
   );
   return Number(row?.total ?? 0);
+}
+
+/**
+ * How the reviewer has been scoring, across recent runs.
+ *
+ * Read from the `steps` column rather than a table of its own — see `readGate`.
+ * Runs from before the reviewer existed have no gate step and are skipped, so
+ * the averages describe the runs that were actually judged, not a diluted
+ * number that counts silence as a pass.
+ */
+export type GateStats = {
+  judged: number;
+  passed: number;
+  held: number;
+  unavailable: number;
+  /** Mean per check name, over the runs where that check ran. */
+  averages: { name: string; value: number; samples: number }[];
+  /** Newest first, for the trend line. */
+  history: { createdAt: string; outcome: string; scores: Record<string, number> }[];
+  totalInputTokens: number;
+};
+
+export async function gateStats(limit = 50): Promise<GateStats> {
+  const rows = await query<{ createdAt: Date | string; steps: unknown }>(
+    `select created_at as "createdAt", steps
+       from blog_agent_runs
+      order by created_at desc
+      limit $1`,
+    [limit]
+  );
+
+  const stats: GateStats = {
+    judged: 0,
+    passed: 0,
+    held: 0,
+    unavailable: 0,
+    averages: [],
+    history: [],
+    totalInputTokens: 0,
+  };
+
+  const sums = new Map<string, { total: number; samples: number }>();
+
+  for (const row of rows) {
+    const gate = readGate(row.steps);
+    if (!gate) continue;
+
+    stats.judged += 1;
+    stats.totalInputTokens += gate.inputTokens;
+    if (gate.outcome === "pass") stats.passed += 1;
+    if (gate.outcome === "hold") stats.held += 1;
+    if (gate.outcome === "unavailable") stats.unavailable += 1;
+
+    const scores: Record<string, number> = {};
+    for (const score of gate.scores) {
+      scores[score.name] = score.value;
+      const current = sums.get(score.name) ?? { total: 0, samples: 0 };
+      sums.set(score.name, {
+        total: current.total + score.value,
+        samples: current.samples + 1,
+      });
+    }
+
+    stats.history.push({
+      createdAt: new Date(row.createdAt).toISOString(),
+      outcome: gate.outcome,
+      scores,
+    });
+  }
+
+  sums.forEach(({ total, samples }, name) => {
+    stats.averages.push({ name, value: total / samples, samples });
+  });
+
+  return stats;
 }

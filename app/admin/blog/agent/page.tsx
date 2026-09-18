@@ -3,9 +3,12 @@ import type { Metadata } from "next";
 import { BlogAgentPanel } from "@/components/admin/blog/agent/agent-panel";
 import { ErrorState } from "@/components/errors/error-state";
 import { readAgentPanelSettings } from "@/lib/blog/agent/config";
+import { DEFAULT_GATE_SETTINGS } from "@/lib/blog/agent/gate-settings";
+import { readGateSettings } from "@/lib/blog/agent/gate-settings-store";
 import { DEFAULT_PROMPT_SECTIONS } from "@/lib/blog/agent/prompts";
 import {
   costSince,
+  gateStats,
   listRunsForAdmin,
   listTopicsForAdmin,
   releaseStaleTopics,
@@ -40,13 +43,19 @@ export default async function AdminBlogAgentPage() {
   // opening it is enough to put such a subject back in the queue.
   await releaseStaleTopics().catch(failed("stale-topic sweep"));
 
-  const [settings, topics, runs, cost, categories] = await Promise.all([
-    readAgentPanelSettings().catch(failed("settings")),
-    listTopicsForAdmin().catch(failed("topics")),
-    listRunsForAdmin().catch(failed("runs")),
-    costSince(30).catch(failed("cost")),
-    getDataRepository().getBlogCategories().catch(failed("categories")),
-  ]);
+  const [settings, topics, runs, cost, categories, gate, gateNumbers] =
+    await Promise.all([
+      readAgentPanelSettings().catch(failed("settings")),
+      listTopicsForAdmin().catch(failed("topics")),
+      listRunsForAdmin().catch(failed("runs")),
+      costSince(30).catch(failed("cost")),
+      getDataRepository().getBlogCategories().catch(failed("categories")),
+      // The reviewer is an addition to the agent, so neither of these may
+      // decide whether the page renders. A database without migration 013
+      // falls back to the defaults and an empty history.
+      readGateSettings().catch(failed("gate settings")),
+      gateStats().catch(failed("gate stats")),
+    ]);
 
   // The same rule as the blog list: a table that cannot be read says so,
   // instead of rendering an empty queue that looks like there is nothing to do.
@@ -68,6 +77,19 @@ export default async function AdminBlogAgentPage() {
       categories={categories.map(({ slug, name }) => ({ slug, name }))}
       languages={BLOG_LANGUAGES.map(({ slug, name }) => ({ slug, name }))}
       promptDefaults={DEFAULT_PROMPT_SECTIONS}
+      gateSettings={gate ?? DEFAULT_GATE_SETTINGS}
+      gateStats={
+        gateNumbers ?? {
+          judged: 0,
+          passed: 0,
+          held: 0,
+          unavailable: 0,
+          averages: [],
+          history: [],
+          totalInputTokens: 0,
+        }
+      }
+      jevKeyConfigured={Boolean(process.env.TYPESAFE_API_KEY?.trim())}
     />
   );
 }

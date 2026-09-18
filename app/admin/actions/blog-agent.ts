@@ -6,6 +6,15 @@ import { z } from "zod";
 import { normalizeBaseUrl, pingModel, type PingResult } from "@/lib/ai/arvan";
 import { requireAdminPermission } from "@/lib/auth/action-guards";
 import { loadAgentConfig } from "@/lib/blog/agent/config";
+import {
+  reviewArticle,
+  type GateVerdict,
+} from "@/lib/blog/agent/gate";
+import { parseGateSettings } from "@/lib/blog/agent/gate-settings";
+import {
+  readGateSettings,
+  writeGateSettings,
+} from "@/lib/blog/agent/gate-settings-store";
 import { runTopicNow } from "@/lib/blog/agent/pipeline";
 import {
   DEFAULT_PROMPT_SECTIONS,
@@ -566,5 +575,71 @@ export async function resetPromptAction(
     await saveAgentPrompt(parsed.data, null, profileId);
     revalidatePath(PANEL_PATH);
     return { success: true };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// The reviewer
+// ---------------------------------------------------------------------------
+
+const gateFields = z.object({
+  mode: z.enum(["off", "log", "soft", "hard"]),
+  preflight: z.boolean(),
+  checks: z.record(
+    z.string(),
+    z.object({ enabled: z.boolean(), threshold: z.number().min(0).max(3) })
+  ),
+});
+
+export async function saveGateSettingsAction(
+  input: unknown
+): Promise<AgentActionResult> {
+  return asSuperAdmin("save reviewer settings", async (profileId) => {
+    const parsed = gateFields.safeParse(input);
+    if (!parsed.success) return { error: firstIssue(parsed.error) };
+
+    // Parsed again on the way in: zod proved the shape, `parseGateSettings`
+    // proves every threshold is inside its own check's range and drops names
+    // this build does not know.
+    await writeGateSettings(parseGateSettings(parsed.data), profileId);
+    revalidatePath(PANEL_PATH);
+    return { success: true };
+  });
+}
+
+/**
+ * Runs the reviewer over text the owner pasted in, against no article and no
+ * queue.
+ *
+ * Nothing is stored and nothing is published — it exists so the owner can put
+ * a draft, a competitor's post, or a paragraph they are unsure about in front
+ * of the same judgments the agent's output gets, and see the numbers.
+ */
+export async function reviewTextAction(input: {
+  topic: string;
+  title: string;
+  body: string;
+}): Promise<AgentActionResult & { verdict?: GateVerdict }> {
+  return asSuperAdmin("review text", async () => {
+    const text = input.body?.trim();
+    if (!text) return { error: "متنی برای بررسی وارد نشده است." };
+
+    const settings = await readGateSettings();
+    const verdict = await reviewArticle(
+      {
+        queuedTopic: input.topic?.trim() || input.title?.trim() || "—",
+        title: input.title?.trim() || "—",
+        summary: text.slice(0, 200),
+        body: text,
+        // The manual box has no cover and no queue to compare against, so the
+        // two checks that need them are told so plainly rather than being
+        // handed an empty string to guess at.
+        imagePrompt: "(no cover was produced for this text)",
+        existingPosts: [],
+      },
+      settings
+    );
+
+    return { success: true, verdict };
   });
 }

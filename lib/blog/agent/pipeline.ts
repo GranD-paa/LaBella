@@ -10,7 +10,9 @@ import {
   failsRun,
   holdsPublication,
   reviewArticle,
+  reviewTopic,
 } from "@/lib/blog/agent/gate";
+import { readGateSettings } from "@/lib/blog/agent/gate-settings-store";
 import {
   loadAgentConfig,
   type ResolvedAgentConfig,
@@ -219,6 +221,25 @@ async function runTopic(
   try {
     // ---------------------------------------------------------------- write
     const context = await loadContext();
+
+    // Cheapest possible check, and the only one that can run before the money
+    // is spent. A null answer — switched off, no key, unreachable — means
+    // write it, exactly as the agent did before any reviewer existed.
+    const gateSettings = await readGateSettings();
+    const preflightStarted = Date.now();
+    const preflight = await reviewTopic(
+      topic.topic,
+      context.existingPosts,
+      gateSettings
+    );
+    if (preflight.alreadyCovered !== null) {
+      steps.push({
+        name: "preflight",
+        durationMs: Date.now() - preflightStarted,
+        note: `alreadyCovered=${preflight.alreadyCovered.toFixed(2)}`,
+      });
+    }
+    if (preflight.reason) notes.push(preflight.reason);
     const writeStarted = Date.now();
 
     const completion = await chatJSON<unknown>({
@@ -267,14 +288,18 @@ async function runTopic(
     // Before the cover, not after it. The image is about half what a run
     // costs, and an article that is not going out does not need one drawn.
     const gateStarted = Date.now();
-    const verdict = await reviewArticle({
-      queuedTopic: topic.topic,
-      title: article.title,
-      summary: article.summary,
-      body: article.content,
-      imagePrompt: article.imagePrompt,
-      existingPosts: context.existingPosts,
-    });
+    const verdict = await reviewArticle(
+      {
+        queuedTopic: topic.topic,
+        title: article.title,
+        summary: article.summary,
+        metaDescription: article.metaDescription,
+        body: article.content,
+        imagePrompt: article.imagePrompt,
+        existingPosts: context.existingPosts,
+      },
+      gateSettings
+    );
     steps.push({
       name: "gate",
       durationMs: Date.now() - gateStarted,

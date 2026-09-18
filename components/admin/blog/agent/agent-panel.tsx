@@ -14,6 +14,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { GateSettings } from "@/lib/blog/agent/gate-settings";
+import type { GateStats } from "@/lib/blog/agent/store";
+
+import { JevPanel } from "./jev-panel";
 import { formatToman } from "@/lib/ai/pricing";
 import type { AgentPanelSettings } from "@/lib/blog/agent/config";
 import type { PromptSectionKey } from "@/lib/blog/agent/prompts";
@@ -61,6 +65,9 @@ export function BlogAgentPanel({
   categories,
   languages,
   promptDefaults,
+  gateSettings,
+  gateStats,
+  jevKeyConfigured,
 }: {
   settings: AgentPanelSettings;
   topics: AdminTopic[];
@@ -69,6 +76,10 @@ export function BlogAgentPanel({
   categories: Option[];
   languages: Option[];
   promptDefaults: Record<PromptSectionKey, string>;
+  gateSettings: GateSettings;
+  gateStats: GateStats;
+  /** Whether `TYPESAFE_API_KEY` is set on the server; never the key itself. */
+  jevKeyConfigured: boolean;
 }) {
   const waiting = topics.filter((topic) => topic.status === "pending");
   const next = waiting[0];
@@ -138,6 +149,7 @@ export function BlogAgentPanel({
           <TabsTrigger value="prompt">پرامپت</TabsTrigger>
           <TabsTrigger value="connection">اتصال هوش مصنوعی</TabsTrigger>
           <TabsTrigger value="settings">تنظیمات</TabsTrigger>
+          <TabsTrigger value="jev">jev</TabsTrigger>
         </TabsList>
 
         <TabsContent value="queue">
@@ -157,6 +169,13 @@ export function BlogAgentPanel({
         </TabsContent>
         <TabsContent value="connection">
           <ConnectionForm settings={settings} />
+        </TabsContent>
+        <TabsContent value="jev">
+          <JevPanel
+            settings={gateSettings}
+            stats={gateStats}
+            keyConfigured={jevKeyConfigured}
+          />
         </TabsContent>
         <TabsContent value="settings">
           <SettingsForm settings={settings} />
