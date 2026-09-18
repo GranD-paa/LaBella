@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ListChecks } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { useTranslations } from "@/components/providers/locale-provider";
+import { Plate } from "@/components/layout/plate";
 import { Button } from "@/components/ui/button";
 
 export function QuizPageIntro({
@@ -26,16 +27,18 @@ export function QuizPageIntro({
         </Link>
       </Button>
 
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 text-primary">
-          <ListChecks className="h-5 w-5" />
-          <span className="text-sm font-medium">{t("quiz.label")}</span>
+      <Plate tone="reading">
+        <div className="plate-zone px-6 pb-8 pt-7 sm:px-10 sm:pb-9">
+          <p className="inline-flex items-center gap-2.5 text-[0.8125rem] font-medium text-foreground/80">
+            <span className="plate-dot" aria-hidden />
+            {t("quiz.label")}
+          </p>
+          <h1 className="plate-title mt-4">{title}</h1>
+          <p className="mt-3.5 max-w-[52ch] text-[0.9375rem]/[1.9] text-muted-foreground">
+            {hasCompleted ? t("quiz.alreadyCompleted") : t("quiz.takeHint")}
+          </p>
         </div>
-        <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
-        <p className="text-muted-foreground">
-          {hasCompleted ? t("quiz.alreadyCompleted") : t("quiz.takeHint")}
-        </p>
-      </div>
+      </Plate>
     </div>
   );
 }

@@ -13,6 +13,7 @@ import {
   CourseLevelAccordion,
 } from "@/components/learn/course-level-accordion";
 import { useTranslations } from "@/components/providers/locale-provider";
+import { Plate } from "@/components/layout/plate";
 import { Button } from "@/components/ui/button";
 import { CURRICULUM_MESSAGE_KEYS } from "@/lib/i18n/content-keys";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
@@ -47,16 +48,17 @@ export function LearnLanguageView({
 
       {language.available ? (
         <>
-          <section className="brand-surface relative overflow-hidden p-6 sm:p-8">
-            <div className="absolute inset-0 bg-brand-gradient opacity-20" />
-            <div className="relative space-y-3">
+          {/* Reading tone: the lamp comes down, because this is the top of
+              a path someone settles into rather than a console they scan. */}
+          <Plate tone="reading">
+            <div className="plate-zone px-6 pb-9 pt-8 sm:px-10 sm:pb-10">
               <FlagIcon slug={language.slug} className="h-8 w-12" />
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                {headline}
-              </h1>
-              <p className="max-w-2xl text-muted-foreground">{description}</p>
+              <h1 className="plate-title mt-4">{headline}</h1>
+              <p className="mt-3.5 max-w-[52ch] text-[0.9375rem]/[1.9] text-muted-foreground">
+                {description}
+              </p>
             </div>
-          </section>
+          </Plate>
 
           <section className="space-y-4">
             <div>

@@ -1,4 +1,5 @@
 import { BrandLogo } from "@/components/layout/brand-logo";
+import { Plate } from "@/components/layout/plate";
 import {
   AuthAsidePanel,
   AuthMobileHeader,
@@ -33,8 +34,12 @@ export default function AuthLayout({
         <AuthAsidePanel />
       </div>
 
+      {/* One plate, the size of the form. Signing in is the first thing anyone
+          sees of the app, so it is the first thing cut from the same metal. */}
       <div className="flex flex-1 items-center justify-center p-6 sm:p-10">
-        <div className="w-full max-w-sm">{children}</div>
+        <Plate className="w-full max-w-sm">
+          <div className="plate-zone px-6 py-8 sm:px-8">{children}</div>
+        </Plate>
       </div>
     </div>
   );

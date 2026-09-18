@@ -40,12 +40,9 @@ export function LevelCategoryGrid({ language, level }: LevelCategoryGridProps) {
 
   return (
     <div className="space-y-8">
-      <section className="brand-surface relative overflow-hidden rounded-2xl border border-white/10 p-6 sm:p-8">
-        <div className="absolute inset-0 bg-brand-gradient opacity-20" />
-        <div className="pointer-events-none absolute -end-10 -top-10 h-40 w-40 rounded-full bg-brand-accent/15 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 start-8 h-32 w-32 rounded-full bg-secondary/20 blur-3xl" />
+      <section className="plate plate--reading p-6 sm:p-8">
 
-        <div className="relative space-y-6">
+        <div className="plate-zone space-y-6">
           <div className="flex flex-wrap items-center gap-2.5">
             <FlagIcon slug={language.slug} className="h-7 w-10 shrink-0 sm:h-8 sm:w-12" />
             <Badge

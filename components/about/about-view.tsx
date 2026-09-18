@@ -4,13 +4,12 @@ import {
   BookOpen,
   Globe2,
   HeartHandshake,
-  Sparkles,
   Target,
   Users,
 } from "lucide-react";
 
 import { useTranslations } from "@/components/providers/locale-provider";
-import { Badge } from "@/components/ui/badge";
+import { Plate } from "@/components/layout/plate";
 
 const VALUE_ICONS = [Target, BookOpen, HeartHandshake, Globe2] as const;
 
@@ -26,24 +25,18 @@ export function AboutView() {
 
   return (
     <div className="space-y-10 pb-4">
-      <section className="brand-surface relative overflow-hidden p-6 sm:p-10">
-        <div className="absolute inset-0 bg-brand-gradient opacity-25" />
-        <div className="relative mx-auto max-w-3xl space-y-5 text-center">
-          <Badge
-            variant="outline"
-            className="gap-1.5 border-brand-accent/40 bg-white/5 px-3 py-1 text-brand-accent"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
+      <Plate>
+        <div className="plate-zone mx-auto max-w-3xl px-6 py-11 text-center sm:px-10 sm:py-14">
+          <p className="inline-flex items-center gap-2.5 text-[0.8125rem] font-medium text-foreground/80">
+            <span className="plate-dot" aria-hidden />
             {t("about.badge")}
-          </Badge>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            {t("about.title")}
-          </h1>
-          <p className="text-base text-muted-foreground sm:text-lg">
+          </p>
+          <h1 className="plate-title mt-4">{t("about.title")}</h1>
+          <p className="mx-auto mt-4 max-w-[52ch] text-[0.9375rem]/[1.9] text-muted-foreground">
             {t("about.subtitle")}
           </p>
         </div>
-      </section>
+      </Plate>
 
       <section className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
         <h2 className="text-xl font-semibold sm:text-2xl">{t("about.missionTitle")}</h2>

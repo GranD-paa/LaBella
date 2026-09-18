@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Crown, Lock, ShieldCheck, Sparkles } from "lucide-react";
+import { Lock, ShieldCheck, Sparkles } from "lucide-react";
 
 import { recoverMyPendingPaymentsAction } from "@/app/actions/checkout";
 import { SubscriptionLanguageTabs } from "@/components/subscription/subscription-language-tabs";
 import { SubscriptionPlanCards } from "@/components/subscription/subscription-plan-cards";
 import { useTranslations } from "@/components/providers/locale-provider";
+import { Plate } from "@/components/layout/plate";
 import { Badge } from "@/components/ui/badge";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
 import { interpolateText } from "@/lib/subscription/interpolate";
@@ -134,24 +135,18 @@ export function SubscriptionView({
 
   return (
     <div className="space-y-10 pb-4">
-      <section className="brand-surface relative overflow-hidden p-6 sm:p-10">
-        <div className="absolute inset-0 bg-brand-gradient opacity-20" />
-        <div className="relative mx-auto max-w-3xl space-y-5 text-center">
-          <Badge
-            variant="outline"
-            className="gap-1.5 border-brand-accent/40 bg-white/5 px-3 py-1 text-brand-accent"
-          >
-            <Crown className="h-3.5 w-3.5" />
+      <Plate>
+        <div className="plate-zone mx-auto max-w-3xl px-6 py-11 text-center sm:px-10 sm:py-14">
+          <p className="inline-flex items-center gap-2.5 text-[0.8125rem] font-medium text-foreground/80">
+            <span className="plate-dot" aria-hidden />
             {t("subscription.monthlyBadge")}
-          </Badge>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            {pageContent.hero_title[locale]}
-          </h1>
-          <p className="text-base text-muted-foreground sm:text-lg">
+          </p>
+          <h1 className="plate-title mt-4">{pageContent.hero_title[locale]}</h1>
+          <p className="mx-auto mt-4 max-w-[52ch] text-[0.9375rem]/[1.9] text-muted-foreground">
             {interpolateText(pageContent.hero_subtitle[locale], { name: displayName })}
           </p>
         </div>
-      </section>
+      </Plate>
 
       {isAdmin ? (
         <section className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5">
