@@ -889,10 +889,28 @@
   }
 }
 
+/*
+ * The figure's box has to be taller than the figure.
+ *
+ * `background-clip: text` below paints the gradient only where the element's
+ * own background would go, so anything the glyph puts outside that box — the
+ * tops of the numerals, under a line-height tuned to look tight — is simply
+ * never painted, and the digits arrive with a few pixels shaved off. Vazirmatn
+ * carries tall vertical metrics for the marks Persian sets above and below its
+ * letters, so the box needs real room: a line-height that clears the font's
+ * ascent, and padding to cover what the half-leading still leaves outside.
+ *
+ * The margins take that room back out of the layout, so the reading sits where
+ * it did. All of it in `em` — the figure is fluid, and a fixed compensation
+ * would only be correct at one viewport width.
+ */
 .ac-fig-value {
+  margin-top: 0.06em;
+  margin-bottom: -0.38em;
+  padding-block: 0.16em;
   font-size: clamp(2.6rem, 1.85rem + 3.1vw, 4.25rem);
   font-weight: 700;
-  line-height: 0.95;
+  line-height: 1.16;
   letter-spacing: -0.035em;
   font-variant-numeric: tabular-nums;
   color: #ffffff;
@@ -903,7 +921,12 @@
    would render the transparent fill and nothing else. */
 @supports (-webkit-background-clip: text) or (background-clip: text) {
   .ac-fig-value {
-    background: linear-gradient(180deg, #ffffff 0%, #f4eeff 36%, #ab93d6 100%);
+    background: linear-gradient(
+      180deg,
+      #ffffff 14%,
+      #f4eeff 44%,
+      #ab93d6 92%
+    );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;

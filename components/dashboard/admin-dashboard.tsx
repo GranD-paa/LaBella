@@ -60,7 +60,9 @@ function Figure({
   return (
     <div className="ac-fig px-6 py-7 sm:px-8 sm:py-9">
       <p className="text-xs font-medium text-white/45">{label}</p>
-      <p className="ac-fig-value mt-4">{value}</p>
+      {/* Spacing lives with the type in globals.css: the figure carries padding
+          the gradient needs, and margins that cancel it out. */}
+      <p className="ac-fig-value">{value}</p>
       <p className="mt-3 text-xs text-white/35">{note}</p>
     </div>
   );
