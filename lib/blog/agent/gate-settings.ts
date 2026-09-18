@@ -19,6 +19,7 @@ export const CHECKS = [
   "coverMatches",
   "depth",
   "seoQuality",
+  "titleGrip",
   "levelFit",
   "grammarCorrect",
   "linksRelevant",
@@ -106,6 +107,20 @@ export const CHECK_DEFINITIONS: Record<CheckName, CheckDefinition> = {
     invert: false,
     max: 3,
     defaultThreshold: 50,
+  },
+  // Split out of `seoQuality` once the numbers showed the two halves moving
+  // apart: the meta descriptions were already strong while the titles named
+  // the subject and nothing else. One score for both hid which to fix.
+  titleGrip: {
+    label: "گیرایی عنوان",
+    meaning: "عنوان گیرِ خواننده و یک جزء مشخص از متن را نام می‌برد",
+    invert: false,
+    max: 3,
+    // Scored against the seven published titles: they ran 34-73 and averaged
+    // 50, while the same articles retitled under the new rule ran 62-95 and
+    // averaged 78. 40 sits in the gap, so it catches the two that named
+    // nothing and lets everything written under the rule through.
+    defaultThreshold: 40,
   },
   levelFit: {
     label: "تناسب سطح زبانی",

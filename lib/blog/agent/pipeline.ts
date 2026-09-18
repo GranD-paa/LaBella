@@ -284,6 +284,20 @@ async function runTopic(
     const article = normalise(parsed.data, context, notes);
     const slug = await uniqueSlug(article.slug, notes);
 
+    // The schema makes the writer list every word it teaches with a Persian
+    // pronunciation; nothing in the schema can make it put them in the prose.
+    // Both numbers go into `steps` rather than into `notes`, because notes are
+    // returned to whoever triggered the run and then lost, while steps are
+    // stored — and this is a measurement we need across runs, not a message.
+    const inlinePronunciations = article.pronunciations.filter((entry) =>
+      article.content.includes(entry.fa)
+    ).length;
+    steps.push({
+      name: "pronunciations",
+      durationMs: 0,
+      note: `listed=${article.pronunciations.length} inline=${inlinePronunciations}`,
+    });
+
     // ----------------------------------------------------------------- gate
     // Before the cover, not after it. The image is about half what a run
     // costs, and an article that is not going out does not need one drawn.
@@ -477,19 +491,6 @@ function normalise(
   );
   if (dropped.length > 0) {
     notes.push(`${dropped.length} لینک داخلی به مطلب ناموجود حذف شد.`);
-  }
-
-  // The schema makes the writer list every word it teaches with a Persian
-  // pronunciation; nothing in the schema can make it put them in the prose.
-  // Counting is exact and free, so the run log says how much of the list
-  // actually reached the reader rather than leaving it to a judgment call.
-  const missing = article.pronunciations.filter(
-    (entry) => !content.includes(entry.fa)
-  );
-  if (article.pronunciations.length > 0 && missing.length > 0) {
-    notes.push(
-      `${missing.length} از ${article.pronunciations.length} تلفظ فقط در فهرست آمده و داخل متن نیامده.`
-    );
   }
 
   return {

@@ -108,6 +108,22 @@ function questionFor(name: CheckName) {
           "Accurate, specific, and names the exact difficulty the reader has",
         ]
       );
+    case "titleGrip":
+      // The rubric is the one measured, not one invented: rewriting seven
+      // published titles to name the reader's difficulty and one particular
+      // from the body moved this from 0.36 to 0.68 on the diagnostic, and
+      // `seoQuality` with it. The number clause is there because both of the
+      // rewrites that lost ground lost it by stating a count the body did not
+      // support.
+      return score(
+        "Judge `article_title` alone, as the one line a searcher sees.",
+        [
+          "Names only the subject; it would fit any article about it",
+          "Names the subject plus a generic angle — a guide, a comparison, a list",
+          "Carries one concrete particular from `article_body`: a word it teaches, a distinction it draws",
+          "Carries that particular AND names the specific difficulty the reader came with",
+        ]
+      );
     case "levelFit":
       // Judged against the subject's own demands, not against an absolute
       // beginner. The first version asked the flat question and punished an
@@ -163,6 +179,8 @@ function reasonFor(name: CheckName): string {
       return "مطلب کم‌مایه است و مثال یا قاعدهٔ کافی ندارد.";
     case "seoQuality":
       return "عنوان یا توضیح متا ضعیف است و نتیجهٔ جست‌وجوی خوبی نمی‌سازد.";
+    case "titleGrip":
+      return "عنوان فقط موضوع را می‌گوید و جزء مشخصی از متن در آن نیست.";
     case "levelFit":
       return "متن سخت‌تر از آن چیزی است که موضوعش ایجاب می‌کند.";
     case "grammarCorrect":
