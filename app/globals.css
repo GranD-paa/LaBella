@@ -617,28 +617,39 @@
 }
 
 /* -------------------------------------------------------------------------
-   The admin console.
+   The plate.
 
-   The rest of the site is made of cards: separate boxes, each with its own
-   border, floating on the page. The console is made of one — a single milled
-   plate, lit from the corner the reader starts at, with its zones cut into it
-   by engraved grooves rather than stacked as panels. It is opaque where the
-   landing page is glass, and its hierarchy comes from type scale and light
-   instead of from nesting.
+   The material every signed-in surface is cut from. The rest of the web is
+   made of cards — separate boxes, each with its own border, floating on the
+   page. A plate is one object: opaque, lit by a single lamp hanging over the
+   corner the language starts at, with its zones cut into it by engraved
+   grooves rather than stacked as panels. Hierarchy comes from type scale and
+   light instead of from nesting.
 
-   Everything is namespaced `ac-` and appended below every other rule, so
-   deleting this block and the markup that calls it returns the page to the
+   Two tones. The default is an instrument: dense, bright, made to be scanned.
+   `.plate--reading` is the same material turned down for surfaces someone
+   stays on — a lesson, a quiz — where a hard light from one corner and a tight
+   rhythm work against the text. Same family, two voices.
+
+   The public landing page and the blog are not made of this; they have their
+   own idiom, and nothing here reaches them.
+
+   Everything is namespaced `plate-` and appended below every other rule, so
+   deleting this block and the markup that calls it returns the app to the
    shared card styling with nothing else disturbed.
    ------------------------------------------------------------------------- */
 
-.ac-plate {
-  --ac-ease: cubic-bezier(0.23, 1, 0.32, 1);
+.plate {
+  --plate-ease: cubic-bezier(0.23, 1, 0.32, 1);
   /* The lamp hangs over the corner the language starts at. */
-  --ac-lamp: 80%;
-  --ac-flow: left;
-  --ac-origin: right;
-  --ac-sweep-from: 115%;
-  --ac-sweep-to: -115%;
+  --plate-lamp: 80%;
+  --plate-flow: left;
+  --plate-origin: right;
+  --plate-sweep-from: 115%;
+  --plate-sweep-to: -115%;
+  --plate-lamp-alpha: 0.62;
+  --plate-bounce-alpha: 0.5;
+  --plate-line: rgba(255, 255, 255, 0.07);
 
   position: relative;
   isolation: isolate;
@@ -646,23 +657,31 @@
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
   background: linear-gradient(177deg, #190235 0%, #0d001d 48%, #0a0016 100%);
-  /* A lit top bevel, a dark seam under the bottom edge, and enough shadow for
-     the plate to sit on the page rather than be painted onto it. */
+  /* A dark seam under the bottom edge, and enough shadow for the plate to sit
+     on the page rather than be painted onto it. The lit top bevel is drawn in
+     ::before, where it can fall away along its own length. */
   box-shadow:
     inset 0 -1px 0 0 rgba(0, 0, 0, 0.5),
     0 44px 84px -50px rgba(0, 0, 0, 0.95);
 }
 
-[dir="ltr"] .ac-plate {
-  --ac-lamp: 20%;
-  --ac-flow: right;
-  --ac-origin: left;
-  --ac-sweep-from: -115%;
-  --ac-sweep-to: 115%;
+[dir="ltr"] .plate {
+  --plate-lamp: 20%;
+  --plate-flow: right;
+  --plate-origin: left;
+  --plate-sweep-from: -115%;
+  --plate-sweep-to: 115%;
+}
+
+/* Turned down for reading: the lamp stops being a light source you notice and
+   becomes the room it is lit in. */
+.plate--reading {
+  --plate-lamp-alpha: 0.32;
+  --plate-bounce-alpha: 0.26;
 }
 
 @media (min-width: 640px) {
-  .ac-plate {
+  .plate {
     border-radius: 1.75rem;
   }
 }
@@ -671,7 +690,7 @@
    directly under the lamp and fall away along it, pool across the masthead,
    and bounce back off the far bottom corner. A top edge of one flat value is
    the tell that a surface was filled rather than lit. */
-.ac-plate::before {
+.plate::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -679,19 +698,19 @@
   pointer-events: none;
   background-image:
     linear-gradient(
-      to var(--ac-flow),
+      to var(--plate-flow),
       rgba(255, 255, 255, 0.42),
       rgba(255, 255, 255, 0.05) 52%,
       transparent 86%
     ),
     radial-gradient(
-      54rem 26rem at var(--ac-lamp) -8rem,
-      rgba(132, 22, 204, 0.62),
+      54rem 26rem at var(--plate-lamp) -8rem,
+      rgb(132 22 204 / var(--plate-lamp-alpha)),
       transparent 70%
     ),
     radial-gradient(
-      34rem 22rem at calc(100% - var(--ac-lamp)) 114%,
-      rgba(76, 12, 138, 0.5),
+      34rem 22rem at calc(100% - var(--plate-lamp)) 114%,
+      rgb(76 12 138 / var(--plate-bounce-alpha)),
       transparent 74%
     );
   background-size:
@@ -708,7 +727,7 @@
 /* Grain. Large flat washes of one colour band on cheap panels and read as
    flat CSS on good ones; a few percent of noise over the whole plate is what
    gives it a surface. */
-.ac-plate::after {
+.plate::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -719,24 +738,34 @@
   background-size: 180px 180px;
 }
 
-.ac-zone {
+.plate-zone {
   position: relative;
   z-index: 2;
 }
 
 /* An engraved groove: the cut, then the light catching its lower lip. One
    line would be a divider; two make the plate look milled. */
-.ac-groove {
+.plate-groove {
   border-top: 1px solid rgba(0, 0, 0, 0.55);
   box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.045);
 }
 
+/* A zone milled a shade below the face around it, shadowed at the top lip and
+   lit at the bottom one. The same move as the groove, at the scale of a whole
+   zone. */
+.plate-well {
+  background-color: rgba(0, 0, 0, 0.26);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
+    inset 0 9px 14px -12px rgba(0, 0, 0, 0.9),
+    inset 0 -9px 14px -12px rgba(0, 0, 0, 0.55);
+}
+
 /* The lamp coming on: one pass of light across the plate, the way it would
    travel over a real surface — from the edge the reading starts at, over the
-   text rather than behind it, gone before it can be stared at. It happens
-   once per load and is the same moment the inlay draws and the readings rise.
-   Everything it touches is already legible without it. */
-.ac-sheen {
+   text rather than behind it, gone before it can be stared at. Once per load,
+   and the same moment the inlay draws and the readings rise. */
+.plate-sheen {
   position: absolute;
   inset: 0;
   z-index: 3;
@@ -748,49 +777,38 @@
     rgba(251, 191, 36, 0.05) 53%,
     transparent 60%
   );
-  animation: ac-sweep 950ms cubic-bezier(0.77, 0, 0.175, 1) 80ms both;
+  animation: plate-sweep 950ms cubic-bezier(0.77, 0, 0.175, 1) 80ms both;
 }
 
-@keyframes ac-sweep {
+@keyframes plate-sweep {
   from {
-    transform: translateX(var(--ac-sweep-from));
+    transform: translateX(var(--plate-sweep-from));
     opacity: 0;
   }
   30% {
     opacity: 1;
   }
   to {
-    transform: translateX(var(--ac-sweep-to));
+    transform: translateX(var(--plate-sweep-to));
     opacity: 0;
   }
 }
 
-/* The index sits in a well milled into the plate: a shade below the face
-   around it, with the cut shadowed at the top lip and lit at the bottom one.
-   It is the same move as the groove, at the scale of a whole zone. */
-.ac-well {
-  background-color: rgba(0, 0, 0, 0.26);
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
-    inset 0 9px 14px -12px rgba(0, 0, 0, 0.9),
-    inset 0 -9px 14px -12px rgba(0, 0, 0, 0.55);
-}
-
-/* The gold inlay that closes the masthead. It is the only unbroken line on
-   the plate, and it draws itself once, from the edge the reading starts at. */
-.ac-horizon {
+/* The gold inlay that closes a masthead. It is the only unbroken line on the
+   plate, and it draws itself once, from the edge the reading starts at. */
+.plate-horizon {
   height: 1px;
   background: linear-gradient(
-    to var(--ac-flow),
+    to var(--plate-flow),
     rgba(251, 191, 36, 0.6),
     rgba(114, 9, 183, 0.38) 34%,
     transparent 84%
   );
-  transform-origin: var(--ac-origin);
-  animation: ac-draw 620ms var(--ac-ease) both;
+  transform-origin: var(--plate-origin);
+  animation: plate-draw 620ms var(--plate-ease) both;
 }
 
-@keyframes ac-draw {
+@keyframes plate-draw {
   from {
     transform: scaleX(0);
     opacity: 0;
@@ -801,7 +819,7 @@
   }
 }
 
-.ac-eyebrow-dot {
+.plate-dot {
   height: 5px;
   width: 5px;
   border-radius: 999px;
@@ -809,33 +827,39 @@
   box-shadow: 0 0 10px 0 rgba(251, 191, 36, 0.85);
 }
 
-.ac-title {
+.plate-title {
   font-size: clamp(2rem, 1.35rem + 2.5vw, 3.15rem);
   font-weight: 700;
   line-height: 1.2;
 }
 
-/* The readings. Four cells cut from the same plate, divided by hairlines that
-   fade out before they reach the edge so the cells read as regions of one
-   surface rather than as four boxes pushed together. */
-.ac-figs {
+/* A reading surface leads with a smaller head — the content is the point, not
+   the greeting above it. */
+.plate--reading .plate-title {
+  font-size: clamp(1.6rem, 1.15rem + 1.7vw, 2.35rem);
+}
+
+/* The readings. Cells cut from the same plate, divided by hairlines that fade
+   out before they reach the edge so they read as regions of one surface rather
+   than as boxes pushed together. */
+.plate-figs {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.ac-fig {
+.plate-fig {
   position: relative;
 }
 
-.ac-fig::before,
-.ac-fig::after {
+.plate-fig::before,
+.plate-fig::after {
   content: "";
   position: absolute;
   pointer-events: none;
 }
 
 /* Vertical hairline, at the cell's leading edge. */
-.ac-fig::before {
+.plate-fig::before {
   inset-block: 0;
   inset-inline-start: 0;
   width: 1px;
@@ -849,12 +873,12 @@
 }
 
 /* Horizontal one, for the second row of the phone layout. */
-.ac-fig::after {
+.plate-fig::after {
   inset-inline: 0;
   top: 0;
   height: 1px;
   background: linear-gradient(
-    to var(--ac-flow),
+    to var(--plate-flow),
     transparent,
     rgba(255, 255, 255, 0.08) 18%,
     rgba(255, 255, 255, 0.08) 82%,
@@ -862,29 +886,29 @@
   );
 }
 
-.ac-figs > :nth-child(odd)::before,
-.ac-figs > :nth-child(-n + 2)::after {
+.plate-figs > :nth-child(odd)::before,
+.plate-figs > :nth-child(-n + 2)::after {
   display: none;
 }
 
 @media (min-width: 1024px) {
-  /* Column flow so three readings fill the plate as evenly as four do — which
-     role is looking decides how many there are. */
-  .ac-figs {
+  /* Column flow so three readings fill the plate as evenly as four do — how
+     many there are is decided by who is looking. */
+  .plate-figs {
     grid-template-columns: none;
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
   }
 
-  .ac-fig::after {
+  .plate-fig::after {
     display: none;
   }
 
-  .ac-figs > :nth-child(odd)::before {
+  .plate-figs > :nth-child(odd)::before {
     display: block;
   }
 
-  .ac-figs > :first-child::before {
+  .plate-figs > :first-child::before {
     display: none;
   }
 }
@@ -904,7 +928,7 @@
  * it did. All of it in `em` — the figure is fluid, and a fixed compensation
  * would only be correct at one viewport width.
  */
-.ac-fig-value {
+.plate-fig-value {
   margin-top: 0.06em;
   margin-bottom: -0.38em;
   padding-block: 0.16em;
@@ -926,19 +950,19 @@
  * hydration takes; the count reveals it, or this animation does if no script
  * ever arrives. Either way nothing false is ever painted.
  */
-.ac-fig-value {
-  animation: ac-appear 240ms ease 560ms both;
+.plate-fig-value {
+  animation: plate-appear 240ms ease 560ms both;
 }
 
-.ac-fig-value[data-counting] {
-  animation: ac-appear 200ms ease both;
+.plate-fig-value[data-counting] {
+  animation: plate-appear 200ms ease both;
 }
 
 /* Polished rather than painted: the figure picks up the lamp at its top and
    cools towards its foot. Guarded, because a browser without background-clip
    would render the transparent fill and nothing else. */
 @supports (-webkit-background-clip: text) or (background-clip: text) {
-  .ac-fig-value {
+  .plate-fig-value {
     background: linear-gradient(
       180deg,
       #ffffff 14%,
@@ -952,9 +976,9 @@
   }
 }
 
-/* The index. A row is a line in a table of contents: the destination, the
-   leader running out of it, and where it goes. */
-.ac-row {
+/* The index. A row is a line in a table of contents: where it goes, the leader
+   running out of it, and the way on. */
+.plate-row {
   position: relative;
   display: flex;
   align-items: center;
@@ -966,10 +990,10 @@
   touch-action: manipulation;
   transition:
     background-image 200ms ease,
-    transform 140ms var(--ac-ease);
+    transform 140ms var(--plate-ease);
 }
 
-.ac-leader {
+.plate-leader {
   flex: 1;
   min-width: 1.25rem;
   height: 1px;
@@ -985,18 +1009,18 @@
   transition: opacity 200ms ease;
 }
 
-.ac-row-icon,
-.ac-chev {
+.plate-row-icon,
+.plate-chev {
   transition:
     color 200ms ease,
-    transform 200ms var(--ac-ease);
+    transform 200ms var(--plate-ease);
 }
 
-.ac-row:active {
+.plate-row:active {
   transform: scale(0.99);
 }
 
-.ac-row:focus-visible {
+.plate-row:focus-visible {
   outline: 2px solid hsl(var(--ring));
   outline-offset: 2px;
 }
@@ -1005,36 +1029,36 @@
    only ever reaches one row — so the accent stays scarce while every
    destination can claim it. Gated: a tap leaves a hover stuck behind it. */
 @media (hover: hover) and (pointer: fine) {
-  .ac-row:hover {
+  .plate-row:hover {
     background-image: linear-gradient(
-      to var(--ac-flow),
+      to var(--plate-flow),
       rgba(251, 191, 36, 0.11),
       rgba(251, 191, 36, 0) 64%
     );
   }
 
-  .ac-row:hover .ac-row-icon,
-  .ac-row:hover .ac-chev {
+  .plate-row:hover .plate-row-icon,
+  .plate-row:hover .plate-chev {
     color: #fbbf24;
   }
 
-  .ac-row:hover .ac-leader {
+  .plate-row:hover .plate-leader {
     opacity: 1;
   }
 
-  [dir="rtl"] .ac-row:hover .ac-chev {
+  [dir="rtl"] .plate-row:hover .plate-chev {
     transform: translateX(-4px);
   }
 
-  [dir="ltr"] .ac-row:hover .ac-chev {
+  [dir="ltr"] .plate-row:hover .plate-chev {
     transform: translateX(4px);
   }
 }
 
 /* One entrance, once: the readings arrive as a short wave under the inlay as
-   it draws. Nothing else on the plate moves on load — an admin opens this
-   several times a day. */
-@keyframes ac-rise {
+   it draws. Nothing else on the plate moves on load — these are screens people
+   open several times a day. */
+@keyframes plate-rise {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -1045,7 +1069,7 @@
   }
 }
 
-@keyframes ac-appear {
+@keyframes plate-appear {
   from {
     opacity: 0;
   }
@@ -1054,46 +1078,46 @@
   }
 }
 
-.ac-wave > * {
-  animation: ac-rise 300ms var(--ac-ease) both;
+.plate-wave > * {
+  animation: plate-rise 300ms var(--plate-ease) both;
   animation-delay: 120ms;
 }
 
-.ac-wave > :nth-child(2) {
+.plate-wave > :nth-child(2) {
   animation-delay: 175ms;
 }
 
-.ac-wave > :nth-child(3) {
+.plate-wave > :nth-child(3) {
   animation-delay: 230ms;
 }
 
-.ac-wave > :nth-child(4) {
+.plate-wave > :nth-child(4) {
   animation-delay: 285ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ac-sheen {
+  .plate-sheen {
     display: none;
   }
 
   /* No count is coming, so nothing is waiting for it. */
-  .ac-fig-value,
-  .ac-fig-value[data-counting] {
+  .plate-fig-value,
+  .plate-fig-value[data-counting] {
     animation: none;
   }
 
-  .ac-horizon {
-    animation: ac-appear 200ms ease both;
+  .plate-horizon {
+    animation: plate-appear 200ms ease both;
     transform: none;
   }
 
-  .ac-wave > * {
-    animation: ac-appear 200ms ease both;
+  .plate-wave > * {
+    animation: plate-appear 200ms ease both;
   }
 
-  .ac-row,
-  .ac-row:active,
-  .ac-row:hover .ac-chev {
+  .plate-row,
+  .plate-row:active,
+  .plate-row:hover .plate-chev {
     transform: none;
   }
 }
