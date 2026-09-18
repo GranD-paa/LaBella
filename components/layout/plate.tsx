@@ -71,7 +71,12 @@ export function PlateHead({
             {eyebrow}
           </p>
         ) : null}
-        <div className={cn("flex items-center gap-4", eyebrow && "mt-4")}>
+        <div
+          className={cn(
+            "flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4",
+            eyebrow && "mt-4"
+          )}
+        >
           {leading}
           <h1 className="plate-title min-w-0">{title}</h1>
         </div>
@@ -82,7 +87,9 @@ export function PlateHead({
         ) : null}
         {children}
       </div>
-      {action ? <div className="shrink-0">{action}</div> : null}
+      {action ? (
+        <div className="w-full shrink-0 sm:w-auto">{action}</div>
+      ) : null}
     </div>
   );
 }
@@ -98,15 +105,9 @@ export function PlateFacts({
   facts: Array<{ label: React.ReactNode; value: React.ReactNode }>;
 }) {
   return (
-    <dl className="mt-6 flex flex-wrap gap-x-7 gap-y-4">
+    <dl className="mt-6 flex flex-wrap gap-x-9 gap-y-5">
       {facts.map((fact, index) => (
-        <div
-          key={index}
-          className={cn(
-            "min-w-0",
-            index > 0 && "border-s border-white/[0.09] ps-7"
-          )}
-        >
+        <div key={index} className="min-w-0">
           <dt className="text-xs font-medium text-muted-foreground/70">
             {fact.label}
           </dt>
