@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { Plate } from "@/components/layout/plate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -87,15 +88,14 @@ export function BlogAgentPanel({
 
   return (
     <div className="space-y-8" dir="rtl">
-      <section className="brand-surface relative overflow-hidden p-6 sm:p-8">
-        <div className="absolute inset-0 bg-brand-gradient opacity-25" />
-        <div className="relative flex flex-wrap items-start justify-between gap-4">
+      <Plate>
+        <div className="plate-zone flex flex-wrap items-start justify-between gap-6 px-6 pb-8 pt-7 sm:px-10 sm:pb-10 sm:pt-9">
           <div className="space-y-3">
-            <Badge className="border-brand-accent/30 bg-brand-accent/10 text-brand-accent">
+            <Badge className="border-white/10 bg-white/[0.04] text-foreground/80">
               <Bot className="me-1 h-3 w-3" />
               ایجنت وبلاگ
             </Badge>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <h1 className="plate-title">
               نویسندهٔ خودکار وبلاگ
             </h1>
             <p className="max-w-2xl text-muted-foreground">
@@ -138,7 +138,7 @@ export function BlogAgentPanel({
             </Link>
           </Button>
         </div>
-      </section>
+      </Plate>
 
       <Tabs defaultValue="queue" dir="rtl" className="space-y-6">
         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 sm:w-auto">

@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import { LessonsMonitor } from "@/components/admin/content/lessons-monitor";
+import { Plate, PlateHead } from "@/components/layout/plate";
 import { useTranslations } from "@/components/providers/locale-provider";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { ContentWizardTarget } from "@/lib/content-management/categories";
 import type { CurriculumLanguage } from "@/lib/curriculum/types";
@@ -52,28 +52,21 @@ export function LessonsMonitorPageView({
 
   return (
     <div className="space-y-8">
-      <section className="brand-surface relative overflow-hidden p-6 sm:p-8">
-        <div className="absolute inset-0 bg-brand-gradient opacity-25" />
-        <div className="relative flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-3">
-            <Badge className="border-brand-accent/30 bg-brand-accent/10 text-brand-accent hover:bg-brand-accent/15">
-              CMS
-            </Badge>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              {t("admin.content.monitor.title")}
-            </h1>
-            <p className="max-w-3xl text-pretty text-muted-foreground">
-              {t("admin.content.monitor.description")}
-            </p>
-          </div>
-          <Button variant="outline" className="border-white/20" asChild>
-            <Link href="/admin/quizzes">
-              <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
-              {t("admin.content.monitor.backToContent")}
-            </Link>
-          </Button>
-        </div>
-      </section>
+      <Plate>
+        <PlateHead
+          eyebrow={"CMS"}
+          title={t("admin.content.monitor.title")}
+          lede={t("admin.content.monitor.description")}
+          action={
+                <Button variant="outline" className="border-white/20" asChild>
+                  <Link href="/admin/quizzes">
+                    <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+                    {t("admin.content.monitor.backToContent")}
+                  </Link>
+                </Button>
+          }
+        />
+      </Plate>
 
       <LessonsMonitor
         languages={languages}

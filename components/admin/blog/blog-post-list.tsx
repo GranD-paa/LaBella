@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 
 import { deleteBlogPostAction } from "@/app/admin/actions/blog";
+import { Plate } from "@/components/layout/plate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,15 +62,14 @@ export function BlogPostList({
 
   return (
     <div className="space-y-8" dir="rtl">
-      <section className="brand-surface relative overflow-hidden p-6 sm:p-8">
-        <div className="absolute inset-0 bg-brand-gradient opacity-25" />
-        <div className="relative flex flex-wrap items-start justify-between gap-4">
+      <Plate>
+        <div className="plate-zone flex flex-wrap items-start justify-between gap-6 px-6 pb-8 pt-7 sm:px-10 sm:pb-10 sm:pt-9">
           <div className="space-y-3">
-            <Badge className="border-brand-accent/30 bg-brand-accent/10 text-brand-accent">
+            <Badge className="border-white/10 bg-white/[0.04] text-foreground/80">
               <FileText className="me-1 h-3 w-3" />
               وبلاگ
             </Badge>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <h1 className="plate-title">
               مطالب وبلاگ
             </h1>
             <p className="max-w-2xl text-muted-foreground">
@@ -101,7 +101,7 @@ export function BlogPostList({
             </Link>
           </Button>
         </div>
-      </section>
+      </Plate>
 
       <Card className="brand-surface">
         <CardHeader className="space-y-1">
@@ -139,7 +139,7 @@ export function BlogPostList({
                         <div className="flex flex-wrap items-center gap-2 font-medium">
                           {post.title}
                           {post.status === "published" ? (
-                            <Badge className="border-brand-accent/30 bg-brand-accent/10 text-brand-accent">
+                            <Badge className="border-white/10 bg-white/[0.04] text-foreground/80">
                               منتشرشده
                             </Badge>
                           ) : (

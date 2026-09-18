@@ -3,10 +3,11 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, EyeOff, Landmark, TriangleAlert } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 
 import { setLandingLanguageVisibilityAction } from "@/app/admin/actions/landing";
+import { Plate, PlateHead } from "@/components/layout/plate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -76,31 +77,27 @@ export function LandingLanguagePanel({
 
   return (
     <div className="space-y-8" dir="rtl">
-      <section className="brand-surface relative overflow-hidden p-6 sm:p-8">
-        <div className="absolute inset-0 bg-brand-gradient opacity-25" />
-        <div className="relative flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-3">
-            <Badge className="border-brand-accent/30 bg-brand-accent/10 text-brand-accent">
-              <Landmark className="me-1 h-3 w-3" />
-              صفحهٔ اصلی
-            </Badge>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              نمایش زبان‌ها روی صفحهٔ اصلی
-            </h1>
-            <p className="max-w-2xl text-muted-foreground">
+      <Plate>
+        <PlateHead
+          eyebrow={"صفحهٔ اصلی"}
+          title={"نمایش زبان‌ها روی صفحهٔ اصلی"}
+          lede={
+            <>
               هر شش بنای سه‌بعدی ساخته شده‌اند. اینجا فقط تصمیم می‌گیرید
               کدام‌شان را بازدیدکننده ببیند. این تنظیم از باز و بستهٔ بودنِ{" "}
               <em>دوره</em> جداست — آن را در بخش «مدیریت زبان‌ها» تغییر می‌دهید.
-            </p>
-          </div>
-          <Button variant="outline" className="border-white/20" asChild>
-            <Link href="/dashboard">
-              <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
-              بازگشت به داشبورد
-            </Link>
-          </Button>
-        </div>
-      </section>
+            </>
+          }
+          action={
+                <Button variant="outline" className="border-white/20" asChild>
+                  <Link href="/dashboard">
+                    <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+                    بازگشت به داشبورد
+                  </Link>
+                </Button>
+          }
+        />
+      </Plate>
 
       <Card className="brand-surface">
         <CardHeader className="space-y-1">
