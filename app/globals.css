@@ -916,6 +916,24 @@
   color: #ffffff;
 }
 
+/*
+ * The reading is held back a beat past its own cell.
+ *
+ * The number is server-rendered as the truth, which means it would be on
+ * screen before the script that counts it up could claim it — and a figure
+ * that shows its final value and then snaps back to zero reads as a glitch,
+ * not an entrance. So the figure alone stays invisible a little longer than
+ * hydration takes; the count reveals it, or this animation does if no script
+ * ever arrives. Either way nothing false is ever painted.
+ */
+.ac-fig-value {
+  animation: ac-appear 240ms ease 560ms both;
+}
+
+.ac-fig-value[data-counting] {
+  animation: ac-appear 200ms ease both;
+}
+
 /* Polished rather than painted: the figure picks up the lamp at its top and
    cools towards its foot. Guarded, because a browser without background-clip
    would render the transparent fill and nothing else. */
@@ -1056,6 +1074,12 @@
 @media (prefers-reduced-motion: reduce) {
   .ac-sheen {
     display: none;
+  }
+
+  /* No count is coming, so nothing is waiting for it. */
+  .ac-fig-value,
+  .ac-fig-value[data-counting] {
+    animation: none;
   }
 
   .ac-horizon {
