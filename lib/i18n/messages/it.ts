@@ -286,6 +286,21 @@ export const it: Messages = {
     videoEmpty:
       "Nessun video ancora aggiunto per questo livello. Appariranno presto qui.",
   },
+  quizHistory: {
+    badge: "I tuoi progressi",
+    title: "Cronologia quiz",
+    subtitle:
+      "Tutti i quiz che hai svolto, con il punteggio, in un unico elenco.",
+    backToDashboard: "Torna alla dashboard",
+    attempts: "Quiz svolti",
+    attemptsNote: "Tentativi totali",
+    average: "Punteggio medio",
+    averageNote: "Su tutti i tentativi",
+    best: "Punteggio migliore",
+    bestNote: "Il tuo risultato piu alto",
+    allAttempts: "Tutti i tentativi",
+    allAttemptsHint: "Dal piu recente.",
+  },
   profile: {
     badge: "Profilo",
     title: "Il tuo profilo",
@@ -350,6 +365,7 @@ export const it: Messages = {
       defaultActivityTopic: "Articoli",
       mainMenu: "Menu principale",
       viewProfile: "Vedi profilo",
+      quizHistory: "Cronologia quiz",
       quizzesCompleted: "Quiz completati",
       ofTotal: "su {total} totali",
       averageScore: "Punteggio medio",
@@ -834,6 +850,7 @@ export const it: Messages = {
     menu: "Menu principale — Laparli",
     dashboard: "Dashboard — Laparli",
     profile: "Profilo — Laparli",
+    quizHistory: "Cronologia quiz — Laparli",
     subscription: "Abbonamento — Laparli",
     subscriptionDescription:
       "Scegli Basic, Pro o Ultimate — piani mensili per il tuo percorso linguistico completo.",

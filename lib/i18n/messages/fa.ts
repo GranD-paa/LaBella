@@ -282,6 +282,21 @@ export const fa: Messages = {
     videoEmpty:
       "هنوز ویدیویی برای این سطح اضافه نشده. به‌زودی اینجا قرار می‌گیرد.",
   },
+  quizHistory: {
+    badge: "پیشرفت شما",
+    title: "تاریخچه آزمون‌ها",
+    subtitle:
+      "نمره و وضعیت همهٔ آزمون‌هایی که داده‌اید، در یک فهرست.",
+    backToDashboard: "بازگشت به داشبورد",
+    attempts: "آزمون‌های داده‌شده",
+    attemptsNote: "مجموع تلاش‌ها",
+    average: "میانگین نمره",
+    averageNote: "در تمام تلاش‌ها",
+    best: "بهترین نمره",
+    bestNote: "بالاترین نمره‌ای که گرفته‌اید",
+    allAttempts: "همه تلاش‌ها",
+    allAttemptsHint: "تازه‌ترین در بالا.",
+  },
   profile: {
     badge: "پروفایل",
     title: "پروفایل شما",
@@ -345,6 +360,7 @@ export const fa: Messages = {
       defaultActivityTopic: "حروف تعریف",
       mainMenu: "منوی اصلی",
       viewProfile: "مشاهده پروفایل",
+      quizHistory: "تاریخچه آزمون‌ها",
       quizzesCompleted: "آزمون‌های تکمیل‌شده",
       ofTotal: "از {total} کل",
       averageScore: "میانگین نمره",
@@ -823,6 +839,7 @@ export const fa: Messages = {
     menu: "منوی اصلی — Laparli",
     dashboard: "داشبورد — Laparli",
     profile: "پروفایل — Laparli",
+    quizHistory: "تاریخچه آزمون‌ها — Laparli",
     subscription: "خرید اشتراک — Laparli",
     subscriptionDescription:
       "بیسیک، پرو یا اولتیمیت را انتخاب کنید — طرح‌های ماهانه برای باز کردن مسیر کامل یادگیری زبان.",

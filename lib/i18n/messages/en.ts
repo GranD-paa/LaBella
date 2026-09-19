@@ -285,6 +285,20 @@ export const en = {
     videoEmpty:
       "No videos have been added for this level yet. They will appear here soon.",
   },
+  quizHistory: {
+    badge: "Your progress",
+    title: "Quiz History",
+    subtitle: "Every quiz you have taken, with its score, in one list.",
+    backToDashboard: "Back to Dashboard",
+    attempts: "Quizzes taken",
+    attemptsNote: "Attempts in total",
+    average: "Average score",
+    averageNote: "Across all attempts",
+    best: "Best score",
+    bestNote: "Your highest so far",
+    allAttempts: "All attempts",
+    allAttemptsHint: "Most recent first.",
+  },
   profile: {
     badge: "Profile",
     title: "Your Profile",
@@ -348,6 +362,7 @@ export const en = {
       defaultActivityTopic: "Articles",
       mainMenu: "Main menu",
       viewProfile: "View profile",
+      quizHistory: "Quiz history",
       quizzesCompleted: "Quizzes completed",
       ofTotal: "of {total} total",
       averageScore: "Average score",
@@ -828,6 +843,7 @@ export const en = {
     menu: "Main Menu — Laparli",
     dashboard: "Dashboard — Laparli",
     profile: "Profile — Laparli",
+    quizHistory: "Quiz History — Laparli",
     subscription: "Subscription — Laparli",
     subscriptionDescription:
       "Choose Basic, Pro, or Ultimate — monthly plans to unlock your full language learning journey.",

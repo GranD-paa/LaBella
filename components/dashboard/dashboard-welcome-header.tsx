@@ -1,7 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Flame, Menu, PlayCircle, Target, User, Zap } from "lucide-react";
+import {
+  Flame,
+  History,
+  Menu,
+  PlayCircle,
+  Target,
+  User,
+  Zap,
+} from "lucide-react";
 
 import { PlateFacts, PlateHead } from "@/components/layout/plate";
 import { FlagIcon } from "@/components/menu/flag-icon";
@@ -108,6 +116,20 @@ export function DashboardWelcomeHeader({
               </Link>
             </Button>
           </div>
+          {/* Its own row rather than a third of the one above: the label is a
+              sentence long in Persian, and three of them would each get a
+              column too narrow to read it in. */}
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            className="w-full border-white/10 bg-white/[0.03] text-muted-foreground hover:bg-white/[0.07] hover:text-foreground"
+          >
+            <Link href="/quiz-history">
+              <History className="h-4 w-4" />
+              {t("dashboard.user.quizHistory")}
+            </Link>
+          </Button>
         </div>
       }
     >
