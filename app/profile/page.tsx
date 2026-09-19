@@ -17,40 +17,7 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  const [profile, attempts, quizzes, lessons] = await Promise.all([
-    repo.getProfileById(user.id),
-    repo.getAttemptsByUserId(user.id),
-    repo.getQuizzes(),
-    repo.getLessons(),
-  ]);
+  const profile = await repo.getProfileById(user.id);
 
-  const lessonMap = new Map(lessons.map((lesson) => [lesson.id, lesson.title]));
-  const quizMap = new Map(
-    quizzes.map((quiz) => [
-      quiz.id,
-      {
-        title: quiz.title,
-        lessonTitle: lessonMap.get(quiz.lesson_id) ?? quiz.title,
-      },
-    ])
-  );
-
-  const historyRows = attempts.map((attempt) => {
-    const quiz = quizMap.get(attempt.quiz_id);
-    return {
-      id: attempt.id,
-      quizId: attempt.quiz_id,
-      score: attempt.score,
-      created_at: attempt.created_at,
-      lessonName: quiz?.lessonTitle ?? "",
-    };
-  });
-
-  return (
-    <ProfileView
-      fullName={profile?.full_name}
-      email={user.email ?? ""}
-      historyRows={historyRows}
-    />
-  );
+  return <ProfileView fullName={profile?.full_name} email={user.email ?? ""} />;
 }

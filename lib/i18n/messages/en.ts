@@ -288,7 +288,7 @@ export const en = {
   profile: {
     badge: "Profile",
     title: "Your Profile",
-    subtitle: "View your account details and quiz history.",
+    subtitle: "View your account details.",
     backToDashboard: "Back to Dashboard",
     account: "Account",
     accountDescription: "Your personal information",

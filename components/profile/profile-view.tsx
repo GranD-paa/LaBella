@@ -11,20 +11,15 @@ import {
   PlateZone,
   PlateZoneHead,
 } from "@/components/layout/plate";
-import {
-  QuizHistoryTable,
-  type QuizAttemptHistoryRow,
-} from "@/components/profile/quiz-history-table";
 import { useTranslations } from "@/components/providers/locale-provider";
 import { Button } from "@/components/ui/button";
 
 type ProfileViewProps = {
   fullName: string | null | undefined;
   email: string;
-  historyRows: QuizAttemptHistoryRow[];
 };
 
-export function ProfileView({ fullName, email, historyRows }: ProfileViewProps) {
+export function ProfileView({ fullName, email }: ProfileViewProps) {
   const { t } = useTranslations();
 
   return (
@@ -49,7 +44,7 @@ export function ProfileView({ fullName, email, historyRows }: ProfileViewProps) 
 
       <PlateHorizon />
 
-      <PlateZone className="px-6 pb-8 pt-7 sm:px-10 sm:pt-8">
+      <PlateZone className="px-6 pb-9 pt-7 sm:px-10 sm:pb-10 sm:pt-8">
         <PlateZoneHead
           title={t("profile.account")}
           hint={t("profile.accountDescription")}
@@ -64,14 +59,6 @@ export function ProfileView({ fullName, email, historyRows }: ProfileViewProps) 
             { label: t("profile.email"), value: email },
           ]}
         />
-      </PlateZone>
-
-      <PlateZone groove well>
-        <PlateZoneHead
-          title={t("profile.quizHistory")}
-          hint={t("profile.quizHistoryHint")}
-        />
-        <QuizHistoryTable attempts={historyRows} />
       </PlateZone>
     </Plate>
   );

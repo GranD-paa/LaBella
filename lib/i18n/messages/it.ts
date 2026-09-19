@@ -289,7 +289,7 @@ export const it: Messages = {
   profile: {
     badge: "Profilo",
     title: "Il tuo profilo",
-    subtitle: "Visualizza i dettagli del tuo account e la cronologia dei quiz.",
+    subtitle: "Visualizza i dettagli del tuo account.",
     backToDashboard: "Torna alla dashboard",
     account: "Account",
     accountDescription: "Le tue informazioni personali",

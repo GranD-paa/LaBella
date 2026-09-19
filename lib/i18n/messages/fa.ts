@@ -285,7 +285,7 @@ export const fa: Messages = {
   profile: {
     badge: "پروفایل",
     title: "پروفایل شما",
-    subtitle: "جزئیات حساب و تاریخچه آزمون‌های خود را ببینید.",
+    subtitle: "جزئیات حساب خود را ببینید.",
     backToDashboard: "بازگشت به داشبورد",
     account: "حساب کاربری",
     accountDescription: "اطلاعات شخصی شما",
