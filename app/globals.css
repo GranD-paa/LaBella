@@ -664,6 +664,10 @@
   --plate-sweep-to: -115%;
   --plate-lamp-alpha: 0.62;
   --plate-bounce-alpha: 0.5;
+  /* The warm core inside the lamp. A violet-only light is what made these
+     screens read as switched off: the plate had a colour but no temperature,
+     and a cool light on a cool surface is the same note twice. */
+  --plate-gold-alpha: 0.3;
   --plate-line: rgba(255, 255, 255, 0.07);
 
   position: relative;
@@ -683,7 +687,7 @@
   overflow: clip;
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  background: linear-gradient(177deg, #190235 0%, #0d001d 48%, #0a0016 100%);
+  background: linear-gradient(177deg, #210740 0%, #130329 46%, #0f0122 100%);
   /* A dark seam under the bottom edge, and enough shadow for the plate to sit
      on the page rather than be painted onto it. The lit top bevel is drawn in
      ::before, where it can fall away along its own length. */
@@ -705,6 +709,7 @@
 .plate--reading {
   --plate-lamp-alpha: 0.32;
   --plate-bounce-alpha: 0.26;
+  --plate-gold-alpha: 0.13;
 }
 
 @media (min-width: 640px) {
@@ -726,9 +731,14 @@
   background-image:
     linear-gradient(
       to var(--plate-flow),
-      rgba(255, 255, 255, 0.42),
-      rgba(255, 255, 255, 0.05) 52%,
+      rgba(255, 236, 196, 0.5),
+      rgba(255, 255, 255, 0.06) 52%,
       transparent 86%
+    ),
+    radial-gradient(
+      40rem 21rem at var(--plate-lamp) -5rem,
+      rgb(251 191 36 / var(--plate-gold-alpha)),
+      transparent 72%
     ),
     radial-gradient(
       54rem 26rem at var(--plate-lamp) -8rem,
@@ -743,9 +753,11 @@
   background-size:
     100% 1px,
     auto,
+    auto,
     auto;
   background-position:
     top,
+    center,
     center,
     center;
   background-repeat: no-repeat;
@@ -781,7 +793,7 @@
    lit at the bottom one. The same move as the groove, at the scale of a whole
    zone. */
 .plate-well {
-  background-color: rgba(0, 0, 0, 0.26);
+  background-color: rgba(0, 0, 0, 0.18);
   box-shadow:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
     inset 0 9px 14px -12px rgba(0, 0, 0, 0.9),
@@ -801,7 +813,7 @@
     100deg,
     transparent 40%,
     rgba(255, 255, 255, 0.055) 47%,
-    rgba(251, 191, 36, 0.05) 53%,
+    rgba(251, 191, 36, 0.11) 53%,
     transparent 60%
   );
   animation: plate-sweep 950ms cubic-bezier(0.77, 0, 0.175, 1) 80ms both;
@@ -827,10 +839,12 @@
   height: 1px;
   background: linear-gradient(
     to var(--plate-flow),
-    rgba(251, 191, 36, 0.6),
-    rgba(114, 9, 183, 0.38) 34%,
-    transparent 84%
+    rgba(251, 191, 36, 0.92),
+    rgba(251, 191, 36, 0.46) 24%,
+    rgba(114, 9, 183, 0.42) 52%,
+    transparent 86%
   );
+  box-shadow: 0 0 14px -1px rgba(251, 191, 36, 0.28);
   transform-origin: var(--plate-origin);
   animation: plate-draw 620ms var(--plate-ease) both;
 }
@@ -852,6 +866,34 @@
   border-radius: 999px;
   background: #fbbf24;
   box-shadow: 0 0 10px 0 rgba(251, 191, 36, 0.85);
+}
+
+/* The eyebrow.
+   Gold, and gold at rest — which bends the rule that the colour is kept for
+   the thing you are about to do. It earns the exception by being the one line
+   on the plate that is pure label: it names the room, it is never something
+   you click, and it sits directly under the lamp where a warm light is already
+   falling. It is also what every surface now opens with. */
+.plate-eyebrow {
+  color: #f6c453;
+}
+
+.plate--reading .plate-eyebrow {
+  color: rgba(246, 196, 83, 0.82);
+}
+
+/* A zone title carries a short gold tick. The groove above it is a hairline
+   by design, so this is what says "a new region starts here" from across the
+   room, before a word of the heading is read. */
+.plate-zone-title::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 0.9em;
+  margin-inline-end: 0.55rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fbbf24, rgba(251, 191, 36, 0.2));
+  vertical-align: -0.09em;
 }
 
 .plate-title {
@@ -1103,6 +1145,18 @@
     box-shadow 220ms ease;
 }
 
+/* The one card that is open for business. Gold at rest is not decoration
+   here: most of this grid is locked, and the warm edge is what separates the
+   card you can walk into from the ones you cannot — before the badge in its
+   corner has been read. */
+.plate-tile--live {
+  border-color: rgba(251, 191, 36, 0.26);
+  background-color: rgba(251, 191, 36, 0.05);
+  box-shadow:
+    inset 0 1px 0 0 rgba(251, 191, 36, 0.14),
+    0 22px 44px -34px rgba(251, 191, 36, 0.45);
+}
+
 .plate-tile-cta {
   transition: color 220ms ease;
 }
@@ -1167,6 +1221,16 @@ a:focus-visible .plate-tile {
 
   a:hover .plate-tile .plate-tile-cta {
     color: #fbbf24;
+  }
+
+  /* After the block above, so the live card's hover warms rather than washes
+     back out to white. */
+  a:hover .plate-tile--live {
+    border-color: rgba(251, 191, 36, 0.5);
+    background-color: rgba(251, 191, 36, 0.09);
+    box-shadow:
+      inset 0 1px 0 0 rgba(251, 191, 36, 0.2),
+      0 22px 44px -28px rgba(251, 191, 36, 0.55);
   }
 }
 

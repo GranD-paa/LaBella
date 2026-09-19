@@ -46,11 +46,11 @@ export function MainMenu({
             */
             <Button
               variant="outline"
-              className="border-white/10 bg-white/[0.03] text-muted-foreground hover:bg-white/[0.07] hover:text-foreground"
+              className="border-primary/25 bg-primary/[0.04] text-foreground/85 hover:bg-primary/10 hover:text-foreground"
               asChild
             >
               <Link href="/dashboard">
-                <Compass className="h-4 w-4" />
+                <Compass className="h-4 w-4 text-primary" />
                 {t("menu.openDashboard")}
               </Link>
             </Button>

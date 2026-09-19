@@ -23,8 +23,8 @@ export function LanguageCard({ language }: { language: CurriculumLanguage }) {
       className={cn(
         "plate-tile group relative overflow-hidden rounded-2xl border p-5 sm:p-6",
         language.available
-          ? "border-white/[0.07] bg-white/[0.025]"
-          : "border-dashed border-white/[0.07] bg-white/[0.012]"
+          ? "plate-tile--live"
+          : "border-dashed border-white/[0.07] bg-white/[0.022]"
       )}
     >
       {/* One tinted light per language, from the corner the card is read from.
@@ -57,7 +57,7 @@ export function LanguageCard({ language }: { language: CurriculumLanguage }) {
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
               language.available
-                ? "border-white/10 bg-white/[0.05] text-foreground/80"
+                ? "border-primary/35 bg-primary/10 text-primary"
                 : "border-white/[0.07] bg-white/[0.02] text-muted-foreground/70"
             )}
           >
@@ -80,9 +80,9 @@ export function LanguageCard({ language }: { language: CurriculumLanguage }) {
         </div>
 
         {language.available ? (
-          /* Gold arrives on the one card the pointer is on, the same way it
-             arrives on one row of an index. */
-          <p className="plate-tile-cta flex items-center gap-2 text-sm font-medium text-foreground/70">
+          /* The way in, in the same gold as the edge around it. It brightens
+             the rest of the way under the pointer. */
+          <p className="plate-tile-cta flex items-center gap-2 text-sm font-medium text-primary/85">
             {t("menu.startLearning")}
             <ArrowRight className="plate-chev h-4 w-4" aria-hidden />
           </p>

@@ -66,7 +66,7 @@ export function PlateHead({
     >
       <div className="min-w-0 flex-1 basis-[22rem]">
         {eyebrow ? (
-          <p className="flex items-center gap-2.5 text-[0.8125rem] font-medium text-foreground/80">
+          <p className="plate-eyebrow flex items-center gap-2.5 text-[0.8125rem] font-medium">
             <span className="plate-dot" aria-hidden />
             {eyebrow}
           </p>
@@ -177,7 +177,7 @@ export function PlateZoneHead({
         className
       )}
     >
-      <h2 className="text-[0.9375rem] font-semibold text-foreground">
+      <h2 className="plate-zone-title text-[0.9375rem] font-semibold text-foreground">
         {title}
       </h2>
       {aside}
