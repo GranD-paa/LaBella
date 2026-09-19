@@ -12,10 +12,7 @@ import type {
   ContinueLearningSnapshot,
   LearnerEngagementMetrics,
 } from "@/lib/dashboard/continue-learning";
-import {
-  getLocalizedLanguageName,
-  getLocalizedLevel,
-} from "@/lib/curriculum/localize";
+import { getLocalizedLanguageName } from "@/lib/curriculum/localize";
 import type { LanguageSlug } from "@/lib/curriculum/types";
 
 type DashboardWelcomeHeaderProps = {
@@ -59,17 +56,6 @@ export function DashboardWelcomeHeader({
   const { t } = useTranslations();
   const languageSlug = snapshot.languageSlug as LanguageSlug;
   const languageName = getLocalizedLanguageName(languageSlug, t);
-  const activeCourseTitle = getLocalizedLevel(
-    languageSlug,
-    {
-      slug: snapshot.levelSlug,
-      code: snapshot.levelCode,
-      title: snapshot.activeCourseTitle,
-      description: "",
-      orderNumber: 0,
-    },
-    t
-  ).title;
 
   const hasEngagementMetrics =
     engagement.streakDays !== null ||
@@ -139,10 +125,6 @@ export function DashboardWelcomeHeader({
           {
             label: t("dashboard.user.levelLabel"),
             value: snapshot.levelCode,
-          },
-          {
-            label: t("dashboard.user.activeCourseLabel"),
-            value: activeCourseTitle,
           },
         ]}
       />
