@@ -15,7 +15,7 @@ export function VocabularyFlashcards({
 
   if (vocabulary.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
+      <div className="plate-empty-edge flex flex-col items-center gap-2 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
         <Languages className="h-8 w-8" />
         <p>{t("lesson.noVocabulary")}</p>
       </div>

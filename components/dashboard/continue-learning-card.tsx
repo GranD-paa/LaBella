@@ -33,7 +33,7 @@ export function ContinueLearningCard({
 
   return (
     <PlateZone groove well className="px-6 py-7 sm:px-10 sm:py-8">
-      <h2 className="text-[0.9375rem] font-semibold text-foreground">
+      <h2 className="plate-zone-title text-[0.9375rem] font-semibold text-foreground">
         {t("dashboard.user.continueLearningTitle")}
       </h2>
 

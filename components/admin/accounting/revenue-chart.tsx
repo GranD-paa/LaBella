@@ -35,7 +35,7 @@ export function RevenueChart({ buckets }: { buckets: RevenueBucket[] }) {
 
   if (!hasRevenue) {
     return (
-      <div className="flex h-56 items-center justify-center rounded-xl border border-white/10 bg-muted/10 text-sm text-muted-foreground">
+      <div className="plate-empty-edge flex h-56 items-center justify-center rounded-xl border border-dashed text-sm text-muted-foreground">
         {t("admin.accounting.chart.empty")}
       </div>
     );

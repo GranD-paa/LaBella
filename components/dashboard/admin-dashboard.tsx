@@ -176,7 +176,7 @@ export function AdminDashboard({
           />
 
           {data.recentActivity.length === 0 ? (
-            <p className="px-6 pb-12 pt-5 text-center text-sm text-muted-foreground">
+            <p className="plate-empty mx-6 mb-10 mt-1 text-sm text-muted-foreground sm:mx-10">
               {t("dashboard.admin.noActivity")}
             </p>
           ) : (

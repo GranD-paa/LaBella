@@ -50,7 +50,7 @@ export function CategoryWatermark({
         // rather than just a heading, so it has to recede further.
         size === "card"
           ? "-start-5 top-1 h-32 w-32 opacity-[0.13] group-hover:opacity-[0.22]"
-          : "-start-8 -top-8 h-44 w-44 opacity-[0.08]",
+          : "-start-12 -top-12 h-52 w-52 opacity-[0.055]",
         className
       )}
     />

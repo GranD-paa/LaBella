@@ -79,7 +79,9 @@ export function LearnCategoryHero({
           </div>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+        {/* Which level this section belongs to: milled into the plate
+            rather than floated on it, like every other secondary region. */}
+        <div className="plate-well rounded-xl border border-white/[0.05] p-4">
           <p className="text-sm font-medium text-muted-foreground">
             {localizedLevel.title}
           </p>

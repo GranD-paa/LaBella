@@ -113,7 +113,7 @@ export function ComingSoonLanguage({
     : language.description;
 
   return (
-    <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed py-20 text-center">
+    <div className="plate-empty-edge flex flex-col items-center gap-4 rounded-2xl border border-dashed py-20 text-center">
       <FlagIcon slug={language.slug} className="h-12 w-[4.5rem]" />
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold">{headline}</h1>

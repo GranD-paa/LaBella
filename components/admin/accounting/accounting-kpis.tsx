@@ -37,7 +37,7 @@ function Tile({
           {label}
         </div>
         {/* The number is the point of the tile, so it gets the size. */}
-        <p className="text-2xl font-bold tracking-tight">{value}</p>
+        <p className="plate-metal text-2xl font-bold">{value}</p>
         {hint ? (
           <p
             className={cn(

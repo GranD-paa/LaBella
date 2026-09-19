@@ -93,7 +93,7 @@ export function QuizTabContent({
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-white/15 bg-white/5 py-16 text-center text-muted-foreground">
+      <div className="plate-empty-edge flex flex-col items-center gap-3 rounded-2xl border border-dashed py-16 text-center text-muted-foreground">
         <ListChecks className="h-10 w-10 text-brand-accent/70" />
         <p>{t("quiz.lesson.noQuiz")}</p>
       </div>

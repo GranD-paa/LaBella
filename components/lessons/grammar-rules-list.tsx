@@ -28,7 +28,7 @@ export function GrammarRulesList({ rules }: { rules: GrammarRuleWithPages[] }) {
 
   if (rules.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
+      <div className="plate-empty-edge flex flex-col items-center gap-2 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
         <BookMarked className="h-8 w-8" />
         <p>{t("lesson.noGrammar")}</p>
       </div>

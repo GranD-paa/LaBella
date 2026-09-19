@@ -62,7 +62,9 @@ export function LearnLanguageView({
 
           <section className="space-y-4">
             <div>
-              <h2 className="text-xl font-semibold">{t("learn.courseLevels")}</h2>
+              <h2 className="plate-zone-title text-xl font-semibold">
+                {t("learn.courseLevels")}
+              </h2>
               <p className="text-sm text-muted-foreground">
                 {t("learn.courseLevelsHint")}
               </p>

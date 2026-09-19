@@ -206,11 +206,11 @@ export function UserManagementPanel({
       </CardHeader>
       <CardContent>
         {users.length === 0 ? (
-          <div className="rounded-lg border border-dashed py-12 text-center text-muted-foreground">
+          <div className="plate-empty-edge rounded-lg border border-dashed py-12 text-center text-muted-foreground">
             {t("admin.users.noUsers")}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-lg border border-dashed py-12 text-center text-muted-foreground">
+          <div className="plate-empty-edge rounded-lg border border-dashed py-12 text-center text-muted-foreground">
             {t("admin.users.noResults")}
           </div>
         ) : (

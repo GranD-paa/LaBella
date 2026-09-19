@@ -96,7 +96,7 @@ export function LearnCategoryView({
           languageSlug={language.slug}
         />
       ) : !lesson && category !== "quiz" ? (
-        <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 py-16 text-center text-muted-foreground">
+        <div className="plate-empty-edge rounded-2xl border border-dashed py-16 text-center text-muted-foreground">
           <p>
             {t("learn.contentPreparing", {
               code: level.code,
@@ -105,7 +105,7 @@ export function LearnCategoryView({
           </p>
         </div>
       ) : category === "quiz" && quizzes.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 py-16 text-center text-muted-foreground">
+        <div className="plate-empty-edge rounded-2xl border border-dashed py-16 text-center text-muted-foreground">
           <p>{t("quiz.lesson.noQuiz")}</p>
         </div>
       ) : (

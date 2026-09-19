@@ -38,8 +38,10 @@ export function AboutView() {
         </div>
       </Plate>
 
-      <section className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
-        <h2 className="text-xl font-semibold sm:text-2xl">{t("about.missionTitle")}</h2>
+      <section className="brand-surface p-6 sm:p-8">
+        <h2 className="plate-zone-title text-xl font-semibold sm:text-2xl">
+          {t("about.missionTitle")}
+        </h2>
         <p className="mt-4 leading-relaxed text-muted-foreground">
           {t("about.missionBody")}
         </p>
@@ -47,7 +49,9 @@ export function AboutView() {
 
       <section className="space-y-5">
         <div className="space-y-2 text-center sm:text-start">
-          <h2 className="text-xl font-semibold sm:text-2xl">{t("about.valuesTitle")}</h2>
+          <h2 className="plate-zone-title text-xl font-semibold sm:text-2xl">
+            {t("about.valuesTitle")}
+          </h2>
           <p className="text-sm text-muted-foreground">{t("about.valuesSubtitle")}</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -73,7 +77,7 @@ export function AboutView() {
 
       <section className="space-y-5">
         <div className="space-y-2 text-center sm:text-start">
-          <h2 className="text-xl font-semibold sm:text-2xl">
+          <h2 className="plate-zone-title text-xl font-semibold sm:text-2xl">
             {t("about.timeline.title")}
           </h2>
           <p className="text-sm text-muted-foreground">{t("about.timeline.subtitle")}</p>

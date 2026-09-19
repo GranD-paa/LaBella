@@ -111,9 +111,9 @@
    */
   .brand-surface {
     @apply rounded-2xl border border-white/[0.06];
-    background: linear-gradient(177deg, #16022f 0%, #0d001d 62%, #0b0018 100%);
+    background: linear-gradient(177deg, #1d0639 0%, #120229 62%, #0f0123 100%);
     box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+      inset 0 1px 0 0 rgba(255, 236, 196, 0.08),
       inset 0 -1px 0 0 rgba(0, 0, 0, 0.45),
       0 28px 56px -38px rgba(0, 0, 0, 0.9);
   }
@@ -1028,15 +1028,19 @@
 }
 
 /* Polished rather than painted: the figure picks up the lamp at its top and
-   cools towards its foot. Guarded, because a browser without background-clip
-   would render the transparent fill and nothing else. */
+   falls to brass at its foot. The readings are the largest thing on most of
+   these screens, and the old fill cooled into violet — the one move that made
+   an instrument full of numbers read as switched off. A number is never
+   something you click, so, like the eyebrow, it can carry the colour without
+   claiming to be an action. Guarded, because a browser without
+   background-clip would render the transparent fill and nothing else. */
 @supports (-webkit-background-clip: text) or (background-clip: text) {
   .plate-fig-value {
     background: linear-gradient(
       180deg,
-      #ffffff 14%,
-      #f4eeff 44%,
-      #ab93d6 92%
+      #ffffff 12%,
+      #fff4e0 46%,
+      #d9b471 94%
     );
     -webkit-background-clip: text;
     background-clip: text;
@@ -1059,7 +1063,7 @@
 
 @supports (-webkit-background-clip: text) or (background-clip: text) {
   .plate-metal {
-    background: linear-gradient(180deg, #ffffff 10%, #f4eeff 46%, #ab93d6 96%);
+    background: linear-gradient(180deg, #ffffff 10%, #fff4e0 48%, #d9b471 96%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -1129,6 +1133,36 @@
 
 [dir="rtl"] .plate-chev {
   transform: rotate(180deg);
+}
+
+/* Nothing here yet.
+   An empty region was one dim sentence adrift in a large dark rectangle,
+   which reads as a screen that failed to load rather than a screen with
+   nothing on it. A warm dashed frame says the room is finished and simply
+   empty, and it is the same gold that marks everything else you could act
+   on — because the way out of an empty region is always to add something. */
+.plate-empty {
+  border: 1px dashed rgba(251, 191, 36, 0.22);
+  border-radius: 1rem;
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  background-image: radial-gradient(
+    26rem 9rem at 50% -1rem,
+    rgba(251, 191, 36, 0.06),
+    transparent 72%
+  );
+}
+
+/* The frame on its own, for an empty region that already carries its own
+   layout. It sits after Tailwind in this file, so it wins the border colour
+   from whatever utility the element was written with. */
+.plate-empty-edge {
+  border-color: rgba(251, 191, 36, 0.2);
+  background-image: radial-gradient(
+    26rem 9rem at 50% -1rem,
+    rgba(251, 191, 36, 0.055),
+    transparent 72%
+  );
 }
 
 /* A card cut from the plate: the hairline and fill of an index row, with room

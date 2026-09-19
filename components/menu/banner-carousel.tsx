@@ -339,7 +339,11 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
             <ChevronRight className="h-5 w-5" />
           </button>
 
-          <div className="absolute inset-x-0 bottom-2 flex items-center justify-center gap-1.5">
+          {/* The dot is 6px of paint inside a 24px target. A thumb cannot
+              hit six pixels, and the row sat at the bottom edge of a banner
+              people swipe — so the button carries the height and the padding
+              and the span carries the look. */}
+          <div className="absolute inset-x-0 bottom-0 flex items-center justify-center">
             {banners.map((banner, dotIndex) => (
               <button
                 key={banner.id}
@@ -347,11 +351,16 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
                 onClick={() => goToBanner(dotIndex)}
                 aria-label={t("menu.goToSlide", { number: dotIndex + 1 })}
                 aria-current={dotIndex === realIndex}
-                className={cn(
-                  "h-1.5 rounded-full transition-all",
-                  dotIndex === realIndex ? "w-5 bg-white" : "w-1.5 bg-white/50"
-                )}
-              />
+                className="flex h-6 items-center px-1.5"
+              >
+                <span
+                  aria-hidden
+                  className={cn(
+                    "block h-1.5 rounded-full transition-all",
+                    dotIndex === realIndex ? "w-5 bg-white" : "w-1.5 bg-white/50"
+                  )}
+                />
+              </button>
             ))}
           </div>
         </>

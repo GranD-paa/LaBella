@@ -144,7 +144,7 @@ export function CurriculumLevelManager({
 
       <CardContent className="space-y-6">
         {bandGroups.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-white/10 px-4 py-8 text-center text-sm text-muted-foreground">
+          <p className="plate-empty text-sm text-muted-foreground">
             {t("admin.languages.curriculum.emptyState")}
           </p>
         ) : (

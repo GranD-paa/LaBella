@@ -42,7 +42,7 @@ export function QuizHistoryTable({
 
   if (attempts.length === 0) {
     return (
-      <p className="px-6 pb-14 pt-4 text-center text-sm text-muted-foreground sm:px-10">
+      <p className="plate-empty mx-6 mb-10 mt-1 text-sm text-muted-foreground sm:mx-10">
         {t("profile.noAttempts")}
       </p>
     );

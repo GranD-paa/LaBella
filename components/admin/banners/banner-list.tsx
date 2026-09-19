@@ -40,7 +40,7 @@ export function BannerList({ banners }: { banners: Banner[] }) {
 
   if (banners.length === 0) {
     return (
-      <p className="rounded-xl border border-dashed border-white/15 bg-muted/10 px-4 py-8 text-center text-sm text-muted-foreground">
+      <p className="plate-empty-edge rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
         {t("admin.banners.empty")}
       </p>
     );

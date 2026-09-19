@@ -27,9 +27,7 @@ export function StatCard({
       <div className="relative flex items-start justify-between gap-3">
         <div className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-3xl font-bold tracking-tight text-foreground">
-            {value}
-          </p>
+          <p className="plate-metal text-3xl font-bold">{value}</p>
           {description ? (
             <p className="text-xs text-muted-foreground">{description}</p>
           ) : null}

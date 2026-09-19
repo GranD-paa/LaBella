@@ -200,7 +200,7 @@ export function SubscriptionPlanCards({
                       </span>
                     ) : null}
                     <div className="flex items-end justify-center gap-1">
-                      <span className="text-4xl font-bold tracking-tight">
+                      <span className="plate-metal text-4xl font-bold">
                         €{centsToEur(price.netCents).toFixed(2)}
                       </span>
                       <span className="pb-1 text-sm text-muted-foreground">

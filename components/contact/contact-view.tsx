@@ -102,7 +102,9 @@ export function ContactView({ defaultName, defaultEmail }: ContactViewProps) {
           className="brand-surface space-y-5 rounded-2xl border border-white/10 p-6 sm:p-8"
         >
           <div className="space-y-1">
-            <h2 className="text-xl font-semibold">{t("contact.form.title")}</h2>
+            <h2 className="plate-zone-title text-xl font-semibold">
+              {t("contact.form.title")}
+            </h2>
             <p className="text-sm text-muted-foreground">
               {t("contact.form.subtitle")}
             </p>

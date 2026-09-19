@@ -24,7 +24,7 @@ export function GrammarManager({
 
   if (lessons.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed p-10 text-center text-muted-foreground">
+      <div className="plate-empty-edge rounded-lg border border-dashed p-10 text-center text-muted-foreground">
         {t("admin.grammar.createLessonFirst")}
       </div>
     );
