@@ -136,7 +136,7 @@ export function RolesPermissionsPanel({
             return (
               <div
                 key={slug}
-                className="space-y-1.5 rounded-lg border border-white/10 bg-white/[0.02] p-3"
+                className="plate-tile space-y-1.5 rounded-xl border border-white/[0.07] bg-white/[0.025] p-3.5"
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge className={definition.badgeClassName}>
@@ -161,10 +161,10 @@ export function RolesPermissionsPanel({
 
         {/* ------------------------------------------------ the matrix */}
         <div className="space-y-2">
-          <p className="text-sm font-semibold">
+          <p className="plate-zone-title text-sm font-semibold">
             {t("admin.users.permissionsPanel.matrixTitle")}
           </p>
-          <div className="overflow-x-auto rounded-lg border border-white/10">
+          <div className="plate-well overflow-x-auto rounded-xl border border-white/[0.06]">
             <table className="w-full min-w-[620px] text-sm">
               <caption className="sr-only">
                 {t("admin.users.permissionsPanel.matrixTitle")}
@@ -248,14 +248,14 @@ export function RolesPermissionsPanel({
         {tiers.length > 0 ? (
           <div className="space-y-2">
             <div className="space-y-1">
-              <p className="text-sm font-semibold">
+              <p className="plate-zone-title text-sm font-semibold">
                 {t("admin.users.permissionsPanel.tiersTitle")}
               </p>
               <p className="text-xs leading-relaxed text-muted-foreground">
                 {t("admin.users.permissionsPanel.tiersDescription")}
               </p>
             </div>
-            <div className="overflow-x-auto rounded-lg border border-white/10">
+            <div className="plate-well overflow-x-auto rounded-xl border border-white/[0.06]">
               <table className="w-full min-w-[480px] text-sm">
                 <thead>
                   <tr className="border-b border-white/10 bg-white/5">
@@ -382,7 +382,7 @@ function RolePermissionEditor({ roleSlug }: { roleSlug: EditableRoleSlug }) {
   return (
     <div className="space-y-4 rounded-lg border border-white/10 p-4">
       <div className="space-y-1">
-        <p className="text-sm font-semibold">
+        <p className="plate-zone-title text-sm font-semibold">
           {t("admin.users.permissionsPanel.editorTitle", {
             role: t(ROLE_DEFINITIONS[roleSlug].labelKey),
           })}

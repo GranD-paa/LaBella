@@ -67,7 +67,7 @@ export function LevelCategoryGrid({ language, level }: LevelCategoryGridProps) {
             ) : null}
           </div>
 
-          <div className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="plate-well flex flex-col gap-3 rounded-xl border border-white/[0.06] p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-accent/15 text-brand-accent">
                 <Sparkles className="h-4 w-4" />

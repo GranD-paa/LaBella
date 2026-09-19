@@ -183,7 +183,7 @@ export function SubscriptionView({
       <div className="flex flex-col items-center gap-3">
         {canPayInRial ? (
           <div
-            className="inline-flex rounded-xl border border-white/10 bg-white/5 p-1"
+            className="plate-well inline-flex rounded-xl border border-white/[0.06] p-1"
             role="group"
             aria-label={t("subscription.currencyGroupLabel")}
           >
@@ -212,7 +212,7 @@ export function SubscriptionView({
 
         {canPayQuarterly ? (
           <div
-            className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 p-1"
+            className="plate-well inline-flex items-center rounded-xl border border-white/[0.06] p-1"
             role="group"
             aria-label={t("subscription.periodGroupLabel")}
           >
@@ -269,7 +269,7 @@ export function SubscriptionView({
         ).map((key) => (
           <div
             key={key}
-            className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center"
+            className="brand-surface p-4 text-center"
           >
             <Sparkles className="mx-auto mb-2 h-5 w-5 text-brand-accent" />
             <p className="text-sm font-medium">{t(key)}</p>
@@ -277,7 +277,7 @@ export function SubscriptionView({
         ))}
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6">
+      <section className="brand-surface p-5 sm:p-6">
         <div className="flex items-start gap-3">
           <Lock className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
           <p className="text-sm leading-relaxed text-muted-foreground">

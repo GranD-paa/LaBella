@@ -86,7 +86,7 @@ export function ContactView({ defaultName, defaultEmail }: ContactViewProps) {
         ).map(({ icon: Icon, titleKey, valueKey, hintKey }) => (
           <div
             key={titleKey}
-            className="rounded-2xl border border-white/10 bg-white/5 p-5"
+            className="brand-surface p-5"
           >
             <Icon className="mb-3 h-5 w-5 text-brand-accent" />
             <p className="text-sm font-medium text-muted-foreground">{t(titleKey)}</p>
@@ -160,7 +160,7 @@ export function ContactView({ defaultName, defaultEmail }: ContactViewProps) {
         </form>
 
         <aside className="space-y-4">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+          <div className="brand-surface p-6">
             <h3 className="font-semibold">{t("contact.helpTitle")}</h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               {(

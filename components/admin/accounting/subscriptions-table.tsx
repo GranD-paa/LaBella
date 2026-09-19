@@ -48,7 +48,7 @@ export function SubscriptionsTable({
       : t("admin.accounting.subscribers.renewsOn");
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-white/10">
+    <div className="plate-well overflow-x-auto rounded-xl border border-white/[0.06]">
       <Table>
         <TableHeader>
           <TableRow>

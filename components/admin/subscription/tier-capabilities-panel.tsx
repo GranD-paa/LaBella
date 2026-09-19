@@ -220,7 +220,7 @@ export function TierCapabilitiesPanel({
             );
           })}
 
-        <div className="flex flex-wrap gap-4 rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-muted-foreground">
+        <div className="plate-well flex flex-wrap gap-4 rounded-xl border border-white/[0.06] p-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <ImageIcon className="h-3.5 w-3.5" />
             {t("admin.subscription.capabilities.vocabulary")}

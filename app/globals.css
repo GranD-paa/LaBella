@@ -109,13 +109,78 @@
    * Safe to change here: the landing page has its own glass idiom and the blog
    * its own palette, and neither uses this class or the shared Card.
    */
+  /*
+   * The shared panel, cut from the same metal as the plate.
+   *
+   * Everything that is not a whole screen is made of this — an admin panel, a
+   * plan card, a lesson tile — and it was a flat fill: one colour top to
+   * bottom with nothing above it. Beside a lit plate that reads as a box
+   * someone forgot to finish, which is exactly what it looked like under the
+   * admin dashboard. It gets the plate's three moves at about a third of the
+   * strength: a top edge that catches the lamp and falls away along its own
+   * length, one warm light over the corner the reading starts at, and grain.
+   *
+   * Painted as background layers rather than pseudo-elements on purpose.
+   * Three dozen components already position things inside a panel, and giving
+   * every one of them a new stacking context and a clipping box would be a far
+   * larger change than a colour is worth. The grain carries its own opacity
+   * inside the SVG for the same reason: a background cannot be faded on its
+   * own, and a layer that could be would have to be an element.
+   */
   .brand-surface {
-    @apply rounded-2xl border border-white/[0.06];
-    background: linear-gradient(177deg, #1d0639 0%, #120229 62%, #0f0123 100%);
+    --panel-lamp: 84%;
+    --panel-flow: left;
+
+    @apply border border-white/[0.06];
+    border-radius: 1.25rem;
+    background-color: #120229;
+    background-image:
+      linear-gradient(
+        to var(--panel-flow),
+        rgba(255, 236, 196, 0.34),
+        rgba(255, 255, 255, 0.05) 56%,
+        transparent 88%
+      ),
+      radial-gradient(
+        22rem 11rem at var(--panel-lamp) -3rem,
+        rgba(251, 191, 36, 0.14),
+        transparent 72%
+      ),
+      radial-gradient(
+        30rem 15rem at var(--panel-lamp) -4rem,
+        rgba(132, 22, 204, 0.32),
+        transparent 72%
+      ),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"),
+      linear-gradient(177deg, #1d0639 0%, #120229 62%, #0f0123 100%);
+    background-size:
+      100% 1px,
+      auto,
+      auto,
+      180px 180px,
+      auto;
+    background-position:
+      top,
+      center,
+      center,
+      center,
+      center;
+    background-repeat:
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      repeat,
+      no-repeat;
     box-shadow:
-      inset 0 1px 0 0 rgba(255, 236, 196, 0.08),
       inset 0 -1px 0 0 rgba(0, 0, 0, 0.45),
       0 28px 56px -38px rgba(0, 0, 0, 0.9);
+  }
+
+  /* The lamp hangs over the corner the language starts at, here as on the
+     plate. */
+  [dir="ltr"] .brand-surface {
+    --panel-lamp: 16%;
+    --panel-flow: right;
   }
 
   .brand-highlight {
@@ -866,6 +931,13 @@
   border-radius: 999px;
   background: #fbbf24;
   box-shadow: 0 0 10px 0 rgba(251, 191, 36, 0.85);
+}
+
+/* A title that leads nothing — the name of a plan, of a lesson, of one card
+   in a grid. The tick marks the start of a region, and a card in a grid is not
+   a region; it is the thing inside one. */
+.plate-no-tick::before {
+  content: none;
 }
 
 /* The eyebrow.

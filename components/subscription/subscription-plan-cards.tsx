@@ -192,7 +192,7 @@ export function SubscriptionPlanCards({
                   <PlanIcon className="h-6 w-6 text-brand-accent" />
                 </div>
                 <div className="space-y-2">
-                  <CardTitle className="text-xl">{planName}</CardTitle>
+                  <CardTitle className="plate-no-tick text-xl">{planName}</CardTitle>
                   <div className="flex flex-col items-center gap-1">
                     {hasDiscount ? (
                       <span className="text-sm text-muted-foreground line-through">

@@ -214,7 +214,7 @@ export function UserManagementPanel({
             {t("admin.users.noResults")}
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-white/10">
+          <div className="plate-well overflow-x-auto rounded-xl border border-white/[0.06]">
             <Table>
               <TableHeader>
                 <TableRow>

@@ -99,7 +99,7 @@ export function CurriculumLevelManager({
 
         {/* CEFR roadmap: a quick visual of how far this language's curriculum
             has grown, and a nudge toward the next stage worth building. */}
-        <div className="flex items-center overflow-x-auto rounded-lg border border-white/10 bg-muted/10 px-4 py-4">
+        <div className="plate-well flex items-center overflow-x-auto rounded-xl border border-white/[0.06] px-4 py-4">
           {CEFR_BANDS.map((band, index) => {
             const count = bandCounts.get(band) ?? 0;
             const hasLevels = count > 0;

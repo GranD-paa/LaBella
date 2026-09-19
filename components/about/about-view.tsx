@@ -88,7 +88,7 @@ export function AboutView() {
               <span className="absolute -start-[1.78rem] top-1 flex h-5 w-5 items-center justify-center rounded-full border border-brand-accent/40 bg-background text-[10px] font-bold text-brand-accent">
                 {index + 1}
               </span>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="plate-tile rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4">
                 <p className="font-medium">{t(`${key}.title`)}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {t(`${key}.description`)}
@@ -103,7 +103,7 @@ export function AboutView() {
         {(["learners", "languages", "lessons"] as const).map((key) => (
           <div
             key={key}
-            className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center"
+            className="brand-surface p-5 text-center"
           >
             <p className="text-3xl font-bold text-brand-accent">
               {t(`about.stats.${key}.value`)}
